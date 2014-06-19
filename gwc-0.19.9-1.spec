@@ -25,7 +25,7 @@ up noisey audio files, in preparation for burning
 to CD's.  The typical application is to record
 the audio from vinyl LP's, 45's, 78's, etc to a
 hard disk as a 16bit,stereo,44.1khz wave formated file,
-and the use GWC to apply denoising and declicking
+and then use GWC to apply denoising and declicking
 algorithms.
 
 %prep
