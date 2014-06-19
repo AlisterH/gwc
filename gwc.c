@@ -1763,16 +1763,18 @@ void destroy(GtkWidget * widget, gpointer data)
 	gtk_main_quit();
 }
 
-void about(GtkWidget * widget, gpointer data)
+void about(GtkWidget *window)
 {
     const gchar *authors[] = { "Jeffrey J. Welty", "James Tappin", "Ian Leonard", "Bill Jetzer", "Charles Morgon", "Frank Freudenberg", "Thiemo Gehrke", "Rob Frohne", NULL };
-    gtk_widget_show(gnome_about_new("Gnome Wave Cleaner",
-				    VERSION,
-				    "Copyright 2001,2002,2003,2004,2005 Redhawk.org",
-				    "An application to aid in denoising (hiss & clicks) of audio files",
-				    authors,
-				    NULL,
-				    NULL,NULL));
+
+    gtk_show_about_dialog(GTK_WINDOW( window ),
+				    "program-name", "Gnome Wave Cleaner",
+				    "version", VERSION,
+				    "copyright", "Copyright 2001, 2002, 2003, 2004, 2005 Redhawk.org",
+				    "website", "http://gwc.sourceforge.net/",
+				    "comments", "An application to aid in denoising (hiss & clicks) of audio files",
+				    "authors", authors,
+				    NULL);
 }
 
 void main_redraw(int cursor_flag, int redraw_data)
