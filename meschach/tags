@@ -1,0 +1,829 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.5.2	//
+ABS	extras.c	200;"	d	file:
+ANON	itertort.c	52;"	d	file:
+ANSI_OR_VAR	memtort.c	736;"	d	file:
+ANSI_OR_VAR	memtort.c	740;"	d	file:
+ASYM	itertort.c	53;"	d	file:
+BKPfactor	bkpfacto.c	/^MAT	*BKPfactor(A,pivot,blocks)$/;"	f
+BKPsolve	bkpfacto.c	/^VEC	*BKPsolve(A,pivot,block,b,x)$/;"	f
+CHfactor	chfactor.c	/^MAT	*CHfactor(A)$/;"	f
+CHsolve	chfactor.c	/^VEC	*CHsolve(A,b,x)$/;"	f
+COL	torture.c	700;"	d	file:
+DIM	mfuntort.c	40;"	d	file:
+Dsolve	solve.c	/^VEC	*Dsolve(A,b,x)$/;"	f
+Dv_mlt	itertort.c	/^VEC	*Dv_mlt(d, x, out)$/;"	f
+EF_ABORT	err.c	53;"	d	file:
+EF_EXIT	err.c	52;"	d	file:
+EF_JUMP	err.c	54;"	d	file:
+EF_SILENT	err.c	55;"	d	file:
+EPS	itertort.c	45;"	d	file:
+EPS	itertort.c	48;"	d	file:
+EPS	sptort.c	43;"	d	file:
+EPS	sptort.c	45;"	d	file:
+E_SIGNAL	err.c	58;"	d	file:
+Err_list	err.c	/^}  Err_list;$/;"	t	file:
+FAC	init.c	243;"	d	file:
+FALSE	err.c	49;"	d	file:
+FOO_1	memtort.c	/^} FOO_1;$/;"	t	file:
+FOO_2	memtort.c	/^} FOO_2;$/;"	t	file:
+FOO_LIST	memtort.c	49;"	d	file:
+FOO_NUM_TYPES	memtort.c	158;"	d	file:
+Hfactor	hessen.c	/^MAT	*Hfactor(A, diag, beta)$/;"	f
+KK	itertort.c	46;"	d	file:
+KK	itertort.c	49;"	d	file:
+LDIAG	torture.c	702;"	d	file:
+LDLfactor	chfactor.c	/^MAT	*LDLfactor(A)$/;"	f
+LDLsolve	chfactor.c	/^VEC	*LDLsolve(LDL,b,x)$/;"	f
+LDLupdate	update.c	/^MAT	*LDLupdate(CHmat,w,alpha)$/;"	f
+LTsolve	solve.c	/^VEC	*LTsolve(L,b,out,diag)$/;"	f
+LUTsolve	lufactor.c	/^VEC	*LUTsolve(LU,pivot,b,x)$/;"	f
+LUcondest	lufactor.c	/^double	LUcondest(LU,pivot)$/;"	f
+LUfactor	lufactor.c	/^MAT	*LUfactor(A,pivot)$/;"	f
+LUsolve	lufactor.c	/^VEC	*LUsolve(LU,pivot,b,x)$/;"	f
+Lsolve	solve.c	/^VEC	*Lsolve(matrix,b,out,diag)$/;"	f
+M3D_LIST	tutadv.c	6;"	d	file:
+M3D_NUM	tutadv.c	129;"	d	file:
+MAT3D	tutadv.c	/^} MAT3D;$/;"	t	file:
+MATLAB_NAME	torture.c	92;"	d	file:
+MATLAB_NAME	ztorture.c	87;"	d	file:
+MAXERR	err.c	86;"	d	file:
+MAXWARN	err.c	96;"	d	file:
+MAX_ERRS	err.c	100;"	d	file:
+MAX_STACK	ivecop.c	245;"	d	file:
+MAX_STACK	svd.c	42;"	d	file:
+MAX_STACK	vecop.c	508;"	d	file:
+MAX_TEST_ERR	torture.c	48;"	d	file:
+MCHfactor	chfactor.c	/^MAT	*MCHfactor(A,tol)$/;"	f
+MEMCHK	torture.c	54;"	d	file:
+MEMCHK	ztorture.c	47;"	d	file:
+MEM_COPY	extras.c	/^void	MEM_COPY(from,to,len)$/;"	f
+MEM_NUM_STD_TYPES	meminfo.c	70;"	d	file:
+MEM_STAT_STRUCT	memstat.c	/^} MEM_STAT_STRUCT;$/;"	t	file:
+MEM_ZERO	extras.c	/^void	MEM_ZERO(ptr,len)$/;"	f
+MINROWLEN	sparse.c	39;"	d	file:
+MINROWLEN	sprow.c	39;"	d	file:
+MINSCRATCH	sparseio.c	187;"	d	file:
+MODULUS	init.c	154;"	d	file:
+MODULUS	init.c	156;"	d	file:
+MODULUS	init.c	241;"	d	file:
+MTX_FN	conjgrad.c	/^typedef VEC	*(*MTX_FN)();$/;"	t	file:
+MZ	init.c	158;"	d	file:
+MZ	init.c	242;"	d	file:
+Maxpy	extras.c	/^void	Maxpy(len,alpha,x,y)$/;"	f
+Mcopy	extras.c	/^void	Mcopy(len,x,y)$/;"	f
+Mdot	extras.c	/^double	Mdot(len,x,y)$/;"	f
+Mmm	extras.c	/^void	Mmm(m,n,p,alpha,A,Aj0,B,Bj0,C,Cj0)$/;"	f
+Mmmtr	extras.c	/^void	Mmmtr(m,n,p,alpha,A,Aj0,B,Bj0,C,Cj0)$/;"	f
+Mmtrm	extras.c	/^void	Mmtrm(m,n,p,alpha,A,Aj0,B,Bj0,C,Cj0)$/;"	f
+Mmtrmtr	extras.c	/^void	Mmtrmtr(m,n,p,alpha,A,Aj0,B,Bj0,C,Cj0)$/;"	f
+Mmv	extras.c	/^void	Mmv(m,n,alpha,A,j0,x,beta,y)$/;"	f
+Mnorm1	extras.c	/^double	Mnorm1(len,x)$/;"	f
+Mnorm2	extras.c	/^double	Mnorm2(len,x)$/;"	f
+Mnorminf	extras.c	/^double	Mnorminf(len,x)$/;"	f
+Mscale	extras.c	/^void	Mscale(len,alpha,x)$/;"	f
+Mswap	extras.c	/^void	Mswap(len,x,y)$/;"	f
+Mupdate	extras.c	/^void	Mupdate(m,n,alpha,x,y,A,j0)$/;"	f
+Mvm	extras.c	/^void	Mvm(m,n,alpha,A,j0,x,beta,y)$/;"	f
+N	tutorial.c	202;"	d	file:
+PI	tutorial.c	205;"	d	file:
+QRCPfactor	qrfactor.c	/^MAT	*QRCPfactor(A,diag,px)$/;"	f
+QRCPsolve	qrfactor.c	/^VEC	*QRCPsolve(QR,diag,pivot,b,x)$/;"	f
+QRTsolve	qrfactor.c	/^VEC *QRTsolve(A,diag,c,sc)$/;"	f
+QRcondest	qrfactor.c	/^double	QRcondest(QR)$/;"	f
+QRfactor	qrfactor.c	/^MAT	*QRfactor(A,diag)$/;"	f
+QRsolve	qrfactor.c	/^VEC	*QRsolve(QR,diag,b,x)$/;"	f
+QRupdate	update.c	/^MAT	*QRupdate(Q,R,u,v)$/;"	f
+REGISTER_RICH	extras.c	90;"	d	file:
+SAVE_FILE	torture.c	91;"	d	file:
+SAVE_FILE	ztorture.c	86;"	d	file:
+SQRT2	symmeig.c	41;"	d	file:
+TRUE	err.c	50;"	d	file:
+TYPE_FOO_1	memtort.c	52;"	d	file:
+TYPE_FOO_2	memtort.c	53;"	d	file:
+TYPE_MAT3D	tutadv.c	7;"	d	file:
+UDIAG	torture.c	701;"	d	file:
+UTmlt	qrfactor.c	/^static	VEC	*UTmlt(U,x,out)$/;"	f	file:
+UTsolve	solve.c	/^VEC	*UTsolve(U,b,out,diag)$/;"	f
+Umlt	qrfactor.c	/^static	VEC	*Umlt(U,x,out)$/;"	f	file:
+Usolve	solve.c	/^VEC	*Usolve(matrix,b,out,diag)$/;"	f
+VEC2MAT	tutorial.c	203;"	d	file:
+Z	mfunc.c	292;"	d	file:
+Z	mfunc.c	315;"	d	file:
+Z	mfunc.c	392;"	d	file:
+Z	mfunc.c	59;"	d	file:
+Z	mfunc.c	98;"	d	file:
+ZZ	mfunc.c	393;"	d	file:
+_Qsolve	qrfactor.c	/^VEC	*_Qsolve(QR,diag,b,x,tmp)$/;"	f
+__add__	machine.c	/^void	__add__(dp1,dp2,out,len)$/;"	f
+__ip__	machine.c	/^double	__ip__(dp1,dp2,len)$/;"	f
+__mltadd__	machine.c	/^void	__mltadd__(dp1,dp2,s,len)$/;"	f
+__smlt__	machine.c	/^void	__smlt__(dp,s,out,len)$/;"	f
+__sub__	machine.c	/^void	__sub__(dp1,dp2,out,len)$/;"	f
+__zadd__	zmachine.c	/^void	__zadd__(zp1,zp2,out,len)$/;"	f
+__zconj__	zmachine.c	/^void	__zconj__(zp,len)$/;"	f
+__zero__	machine.c	/^void	__zero__(dp,len)$/;"	f
+__zip__	zmachine.c	/^complex	__zip__(zp1,zp2,len,flag)$/;"	f
+__zmlt__	zmachine.c	/^void	__zmlt__(zp,s,out,len)$/;"	f
+__zmltadd__	zmachine.c	/^void	__zmltadd__(zp1,zp2,s,len,flag)$/;"	f
+__zsub__	zmachine.c	/^void	__zsub__(zp1,zp2,out,len)$/;"	f
+__zzero__	zmachine.c	/^void	__zzero__(zp,len)$/;"	f
+_hhtrcols	hsehldr.c	/^MAT	*_hhtrcols(M,i0,j0,hh,beta,w)$/;"	f
+_in_prod	vecop.c	/^double	_in_prod(a,b,i0)$/;"	f
+_m_copy	copy.c	/^MAT	*_m_copy(in,out,i0,j0)$/;"	f
+_m_exp	mfunc.c	/^MAT *_m_exp(A,eps,out,q_out,j_out)$/;"	f
+_m_pow	mfunc.c	/^MAT	*_m_pow(A, p, tmp, out)$/;"	f
+_set_col	submat.c	/^MAT	*_set_col(mat,col,vec,i0)$/;"	f
+_set_row	submat.c	/^MAT	*_set_row(mat,row,vec,j0)$/;"	f
+_v_copy	copy.c	/^VEC	*_v_copy(in,out,i0)$/;"	f
+_v_map	vecop.c	/^VEC	*_v_map(f,params,x,out)$/;"	f
+_v_norm1	norm.c	/^double	_v_norm1(x,scale)$/;"	f
+_v_norm2	norm.c	/^double	_v_norm2(x,scale)$/;"	f
+_v_norm_inf	norm.c	/^double	_v_norm_inf(x,scale)$/;"	f
+_zQsolve	zqrfctr.c	/^ZVEC	*_zQsolve(QR,diag,b,x,tmp)$/;"	f
+_zhhtrcols	zhsehldr.c	/^ZMAT	*_zhhtrcols(M,i0,j0,hh,beta,w)$/;"	f
+_zin_prod	zvecop.c	/^complex	_zin_prod(a,b,i0,flag)$/;"	f
+_zm_copy	zcopy.c	/^ZMAT	*_zm_copy(in,out,i0,j0)$/;"	f
+_zv_copy	zcopy.c	/^ZVEC	*_zv_copy(in,out,i0)$/;"	f
+_zv_map	zvecop.c	/^ZVEC	*_zv_map(f,params,x,out)$/;"	f
+_zv_norm1	znorm.c	/^double	_zv_norm1(x,scale)$/;"	f
+_zv_norm2	znorm.c	/^double	_zv_norm2(x,scale)$/;"	f
+_zv_norm_inf	znorm.c	/^double	_zv_norm_inf(x,scale)$/;"	f
+a	memtort.c	/^   Real (*a)[10];$/;"	m	file:
+a	memtort.c	/^  Real (*a)[2];$/;"	m	file:
+alpha	bkpfacto.c	42;"	d	file:
+alpha	spbkp.c	45;"	d	file:
+arnoldi	arnoldi.c	/^MAT	*arnoldi(A,A_param,x0,m,h_rem,Q,H)$/;"	f
+b2s	zschur.c	42;"	d	file:
+band2mat	bdfactor.c	/^MAT *band2mat(bA,A)$/;"	f
+base	tutadv.c	/^        Real *base, **me2d;  \/* me and me2d are additional pointers $/;"	m	file:
+bdLDLfactor	bdfactor.c	/^BAND *bdLDLfactor(A)$/;"	f
+bdLDLsolve	bdfactor.c	/^VEC    *bdLDLsolve(A,b,x)$/;"	f
+bdLUfactor	bdfactor.c	/^BAND	*bdLUfactor(bA,pivot)$/;"	f
+bdLUsolve	bdfactor.c	/^VEC	*bdLUsolve(bA,pivot,b,x)$/;"	f
+bd_copy	bdfactor.c	/^BAND *bd_copy(A,B)$/;"	f
+bd_free	bdfactor.c	/^int bd_free(A)$/;"	f
+bd_get	bdfactor.c	/^BAND *bd_get(lb,ub,n)$/;"	f
+bd_mv_mlt	bdfactor.c	/^VEC *bd_mv_mlt(A, x, out)$/;"	f
+bd_resize	bdfactor.c	/^BAND *bd_resize(A,new_lb,new_ub,new_n)$/;"	f
+bd_transp	bdfactor.c	/^BAND *bd_transp(in,out)$/;"	f
+bd_zero	bdfactor.c	/^BAND	*bd_zero(A)$/;"	f
+bds_mltadd	bdfactor.c	/^BAND	*bds_mltadd(A,B,alpha,OUT)$/;"	f
+bdv_mltadd	bdfactor.c	/^VEC	*bdv_mltadd(x,y,bA,s,out)$/;"	f
+bfin_vec	matrixio.c	/^VEC     *bfin_vec(fp,vec)$/;"	f
+bifactor	svd.c	/^MAT	*bifactor(A,U,V)$/;"	f
+bisvd	svd.c	/^VEC	*bisvd(d,f,U,V)$/;"	f
+biv_finput	matrixio.c	/^IVEC	*biv_finput(fp,iv)$/;"	f
+bkp_bump_col	spbkp.c	/^row_elt	*bkp_bump_col(A, j, row, idx)$/;"	f
+bkp_interchange	spbkp.c	/^SPMAT	*bkp_interchange(A, i1, i2)$/;"	f
+bkp_swap_elt	spbkp.c	/^static SPMAT	*bkp_swap_elt(A,i1,j1,idx1,i2,j2,idx2)$/;"	f	file:
+bm_finput	matrixio.c	/^MAT     *bm_finput(fp,mat)$/;"	f
+bpx_finput	matrixio.c	/^PERM    *bpx_finput(fp,px)$/;"	f
+btos	bkpfacto.c	38;"	d	file:
+btos	spbkp.c	48;"	d	file:
+btos	spswap.c	40;"	d	file:
+bump_col	spswap.c	/^row_elt *bump_col(A, col, row_num, idx)$/;"	f
+bzm_finput	zmatio.c	/^ZMAT     *bzm_finput(fp,mat)$/;"	f
+bzv_finput	zmatio.c	/^ZVEC     *bzv_finput(fp,vec)$/;"	f
+catch_FPE	err.c	/^void	catch_FPE()$/;"	f
+cg_num_iters	conjgrad.c	/^int	cg_num_iters;$/;"	v
+cg_set_maxiter	conjgrad.c	/^int	cg_set_maxiter(numiter)$/;"	f
+cgs	conjgrad.c	/^VEC	*cgs(A,A_params,b,r0,tol,x)$/;"	f
+chase_col	spswap.c	/^row_elt *chase_col(A, col, row_num, idx, max_row)$/;"	f
+chase_past	spswap.c	/^row_elt *chase_past(A, col, row_num, idx, min_row)$/;"	f
+checkpt	ztorture.c	49;"	d	file:
+chk_col_access	spbkp.c	/^int	chk_col_access(A)$/;"	f
+chk_col_accessSPT	sptort.c	/^int	chk_col_accessSPT(A)$/;"	f
+cmp_perm	torture.c	/^int	cmp_perm(pi1, pi2)$/;"	f
+cmp_perm	ztorture.c	/^int	cmp_perm(pi1, pi2)$/;"	f
+cnt_errs	err.c	/^static	int	err_flag = EF_EXIT, num_errs = 0, cnt_errs = 1;$/;"	v	file:
+col_cmp	spbkp.c	/^static int	col_cmp(e1,e2)$/;"	f	file:
+col_list	spchfctr.c	/^			*col_list = (int *)NULL;$/;"	v	file:
+comp_AAT	spchfctr.c	/^SPMAT	*comp_AAT(A)$/;"	f
+count_errs	err.c	/^int	count_errs(flag)$/;"	f
+cube	norm.c	/^double cube(x)$/;"	f
+d_save	matlab.c	/^double	d_save(fp,x,name)$/;"	f
+dbl_cmp	itersym.c	/^static	int	dbl_cmp(x,y)$/;"	f	file:
+dbl_cmp	lanczos.c	/^static	int	dbl_cmp(x,y)$/;"	f	file:
+dclean	dmacheps.c	/^double	dclean(x)$/;"	f
+dim	memtort.c	/^   int dim;$/;"	m	file:
+dim	memtort.c	/^  int dim;$/;"	m	file:
+err_flag	err.c	/^static	int	err_flag = EF_EXIT, num_errs = 0, cnt_errs = 1;$/;"	v	file:
+err_is_list_attached	err.c	/^int err_is_list_attached(list_num)$/;"	f
+err_list	err.c	/^static Err_list     err_list[ERR_LIST_MAX_LEN] = {$/;"	v	file:
+err_list_attach	err.c	/^int err_list_attach(list_num, list_len,err_ptr,warn)$/;"	f
+err_list_end	err.c	/^static int err_list_end = 2;   \/* number of elements in err_list *\/$/;"	v	file:
+err_list_free	err.c	/^int err_list_free(list_num)$/;"	f
+err_mesg	err.c	/^static	char	*err_mesg[] =$/;"	v	file:
+errmesg	iotort.c	36;"	d	file:
+errmesg	itertort.c	39;"	d	file:
+errmesg	memtort.c	40;"	d	file:
+errmesg	mfuntort.c	37;"	d	file:
+errmesg	sptort.c	37;"	d	file:
+errmesg	torture.c	38;"	d	file:
+errmesg	ztorture.c	40;"	d	file:
+ev_err	err.c	/^int	ev_err(file,err_num,line_num,fn_name,list_num)$/;"	f
+ex_sol	itertort.c	/^static VEC *ex_sol = VNULL;$/;"	v	file:
+f	tutorial.c	/^VEC	*f(t,x,out)$/;"	f
+f1	tutorial.c	/^double f1(x,y)$/;"	f
+fclean	fmacheps.c	/^double	fclean(x)$/;"	f
+fft	fft.c	/^void    fft(x_re,x_im)$/;"	f
+fin_double	otherio.c	/^double	fin_double(fp,s,low,high)$/;"	f
+fin_int	otherio.c	/^int	fin_int(fp,s,low,high)$/;"	f
+fix_dim	memtort.c	/^   int fix_dim;$/;"	m	file:
+fix_dim	memtort.c	/^  int fix_dim;$/;"	m	file:
+fixsvd	svd.c	/^static void	fixsvd(d,U,V)$/;"	f	file:
+float_error	err.c	/^static void	float_error(num)$/;"	f	file:
+fname	memstat.c	/^  char	*fname;	\/* source file name where last registered *\/$/;"	m	file:
+foo_1_free	memtort.c	/^int foo_1_free(f)$/;"	f
+foo_1_get	memtort.c	/^FOO_1 *foo_1_get(dim)$/;"	f
+foo_2_free	memtort.c	/^int foo_2_free(f)$/;"	f
+foo_2_get	memtort.c	/^FOO_2 *foo_2_get(dim)$/;"	f
+foo_free_func	memtort.c	/^int (*foo_free_func[FOO_NUM_TYPES])() = {$/;"	v
+foo_info_sum	memtort.c	/^static MEM_ARRAY foo_info_sum[FOO_NUM_TYPES];$/;"	v	file:
+foo_type_name	memtort.c	/^char *foo_type_name[] = {$/;"	v
+format	matrixio.c	/^static const char    *format = "%14.9g ";$/;"	v	file:
+fy_or_n	otherio.c	/^int	fy_or_n(fp,s)$/;"	f
+gen_non_symm	memtort.c	/^SPMAT  *gen_non_symm(m,n)$/;"	f
+gen_sym_precond	itertort.c	/^SPMAT *gen_sym_precond(A)$/;"	f
+get_col	submat.c	/^VEC	*get_col(mat,col,vec)$/;"	f
+get_row	submat.c	/^VEC	*get_row(mat,row,vec)$/;"	f
+givens	givens.c	/^void	givens(x,y,c,s)$/;"	f
+gmres	arnoldi.c	/^VEC	*gmres(A,A_param,m,Q,R,b,tol,x)$/;"	f
+hhldr3	schur.c	/^static	void	hhldr3(x,y,z,nu1,beta,newval)$/;"	f	file:
+hhldr3cols	schur.c	/^static	void	hhldr3cols(A,k,j0,beta,nu1,nu2,nu3)$/;"	f	file:
+hhldr3rows	schur.c	/^static	void	hhldr3rows(A,k,i0,beta,nu1,nu2,nu3)$/;"	f	file:
+hhtrcols	hsehldr.c	/^MAT	*hhtrcols(M,i0,j0,hh,beta)$/;"	f
+hhtrrows	hsehldr.c	/^MAT	*hhtrrows(M,i0,j0,hh,beta)$/;"	f
+hhtrvec	hsehldr.c	/^VEC	*hhtrvec(hh,beta,i0,in,out)$/;"	f
+hhvec	hsehldr.c	/^VEC	*hhvec(vec,i0,beta,out,newval)$/;"	f
+ifft	fft.c	/^void	ifft(x_re,x_im)$/;"	f
+ifin_vec	matrixio.c	/^VEC     *ifin_vec(fp,vec)$/;"	f
+iiv_finput	matrixio.c	/^IVEC	*iiv_finput(fp,iv)$/;"	f
+im_finput	matrixio.c	/^MAT     *im_finput(fp,mat)$/;"	f
+index	tutorial.c	206;"	d	file:
+inext	init.c	/^static int  inext = 0, inextp = 31;$/;"	v	file:
+inextp	init.c	/^static int  inext = 0, inextp = 31;$/;"	v	file:
+interchange	bkpfacto.c	/^static void interchange(A,i,j)$/;"	f	file:
+ipx_finput	matrixio.c	/^PERM    *ipx_finput(fp,px)$/;"	f
+is_zero	zhsehldr.c	44;"	d	file:
+is_zero	zlufctr.c	38;"	d	file:
+is_zero	zmatop.c	34;"	d	file:
+is_zero	zqrfctr.c	49;"	d	file:
+is_zero	zschur.c	41;"	d	file:
+is_zero	zsolve.c	39;"	d	file:
+iter_arnoldi	iternsym.c	/^MAT	*iter_arnoldi(ip,h_rem,Q,H)$/;"	f
+iter_arnoldi_iref	iternsym.c	/^MAT	*iter_arnoldi_iref(ip,h_rem,Q,H)$/;"	f
+iter_cg	itersym.c	/^VEC  *iter_cg(ip)$/;"	f
+iter_cg1	itersym.c	/^VEC  *iter_cg1(ip)$/;"	f
+iter_cgne	iternsym.c	/^VEC  *iter_cgne(ip)$/;"	f
+iter_cgs	iternsym.c	/^VEC	*iter_cgs(ip,r0)$/;"	f
+iter_copy	iter0.c	/^ITER *iter_copy(ip1,ip2)$/;"	f
+iter_copy2	iter0.c	/^ITER *iter_copy2(ip1,ip2)$/;"	f
+iter_dump	iter0.c	/^void iter_dump(fp,ip)$/;"	f
+iter_free	iter0.c	/^int iter_free(ip)$/;"	f
+iter_gen_nonsym	iter0.c	/^SPMAT	*iter_gen_nonsym(m,n,nrow,diag)$/;"	f
+iter_gen_nonsym_posdef	iter0.c	/^SPMAT	*iter_gen_nonsym_posdef(n,nrow)$/;"	f
+iter_gen_sym	iter0.c	/^SPMAT	*iter_gen_sym(n,nrow)$/;"	f
+iter_get	iter0.c	/^ITER *iter_get(lenb, lenx)$/;"	f
+iter_gmres	iternsym.c	/^VEC	*iter_gmres(ip)$/;"	f
+iter_lanczos	itersym.c	/^void	iter_lanczos(ip,a,b,beta2,Q)$/;"	f
+iter_lanczos2	itersym.c	/^VEC	*iter_lanczos2(ip,evals,err_est)$/;"	f
+iter_lsqr	iternsym.c	/^VEC	*iter_lsqr(ip)$/;"	f
+iter_mgcr	iternsym.c	/^VEC *iter_mgcr(ip)$/;"	f
+iter_mod_info	itertort.c	/^void iter_mod_info(ip,nres,res,Bres)$/;"	f
+iter_resize	iter0.c	/^ITER *iter_resize(ip,new_lenb,new_lenx)$/;"	f
+iter_sparnoldi	iternsym.c	/^MAT	*iter_sparnoldi(A,x0,m,h_rem,Q,H)$/;"	f
+iter_spcg	itersym.c	/^VEC  *iter_spcg(A,LLT,b,eps,x,limit,steps)$/;"	f
+iter_spcgne	iternsym.c	/^VEC  *iter_spcgne(A,B,b,eps,x,limit,steps)$/;"	f
+iter_spcgs	iternsym.c	/^VEC	*iter_spcgs(A,B,b,r0,tol,x,limit,steps)$/;"	f
+iter_spgmres	iternsym.c	/^VEC	*iter_spgmres(A,B,b,tol,x,k,limit,steps)$/;"	f
+iter_splanczos	itersym.c	/^void    iter_splanczos(A,m,x0,a,b,beta2,Q)$/;"	f
+iter_splanczos2	itersym.c	/^VEC    *iter_splanczos2(A,m,x0,evals,err_est)$/;"	f
+iter_splsqr	iternsym.c	/^VEC	*iter_splsqr(A,b,tol,x,limit,steps)$/;"	f
+iter_spmgcr	iternsym.c	/^VEC	*iter_spmgcr(A,B,b,tol,x,k,limit,steps)$/;"	f
+iter_std_info	iter0.c	/^void iter_std_info(ip,nres,res,Bres)$/;"	f
+iter_std_stop_crit	iter0.c	/^int iter_std_stop_crit(ip, nres, res, Bres)$/;"	f
+iv_add	ivecop.c	/^IVEC	*iv_add(iv1,iv2,out)$/;"	f
+iv_copy	ivecop.c	/^IVEC	*iv_copy(in,out)$/;"	f
+iv_dump	matrixio.c	/^void	iv_dump(fp,iv)$/;"	f
+iv_finput	matrixio.c	/^IVEC	*iv_finput(fp,x)$/;"	f
+iv_foutput	matrixio.c	/^void	iv_foutput(fp,iv)$/;"	f
+iv_free	ivecop.c	/^int	iv_free(iv)$/;"	f
+iv_free_vars	memory.c	/^int iv_free_vars(IVEC **ipv,...)$/;"	f
+iv_free_vars	memory.c	/^int iv_free_vars(va_alist) va_dcl$/;"	f
+iv_get	ivecop.c	/^IVEC	*iv_get(dim)$/;"	f
+iv_get_vars	memory.c	/^int iv_get_vars(int dim,...) $/;"	f
+iv_get_vars	memory.c	/^int iv_get_vars(va_alist) va_dcl$/;"	f
+iv_min	spbkp.c	/^int	iv_min(iv,index)$/;"	f
+iv_move	ivecop.c	/^IVEC	*iv_move(in,i0,dim0,out,i1)$/;"	f
+iv_resize	ivecop.c	/^IVEC	*iv_resize(iv,new_dim)$/;"	f
+iv_resize_vars	memory.c	/^int iv_resize_vars(int new_dim,...) $/;"	f
+iv_resize_vars	memory.c	/^int iv_resize_vars(va_alist) va_dcl$/;"	f
+iv_sort	ivecop.c	/^IVEC	*iv_sort(x, order)$/;"	f
+iv_sub	ivecop.c	/^IVEC	*iv_sub(iv1,iv2,out)$/;"	f
+iv_zero	init.c	/^IVEC	*iv_zero(ix)$/;"	f
+izm_finput	zmatio.c	/^ZMAT     *izm_finput(fp,mat)$/;"	f
+izv_finput	zmatio.c	/^ZVEC     *izv_finput(fp,vec)$/;"	f
+l	tutadv.c	/^	int l,m,n;    \/* actual dimensions *\/$/;"	m	file:
+lanczos	lanczos.c	/^void	lanczos(A_fn,A_params,m,x0,a,b,beta2,Q)$/;"	f
+lanczos2	lanczos.c	/^VEC	*lanczos2(A_fn,A_params,m,x0,evals,err_est)$/;"	f
+laplacian	tutorial.c	/^SPMAT *laplacian(A)$/;"	f
+len	err.c	/^   unsigned len;    \/* length of the list *\/$/;"	m	file:
+line	ivecop.c	/^static char    line[MAXLINE];$/;"	v	file:
+line	matrixio.c	/^static char line[MAXLINE];$/;"	v	file:
+line	memstat.c	/^  int	line;	\/* line # of file where last registered *\/$/;"	m	file:
+line	sparseio.c	/^static char line[MAXLINE];$/;"	v	file:
+line	zmatio.c	/^static char line[MAXLINE];$/;"	v	file:
+listp	err.c	/^   char **listp;    \/* pointer to a list of errors *\/$/;"	m	file:
+lsqr	conjgrad.c	/^VEC	*lsqr(A,AT,A_params,b,tol,x)$/;"	f
+m	tutadv.c	/^	int l,m,n;    \/* actual dimensions *\/$/;"	m	file:
+m3d_free	tutadv.c	/^int m3d_free(mat)$/;"	f
+m3d_free_funcs	tutadv.c	/^int (*m3d_free_funcs[M3D_NUM])() = {$/;"	v
+m3d_get	tutadv.c	/^MAT3D *m3d_get(l,m,n)$/;"	f
+m3d_names	tutadv.c	/^char *m3d_names[] = {$/;"	v
+m3d_sum	tutadv.c	/^static MEM_ARRAY m3d_sum[M3D_NUM];$/;"	v	file:
+m_add	matop.c	/^MAT	*m_add(mat1,mat2,out)$/;"	f
+m_dump	matrixio.c	/^void    m_dump(fp,a)$/;"	f
+m_exp	mfunc.c	/^MAT *m_exp(A,eps,out)$/;"	f
+m_finput	matrixio.c	/^MAT     *m_finput(fp,a)$/;"	f
+m_foutput	matrixio.c	/^void    m_foutput(fp,a)$/;"	f
+m_free	memory.c	/^int	m_free(mat)$/;"	f
+m_free_vars	memory.c	/^int m_free_vars(MAT **va,...)$/;"	f
+m_free_vars	memory.c	/^int m_free_vars(va_alist) va_dcl$/;"	f
+m_get	memory.c	/^MAT	*m_get(m,n)$/;"	f
+m_get_vars	memory.c	/^int m_get_vars(int m,int n,...) $/;"	f
+m_get_vars	memory.c	/^int m_get_vars(va_alist) va_dcl$/;"	f
+m_ident	init.c	/^MAT	*m_ident(A)$/;"	f
+m_inverse	lufactor.c	/^MAT	*m_inverse(A,out)$/;"	f
+m_load	matlab.c	/^MAT     *m_load(fp,name)$/;"	f
+m_mlt	matop.c	/^MAT	*m_mlt(A,B,OUT)$/;"	f
+m_move	copy.c	/^MAT	*m_move(in,i0,j0,m0,n0,out,i1,j1)$/;"	f
+m_norm1	norm.c	/^double	m_norm1(A)$/;"	f
+m_norm_frob	norm.c	/^double	m_norm_frob(A)$/;"	f
+m_norm_inf	norm.c	/^double	m_norm_inf(A)$/;"	f
+m_ones	init.c	/^MAT	*m_ones(A)$/;"	f
+m_poly	mfunc.c	/^MAT *m_poly(A,a,out)$/;"	f
+m_pow	mfunc.c	/^MAT	*m_pow(A, p, out)$/;"	f
+m_rand	init.c	/^MAT	*m_rand(A)$/;"	f
+m_resize	memory.c	/^MAT	*m_resize(A,new_m,new_n)$/;"	f
+m_resize_vars	memory.c	/^int m_resize_vars(int m,int n,...) $/;"	f
+m_resize_vars	memory.c	/^int m_resize_vars(va_alist) va_dcl$/;"	f
+m_save	matlab.c	/^MAT     *m_save(fp,A,name)$/;"	f
+m_sub	matop.c	/^MAT	*m_sub(mat1,mat2,out)$/;"	f
+m_transp	matop.c	/^MAT	*m_transp(in,out)$/;"	f
+m_version	version.c	/^void	m_version()$/;"	f
+m_zero	init.c	/^MAT	*m_zero(A)$/;"	f
+main	dmacheps.c	/^main()$/;"	f
+main	fmacheps.c	/^main()$/;"	f
+main	iotort.c	/^void main()$/;"	f
+main	itertort.c	/^void	main(argc, argv)$/;"	f
+main	maxint.c	/^main()$/;"	f
+main	memtort.c	/^void main(argc, argv)$/;"	f
+main	mfuntort.c	/^void main()$/;"	f
+main	sptort.c	/^void	main(argc, argv)$/;"	f
+main	torture.c	/^int main(argc, argv)$/;"	f
+main	tutadv.c	/^void main()$/;"	f
+main	tutorial.c	/^void main()$/;"	f
+main	ztorture.c	/^void	main(argc, argv)$/;"	f
+makeH	hessen.c	/^MAT	*makeH(H,Hout)$/;"	f
+makeHQ	hessen.c	/^MAT	*makeHQ(H, diag, beta, Qout)$/;"	f
+makeQ	qrfactor.c	/^MAT	*makeQ(QR,diag,Qout)$/;"	f
+makeR	qrfactor.c	/^MAT	*makeR(QR,Rout)$/;"	f
+mark	memstat.c	/^  int	mark;	\/* what mark is chosen *\/$/;"	m	file:
+mat2band	bdfactor.c	/^BAND *mat2band(A,lb,ub,bA)$/;"	f
+max	norm.c	116;"	d	file:
+max	znorm.c	105;"	d	file:
+max_iter	conjgrad.c	/^static	int	max_iter = 10000;$/;"	v	file:
+max_l	tutadv.c	/^	int max_l, max_m, max_n;    \/* maximal dimensions *\/$/;"	m	file:
+max_m	tutadv.c	/^	int max_l, max_m, max_n;    \/* maximal dimensions *\/$/;"	m	file:
+max_n	tutadv.c	/^	int max_l, max_m, max_n;    \/* maximal dimensions *\/$/;"	m	file:
+max_row_col	spbkp.c	/^static double max_row_col(A,i,j,l)$/;"	f	file:
+me	tutadv.c	/^	Real ***me;    \/* pointer to matrix elements *\/$/;"	m	file:
+me2d	tutadv.c	/^        Real *base, **me2d;  \/* me and me2d are additional pointers $/;"	m	file:
+mem_attach_list	meminfo.c	/^int mem_attach_list(list, ntypes, type_names, free_funcs, info_sum)$/;"	f
+mem_bytes_list	meminfo.c	/^void mem_bytes_list(type,old_size,new_size,list)$/;"	f
+mem_connect	meminfo.c	/^MEM_CONNECT mem_connect[MEM_CONNECT_MAX_LISTS] = {$/;"	v
+mem_dump_list	meminfo.c	/^void mem_dump_list(fp,list)$/;"	f
+mem_free_funcs	meminfo.c	/^static int (*mem_free_funcs[MEM_NUM_STD_TYPES])() = {$/;"	v	file:
+mem_free_vars	meminfo.c	/^int mem_free_vars(list)$/;"	f
+mem_hash	memstat.c	/^static unsigned int mem_hash(ptr)$/;"	f	file:
+mem_hash_idx	memstat.c	/^static unsigned int mem_hash_idx[MEM_HASHSIZE];$/;"	v	file:
+mem_hash_idx_end	memstat.c	/^static unsigned int mem_hash_idx_end = 0;$/;"	v	file:
+mem_info_bytes	meminfo.c	/^long mem_info_bytes(type,list)$/;"	f
+mem_info_file	meminfo.c	/^void mem_info_file(fp,list)$/;"	f
+mem_info_is_on	meminfo.c	/^int mem_info_is_on(void)$/;"	f
+mem_info_numvar	meminfo.c	/^int mem_info_numvar(type,list)$/;"	f
+mem_info_on	meminfo.c	/^int mem_info_on(sw)$/;"	f
+mem_info_sum	meminfo.c	/^static MEM_ARRAY   mem_info_sum[MEM_NUM_STD_TYPES];  $/;"	v	file:
+mem_is_list_attached	meminfo.c	/^int mem_is_list_attached(list)$/;"	f
+mem_lookup	memstat.c	/^static int mem_lookup(var)$/;"	f	file:
+mem_numvar_list	meminfo.c	/^void mem_numvar_list(type,num,list)$/;"	f
+mem_stat_dump	memstat.c	/^void mem_stat_dump(fp,list)$/;"	f
+mem_stat_free_list	memstat.c	/^int mem_stat_free_list(mark,list)$/;"	f
+mem_stat_mark	memstat.c	/^int mem_stat_mark(mark)$/;"	f
+mem_stat_mark_curr	memstat.c	/^static int mem_stat_mark_curr = 0;$/;"	v	file:
+mem_stat_mark_many	memstat.c	/^static int mem_stat_mark_many = 0;$/;"	v	file:
+mem_stat_reg_list	memstat.c	/^int mem_stat_reg_list(var,type,list,fname,line)$/;"	f
+mem_stat_reg_vars	memstat.c	/^int mem_stat_reg_vars(int list,int type,char *fname,int line, ...)$/;"	f
+mem_stat_reg_vars	memstat.c	/^int mem_stat_reg_vars(va_alist) va_dcl$/;"	f
+mem_stat_show_mark	memstat.c	/^int mem_stat_show_mark(void)$/;"	f
+mem_stat_var	memstat.c	/^static MEM_STAT_STRUCT mem_stat_var[MEM_HASHSIZE];$/;"	v	file:
+mem_switched_on	meminfo.c	/^static int	mem_switched_on = MEM_SWITCH_ON_DEF;  \/* on\/off *\/$/;"	v	file:
+mem_type_names	meminfo.c	/^static char *mem_type_names[] = {$/;"	v	file:
+mmtr_mlt	matop.c	/^MAT	*mmtr_mlt(A,B,OUT)$/;"	f
+mrand	init.c	/^double mrand(void)$/;"	f
+mrand_list	init.c	/^static long mrand_list[56];$/;"	v	file:
+mrandlist	init.c	/^void	mrandlist(a, len)$/;"	f
+ms_mltadd	matop.c	/^MAT	*ms_mltadd(A1,A2,s,out)$/;"	f
+mtrm_mlt	matop.c	/^MAT	*mtrm_mlt(A,B,OUT)$/;"	f
+mv_mlt	matop.c	/^VEC	*mv_mlt(A,b,out)$/;"	f
+mv_mltadd	matop.c	/^VEC	*mv_mltadd(v1,v2,A,alpha,out)$/;"	f
+mv_move	copy.c	/^VEC	*mv_move(in,i0,j0,m0,n0,out,i1)$/;"	f
+myqsort	pxop.c	/^static int myqsort(a,num)$/;"	f	file:
+mz_mltadd	zmatop.c	/^ZMAT	*mz_mltadd(A1,A2,s,out)$/;"	f
+n	tutadv.c	/^	int l,m,n;    \/* actual dimensions *\/$/;"	m	file:
+name	torture.c	/^char	name[81] = MATLAB_NAME;$/;"	v
+name	ztorture.c	/^char	name[81] = MATLAB_NAME;$/;"	v
+nonzeros	spbkp.c	/^static int	nonzeros(A)$/;"	f	file:
+norm_equ	itertort.c	/^VEC *norm_equ(A,x,out)$/;"	f
+notice	iotort.c	37;"	d	file:
+notice	itertort.c	40;"	d	file:
+notice	memtort.c	41;"	d	file:
+notice	mfuntort.c	38;"	d	file:
+notice	sptort.c	38;"	d	file:
+notice	torture.c	39;"	d	file:
+notice	ztorture.c	41;"	d	file:
+num_errs	err.c	/^static	int	err_flag = EF_EXIT, num_errs = 0, cnt_errs = 1;$/;"	v	file:
+patch_col	spswap.c	/^void patch_col(A, col, old_row, old_idx, row_num, idx)$/;"	f
+pccg	conjgrad.c	/^VEC	*pccg(A,A_params,M_inv,M_params,b,eps,x)$/;"	f
+product	itersym.c	/^static	double	product(a,offset,expt)$/;"	f	file:
+product	lanczos.c	/^static	double	product(a,offset,expt)$/;"	f	file:
+product2	itersym.c	/^static	double	product2(a,k,expt)$/;"	f	file:
+product2	lanczos.c	/^static	double	product2(a,k,expt)$/;"	f	file:
+px_cols	pxop.c	/^MAT	*px_cols(px,A,out)$/;"	f
+px_copy	copy.c	/^PERM	*px_copy(in,out)$/;"	f
+px_dump	matrixio.c	/^void    px_dump(fp,px)$/;"	f
+px_finput	matrixio.c	/^PERM    *px_finput(fp,px)$/;"	f
+px_foutput	matrixio.c	/^void    px_foutput(fp,px)$/;"	f
+px_free	memory.c	/^int	px_free(px)$/;"	f
+px_free_vars	memory.c	/^int px_free_vars(PERM **vpx,...)$/;"	f
+px_free_vars	memory.c	/^int px_free_vars(va_alist) va_dcl$/;"	f
+px_get	memory.c	/^PERM	*px_get(size)$/;"	f
+px_get_vars	memory.c	/^int px_get_vars(int dim,...) $/;"	f
+px_get_vars	memory.c	/^int px_get_vars(va_alist) va_dcl$/;"	f
+px_ident	init.c	/^PERM	*px_ident(px)$/;"	f
+px_inv	pxop.c	/^PERM	*px_inv(px,out)$/;"	f
+px_mlt	pxop.c	/^PERM	*px_mlt(px1,px2,out)$/;"	f
+px_rand	memtort.c	/^PERM    *px_rand(pi)$/;"	f
+px_rand	torture.c	/^PERM	*px_rand(pi)$/;"	f
+px_rand	ztorture.c	/^PERM	*px_rand(pi)$/;"	f
+px_resize	memory.c	/^PERM	*px_resize(px,new_size)$/;"	f
+px_resize_vars	memory.c	/^int px_resize_vars(int new_dim,...) $/;"	f
+px_resize_vars	memory.c	/^int px_resize_vars(va_alist) va_dcl$/;"	f
+px_rows	pxop.c	/^MAT	*px_rows(px,A,out)$/;"	f
+px_sign	pxop.c	/^int	px_sign(px)$/;"	f
+px_transp	pxop.c	/^PERM	*px_transp(px,i1,i2)$/;"	f
+px_vec	pxop.c	/^VEC	*px_vec(px,vector,out)$/;"	f
+px_zvec	zvecop.c	/^ZVEC	*px_zvec(px,vector,out)$/;"	f
+pxinv_vec	pxop.c	/^VEC	*pxinv_vec(px,x,out)$/;"	f
+pxinv_zvec	zvecop.c	/^ZVEC	*pxinv_zvec(px,x,out)$/;"	f
+rcsid	arnoldi.c	/^static char rcsid[] = "$Id: arnoldi.c,v 1.3 1994\/01\/13 05:45:40 des Exp $";$/;"	v	file:
+rcsid	bdfactor.c	/^static	char	rcsid[] = "$Id: ";$/;"	v	file:
+rcsid	bkpfacto.c	/^static	char	rcsid[] = "$Id: bkpfacto.c,v 1.7 1994\/01\/13 05:45:50 des Exp $";$/;"	v	file:
+rcsid	chfactor.c	/^static	char	rcsid[] = "$Id: chfactor.c,v 1.2 1994\/01\/13 05:36:36 des Exp $";$/;"	v	file:
+rcsid	conjgrad.c	/^static char	rcsid[] = "$Id: conjgrad.c,v 1.4 1994\/01\/13 05:36:45 des Exp $";$/;"	v	file:
+rcsid	copy.c	/^static	char	rcsid[] = "$Id: copy.c,v 1.2 1994\/01\/13 05:37:14 des Exp $";$/;"	v	file:
+rcsid	err.c	/^static	char	rcsid[] = "$Id: err.c,v 1.6 1995\/01\/30 14:49:14 des Exp $";$/;"	v	file:
+rcsid	extras.c	/^static char	rcsid[] = "$Id: extras.c,v 1.4 1995\/06\/08 15:13:15 des Exp $";$/;"	v	file:
+rcsid	fft.c	/^static char rcsid[] = "$Id: fft.c,v 1.4 1996\/08\/20 14:21:05 stewart Exp $";$/;"	v	file:
+rcsid	givens.c	/^static	char	rcsid[] = "$Id: givens.c,v 1.3 1995\/03\/27 15:41:15 des Exp $";$/;"	v	file:
+rcsid	hessen.c	/^static	char	rcsid[] = "$Id: hessen.c,v 1.2 1994\/01\/13 05:36:24 des Exp $";$/;"	v	file:
+rcsid	hsehldr.c	/^static	char	rcsid[] = "$Id: hsehldr.c,v 1.2 1994\/01\/13 05:36:29 des Exp $";$/;"	v	file:
+rcsid	init.c	/^static	char	rcsid[] = "$Id: init.c,v 1.6 1994\/01\/13 05:36:58 des Exp $";$/;"	v	file:
+rcsid	iotort.c	/^static char rcsid[] = "$Id: $";$/;"	v	file:
+rcsid	iter0.c	/^static char rcsid[] = "$Id: iter0.c,v 1.3 1995\/01\/30 14:50:56 des Exp $";$/;"	v	file:
+rcsid	iternsym.c	/^static char rcsid[] = "$Header: iternsym.c,v 1.6 1995\/01\/30 14:53:01 des Exp $";$/;"	v	file:
+rcsid	itersym.c	/^static char rcsid[] = "$Id: itersym.c,v 1.2 1995\/01\/30 14:55:54 des Exp $";$/;"	v	file:
+rcsid	ivecop.c	/^static	char	rcsid[] = "$Id: ivecop.c,v 1.6 1996\/08\/20 18:19:21 stewart Exp $";$/;"	v	file:
+rcsid	lanczos.c	/^static char rcsid[] = "$Id: lanczos.c,v 1.4 1994\/01\/13 05:28:24 des Exp $";$/;"	v	file:
+rcsid	lufactor.c	/^static	char	rcsid[] = "$Id: lufactor.c,v 1.10 1995\/05\/16 17:26:44 des Exp $";$/;"	v	file:
+rcsid	machine.c	/^static	char	*rcsid = "$Id: machine.c,v 1.4 1994\/01\/13 05:28:56 des Exp $";$/;"	v	file:
+rcsid	matlab.c	/^static char rcsid[] = "$Id: matlab.c,v 1.8 1995\/02\/14 20:12:36 des Exp $";$/;"	v	file:
+rcsid	matop.c	/^static	char	rcsid[] = "$Id: matop.c,v 1.4 1995\/03\/27 15:43:57 des Exp $";$/;"	v	file:
+rcsid	matrixio.c	/^static char rcsid[] = "$Id: matrixio.c,v 1.4 1994\/01\/13 05:31:10 des Exp $";$/;"	v	file:
+rcsid	meminfo.c	/^static char rcsid[] = "$Id: meminfo.c,v 1.1 1994\/01\/13 05:31:39 des Exp $";$/;"	v	file:
+rcsid	memory.c	/^static	char	rcsid[] = "$Id: memory.c,v 1.13 1994\/04\/05 02:10:37 des Exp $";$/;"	v	file:
+rcsid	memstat.c	/^static char rcsid[] = "$Id: memstat.c,v 1.1 1994\/01\/13 05:32:44 des Exp $";$/;"	v	file:
+rcsid	memtort.c	/^static char rcsid[] = "$Id: $";$/;"	v	file:
+rcsid	mfunc.c	/^static char	rcsid[] = "$Id: mfunc.c,v 1.2 1994\/11\/01 05:57:56 des Exp $";$/;"	v	file:
+rcsid	mfuntort.c	/^static char rcsid[] = "$Id: mfuntort.c,v 1.2 1994\/01\/14 01:08:06 des Exp $";$/;"	v	file:
+rcsid	norm.c	/^static	char	rcsid[] = "$Id: norm.c,v 1.6 1994\/01\/13 05:34:35 des Exp $";$/;"	v	file:
+rcsid	otherio.c	/^static	char	rcsid[] = "$Id: otherio.c,v 1.2 1994\/01\/13 05:34:52 des Exp $";$/;"	v	file:
+rcsid	pxop.c	/^static	char	rcsid[] = "$Id: pxop.c,v 1.6 1995\/06\/08 14:57:11 des Exp $";$/;"	v	file:
+rcsid	qrfactor.c	/^static	char	rcsid[] = "$Id: qrfactor.c,v 1.5 1994\/01\/13 05:35:07 des Exp $";$/;"	v	file:
+rcsid	schur.c	/^static char rcsid[] = "$Id: schur.c,v 1.7 1994\/03\/17 05:36:53 des Exp $";$/;"	v	file:
+rcsid	solve.c	/^static	char	rcsid[] = "$Id: solve.c,v 1.3 1994\/01\/13 05:29:57 des Exp $";$/;"	v	file:
+rcsid	sparse.c	/^static char	rcsid[] = "$Id: sparse.c,v 1.10 1994\/03\/08 05:46:07 des Exp $";$/;"	v	file:
+rcsid	sparseio.c	/^static char rcsid[] = "$Id: sparseio.c,v 1.4 1994\/01\/13 05:34:25 des Exp $";$/;"	v	file:
+rcsid	spbkp.c	/^static	char	rcsid[] = "$Id: spbkp.c,v 1.6 1996\/08\/20 19:53:10 stewart Exp $";$/;"	v	file:
+rcsid	spchfctr.c	/^static char	rcsid[] = "$Id: spchfctr.c,v 1.5 1996\/08\/20 19:45:33 stewart Exp $";$/;"	v	file:
+rcsid	sprow.c	/^static char	rcsid[] = "$Id: sprow.c,v 1.1 1994\/01\/13 05:35:36 des Exp $";$/;"	v	file:
+rcsid	spswap.c	/^static	char	rcsid[] = "$Id: spswap.c,v 1.3 1994\/01\/13 05:44:43 des Exp $";$/;"	v	file:
+rcsid	submat.c	/^static	char	rcsid[] = "$Id: submat.c,v 1.2 1994\/01\/13 05:28:12 des Exp $";$/;"	v	file:
+rcsid	svd.c	/^static char rcsid[] = "$Id: svd.c,v 1.7 1995\/09\/08 14:45:43 des Exp $";$/;"	v	file:
+rcsid	symmeig.c	/^static char rcsid[] = "$Id: symmeig.c,v 1.6 1995\/03\/27 15:45:55 des Exp $";$/;"	v	file:
+rcsid	torture.c	/^static char rcsid[] = "$Id: torture.c,v 1.6 1994\/08\/25 15:22:11 des Exp $";$/;"	v	file:
+rcsid	tutorial.c	/^static char rcsid[] = "$Id: tutorial.c,v 1.3 1994\/01\/16 22:53:09 des Exp $";$/;"	v	file:
+rcsid	update.c	/^static	char	rcsid[] = "$Id: update.c,v 1.2 1994\/01\/13 05:26:06 des Exp $";$/;"	v	file:
+rcsid	vecop.c	/^static	char	rcsid[] = "$Id: vecop.c,v 1.5 1996\/08\/20 18:18:10 stewart Exp $";$/;"	v	file:
+rcsid	zcopy.c	/^static	char	rcsid[] = "$Id: zcopy.c,v 1.1 1994\/01\/13 04:28:42 des Exp $";$/;"	v	file:
+rcsid	zfunc.c	/^static char rcsid[] = "$Id: zfunc.c,v 1.3 1995\/04\/07 16:27:25 des Exp $";$/;"	v	file:
+rcsid	zgivens.c	/^static	char	rcsid[] = "$Id: ";$/;"	v	file:
+rcsid	zhessen.c	/^static	char	rcsid[] = "$Id: zhessen.c,v 1.2 1995\/03\/27 15:47:50 des Exp $";$/;"	v	file:
+rcsid	zhsehldr.c	/^static	char	rcsid[] = "$Id: zhsehldr.c,v 1.2 1994\/04\/07 01:43:47 des Exp $";$/;"	v	file:
+rcsid	zlufctr.c	/^static	char	rcsid[] = "$Id: zlufctr.c,v 1.3 1996\/08\/20 20:07:09 stewart Exp $";$/;"	v	file:
+rcsid	zmachine.c	/^static	char	*rcsid = "$Id: zmachine.c,v 1.1 1994\/01\/13 04:25:41 des Exp $";$/;"	v	file:
+rcsid	zmatio.c	/^static char rcsid[] = "$Id: zmatio.c,v 1.1 1994\/01\/13 04:25:18 des Exp $";$/;"	v	file:
+rcsid	zmatlab.c	/^static char rcsid[] = "$Id: zmatlab.c,v 1.2 1995\/02\/14 20:13:27 des Exp $";$/;"	v	file:
+rcsid	zmatop.c	/^static	char	rcsid[] = "$Id: zmatop.c,v 1.2 1995\/03\/27 15:49:03 des Exp $";$/;"	v	file:
+rcsid	zmemory.c	/^static	char	rcsid[] = "$Id: zmemory.c,v 1.2 1994\/04\/05 02:13:14 des Exp $";$/;"	v	file:
+rcsid	znorm.c	/^static	char	rcsid[] = "$Id: znorm.c,v 1.1 1994\/01\/13 04:21:31 des Exp $";$/;"	v	file:
+rcsid	zqrfctr.c	/^static	char	rcsid[] = "$Id: zqrfctr.c,v 1.1 1994\/01\/13 04:21:22 des Exp $";$/;"	v	file:
+rcsid	zschur.c	/^static char rcsid[] = "$Id: zschur.c,v 1.4 1995\/04\/07 16:28:58 des Exp $";$/;"	v	file:
+rcsid	zsolve.c	/^static	char	rcsid[] = "$Id: zsolve.c,v 1.1 1994\/01\/13 04:20:33 des Exp $";$/;"	v	file:
+rcsid	ztorture.c	/^static char rcsid[] = "$Id: $";$/;"	v	file:
+rcsid	zvecop.c	/^static	char	rcsid[] = "$Id: zvecop.c,v 1.3 1997\/10\/07 16:13:54 stewart Exp stewart $";$/;"	v	file:
+restart	err.c	/^jmp_buf	restart;$/;"	v
+rhs_lap	tutorial.c	/^VEC *rhs_lap(b)$/;"	f
+rk4	tutorial.c	/^double rk4(f,t,x,h)$/;"	f
+rk4_var	tutorial.c	/^double rk4_var(f,t,x,h)$/;"	f
+rot_cols	givens.c	/^MAT	*rot_cols(mat,i,k,c,s,out)$/;"	f
+rot_rows	givens.c	/^MAT	*rot_rows(mat,i,k,c,s,out)$/;"	f
+rot_vec	givens.c	/^VEC	*rot_vec(x,i,k,c,s,out)$/;"	f
+rot_zvec	zgivens.c	/^ZVEC	*rot_zvec(x,i,k,c,s,out)$/;"	f
+sbd_mlt	bdfactor.c	/^BAND	*sbd_mlt(Real s, BAND *A, BAND *OUT)$/;"	f
+scan_idx	spchfctr.c	/^static	int	*scan_row = (int *)NULL, *scan_idx = (int *)NULL,$/;"	v	file:
+scan_len	spchfctr.c	/^static	int	scan_len = 0;$/;"	v	file:
+scan_row	spchfctr.c	/^static	int	*scan_row = (int *)NULL, *scan_idx = (int *)NULL,$/;"	v	file:
+scan_to	spswap.c	/^void	scan_to(A, scan_row, scan_idx, col_list, max_row)$/;"	f
+schur	schur.c	/^MAT	*schur(A,Q)$/;"	f
+schur_evals	schur.c	/^void	schur_evals(T,real_pt,imag_pt)$/;"	f
+schur_vecs	schur.c	/^MAT	*schur_vecs(T,Q,X_re,X_im)$/;"	f
+scratch	otherio.c	/^static	char	scratch[MAXLINE+1];$/;"	v	file:
+set_err_flag	err.c	/^int	set_err_flag(flag)$/;"	f
+set_scan	spchfctr.c	/^int	set_scan(new_len)$/;"	f
+setformat	matrixio.c	/^char	*setformat(f_string)$/;"	f
+setzformat	zmatio.c	/^char	*setzformat(f_string)$/;"	f
+sgn	svd.c	41;"	d	file:
+sgn	symmeig.c	42;"	d	file:
+sign	qrfactor.c	51;"	d	file:
+sign	zqrfctr.c	52;"	d	file:
+skipjunk	matrixio.c	/^int     skipjunk(fp)$/;"	f
+sm_mlt	matop.c	/^MAT	*sm_mlt(scalar,matrix,out)$/;"	f
+smrand	init.c	/^void smrand(seed)$/;"	f
+spBKPfactor	spbkp.c	/^SPMAT	*spBKPfactor(A,pivot,blocks,tol)$/;"	f
+spBKPsolve	spbkp.c	/^VEC	*spBKPsolve(A,pivot,block,b,x)$/;"	f
+spCHfactor	spchfctr.c	/^SPMAT	*spCHfactor(A)$/;"	f
+spCHsolve	spchfctr.c	/^VEC	*spCHsolve(L,b,out)$/;"	f
+spCHsymb	spchfctr.c	/^SPMAT	*spCHsymb(A)$/;"	f
+spICHfactor	spchfctr.c	/^SPMAT	*spICHfactor(A)$/;"	f
+spILUfactor	splufctr.c	/^SPMAT	*spILUfactor(A,alpha)$/;"	f
+spLUTsolve	splufctr.c	/^VEC	*spLUTsolve(A,pivot,b,x)$/;"	f
+spLUfactor	splufctr.c	/^SPMAT	*spLUfactor(A,px,alpha)$/;"	f
+spLUsolve	splufctr.c	/^VEC	*spLUsolve(A,pivot,b,x)$/;"	f
+sp_add	sparse.c	/^SPMAT *sp_add(A,B,C)$/;"	f
+sp_arnoldi	arnoldi.c	/^MAT	*sp_arnoldi(A,x0,m,h_rem,Q,H)$/;"	f
+sp_cgs	conjgrad.c	/^VEC	*sp_cgs(A,b,r0,tol,x)$/;"	f
+sp_col_access	sparse.c	/^SPMAT	*sp_col_access(A)$/;"	f
+sp_compact	sparse.c	/^SPMAT	*sp_compact(A,tol)$/;"	f
+sp_copy	sparse.c	/^SPMAT	*sp_copy(A)$/;"	f
+sp_copy2	sparse.c	/^SPMAT	*sp_copy2(A,OUT)$/;"	f
+sp_diag_access	sparse.c	/^SPMAT	*sp_diag_access(A)$/;"	f
+sp_dump	sparseio.c	/^void    sp_dump(fp,A)$/;"	f
+sp_finput	sparseio.c	/^SPMAT  *sp_finput(fp)$/;"	f
+sp_foutput	sparseio.c	/^void    sp_foutput(fp,A)$/;"	f
+sp_free	sparse.c	/^int	sp_free(A)$/;"	f
+sp_free_vars	sparse.c	/^int sp_free_vars(SPMAT **va,...)$/;"	f
+sp_free_vars	sparse.c	/^int sp_free_vars(va_alist) va_dcl$/;"	f
+sp_get	sparse.c	/^SPMAT	*sp_get(m,n,maxlen)$/;"	f
+sp_get_val	sparse.c	/^double	sp_get_val(A,i,j)$/;"	f
+sp_get_vars	sparse.c	/^int sp_get_vars(int m,int n,int deg,...) $/;"	f
+sp_get_vars	sparse.c	/^int sp_get_vars(va_alist) va_dcl$/;"	f
+sp_lanczos	lanczos.c	/^void    sp_lanczos(A,m,x0,a,b,beta2,Q)$/;"	f
+sp_lanczos2	lanczos.c	/^VEC	*sp_lanczos2(A,m,x0,evals,err_est)$/;"	f
+sp_lsqr	conjgrad.c	/^VEC	*sp_lsqr(A,b,tol,x)$/;"	f
+sp_m2dense	sparse.c	/^MAT	*sp_m2dense(A,out)$/;"	f
+sp_mlt	sparse.c	/^SPMAT   *sp_mlt(const SPMAT *A, const SPMAT *B, SPMAT *out)$/;"	f
+sp_mltadd	sparse.c	/^SPMAT *sp_mltadd(A,B,alpha,C)$/;"	f
+sp_mv_mlt	sparse.c	/^VEC	*sp_mv_mlt(A,x,out)$/;"	f
+sp_pccg	conjgrad.c	/^VEC	*sp_pccg(A,LLT,b,eps,x)$/;"	f
+sp_resize	sparse.c	/^SPMAT	*sp_resize(A,m,n)$/;"	f
+sp_resize_vars	sparse.c	/^int sp_resize_vars(int m,int n,...) $/;"	f
+sp_resize_vars	sparse.c	/^int sp_resize_vars(va_alist) va_dcl$/;"	f
+sp_set_val	sparse.c	/^double	sp_set_val(A,i,j,val)$/;"	f
+sp_smlt	sparse.c	/^SPMAT *sp_smlt(A,alpha,B)$/;"	f
+sp_sub	sparse.c	/^SPMAT *sp_sub(A,B,C)$/;"	f
+sp_vm_mlt	sparse.c	/^VEC	*sp_vm_mlt(A,x,out)$/;"	f
+sp_zero	sparse.c	/^SPMAT	*sp_zero(A)$/;"	f
+sprow_add	sprow.c	/^SPROW	*sprow_add(r1,r2,j0,r_out,type)$/;"	f
+sprow_copy	sprow.c	/^SPROW	*sprow_copy(r1,r2,r_out,type)$/;"	f
+sprow_dump	sprow.c	/^void sprow_dump(fp,r)$/;"	f
+sprow_foutput	sprow.c	/^void	sprow_foutput(fp,r)$/;"	f
+sprow_free	sprow.c	/^int sprow_free(r)$/;"	f
+sprow_get	sprow.c	/^SPROW	*sprow_get(maxlen)$/;"	f
+sprow_idx	sprow.c	/^int	sprow_idx(r,col)$/;"	f
+sprow_ip	spchfctr.c	/^static double	sprow_ip(row1, row2, lim)$/;"	f	file:
+sprow_merge	sprow.c	/^SPROW	*sprow_merge(r1,r2,r_out,type)$/;"	f
+sprow_mltadd	sprow.c	/^SPROW	*sprow_mltadd(r1,r2,alpha,j0,r_out,type)$/;"	f
+sprow_resize	sprow.c	/^SPROW	*sprow_resize(r,n,type)$/;"	f
+sprow_set_val	sprow.c	/^double  sprow_set_val(r,j,val)$/;"	f
+sprow_smlt	sprow.c	/^SPROW	*sprow_smlt(r1,alpha,j0,r_out,type)$/;"	f
+sprow_sqr	spchfctr.c	/^static double	sprow_sqr(row, lim)$/;"	f	file:
+sprow_sub	sprow.c	/^SPROW	*sprow_sub(r1,r2,j0,r_out,type)$/;"	f
+sprow_xpd	sprow.c	/^SPROW	*sprow_xpd(r,n,type)$/;"	f
+sqr	bkpfacto.c	/^double	sqr(x)$/;"	f
+sqr	spbkp.c	51;"	d	file:
+square	norm.c	/^double	square(x)$/;"	f
+square	znorm.c	74;"	d	file:
+started	init.c	/^static int  started = FALSE;$/;"	v	file:
+stat_test1	memtort.c	/^void stat_test1(par)$/;"	f
+stat_test2	memtort.c	/^void stat_test2(par)$/;"	f
+stat_test3	memtort.c	/^void stat_test3(par)$/;"	f
+stat_test4	memtort.c	/^void stat_test4(par)$/;"	f
+sub_mat	submat.c	/^MAT	*sub_mat(old,row1,col1,row2,col2,new)$/;"	f
+sub_vec	submat.c	/^VEC	*sub_vec(old,i1,i2,new)$/;"	f
+sv_mlt	vecop.c	/^VEC	*sv_mlt(scalar,vector,out)$/;"	f
+svd	svd.c	/^VEC	*svd(A,U,V,d)$/;"	f
+swap_cols	matop.c	/^MAT	*swap_cols(A,i,j,lo,hi)$/;"	f
+swap_rows	matop.c	/^MAT	*swap_rows(A,i,j,lo,hi)$/;"	f
+symmeig	symmeig.c	/^VEC	*symmeig(A,Q,out)$/;"	f
+test_err_list	torture.c	/^static char *test_err_list[] = {$/;"	v	file:
+test_gmres	iternsym.c	/^static void test_gmres(ip,i,Q,R,givc,givs,h_val)$/;"	f	file:
+test_mgcr	iternsym.c	/^static void test_mgcr(ip,i,Q,R)$/;"	f	file:
+test_stat	tutadv.c	/^void test_stat(k)$/;"	f
+trieig	symmeig.c	/^VEC	*trieig(a,b,Q)$/;"	f
+tut_lap	tutorial.c	/^void tut_lap()$/;"	f
+tutor_ls	tutorial.c	/^void tutor_ls()$/;"	f
+tutor_rk4	tutorial.c	/^void tutor_rk4()$/;"	f
+type	memstat.c	/^  int	type;	\/* type of A *\/$/;"	m	file:
+unord_get_idx	spbkp.c	/^int	unord_get_idx(r,j)$/;"	f
+unord_get_val	spbkp.c	/^double	unord_get_val(A,i,j)$/;"	f
+v_add	vecop.c	/^VEC	*v_add(vec1,vec2,out)$/;"	f
+v_conv	vecop.c	/^VEC	*v_conv(x1, x2, out)$/;"	f
+v_count	init.c	/^VEC	*v_count(x)$/;"	f
+v_dump	matrixio.c	/^void    v_dump(fp,x)$/;"	f
+v_finput	matrixio.c	/^VEC     *v_finput(fp,x)$/;"	f
+v_foutput	matrixio.c	/^void    v_foutput(fp,x)$/;"	f
+v_free	memory.c	/^int	v_free(vec)$/;"	f
+v_free_vars	memory.c	/^int v_free_vars(VEC **pv,...)$/;"	f
+v_free_vars	memory.c	/^int v_free_vars(va_alist) va_dcl$/;"	f
+v_get	memory.c	/^VEC	*v_get(size)$/;"	f
+v_get_vars	memory.c	/^int v_get_vars(int dim,...) $/;"	f
+v_get_vars	memory.c	/^int v_get_vars(va_alist) va_dcl$/;"	f
+v_lincomb	vecop.c	/^VEC	*v_lincomb(n,v,a,out)$/;"	f
+v_linlist	vecop.c	/^VEC  *v_linlist(VEC *out,VEC *v1,double a1,...)$/;"	f
+v_linlist	vecop.c	/^VEC  *v_linlist(va_alist) va_dcl$/;"	f
+v_map	vecop.c	/^VEC	*v_map(f,x,out)$/;"	f
+v_max	vecop.c	/^double	v_max(x, max_idx)$/;"	f
+v_min	vecop.c	/^double	v_min(x, min_idx)$/;"	f
+v_mltadd	vecop.c	/^VEC	*v_mltadd(v1,v2,scale,out)$/;"	f
+v_move	copy.c	/^VEC	*v_move(in,i0,dim0,out,i1)$/;"	f
+v_ones	init.c	/^VEC	*v_ones(x)$/;"	f
+v_pconv	vecop.c	/^VEC	*v_pconv(x1, x2, out)$/;"	f
+v_rand	init.c	/^VEC	*v_rand(x)$/;"	f
+v_resize	memory.c	/^VEC	*v_resize(x,new_dim)$/;"	f
+v_resize_vars	memory.c	/^int v_resize_vars(int new_dim,...)$/;"	f
+v_resize_vars	memory.c	/^int v_resize_vars(va_alist) va_dcl$/;"	f
+v_save	matlab.c	/^VEC     *v_save(fp,x,name)$/;"	f
+v_slash	vecop.c	/^VEC	*v_slash(x1, x2, out)$/;"	f
+v_sort	vecop.c	/^VEC	*v_sort(x, order)$/;"	f
+v_star	vecop.c	/^VEC	*v_star(x1, x2, out)$/;"	f
+v_sub	vecop.c	/^VEC	*v_sub(vec1,vec2,out)$/;"	f
+v_sum	vecop.c	/^double	v_sum(x)$/;"	f
+v_zero	init.c	/^VEC	*v_zero(x)$/;"	f
+var	memstat.c	/^  void	**var;	\/* for &A, where A is a pointer *\/$/;"	m	file:
+vbd_mltadd	bdfactor.c	/^VEC	*vbd_mltadd(x,y,bA,s,out)$/;"	f
+vm_mlt	matop.c	/^VEC	*vm_mlt(A,b,out)$/;"	f
+vm_mltadd	matop.c	/^VEC	*vm_mltadd(v1,v2,A,alpha,out)$/;"	f
+vm_move	copy.c	/^MAT	*vm_move(in,i0,out,i1,j1,m1,n1)$/;"	f
+warn	err.c	/^   unsigned warn;   \/* =FALSE - errors, =TRUE - warnings *\/$/;"	m	file:
+warn_mesg	err.c	/^static char *warn_mesg[] = {$/;"	v	file:
+y_n_dflt	otherio.c	/^static	int	y_n_dflt = TRUE;$/;"	v	file:
+yn_dflt	otherio.c	/^int	yn_dflt(val)$/;"	f
+zDsolve	zsolve.c	/^ZVEC	*zDsolve(A,b,x)$/;"	f
+zHQunpack	zhessen.c	/^ZMAT	*zHQunpack(HQ,diag,Q,H)$/;"	f
+zHfactor	zhessen.c	/^ZMAT	*zHfactor(A, diag)$/;"	f
+zLAsolve	zsolve.c	/^ZVEC	*zLAsolve(L,b,out,diag)$/;"	f
+zLUAsolve	zlufctr.c	/^ZVEC	*zLUAsolve(LU,pivot,b,x)$/;"	f
+zLUcondest	zlufctr.c	/^double	zLUcondest(LU,pivot)$/;"	f
+zLUfactor	zlufctr.c	/^ZMAT	*zLUfactor(A,pivot)$/;"	f
+zLUsolve	zlufctr.c	/^ZVEC	*zLUsolve(A,pivot,b,x)$/;"	f
+zLsolve	zsolve.c	/^ZVEC	*zLsolve(matrix,b,out,diag)$/;"	f
+zQRAsolve	zqrfctr.c	/^ZVEC	*zQRAsolve(QR,diag,b,x)$/;"	f
+zQRCPfactor	zqrfctr.c	/^ZMAT	*zQRCPfactor(A,diag,px)$/;"	f
+zQRCPsolve	zqrfctr.c	/^ZVEC	*zQRCPsolve(QR,diag,pivot,b,x)$/;"	f
+zQRcondest	zqrfctr.c	/^double	zQRcondest(QR)$/;"	f
+zQRfactor	zqrfctr.c	/^ZMAT	*zQRfactor(A,diag)$/;"	f
+zQRsolve	zqrfctr.c	/^ZVEC	*zQRsolve(QR,diag,b,x)$/;"	f
+zUAmlt	zqrfctr.c	/^ZVEC	*zUAmlt(U,x,out)$/;"	f
+zUAsolve	zsolve.c	/^ZVEC	*zUAsolve(U,b,out,diag)$/;"	f
+zUmlt	zqrfctr.c	/^ZVEC	*zUmlt(U,x,out)$/;"	f
+zUsolve	zsolve.c	/^ZVEC	*zUsolve(matrix,b,out,diag)$/;"	f
+z_finput	zmatio.c	/^complex	z_finput(fp)$/;"	f
+z_foutput	zmatio.c	/^void	z_foutput(fp,z)$/;"	f
+z_save	zmatlab.c	/^complex	z_save(fp,z,name)$/;"	f
+zabs	zfunc.c	/^double	zabs(z)$/;"	f
+zadd	zfunc.c	/^complex zadd(z1,z2)$/;"	f
+zconj	zfunc.c	/^complex	zconj(z)$/;"	f
+zdiv	zfunc.c	/^complex	zdiv(z1,z2)$/;"	f
+zexp	zfunc.c	/^complex	zexp(z)$/;"	f
+zformat	zmatio.c	/^static const char    *zformat = " (%14.9g, %14.9g) ";$/;"	v	file:
+zget_col	zmatop.c	/^ZVEC	*zget_col(mat,col,vec)$/;"	f
+zget_row	zmatop.c	/^ZVEC	*zget_row(mat,row,vec)$/;"	f
+zgivens	zgivens.c	/^void	zgivens(x,y,c,s)$/;"	f
+zhhtrcols	zhsehldr.c	/^ZMAT	*zhhtrcols(M,i0,j0,hh,beta)$/;"	f
+zhhtrrows	zhsehldr.c	/^ZMAT	*zhhtrrows(M,i0,j0,hh,beta)$/;"	f
+zhhtrvec	zhsehldr.c	/^ZVEC	*zhhtrvec(hh,beta,i0,in,out)$/;"	f
+zhhvec	zhsehldr.c	/^ZVEC	*zhhvec(vec,i0,beta,out,newval)$/;"	f
+zinv	zfunc.c	/^complex	zinv(z)$/;"	f
+zlog	zfunc.c	/^complex	zlog(z)$/;"	f
+zm_add	zmatop.c	/^ZMAT	*zm_add(mat1,mat2,out)$/;"	f
+zm_adjoint	zmatop.c	/^ZMAT	*zm_adjoint(in,out)$/;"	f
+zm_dump	zmatio.c	/^void    zm_dump(fp,a)$/;"	f
+zm_finput	zmatio.c	/^ZMAT	*zm_finput(fp,a)$/;"	f
+zm_foutput	zmatio.c	/^void    zm_foutput(fp,a)$/;"	f
+zm_free	zmemory.c	/^int	zm_free(mat)$/;"	f
+zm_free_vars	zmemory.c	/^int zm_free_vars(ZMAT **va,...)$/;"	f
+zm_free_vars	zmemory.c	/^int zm_free_vars(va_alist) va_dcl$/;"	f
+zm_get	zmemory.c	/^ZMAT	*zm_get(m,n)$/;"	f
+zm_get_vars	zmemory.c	/^int zm_get_vars(int m,int n,...) $/;"	f
+zm_get_vars	zmemory.c	/^int zm_get_vars(va_alist) va_dcl$/;"	f
+zm_inverse	zlufctr.c	/^ZMAT	*zm_inverse(A,out)$/;"	f
+zm_load	zmatlab.c	/^ZMAT    *zm_load(fp,name)$/;"	f
+zm_mlt	zmatop.c	/^ZMAT	*zm_mlt(A,B,OUT)$/;"	f
+zm_move	zcopy.c	/^ZMAT	*zm_move(in,i0,j0,m0,n0,out,i1,j1)$/;"	f
+zm_norm1	znorm.c	/^double	zm_norm1(A)$/;"	f
+zm_norm_frob	znorm.c	/^double	zm_norm_frob(A)$/;"	f
+zm_norm_inf	znorm.c	/^double	zm_norm_inf(A)$/;"	f
+zm_rand	zmatop.c	/^ZMAT	*zm_rand(A)$/;"	f
+zm_resize	zmemory.c	/^ZMAT	*zm_resize(A,new_m,new_n)$/;"	f
+zm_resize_vars	zmemory.c	/^int zm_resize_vars(int m,int n,...) $/;"	f
+zm_resize_vars	zmemory.c	/^int zm_resize_vars(va_alist) va_dcl$/;"	f
+zm_save	zmatlab.c	/^ZMAT    *zm_save(fp,A,name)$/;"	f
+zm_sub	zmatop.c	/^ZMAT	*zm_sub(mat1,mat2,out)$/;"	f
+zm_zero	zmemory.c	/^ZMAT	*zm_zero(A)$/;"	f
+zmake	zfunc.c	/^complex	zmake(real,imag)$/;"	f
+zmakeQ	zqrfctr.c	/^ZMAT	*zmakeQ(QR,diag,Qout)$/;"	f
+zmakeR	zqrfctr.c	/^ZMAT	*zmakeR(QR,Rout)$/;"	f
+zmam_mlt	zmatop.c	/^ZMAT	*zmam_mlt(A,B,OUT)$/;"	f
+zmlt	zfunc.c	/^complex	zmlt(z1,z2)$/;"	f
+zmma_mlt	zmatop.c	/^ZMAT	*zmma_mlt(A,B,OUT)$/;"	f
+zmv_mlt	zmatop.c	/^ZVEC	*zmv_mlt(A,b,out)$/;"	f
+zmv_mltadd	zmatop.c	/^ZVEC	*zmv_mltadd(v1,v2,A,alpha,out)$/;"	f
+zmv_move	zcopy.c	/^ZVEC	*zmv_move(in,i0,j0,m0,n0,out,i1)$/;"	f
+zneg	zfunc.c	/^complex	zneg(z)$/;"	f
+zrot_cols	zgivens.c	/^ZMAT	*zrot_cols(mat,i,k,c,s,out)$/;"	f
+zrot_rows	zgivens.c	/^ZMAT	*zrot_rows(mat,i,k,c,s,out)$/;"	f
+zschur	zschur.c	/^ZMAT	*zschur(A,Q)$/;"	f
+zset_col	zmatop.c	/^ZMAT	*zset_col(mat,col,vec)$/;"	f
+zset_row	zmatop.c	/^ZMAT	*zset_row(mat,row,vec)$/;"	f
+zsm_mlt	zmatop.c	/^ZMAT	*zsm_mlt(scalar,matrix,out)$/;"	f
+zsqrt	zfunc.c	/^complex	zsqrt(z)$/;"	f
+zsub	zfunc.c	/^complex zsub(z1,z2)$/;"	f
+zswap_cols	zmatop.c	/^ZMAT	*zswap_cols(A,i,j,lo,hi)$/;"	f
+zswap_rows	zmatop.c	/^ZMAT	*zswap_rows(A,i,j,lo,hi)$/;"	f
+zv_add	zvecop.c	/^ZVEC	*zv_add(vec1,vec2,out)$/;"	f
+zv_dump	zmatio.c	/^void    zv_dump(fp,x)$/;"	f
+zv_finput	zmatio.c	/^ZVEC     *zv_finput(fp,x)$/;"	f
+zv_foutput	zmatio.c	/^void    zv_foutput(fp,x)$/;"	f
+zv_free	zmemory.c	/^int	zv_free(vec)$/;"	f
+zv_free_vars	zmemory.c	/^int zv_free_vars(ZVEC **pv,...)$/;"	f
+zv_free_vars	zmemory.c	/^int zv_free_vars(va_alist) va_dcl$/;"	f
+zv_get	zmemory.c	/^ZVEC	*zv_get(size)$/;"	f
+zv_get_vars	zmemory.c	/^int zv_get_vars(int dim,...) $/;"	f
+zv_get_vars	zmemory.c	/^int zv_get_vars(va_alist) va_dcl$/;"	f
+zv_lincomb	zvecop.c	/^ZVEC	*zv_lincomb(n,v,a,out)$/;"	f
+zv_linlist	zvecop.c	/^ZVEC	*zv_linlist(ZVEC *out,ZVEC *v1,complex a1,...)$/;"	f
+zv_linlist	zvecop.c	/^ZVEC  *zv_linlist(va_alist) va_dcl$/;"	f
+zv_map	zvecop.c	/^ZVEC	*zv_map(f,x,out)$/;"	f
+zv_mlt	zvecop.c	/^ZVEC	*zv_mlt(scalar,vector,out)$/;"	f
+zv_mltadd	zvecop.c	/^ZVEC	*zv_mltadd(v1,v2,scale,out)$/;"	f
+zv_move	zcopy.c	/^ZVEC	*zv_move(in,i0,dim0,out,i1)$/;"	f
+zv_rand	zvecop.c	/^ZVEC	*zv_rand(x)$/;"	f
+zv_resize	zmemory.c	/^ZVEC	*zv_resize(x,new_dim)$/;"	f
+zv_resize_vars	zmemory.c	/^int zv_resize_vars(int new_dim,...)$/;"	f
+zv_resize_vars	zmemory.c	/^int zv_resize_vars(va_alist) va_dcl$/;"	f
+zv_save	zmatlab.c	/^ZVEC    *zv_save(fp,x,name)$/;"	f
+zv_slash	zvecop.c	/^ZVEC	*zv_slash(x1, x2, out)$/;"	f
+zv_star	zvecop.c	/^ZVEC	*zv_star(x1, x2, out)$/;"	f
+zv_sub	zvecop.c	/^ZVEC	*zv_sub(vec1,vec2,out)$/;"	f
+zv_sum	zvecop.c	/^complex	zv_sum(x)$/;"	f
+zv_zero	zmemory.c	/^ZVEC	*zv_zero(x)$/;"	f
+zvm_mlt	zmatop.c	/^ZVEC	*zvm_mlt(A,b,out)$/;"	f
+zvm_mltadd	zmatop.c	/^ZVEC	*zvm_mltadd(v1,v2,A,alpha,out)$/;"	f
+zvm_move	zcopy.c	/^ZMAT	*zvm_move(in,i0,out,i1,j1,m1,n1)$/;"	f

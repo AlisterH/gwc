@@ -1,0 +1,4 @@
+amplify 0.7
+dsp (high shelf filter) 20 18 2500
+denoise 1024 0.8 4 16 .98 (hanning-overlap-add) (Lorber & Hoeldrich)
+amplify 0.85

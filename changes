@@ -1,0 +1,105 @@
+Made spectrogram much faster and have more distinct colors for the different
+levels (may be a little gaudy now). Also has log frequency mode and little
+different scale.  Made selection not redraw spectrogram.
+
+Sped up drawing of play cursor
+
+Sped up declick
+
+Sped up save and restore of undo.  Also added progress bar and saved channel_selection_mask
+
+Changed scaling to use *= and /= so scaling woudn't go negative
+
+Changed drawing waveform to look at all samples for pixel to give better
+display of amplitudes for your pseudo max.  I might prefer a true max so you
+know how close spots are to maximum.
+
+Added automatic song marking and manual song marker editing.  Added simple
+CD-TEXT for toc file.  Edit->Mark songs to mark with preference for
+expected silence length.  You can move/add/delete them manually and
+select around them to easily see/hear them. 
+
+Fixed bug on slider where gwc might read past end of file due to scroll
+bar change not limiting end to number of samples
+
+Some changes to menus.  Added marker options, right aligned field labels
+
+Fixed some drawing where you zoomed in and coordinates overflowed short so
+things would draw in the wrong location (gint is actuall treated as short)
+
+Changed AtoS to agree with the screen which was drawn with one seperator
+down the middle instead of two unused areas at the top.  Also made it so
+it clipped to the two drawing areas so top waveform wouldn't leak into bottom.
+
+Some cleanup to status bar progress
+
+Made error if write fails to undo data.  Program exits.  Prevents using bad
+undo file and making changes that can't be undone.  Seemed like a lot more
+work to do something better.
+
+Also
+KNOWN BUGS:
+----------- 
+
+>Select a selection, save it, selection is no longer marked,
+>        zoom out, selection is now marked 
+
+Think this is fixed along with other problems with highlighting on expose
+events
+
+>Spectral view button needs a 'working' dialog.
+
+Added.  Also much faster
+
+>When 'undo'ing' no progress bar
+Added (but resampling audio doesn't have one). Saving and restoring undo much
+faster also
+
+
+
+Things I noticed but didn't fix.
+
+Denoise can overflow so large positive signals become large negative.  No
+warning is given either when this happens.
+
+If you denoise with  1 channel selected strange things happen to the other.
+
+---- part 2
+Removed F# from menu.
+
+Attached find next marker to n
+
+index_20Hz was calculated before FFT_SIZE was set
+
+removed redraw from zoom since set scrollbar does that (indirectly).  Made
+sonogram redraw twice while zooming in.
+
+fixed error in merging log sonogram stuff in
+
+Fixed seg fault in sonogram
+
+Fixed draw_a_line when zooming in so lines don't draw at wrong location
+
+Fixed scroll_bar_changed so it can't set sample past end of file
+
+Made some changes to mark_song to improve performance with my albums
+
+Saved song markers and cdtext info to .gwc file
+
+Added accelerators to menus and removed from keyboard checking case
+
+Changed delete song markers to delete all selected song markers for consistency
+---- part 3
+Added interface (frontend) to lame/oggenc for MP3 and Ogg encodings of selected waveform portions.
+
+Fixed issue with warnings if closing pop up windows via X in corner.
+
+Fixed issues with performing tasks with no file opened causing segfault.
+
+Fixed issue of trying to play when sonogram is being built.
+
+Fixed issue of trying to display sonogram(or do anything) while file is being played.
+
+Added some fixes to improve speed of display/amplify and some other functions.
+(do not cast if not needed and when you must cast do it wisely. See http://www.mega-nerd.com/FPcast/
+by Eric De Castro Lopo Author of libsndfile API). 

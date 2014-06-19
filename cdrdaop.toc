@@ -1,0 +1,25 @@
+CD_TEXT {
+   LANGUAGE_MAP {
+      0: EN
+   }
+   LANGUAGE 0 {
+      TITLE ""
+      MESSAGE ""
+   }
+}
+TRACK AUDIO
+   CD_TEXT {
+      LANGUAGE 0 {
+         TITLE "song1"
+         MESSAGE ""
+      }
+   }
+   FILE "sfd.wav" 322471 469223
+TRACK AUDIO
+   CD_TEXT {
+      LANGUAGE 0 {
+         TITLE "song3"
+         MESSAGE ""
+      }
+   }
+   FILE "sfd.wav" 1071179 256955

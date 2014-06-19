@@ -1,0 +1,255 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.77 [en] (X11; U; Linux 2.4.2-2 i686) [Netscape]">
+</head>
+<body>
+<font size=+3>Using Gnome Wave Cleaner to record and clean up your old vinyl music</font>
+<br>
+<hr WIDTH="100%">
+<h1>Recording your wavfiles</h1>
+<ul>
+<li>
+<em>CLEAN YOUR RECORDS AS WELL AS POSSIBLE!!</em>&nbsp; The safest method is to
+use distilled water, and spray it on with a perfectly clean spray bottle.&nbsp;
+Let it sit for a few minutes and then wipe it off with clean, soft, pure
+cotton cloth. Don't do this on the turntable itself, lay the record on
+a soft cloth on top of a firm flat surface.&nbsp; Any lint from the that
+gets on the record from the cloth will come off easily with your regular
+record duster that you will apply while the record is on the turntable
+and spinning.&nbsp; There are plenty of places on the internet that have
+suggestions for how to clean LP's.&nbsp; The other thing to try is to play
+the LP once before you copy it to disk, the action of the needle in the
+groove may be able to dislodge more remaining particles.</li>
+</ul>
+
+<ul>
+
+<li>
+Make sure cpu and memory intensive apps are not running !!
+<br>For example the setiathome client uses enough of both to
+    really make the playback (and recording) not be able to
+    get data to and from the hard drive to the audio device.
+</li>
+</ul>
+
+<ul>
+
+<li>
+Record your track(s).  I now use a tool like brec for OSS and arec for ALSA, and
+record a number of tracks (i.e. one entire side of an LP at
+once).  Because GWC can handle extremely large audio
+files, it is more convenient to work with one single file.
+Using cdrdao to burn the CD's also allows the use of a single
+audio file.
+
+Be sure to get some "silent" audio
+at the start of each track, this information is used by gwc to assess the
+background noise level for noise elimination.</li>
+</ul>
+</ul>
+
+<h2> An <i>important</i>  note on GWC editing </h2>
+GWC commits all changes to the original
+file instantly, and undo saves the deltas needed to get back to the original,
+so on exit all your changes are saved.  As of version 0.21-06, GWC will
+notify you that changes have been made, and give you the chance to exit (or open a new file)
+without making the changes permanent.
+
+<h1>Selecting regions</h1>
+<ul>
+<li>This is how you identify regions of audio for GWC to perform tasks upon, it is done by
+highlighting a portion of the displayed audio waveform with the standard click and drag method using the mouse. </li>
+<p><li>If you position your cursor between the left and right channels while you highlight, you will select both
+channels, but if you move the cursor up or down when you make the selection, you can select either the left
+channel, or the right channel indepedently.</li>
+<p><li> There are 200 markers available.  You set them by using the "B" and "E" keys, and clear them using the "Markers:Clear Markers" menu item.
+"B" toggles the first marker at the <em>start</em> of the currently selected region.  "E" toggles the second
+marker at the <em>end</em> of the currently selected region. </li>
+<p><li>While you are selecting a region, if the cursor gets within 10 pixels of a marker, it will "snap" to
+that marker.  This allows you to zoom in to a portion of the audio data, set a marker, zoom and pan to another
+portion, set another marker, and then zoom back out and select the region between the markers -- giving you
+a fine level of control on the precision of the selected region.</li>
+<p><li> You may also press the 'm' key, to automatically select the region between markers.  A button and icon are
+in the works...</li>
+</ul>
+</ul>
+
+<h1>Steps to restore audio quality</h1>
+<ul>
+<li><h2>Denoise<h2></li>
+
+<ul>
+<li>
+Select the sample region, make sure the sample region is entirely free of music.</li>
+<p><li> If you have a "clean" LP, i.e. almost no crackle in the "silent" region
+(you may the declicker in the silent region to remove a few clicks,
+but make sure the result doesn't sound goofy)</li>
+
+<p><li> Press the sample noise button (the one with the eyedropper) </li>
+
+<p><li>
+Now select and 
+test denoising on a couple of different areas on the audio file, just to
+be sure it works.&nbsp; Take the defaults of:</li>
+
+<ul>FFT Size=4096
+<br>reduction=0.5
+<br>smoothness=11
+<br>number of samples=16
+<br>gamma=0.95
+<br>Windowing Function=Hanning-overlap-add
+<br>Noise Suppresion Method=Lorber & Hoeldrich
+</ul>
+
+
+<p><li>
+Try denoising a few seconds at the start of the track (include some of the pre-track
+noise section to see how good the denoise algorithm works on pure noise). Play the
+denoised region, see if you like it.  <em>Now do an Edit->undo (Ctrl-Z)</em>
+<br><br> Repeat the above process at the end of the track and some place in the middle.
+This gives you a good idea of how the noise sample a the start of the track will
+work as an estimate of the actual noise at the middle and end of the track.
+<br><br>If you find the result sounds "metallic" or "burbly", back off on the reduction
+amount, remember to use Edit->undo (Ctrl-Z).  You can also try varying the gamma
+factor.  I have found if it gets too close to 1.0, it can distort the final
+sound a little.  Anything between 0.5 and 0.99 is probably worth trying.
+<p>
+</li>
+<li> When you are satisfied you have the settings you want, go for the gold and
+select the entire track and denoise the whole thing.  In most cases the defaults
+given above will work quite well, so don't think this is hard, it's really easy!
+At this point you may skip saving the undo data, which for most songs is 10's of megabytes and will take
+some time to save.
+</li>
+</ul>
+</ul>
+
+<p>
+<ul>
+<li><h2>Declicking</h2></li>
+<ul>
+<li>
+The highest quality declicking really needs to be done "manually".&nbsp; I have had cases where
+it has a "false positive", and inadvertently degrades the signal in a few
+places.&nbsp; I do manual declicking by either going to sonogram view,
+and looking for spikes, or just listening and highlighting an area around
+where I hear the click.  There is no better click detector than your ears!
+I have found for a window which is 600 pixels wide, about 22050 samples (about 1/2
+second at the 44100 Hz sample rate, which is CD quality...)
+displayed in the sonogram view works quite well.</li>
+
+<p><li>
+There is an FFT click detector implemented now.  The settings are the dB above
+average that the click amplitude must be in order to be marked and or fixed.
+Humans generally can detect a 3 dB change, so that's the default level for weak
+click detection.  While the FFT click detector appears to work better, it is
+only based on some limited observations of mine, and it is MUCH SLOWER.</li>
+
+<p><li>
+If you are working on a track that you are less concerned about the final quality,
+then you can select a large region and use the declick strong clicks button.  This
+works reasonably well.</li>
+
+
+<p><li>
+<b><i>&lt;HINT> - use the spacebar
+to start and stop playback!!! <br>left hand on
+spacebar, right hand on mouse - very efficient. <br>You can get a good
+idea where the click is by watching where the cursor is when you hear
+the click&lt;/HINT></li>
+<p><li>
+<p><em> If you hit the "s" key during playback, gwc will stop
+the playback and highlight the last 1/2 second of audio played</em>
+</i></b></li>
+
+<p>
+<li>There are 3 levels of declicking</li>
+<ol>
+<li>  Declick-strong - searches for and repairs the loudest clicks </li>
+<p><li>  Declick-weak - searches for and repairs weaker clicks </li>
+<p><li>  Declick-manual - If neither of the above methods worked to find the click, you
+      can zoom in on the click by listening, highlighting, zooming in on the selection
+      as described above.  Then, making sure you have only the damaged portion of the
+      audio data selected (in most cases this will be less than 100 samples), push this
+      button, and it repairs the highlighted selection (or current view) -- don't use on
+      more than about 200 samples! </li>
+</ol>
+
+<p><li>In general you should start with Declick-strong , and use Declick-manual as your last resort.</li>
+</ul>
+
+</ul>
+</ul>
+</li>
+<p>
+<ul>
+<li>
+<h2>De-crackling</h2>  -- that sound of bacon frying on your audio track. Crackle
+is mostly a bunch of closely spaced clicks. First try the decrackling
+algorithm.  Use the default settings in preferences. If that fails you,
+I have had success at times by repeatedly
+applying the "remove strong clicks" filter over an area until the reported
+repairs is zero.</li>
+</ul>
+
+<br>
+<ul>
+<li>
+<h2>Estimating</h2> Sometimes, there are large sections in the audio (200 to 8000
+samples), that are just bad.  It may sound like a "thunk" or a dropout.
+The estimation repair looks at the frequencies to the left and right of the
+selection (or current view), and blends those frequencies across the repair
+area.  The result will be better than what was there to begin with,
+as of version 0.20-08 this works quite well, but remember, UNDO is your friend!
+</li>
+</ul>
+
+<ul>
+<li><h2>Finishing up</h2>
+<ul>
+<li>
+Eliminate blank portions at start and end of track -- highlight the area
+at the start of the track and use the scissors icon to indicate you want
+that deleted, do the same for the end of the track.&nbsp; You can't eliminate
+sections in the middle of the track.&nbsp; Umm, I haven't tested what would
+happen if you tried, it could be bad.  Always back up your data :-)</li>
+</ul>
+
+<ul>
+<p><li>
+You may want to look at the reverb and DSP filters if the audio needs
+a little bit of "presence".  They are documented in the main help file for GWC
+</li>
+<p><li>
+Exit. -- gwc will ask if you really want to save your changes
+</li>
+</ul>
+</ul>
+
+<ul>
+<li>
+I wrote a little utility -- wavlist, which will list the *.wav files and
+append the time in minutes:sec to the list so you can use it with something
+like gcover to create jewel case covers.</li>
+</ul>
+
+<hr>
+<h2>KEYBOARD FUNCTIONS:</h2>
+<ul>
+<li>spacebar - starts and stops playback</li>
+<li>'a' - Creates or appends "cdrdao.toc", with the currently selected or viewd audio segment.</li>
+<li><b>'Alt-a'</b> - Apply sample restoration algorithm (declick),to the currently selected (or viewed) audio segment</li>
+<li>'u' - increase the scale on audio display</li>
+<li>'d' - decrease the scale on audio display</li>
+<li>'m' - select the region between the markers</li>
+<li>'r' - reset the scale on audio display to 1.0</li>
+<li>'s' - stop playback, and automatically highlight last 1/2 second of audio played</li>
+<li>'z' - zoom in on the selected region</li>
+<li>B - this will toggle the marker at the start of the currently selected region
+<li>E - this will toggle the marker at the end of the currently selected region
+</ul>
+
+</body>
+</html>

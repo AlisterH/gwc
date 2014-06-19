@@ -1,0 +1,915 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+A	i0.c	/^static double A[] =$/;"	v	file:
+A	i0.c	/^static unsigned short A[] = {$/;"	v	file:
+A	i1.c	/^static double A[] =$/;"	v	file:
+A	i1.c	/^static unsigned short A[] = {$/;"	v	file:
+ALLP_FILTER	tap_reverb.c	/^} ALLP_FILTER;$/;"	t	typeref:struct:__anon10	file:
+ARLeastSquare	ar.c	/^int ARLeastSquare($/;"	f
+ARMaxEntropy	ar.c	/^int ARMaxEntropy($/;"	f
+ARRAYSIZE	markers.c	85;"	d	file:
+AUDIO_BLOCK_LEN	markers.c	247;"	d	file:
+AtoS	drawing.c	182;"	d	file:
+AutoRegression	ar.c	/^int AutoRegression($/;"	f
+B	i0.c	/^static double B[] =$/;"	v	file:
+B	i0.c	/^static unsigned short B[] = {$/;"	v	file:
+B	i1.c	/^static double B[] =$/;"	v	file:
+B	i1.c	/^static unsigned short B[] = {$/;"	v	file:
+BANDPASS_BWIDTH	tap_reverb.c	50;"	d	file:
+BIQUAD	biquad.c	35;"	d	file:
+BOTH_DJG_JJW_NOT	drawing.c	619;"	d	file:
+BOTTOM_SPACE	gtkled.c	27;"	d	file:
+BUFFERSIZE	audio_osx.c	/^int BUFFERSIZE = 1024; \/\/ The size of the buffers we will send.$/;"	v
+BUFSIZE	amplify.c	26;"	d	file:
+BUFSIZE	audio_util.c	/^int BUFSIZE ;$/;"	v
+BUFSIZE	biquad.c	43;"	d	file:
+BUFSIZE	pinknoise.c	26;"	d	file:
+BUFSIZE	reverb.c	32;"	d	file:
+BYSAMPLE	gwc.c	2505;"	d	file:
+BYTESPERSAMPLE	audio_util.c	/^int BYTESPERSAMPLE = 2 ;$/;"	v
+BYTESPERSAMPLE	audio_util.c	1211;"	d	file:
+BYTESPERSAMPLE	audio_util.c	1281;"	d	file:
+BYTIME	gwc.c	2504;"	d	file:
+BiQuad	biquad.c	/^smp_type BiQuad(smp_type sample, biquad * b)$/;"	f
+BiQuad_new	biquad.c	/^biquad *BiQuad_new(int type, smp_type dbGain, smp_type freq,$/;"	f
+BiQuad_response	biquad.c	/^double BiQuad_response(double freq, double srate, biquad *p)$/;"	f
+CLIPBOARD_FILE	audio_edit.c	31;"	d	file:
+COMBINE_MAX	drawing.c	434;"	d	file:
+COMB_FILTER	tap_reverb.c	/^} COMB_FILTER;$/;"	t	typeref:struct:__anon9	file:
+DECLICK_CUBIC	declick.c	483;"	d	file:
+DECLICK_LSAR	declick.c	484;"	d	file:
+DECLICK_MAX_FFT	declick.c	683;"	d	file:
+DENORM	tap_reverb.c	71;"	d	file:
+ENH_STEREO_RATIO	tap_reverb.c	52;"	d	file:
+EXTRA_DATA_WING	declick.c	586;"	d	file:
+F2S	tap_reverb.c	78;"	d	file:
+F2S	tap_reverb.c	83;"	d	file:
+FEATHER_WIDTH	audio_util.c	1226;"	d	file:
+FFT_MAX	declick.c	40;"	d	file:
+FFT_MAX	dethunk.c	28;"	d	file:
+FFT_MAX	drawing.c	428;"	d	file:
+FFT_WINDOW	declick.c	694;"	d	file:
+FLUSH_AUDIO_BUF	audio_util.c	1041;"	d	file:
+FRAMESIZE	audio_util.c	/^int FRAMESIZE = 4 ;$/;"	v
+FREE	gtkgamma.c	/^    FREE,$/;"	e	enum:__anon3	file:
+FREQ_RESP_BWIDTH	tap_reverb.c	51;"	d	file:
+FROM_BUILTIN	tap_reverb_file_io.c	78;"	d	file:
+FROM_FILE	tap_reverb_file_io.c	79;"	d	file:
+FR_R_COMP	tap_reverb.c	54;"	d	file:
+Fc	biquad.c	/^    double Fc ;$/;"	m	struct:__anon2	file:
+Fc	biquad.c	/^static gfloat Fc = 120 ;$/;"	v	file:
+Frame	gwcmad.c	/^        struct mad_frame        Frame;$/;"	m	struct:__anon5	typeref:struct:__anon5::mad_frame	file:
+Frame	mp3.c	/^        struct mad_frame        Frame;$/;"	m	struct:__anon6	typeref:struct:__anon6::mad_frame	file:
+FrameCount	gwcmad.c	/^        size_t              FrameCount;$/;"	m	struct:__anon5	file:
+FrameCount	mp3.c	/^        size_t              FrameCount;$/;"	m	struct:__anon6	file:
+GAMMA	gtkgamma.c	/^    GAMMA,$/;"	e	enum:__anon3	file:
+GNOMEUIINFO_ITEM_ACCEL	gwc.c	2035;"	d	file:
+GRAPH_MASK	gtkcurve.c	41;"	d	file:
+GWC_STACK_LIM	gwc.c	2724;"	d	file:
+GeneratePinkNoise	pinknoise.c	/^float GeneratePinkNoise( PinkNoise *pink )$/;"	f
+GenerateRandomNumber	pinknoise.c	/^static unsigned long GenerateRandomNumber( void )$/;"	f	file:
+GenerateWhiteNoise	pinknoise.c	/^float GenerateWhiteNoise( PinkNoise *pink )$/;"	f
+HANDLE_THICKNESS	drawing.c	38;"	d	file:
+HPF_AVE_WIDTH_BASE	declick.c	584;"	d	file:
+HPF_AVE_WIDTH_LOCAL	declick.c	585;"	d	file:
+HPF_AVE_WING_BASE	declick.c	578;"	d	file:
+HPF_AVE_WING_LOCAL	declick.c	579;"	d	file:
+HPF_DATA_WING	declick.c	580;"	d	file:
+HPF_DELTA_WIDTH	declick.c	581;"	d	file:
+ID3_TAG_FLAG_FOOTERPRESENT	gwcmad.c	25;"	d	file:
+ID3_TAG_FLAG_FOOTERPRESENT	mp3.c	28;"	d	file:
+INC_POS	declick.c	589;"	d	file:
+INPUT_BUFFER_SIZE	gwcmad.c	28;"	d	file:
+INPUT_BUFFER_SIZE	mp3.c	31;"	d	file:
+InitializePinkNoise	pinknoise.c	/^void InitializePinkNoise( PinkNoise *pink, int numRows )$/;"	f
+InputBuffer	gwcmad.c	/^        unsigned char           *InputBuffer;$/;"	m	struct:__anon5	file:
+InputBuffer	mp3.c	/^        unsigned char           *InputBuffer;$/;"	m	struct:__anon6	file:
+JJW_CMAP_NOT	drawing.c	948;"	d	file:
+LED_COLOR_OFF	gtkled.c	/^  LED_COLOR_OFF$/;"	e	enum:__anon4	file:
+LED_COLOR_ON	gtkled.c	/^  LED_COLOR_ON,$/;"	e	enum:__anon4	file:
+LED_HEIGHT	gtkled.c	26;"	d	file:
+LED_WIDTH	gtkled.c	25;"	d	file:
+LIMIT	tap_reverb.c	64;"	d	file:
+LINEAR	gtkgamma.c	/^    LINEAR = 0,$/;"	e	enum:__anon3	file:
+LN_2_2	tap_reverb.c	63;"	d	file:
+MAXBUF	audio_util.c	1055;"	d	file:
+MAXBUF	audio_util.c	1082;"	d	file:
+MAXBUF	audio_util.c	1092;"	d	file:
+MAXBUF	audio_util.c	1119;"	d	file:
+MAXBUF	audio_util.c	1128;"	d	file:
+MAXBUF	audio_util.c	1155;"	d	file:
+MAXBUFSIZE	audio_util.c	196;"	d	file:
+MAXH	biquad.c	146;"	d	file:
+MAXSAMPLEVALUE	audio_util.c	/^int MAXSAMPLEVALUE = 1 ;$/;"	v
+MAXSH	drawing.c	463;"	d	file:
+MAXSW	drawing.c	462;"	d	file:
+MAX_BUF	drawing.c	168;"	d	file:
+MAX_HARMONIC	denoise.c	508;"	d	file:
+MAX_WINDOW_SIZE	declick.c	587;"	d	file:
+MESCHACH	declick.c	30;"	d	file:
+MIN_DISTANCE	gtkcurve.c	39;"	d	file:
+MP3_TYPE	audio_util.c	69;"	d	file:
+M_PI	tap_reverb.c	58;"	d	file:
+M_SQR	biquad.c	569;"	d	file:
+MacOSXAudioData	audio_osx.c	/^} MacOSXAudioData ;$/;"	t	typeref:struct:__anon1	file:
+N	drawing.c	758;"	d	file:
+N	stat.c	/^static int row, col, N, i ;$/;"	v	file:
+NMAX	crackle.c	5;"	d	file:
+NO_DEBUG	denoise.c	646;"	d	file:
+NPARAMS	declick.c	113;"	d	file:
+NUM_XPMS	gtkgamma.c	/^    NUM_XPMS$/;"	e	enum:__anon3	file:
+N_ALLOC_INC	undo.c	199;"	d	file:
+N_BANDS	godsill_wolfe.c	17;"	d	file:
+OGG_TYPE	audio_util.c	68;"	d	file:
+ORDER	declick.c	112;"	d	file:
+ORDER	dethunk.c	539;"	d	file:
+PAUL_SANDERS	stat.c	80;"	d	file:
+PINK_MAX_RANDOM_ROWS	pinknoise.c	74;"	d	file:
+PINK_MEASURE	pinknoise.c	103;"	d	file:
+PINK_RANDOM_BITS	pinknoise.c	75;"	d	file:
+PINK_RANDOM_SHIFT	pinknoise.c	76;"	d	file:
+PLAYBACK_FRAMESIZE	audio_util.c	/^int PLAYBACK_FRAMESIZE = 4 ;$/;"	v
+PREFIX	gwc.c	2752;"	d	file:
+PinkNoise	pinknoise.c	/^} PinkNoise;$/;"	t	typeref:struct:__anon7	file:
+RADIUS	gtkcurve.c	38;"	d	file:
+REALLY_TRUNCATE	audio_util.c	311;"	d	file:
+RESET	gtkgamma.c	/^    RESET,$/;"	e	enum:__anon3	file:
+SLOW_EM	denoise.c	190;"	d	file:
+SNDFILE_TYPE	audio_util.c	67;"	d	file:
+SONG_BLOCK_LEN	markers.c	87;"	d	file:
+SOX_FORMAT_HANDLER	gwcmad.c	/^SOX_FORMAT_HANDLER(mp3)$/;"	f
+SOX_FORMAT_HANDLER	mp3.c	/^SOX_FORMAT_HANDLER(mp3)$/;"	f
+SPLINE	gtkgamma.c	/^    SPLINE,$/;"	e	enum:__anon3	file:
+SYSCONFDIR	gwc.c	2753;"	d	file:
+SolveLE	ar.c	/^int SolveLE(double **mat,double *vec,unsigned int n)$/;"	f
+Stream	gwcmad.c	/^        struct mad_stream       Stream;$/;"	m	struct:__anon5	typeref:struct:__anon5::mad_stream	file:
+Stream	mp3.c	/^        struct mad_stream       Stream;$/;"	m	struct:__anon6	typeref:struct:__anon6::mad_stream	file:
+Synth	gwcmad.c	/^        struct mad_synth        Synth;$/;"	m	struct:__anon5	typeref:struct:__anon5::mad_synth	file:
+Synth	mp3.c	/^        struct mad_synth        Synth;$/;"	m	struct:__anon6	typeref:struct:__anon6::mad_synth	file:
+THICKNESS	drawing.c	33;"	d	file:
+TMPBUFSIZE	audio_util.c	473;"	d	file:
+TMPBUFSIZE	soundfile.c	232;"	d	file:
+TMPBUFSIZE	soundfile.c	328;"	d	file:
+TRY_NEW_ABSTRACTION	audio_util.c	844;"	d	file:
+Timer	gwcmad.c	/^        mad_timer_t             Timer;$/;"	m	struct:__anon5	file:
+Timer	mp3.c	/^        mad_timer_t             Timer;$/;"	m	struct:__anon6	file:
+UNDO_INSERT	undo.c	36;"	d	file:
+UNDO_OVERWRITE	undo.c	35;"	d	file:
+UNDO_REMOVE	undo.c	37;"	d	file:
+WINDOW_OVERLAP	declick.c	582;"	d	file:
+WINDOW_SIZE	declick.c	577;"	d	file:
+WRITE_VALUE_TO_AUDIO_BUF	audio_util.c	/^int WRITE_VALUE_TO_AUDIO_BUF(char *ivalue)$/;"	f
+_add_song_marker	markers.c	/^int _add_song_marker(long loc)$/;"	f
+_audio_device_processed_bytes	audio_alsa.c	/^long _audio_device_processed_bytes = 0 ;$/;"	v
+a1	tap_reverb.c	/^        float a1;$/;"	m	struct:__anon8	file:
+a2	tap_reverb.c	/^        float a2;$/;"	m	struct:__anon8	file:
+about	gwc.c	/^void about(GtkWidget * widget, gpointer data)$/;"	f
+abs	stat.c	15;"	d	file:
+abs_thresh	godsill_wolfe.c	/^double abs_thresh[N_BANDS] ;$/;"	v
+add_number_entry_with_label	dialog.c	/^GtkWidget *add_number_entry_with_label(char *entry_text, char *label_text, GtkWidget *table,$/;"	f
+add_number_entry_with_label_double	dialog.c	/^GtkWidget *add_number_entry_with_label_double(double value, char *label_text, GtkWidget *table, int row)$/;"	f
+add_number_entry_with_label_int	dialog.c	/^GtkWidget *add_number_entry_with_label_int(int value, char *label_text, GtkWidget *table, int row)$/;"	f
+add_song_marker	markers.c	/^void add_song_marker(void)$/;"	f
+add_song_marker_pair	markers.c	/^void add_song_marker_pair(void)$/;"	f
+adjust_all_marker_positions	soundfile.c	/^static void adjust_all_marker_positions(long start, long delta)$/;"	f	file:
+adjust_marker_positions	gwc.c	/^void adjust_marker_positions(long pos, long delta)$/;"	f
+adjust_song_marker_positions	markers.c	/^void adjust_song_marker_positions(long pos, long delta)$/;"	f
+adjust_view	audio_edit.c	/^static void adjust_view(struct view *v)$/;"	f	file:
+allp_run	tap_reverb.c	/^allp_run(rev_t insample, ALLP_FILTER * allp) {$/;"	f
+allps	tap_reverb.c	/^ALLP_FILTER allps[2 * MAX_ALLPS];$/;"	v
+allps_IR	tap_reverb.c	/^ALLP_FILTER allps_IR[MAX_ALLPS];$/;"	v
+allps_en	tap_reverb.c	/^int allps_en = 1; \/* on\/off *\/$/;"	v
+alpha_lorber	denoise.c	/^double alpha_lorber(double snr)$/;"	f
+amount_first	amplify.c	/^static gfloat amount_first[2] = {1.0,1.0} ;$/;"	v	file:
+amount_first_l	amplify.c	/^static gfloat amount_first_l[2] = {1.0,0.0} ;$/;"	v	file:
+amount_first_r	amplify.c	/^static gfloat amount_first_r[2] = {0.0,1.0} ;$/;"	v	file:
+amount_last	amplify.c	/^static gfloat amount_last[2] = {1.0,1.0} ;$/;"	v	file:
+amount_last_l	amplify.c	/^static gfloat amount_last_l[2] = {1.0,0.0} ;$/;"	v	file:
+amount_last_r	amplify.c	/^static gfloat amount_last_r[2] = {0.0,1.0} ;$/;"	v	file:
+amount_pink	pinknoise.c	/^static gfloat amount_pink = .01 ;$/;"	v	file:
+amount_white	pinknoise.c	/^static gfloat amount_white = .01 ;$/;"	v	file:
+amplify	gwc.c	/^void amplify(GtkWidget * widget, gpointer data)$/;"	f
+amplify_audio	amplify.c	/^void amplify_audio(struct sound_prefs *p, long first, long last, int channel_mask)$/;"	f
+amplify_dialog	amplify.c	/^int amplify_dialog(struct sound_prefs current, struct view *v)$/;"	f
+answer	stat.c	/^static VEC *answer = VNULL ;$/;"	v	file:
+append_cdrdao	gwc.c	/^void append_cdrdao(struct view *v)$/;"	f
+audio_area_button_event	drawing.c	/^int audio_area_button_event(GtkWidget *c, GdkEventButton *event, gpointer data)$/;"	f
+audio_area_configure_event	gwc.c	/^static gint audio_area_configure_event(GtkWidget * widget, GdkEventConfigure * event)$/;"	f	file:
+audio_area_motion_event	drawing.c	/^int audio_area_motion_event(GtkWidget *c, GdkEventMotion *event)$/;"	f
+audio_bits	audio_util.c	/^int audio_bits = 16 ;$/;"	v
+audio_buffer	audio_util.c	/^unsigned char audio_buffer[MAXBUFSIZE] ;$/;"	v
+audio_buffer2	audio_util.c	/^unsigned char audio_buffer2[MAXBUFSIZE] ;$/;"	v
+audio_bytes_written	audio_util.c	/^long audio_bytes_written ;$/;"	v
+audio_canvas_w	gwc.c	/^GtkWidget *audio_canvas_w;$/;"	v
+audio_data	audio_osx.c	/^MacOSXAudioData 	audio_data ;$/;"	v
+audio_debug	gwc.c	/^static int audio_debug = 0 ;$/;"	v	file:
+audio_debug_print	gwc.c	/^void audio_debug_print(char *fmt, ...)$/;"	f
+audio_device	gwc.c	/^char audio_device[256]="\/dev\/dsp";$/;"	v
+audio_device	gwc.c	/^char audio_device[256]="hw:0,0";$/;"	v
+audio_device_best_buffer_size	audio_alsa.c	/^int audio_device_best_buffer_size(int playback_bytes_per_block)$/;"	f
+audio_device_best_buffer_size	audio_oss.c	/^int audio_device_best_buffer_size(int playback_bytes_per_block)$/;"	f
+audio_device_best_buffer_size	audio_osx.c	/^int audio_device_best_buffer_size(int playback_bytes_per_block)  \/\/The result of this doesn't make any difference.$/;"	f
+audio_device_close	audio_alsa.c	/^void audio_device_close(void)$/;"	f
+audio_device_close	audio_oss.c	/^void audio_device_close(void)$/;"	f
+audio_device_close	audio_osx.c	/^void audio_device_close(void)  \/\/Reminder: check to make sure this works when no device has been opened.$/;"	f
+audio_device_nonblocking_write_buffer_size	audio_alsa.c	/^int audio_device_nonblocking_write_buffer_size(int maxbufsize,$/;"	f
+audio_device_nonblocking_write_buffer_size	audio_oss.c	/^int audio_device_nonblocking_write_buffer_size(int maxbufsize,$/;"	f
+audio_device_nonblocking_write_buffer_size	audio_osx.c	/^int audio_device_nonblocking_write_buffer_size(int maxbufsize,    \/\/Normally returns the number of bytes the send buffer is ready for.$/;"	f
+audio_device_open	audio_alsa.c	/^int audio_device_open(char *output_device)$/;"	f
+audio_device_open	audio_oss.c	/^int audio_device_open(char *output_device)$/;"	f
+audio_device_open	audio_osx.c	/^int audio_device_open(char *output_device) $/;"	f
+audio_device_processed_bytes	audio_alsa.c	/^long audio_device_processed_bytes(void)$/;"	f
+audio_device_processed_bytes	audio_oss.c	/^long audio_device_processed_bytes(void)$/;"	f
+audio_device_processed_bytes	audio_osx.c	/^long audio_device_processed_bytes(void)$/;"	f
+audio_device_read	audio_alsa.c	/^int audio_device_read(unsigned char *buffer, int buffersize)$/;"	f
+audio_device_read	audio_oss.c	/^int audio_device_read(unsigned char *buffer, int buffersize)$/;"	f
+audio_device_read	audio_osx.c	/^int audio_device_read(unsigned char *buffer, int buffersize){return 0;} \/\/ Leave this stub function because we don't want to read data.$/;"	f
+audio_device_set_params	audio_alsa.c	/^int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate)$/;"	f
+audio_device_set_params	audio_oss.c	/^int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate)$/;"	f
+audio_device_set_params	audio_osx.c	/^int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate) \/\/And start the audio playing.  (This is different from linux.)$/;"	f
+audio_device_write	audio_alsa.c	/^int audio_device_write(unsigned char *data, int count)$/;"	f
+audio_device_write	audio_oss.c	/^int audio_device_write(unsigned char *buffer, int buffersize)$/;"	f
+audio_device_write	audio_osx.c	/^int audio_device_write(unsigned char *buffer, int buffersize){return 0;} \/\/ Not quite what the title says in OS X.$/;"	f
+audio_drawing_area	gwc.c	/^GtkWidget *audio_drawing_area;$/;"	v
+audio_expose_event	gwc.c	/^gint audio_expose_event(GtkWidget * widget, GdkEventExpose * event)$/;"	f
+audio_fd	audio_oss.c	/^static int audio_fd = -1 ;$/;"	v	file:
+audio_is_looping	gwc.c	/^int audio_is_looping = FALSE;$/;"	v
+audio_normalize	audio_util.c	/^void audio_normalize(int flag)$/;"	f
+audio_pixmap	gwc.c	/^GdkPixmap *audio_pixmap = NULL;$/;"	v
+audio_playback	gwc.c	/^int audio_playback = FALSE;$/;"	v
+audio_state	audio_util.c	/^int audio_state = AUDIO_IS_IDLE ;$/;"	v
+audio_type	audio_util.c	/^int audio_type ;$/;"	v
+audio_view	gwc.c	/^struct view audio_view;$/;"	v	typeref:struct:view
+audioedit_copy_selection	audio_edit.c	/^int audioedit_copy_selection(struct view *v)$/;"	f
+audioedit_count_samples_in_clipdata	audio_edit.c	/^long audioedit_count_samples_in_clipdata(void)$/;"	f
+audioedit_cut_selection	audio_edit.c	/^int audioedit_cut_selection(struct view *v)$/;"	f
+audioedit_delete_selection	audio_edit.c	/^int audioedit_delete_selection(struct view *v)$/;"	f
+audioedit_has_clipdata	audio_edit.c	/^int audioedit_has_clipdata(void)$/;"	f
+audioedit_insert_silence	audio_edit.c	/^int audioedit_insert_silence(struct view *v)$/;"	f
+audioedit_paste_selection	audio_edit.c	/^int audioedit_paste_selection(struct view *v)$/;"	f
+audiofileisopen	audio_util.c	/^int audiofileisopen = 0 ;$/;"	v
+b	stat.c	/^static VEC *b = VNULL ;$/;"	v	file:
+b0	tap_reverb.c	/^        float b0;$/;"	m	struct:__anon8	file:
+b1	tap_reverb.c	/^        float b1;$/;"	m	struct:__anon8	file:
+b2	tap_reverb.c	/^        float b2;$/;"	m	struct:__anon8	file:
+bandps_en	tap_reverb.c	/^int bandps_en = 1; \/* on\/off *\/$/;"	v
+bandwidth	biquad.c	/^    double bandwidth ;$/;"	m	struct:__anon2	file:
+bandwidth	biquad.c	/^static gfloat bandwidth ;$/;"	v	file:
+bandwidth_entry	biquad.c	/^static GtkWidget *bandwidth_entry ;$/;"	v	file:
+bark_z	denoise.c	/^double bark_z[DENOISE_MAX_FFT] ;$/;"	v
+batch	gwc.c	/^void batch(int argc, char **argv)$/;"	f
+batch_mode	gwc.c	/^int batch_mode = 0 ;$/;"	v
+batch_normalize	amplify.c	/^void batch_normalize(struct sound_prefs *p, long first, long last, int channel_mask)$/;"	f
+begin_operation	audio_edit.c	/^static void begin_operation(char *status_text)$/;"	f	file:
+biquad	tap_reverb.c	/^} biquad;$/;"	t	typeref:struct:__anon8	file:
+biquad_init	tap_reverb.c	/^biquad_init(biquad *f) {$/;"	f	file:
+biquad_run	tap_reverb.c	/^biquad_run(biquad *f, rev_t x) {$/;"	f	file:
+black_color	drawing.c	/^GdkColor *black_color = &black_gdk_color ;$/;"	v
+black_gdk_color	drawing.c	/^GdkColor black_gdk_color = {5, 0, 0, 0} ;$/;"	v
+blackman	denoise.c	/^double blackman(int k, int N)$/;"	f
+blackman_hybrid	denoise.c	/^double blackman_hybrid(int k, int n_flat, int N)$/;"	f
+blanks_marked	markers.c	/^static int blanks_marked ; \/* song markers are positioned at start AND end of each song? *\/$/;"	v	file:
+blue_color	drawing.c	/^GdkColor *blue_color = &blue_gdk_color ;$/;"	v
+blue_gdk_color	drawing.c	/^GdkColor blue_gdk_color = {1, 0, 0, 65535} ;$/;"	v
+buf_size	audio_osx.c	/^	UInt32 			buf_size ;$/;"	m	struct:__anon1	file:
+buff_num	audio_osx.c	/^long buff_num; \/\/ An index to allow us to create the array to run the VU meters.$/;"	v
+buff_num_play	audio_osx.c	/^long buff_num_play;  \/\/ The index of the buffer we are playing.$/;"	v
+buffer_pos	tap_reverb.c	/^	unsigned long buffer_pos;$/;"	m	struct:__anon10	file:
+buffer_pos	tap_reverb.c	/^	unsigned long buffer_pos;$/;"	m	struct:__anon9	file:
+buflen	tap_reverb.c	/^	unsigned long buflen;$/;"	m	struct:__anon10	file:
+buflen	tap_reverb.c	/^	unsigned long buflen;$/;"	m	struct:__anon9	file:
+build_options	encode.c	/^int build_options(int fmt, char *newfilename)$/;"	f
+builtin_ptr	tap_reverb_file_io.c	/^int builtin_ptr = 0 ;$/;"	v
+button	encode.c	/^static GtkWidget *button;$/;"	v	file:
+button_clicked_callback	gtkgamma.c	/^button_clicked_callback (GtkWidget *w, gpointer data)$/;"	f	file:
+button_realize_callback	gtkgamma.c	/^button_realize_callback (GtkWidget *w)$/;"	f	file:
+button_toggled_callback	gtkgamma.c	/^button_toggled_callback (GtkWidget *w, gpointer data)$/;"	f	file:
+bypass	tap_reverb.c	/^int bypass = 0; \/* on\/off *\/$/;"	v
+cancel_encoding	encode.c	/^void cancel_encoding(GtkWidget *w)$/;"	f
+cdrdao_toc_info	markers.c	/^void cdrdao_toc_info(char *filename)$/;"	f
+cdtext_data	markers.c	/^char *cdtext_data = NULL;$/;"	v
+cdtext_length	markers.c	/^long cdtext_length;$/;"	v
+changed_settings	tap_reverb.c	/^int changed_settings = 0;$/;"	v
+chbevl	chbevl.c	/^double chbevl( x, array, n )$/;"	f
+cleanup_and_close	gwc.c	/^int cleanup_and_close(struct view *v, struct sound_prefs *p)$/;"	f
+clear_markers_in_view	gwc.c	/^void clear_markers_in_view(GtkWidget * widget, gpointer data)$/;"	f
+click_data	gwc.c	/^struct click_data click_data;$/;"	v	typeref:struct:click_data
+clicks	drawing.c	/^struct click_data *clicks = &click_data ;$/;"	v	typeref:struct:click_data
+close_undo	undo.c	/^int close_undo(void)$/;"	f
+close_wavefile	audio_util.c	/^int close_wavefile(struct view *v)$/;"	f
+coef	stat.c	/^static MAT *coef = MNULL ;$/;"	v	file:
+col	stat.c	/^static int row, col, N, i ;$/;"	v	file:
+comb_run	tap_reverb.c	/^comb_run(rev_t insample, COMB_FILTER * comb) {$/;"	f
+combs	tap_reverb.c	/^COMB_FILTER combs[2 * MAX_COMBS];$/;"	v
+combs_IR	tap_reverb.c	/^COMB_FILTER combs_IR[MAX_COMBS];$/;"	v
+combs_en	tap_reverb.c	/^int combs_en = 1; \/* on\/off *\/$/;"	v
+comp_coeffs	tap_reverb.c	/^comp_coeffs(void) {$/;"	f
+compute_bark_z	denoise.c	/^void compute_bark_z(int FFT_SIZE, int rate)$/;"	f
+compute_johnston_gain	denoise.c	/^void compute_johnston_gain(int FFT_SIZE, double tonality_factor)$/;"	f
+compute_sum_window_wgts	denoise.c	/^void compute_sum_window_wgts(struct denoise_prefs *pDnprefs)$/;"	f
+config_audio_device	audio_util.c	/^void config_audio_device(int rate_set, int bits_set, int stereo_set)$/;"	f
+convf	tap_reverb_file_io.c	/^float convf(char * s) {$/;"	f
+copy_callback	gwc.c	/^void copy_callback(GtkWidget * widget, gpointer data)$/;"	f
+count	gwc.c	/^int count = 0;$/;"	v
+create_progress_window	encode.c	/^void create_progress_window(void)$/;"	f
+crit_bands	godsill_wolfe.c	/^int crit_bands[N_BANDS] = {0,100,200,300,400,510,630,770,920,1080,1270,1480,1720,2000,2320,2700,3150,3700,4400,5300,6400,7700,9500,12000,15500,1.e30};$/;"	v
+curr	tap_reverb.c	/^REVTYPE * curr = NULL ;$/;"	v
+current_ogg_bitstream	audio_util.c	/^int current_ogg_bitstream = 0 ;$/;"	v
+current_ogg_or_mp3_pos	audio_util.c	/^long current_ogg_or_mp3_pos ;$/;"	v
+current_sample	audio_util.c	/^int current_sample ;$/;"	v
+current_undo_msg	undo.c	/^static char current_undo_msg[200] ;$/;"	v	file:
+cursamp	gwcmad.c	/^        ptrdiff_t             cursamp;$/;"	m	struct:__anon5	file:
+cursamp	mp3.c	/^        ptrdiff_t             cursamp;$/;"	m	struct:__anon6	file:
+cursor_pixmap	gwc.c	/^GdkPixmap *cursor_pixmap = NULL;$/;"	v
+cursor_playback	gwc.c	/^int cursor_playback = FALSE;$/;"	v
+cursor_samples_per_playback_block	gwc.c	/^long cursor_samples_per_playback_block;$/;"	v
+cursor_timer	gwc.c	/^gint cursor_timer;$/;"	v
+curve_type_changed_callback	gtkgamma.c	/^curve_type_changed_callback (GtkWidget *w, gpointer data)$/;"	f	file:
+curve_type_changed_signal	gtkcurve.c	/^static guint curve_type_changed_signal = 0;$/;"	v	file:
+cut_callback	gwc.c	/^void cut_callback(GtkWidget * widget, gpointer data)$/;"	f
+cut_highlight_color	drawing.c	74;"	d	file:
+d_print	gwc.c	/^void d_print(char *fmt, ...)$/;"	f
+db2lin	tap_reverb.c	62;"	d	file:
+dbGain	biquad.c	/^    double dbGain ;$/;"	m	struct:__anon2	file:
+dbGain	biquad.c	/^static gfloat dbGain = 3 ;$/;"	v	file:
+dbGain_entry	biquad.c	/^static GtkWidget *dbGain_entry ;$/;"	v	file:
+debug	gwc.c	/^gint debug = 0;$/;"	v
+decay	reverb.c	/^static gfloat decay = 1500 ;$/;"	v	file:
+declick	gwc.c	/^void declick(GtkWidget * widget, gpointer data)$/;"	f
+declick_a_click	declick.c	/^int declick_a_click(struct sound_prefs *p, long first_sample, long last_sample, int channel_mask)$/;"	f
+declick_detector_type	gwc.c	/^int declick_detector_type = FFT_DETECT ;$/;"	v
+declick_iterate_flag	gwc.c	/^gint declick_iterate_flag = 0;$/;"	v
+declick_sensitivity	gwc.c	/^double declick_sensitivity = 0.75;$/;"	v
+declick_set_preferences	preferences.c	/^void declick_set_preferences(GtkWidget * widget, gpointer data)$/;"	f
+declick_weak	gwc.c	/^void declick_weak(GtkWidget * widget, gpointer data)$/;"	f
+declick_with_sensitivity	gwc.c	/^void declick_with_sensitivity(double sensitivity)$/;"	f
+decrackle	gwc.c	/^void decrackle(GtkWidget * widget, gpointer data)$/;"	f
+decrackle_average	gwc.c	/^gint decrackle_average = 3;$/;"	v
+decrackle_level	gwc.c	/^double decrackle_level = 0.2;$/;"	v
+decrackle_set_preferences	preferences.c	/^void decrackle_set_preferences(GtkWidget * widget, gpointer data)$/;"	f
+decrackle_window	gwc.c	/^gint decrackle_window = 2000;$/;"	v
+delete_callback	gwc.c	/^void delete_callback(GtkWidget * widget, gpointer data)$/;"	f
+delete_event	gwc.c	/^gint delete_event(GtkWidget * widget, GdkEvent * event, gpointer data)$/;"	f
+delete_song_marker	markers.c	/^void delete_song_marker(void)$/;"	f
+denoise	denoise.c	/^int denoise(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs, long noise_start, long noise_end,$/;"	f
+denoise_data	gwc.c	/^DENOISE_DATA denoise_data = { 0, 0, 0, 0, FALSE };$/;"	v
+denoise_normalize	denoise.c	/^int denoise_normalize = 0 ;$/;"	v
+denoise_prefs	gwc.c	/^struct denoise_prefs denoise_prefs;$/;"	v	typeref:struct:denoise_prefs
+denoise_set_preferences	preferences.c	/^void denoise_set_preferences(GtkWidget * widget, gpointer data)$/;"	f
+destroy	gwc.c	/^void destroy(GtkWidget * widget, gpointer data)$/;"	f
+destroy_progress_window	encode.c	/^void destroy_progress_window(void)$/;"	f
+detect_only_func	gwc.c	/^void detect_only_func(GtkWidget * widget, gpointer data)$/;"	f
+detect_only_widget	gwc.c	/^GtkWidget *detect_only_widget;$/;"	v
+dethunk	dethunk.c	/^int dethunk(struct sound_prefs *pPrefs,$/;"	f
+dethunk_current	dethunk.c	/^int dethunk_current(struct sound_prefs *pPrefs,$/;"	f
+dethunk_new	dethunk.c	/^int dethunk_new(struct sound_prefs *pPrefs,$/;"	f
+device	audio_osx.c	/^	AudioDeviceID 	device ;$/;"	m	struct:__anon1	file:
+dial	gwc.c	/^GtkWidget *dial[2];$/;"	v
+display_message	gwc.c	/^void display_message(char *msg, char *title) $/;"	f
+display_sonogram	gwc.c	/^void display_sonogram(GtkWidget * widget, gpointer data)$/;"	f
+display_times	gwc.c	/^void display_times(void)$/;"	f
+do_declick	declick.c	/^char *do_declick(struct sound_prefs *p, long first_sample, long last_sample, int channel_mask, double sensitivity, int repair,$/;"	f
+do_declick_fft	declick.c	/^char *do_declick_fft(struct sound_prefs *p, long first_sample, long last_sample, int channel_mask, double sensitivity, int repair,$/;"	f
+do_declick_hpf	declick.c	/^char *do_declick_hpf(struct sound_prefs *p, long first_sample, long last_sample, int channel_mask, double sensitivity, int repair,$/;"	f
+do_decrackle	decrackle.c	/^int do_decrackle(struct sound_prefs *pPrefs, long first_sample, $/;"	f
+doing_statusbar_update	gwc.c	/^gint doing_statusbar_update = FALSE;$/;"	v
+done_playing	audio_osx.c	/^	int 			done_playing ;$/;"	m	struct:__anon1	file:
+done_reading	audio_osx.c	/^	bool			done_reading ;$/;"	m	struct:__anon1	file:
+drand48	crackle.c	/^double drand48(void)$/;"	f
+draw_a_cursor_line	drawing.c	/^draw_a_cursor_line(GdkGC *gc,$/;"	f	file:
+draw_a_highlight_rect	drawing.c	/^draw_a_highlight_rect(GdkGC *gc,$/;"	f	file:
+draw_a_line	drawing.c	/^draw_a_line(GdkGC *gc,$/;"	f	file:
+draw_a_rect	drawing.c	/^draw_a_rect(GdkGC *gc,$/;"	f	file:
+draw_compressed_audio_image	drawing.c	/^void draw_compressed_audio_image(struct view *v, struct sound_prefs *p, GtkWidget *da)$/;"	f
+draw_sonogram	drawing.c	/^void draw_sonogram(struct view *v, struct sound_prefs *pPrefs, GtkWidget *da, double samples_per_pixel, int cursor_flag)$/;"	f
+dry_level	reverb.c	/^static gfloat dry_level = -0.5 ;$/;"	v	file:
+drylevel	tap_reverb.c	/^float drylevel = 0.0f;$/;"	v
+edit_menu	gwc.c	/^GnomeUIInfo edit_menu[] = {$/;"	v
+edit_toolbar	gwc.c	/^GtkWidget *edit_toolbar;$/;"	v
+edit_toolbar_info	gwc.c	/^GnomeUIInfo edit_toolbar_info[] = {$/;"	v
+encode	encode.c	/^int encode(int mode, char *origfilename, char *newfilename, long start,$/;"	f
+encode_progress	encode.c	/^gint encode_progress (gfloat pvalue)$/;"	f
+encoding_prefs	gwc.c	/^struct encoding_prefs encoding_prefs;$/;"	v	typeref:struct:encoding_prefs
+encoding_type	gwc.c	/^gint encoding_type = GWC_OGG;$/;"	v
+encpresets	preferences.c	/^static int svbr_mode, encpresets, oggencopt;$/;"	v	file:
+end_operation	audio_edit.c	/^static void end_operation(void)$/;"	f	file:
+end_time	denoise.c	/^struct timeb start_time, middle_time, end_time ;$/;"	v	typeref:struct:
+end_time	denoise.c	/^struct timeval start_time, middle_time, end_time ;$/;"	v	typeref:struct:
+estimate	gwc.c	/^void estimate(GtkWidget * widget, gpointer data)$/;"	f
+estimate_reg	stat.c	/^int estimate_reg(double *b_solution)$/;"	f
+estimate_region	dethunk.c	/^void estimate_region(fftw_real data[], int firstbad, int lastbad, int siglen)$/;"	f
+failed	stat.c	/^static int failed ;$/;"	v	file:
+fb_gain	tap_reverb.c	/^	float fb_gain;$/;"	m	struct:__anon10	file:
+fb_gain	tap_reverb.c	/^	float fb_gain;$/;"	m	struct:__anon9	file:
+fd	gwcmad.c	/^	int fd ;$/;"	m	struct:__anon5	file:
+feather_width	amplify.c	/^static int feather_width = 20 ;$/;"	v	file:
+feather_width	biquad.c	/^    int feather_width ;$/;"	m	struct:__anon2	file:
+feather_width	biquad.c	/^static int feather_width = 20 ;$/;"	v	file:
+feather_width	pinknoise.c	/^static int feather_width = 0 ;$/;"	v	file:
+feedback	tap_reverb.c	/^	float feedback;$/;"	m	struct:__anon10	file:
+feedback	tap_reverb.c	/^	float feedback;$/;"	m	struct:__anon9	file:
+fft_remove_noise	denoise.c	/^static void fft_remove_noise(fftw_real sample[], fftw_real noise_min2[], fftw_real noise_max2[], fftw_real noise_avg2[],$/;"	f	file:
+fft_window	denoise.c	/^double fft_window(int k, int N, int window_type)$/;"	f
+fft_window_select	preferences.c	/^void fft_window_select(GtkWidget * clist, gint row, gint column,$/;"	f
+file_is_open	gwc.c	/^gint file_is_open = FALSE;$/;"	v
+file_menu	gwc.c	/^GnomeUIInfo file_menu[] = {$/;"	v
+file_processing	gwc.c	/^gint file_processing = FALSE;$/;"	v
+file_selector	gwc.c	/^GtkWidget *file_selector;$/;"	v
+file_selector	markers.c	/^GtkWidget *file_selector;$/;"	v
+filestat	encode.c	/^struct stat filestat;$/;"	v	typeref:struct:stat
+fill_sample_buffer	sample_block.c	/^void fill_sample_buffer(struct sound_prefs *p)$/;"	f
+filter	tap_reverb.c	/^	biquad filter;$/;"	m	struct:__anon9	file:
+filter2row	biquad.c	/^int filter2row(gint filter_type)$/;"	f
+filter_audio	biquad.c	/^void filter_audio(struct sound_prefs *p, long first, long last, int channel_mask)$/;"	f
+filter_cb	gwc.c	/^void filter_cb(GtkWidget * widget, gpointer data)$/;"	f
+filter_dialog	biquad.c	/^int filter_dialog(struct sound_prefs current, struct view *v)$/;"	f
+filter_prefs	biquad.c	/^    } filter_prefs ;$/;"	v	typeref:struct:__anon2
+filter_type	biquad.c	/^    int filter_type ;$/;"	m	struct:__anon2	file:
+filter_type	biquad.c	/^static int filter_type = NOTCH ;$/;"	v	file:
+find_text	markers.c	/^char *find_text(long length,char *data, char *str) {$/;"	f
+first_pick_x	drawing.c	/^int first_pick_x, last_pick_x ;$/;"	v
+first_playback_sample	audio_util.c	/^long first_playback_sample ;$/;"	v
+fit_cubic	declick.c	/^void fit_cubic(fftw_real data[], int n, fftw_real estimated[])$/;"	f
+fit_trig_basis	declick.c	/^void fit_trig_basis(fftw_real data[], int n, fftw_real estimated[], int click_start, int click_end)$/;"	f
+flush_wavefile_data	audio_util.c	/^void flush_wavefile_data(void)$/;"	f
+format	audio_osx.c	/^{	AudioStreamBasicDescription		format ;$/;"	m	struct:__anon1	file:
+forward_extrapolate	dethunk.c	/^int forward_extrapolate(fftw_real data[], int firstbad, int lastbad, int siglen)$/;"	f
+fp_mp3	audio_util.c	/^mpg123_handle *fp_mp3 = NULL ;$/;"	v
+fp_ogg	audio_util.c	/^FILE *fp_ogg = NULL ;$/;"	v
+freq_entry	biquad.c	/^static GtkWidget *freq_entry ;$/;"	v	file:
+freq_resp	tap_reverb.c	/^	float freq_resp;$/;"	m	struct:__anon9	file:
+gain_em	denoise.c	/^double gain_em(double Rprio, double Rpost, double alpha)$/;"	f
+gain_power_subtraction	denoise.c	/^double gain_power_subtraction(double Yk2, double Dk2)$/;"	f
+gain_weiner	denoise.c	/^double gain_weiner(double Yk2, double Dk2)$/;"	f
+gamma_cancel_callback	gtkgamma.c	/^gamma_cancel_callback (GtkWidget *w, gpointer data)$/;"	f	file:
+gamma_ok_callback	gtkgamma.c	/^gamma_ok_callback (GtkWidget *w, gpointer data)$/;"	f	file:
+get_hpf	declick.c	/^void get_hpf (long sample, fftw_real channel_data[], double *hpf, double *hpf_ave, double *hpf_dev)$/;"	f
+get_next_revtype	tap_reverb_file_io.c	/^REVTYPE * get_next_revtype(REVTYPE *root)$/;"	f
+get_noise_sample	denoise.c	/^void get_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs, long noise_start, long noise_end,$/;"	f
+get_region_of_interest	gwc.c	/^void get_region_of_interest(long *first, long *last, struct view *v)$/;"	f
+get_revroot	tap_reverb_file_io.c	/^REVTYPE *get_revroot() $/;"	f
+get_revtype_by_name	tap_reverb_file_io.c	/^get_revtype_by_name(REVTYPE * root, const char * name) {$/;"	f
+get_sample_buffer	sample_block.c	/^int get_sample_buffer(struct sample_block **result) {$/;"	f
+get_sample_stats	sample_block.c	/^void get_sample_stats(struct sample_display_block *result, long first, long last, double blocks_per_pixel)$/;"	f
+get_undo_levels	undo.c	/^int get_undo_levels(void)$/;"	f
+get_undo_msg	undo.c	/^char *get_undo_msg(void)$/;"	f
+get_window_delta	denoise.c	/^int get_window_delta(struct denoise_prefs *pDnprefs)$/;"	f
+get_windowed_ps	declick.c	/^void get_windowed_ps(fftw_real ps[], fftw_real in[], double window_coef[], int FFT_SIZE, rfftw_plan pFor)$/;"	f
+gfp	gwcmad.c	/^        lame_global_flags       *gfp;$/;"	m	struct:__anon5	file:
+gfp	mp3.c	/^        lame_global_flags       *gfp;$/;"	m	struct:__anon6	file:
+gnome_flush	gwc.c	/^void gnome_flush(void)$/;"	f
+green_color	drawing.c	/^GdkColor *green_color = &green_gdk_color ;$/;"	v
+green_gdk_color	drawing.c	/^GdkColor green_gdk_color = {0, 0, 65535, 0} ;$/;"	v
+grey_color	drawing.c	/^GdkColor *grey_color = &grey_gdk_color ;$/;"	v
+grey_gdk_color	drawing.c	/^GdkColor grey_gdk_color = {3, 43000, 43000, 43000} ;$/;"	v
+gsl_m_inverse	declick.c	/^gsl_matrix * gsl_m_inverse(gsl_matrix *m)$/;"	f
+gsl_m_mlt	declick.c	/^gsl_matrix  *gsl_m_mlt(gsl_matrix *m1, gsl_matrix *m2)$/;"	f
+gsl_mv_mlt	declick.c	/^gsl_vector *gsl_mv_mlt(gsl_matrix *m, gsl_vector *v)$/;"	f
+gsl_transp	declick.c	/^gsl_matrix *gsl_transp(gsl_matrix *m)$/;"	f
+gtk_curve_class_init	gtkcurve.c	/^gtk_curve_class_init (GtkCurveClass *class)$/;"	f	file:
+gtk_curve_draw	gtkcurve.c	/^gtk_curve_draw (GtkCurve *c, gint width, gint height)$/;"	f	file:
+gtk_curve_finalize	gtkcurve.c	/^gtk_curve_finalize (GtkObject *object)$/;"	f	file:
+gtk_curve_get_type	gtkcurve.c	/^gtk_curve_get_type (void)$/;"	f
+gtk_curve_get_vector	gtkcurve.c	/^gtk_curve_get_vector (GtkCurve *c, int veclen, gfloat vector[])$/;"	f
+gtk_curve_graph_events	gtkcurve.c	/^gtk_curve_graph_events (GtkWidget *widget, GdkEvent *event, GtkCurve *c)$/;"	f	file:
+gtk_curve_init	gtkcurve.c	/^gtk_curve_init (GtkCurve *curve)$/;"	f	file:
+gtk_curve_interpolate	gtkcurve.c	/^gtk_curve_interpolate (GtkCurve *c, gint width, gint height)$/;"	f	file:
+gtk_curve_new	gtkcurve.c	/^gtk_curve_new (void)$/;"	f
+gtk_curve_reset	gtkcurve.c	/^gtk_curve_reset (GtkCurve *c)$/;"	f
+gtk_curve_reset_vector	gtkcurve.c	/^gtk_curve_reset_vector (GtkCurve *curve)$/;"	f	file:
+gtk_curve_set_curve_type	gtkcurve.c	/^gtk_curve_set_curve_type (GtkCurve *c, GtkCurveType new_type)$/;"	f
+gtk_curve_set_gamma	gtkcurve.c	/^gtk_curve_set_gamma (GtkCurve *c, gfloat gamma)$/;"	f
+gtk_curve_set_range	gtkcurve.c	/^gtk_curve_set_range (GtkCurve *curve,$/;"	f
+gtk_curve_set_vector	gtkcurve.c	/^gtk_curve_set_vector (GtkCurve *c, int veclen, gfloat vector[])$/;"	f
+gtk_curve_size_graph	gtkcurve.c	/^gtk_curve_size_graph (GtkCurve *curve)$/;"	f	file:
+gtk_gamma_curve_class_init	gtkgamma.c	/^gtk_gamma_curve_class_init (GtkGammaCurveClass *class)$/;"	f	file:
+gtk_gamma_curve_destroy	gtkgamma.c	/^gtk_gamma_curve_destroy (GtkObject *object)$/;"	f	file:
+gtk_gamma_curve_get_type	gtkgamma.c	/^gtk_gamma_curve_get_type (void)$/;"	f
+gtk_gamma_curve_init	gtkgamma.c	/^gtk_gamma_curve_init (GtkGammaCurve *curve)$/;"	f	file:
+gtk_gamma_curve_new	gtkgamma.c	/^gtk_gamma_curve_new (void)$/;"	f
+gtk_led_class_init	gtkled.c	/^gtk_led_class_init (GtkLedClass *class)$/;"	f
+gtk_led_destroy	gtkled.c	/^gtk_led_destroy (GtkObject *object)$/;"	f	file:
+gtk_led_expose	gtkled.c	/^gtk_led_expose (GtkWidget      *widget,$/;"	f	file:
+gtk_led_get_type	gtkled.c	/^gtk_led_get_type ()$/;"	f
+gtk_led_init	gtkled.c	/^gtk_led_init (GtkLed *led)$/;"	f
+gtk_led_is_on	gtkled.c	/^gtk_led_is_on (GtkLed  *led)$/;"	f
+gtk_led_new	gtkled.c	/^gtk_led_new ()$/;"	f
+gtk_led_realize	gtkled.c	/^gtk_led_realize (GtkWidget *widget)$/;"	f	file:
+gtk_led_set_colors	gtkled.c	/^gtk_led_set_colors (GtkLed *led, GdkColor *active, GdkColor *inactive)$/;"	f
+gtk_led_set_state	gtkled.c	/^gtk_led_set_state (GtkLed	*led,$/;"	f
+gtk_led_size_request	gtkled.c	/^gtk_led_size_request (GtkWidget	     *widget,$/;"	f	file:
+gtk_led_switch	gtkled.c	/^gtk_led_switch (GtkLed	     *led,$/;"	f
+gwc_dialog_run	preferences.c	/^int gwc_dialog_run(GtkDialog *dlg)$/;"	f
+gwc_mpg123_close	audio_util.c	/^int gwc_mpg123_close(void)$/;"	f
+gwc_mpg123_open	audio_util.c	/^int gwc_mpg123_open(char *filename)$/;"	f
+gwc_signal_handler	gwc.c	/^void gwc_signal_handler(int sig)$/;"	f
+gwc_window_set_title	gwc.c	/^void gwc_window_set_title(char *title)$/;"	f
+handle	audio_alsa.c	/^static snd_pcm_t *handle = NULL;$/;"	v	file:
+handle_color	drawing.c	36;"	d	file:
+hanning	denoise.c	/^double hanning(int k, int N)$/;"	f
+harmonics	biquad.c	/^    int harmonics ;$/;"	m	struct:__anon2	file:
+help	gwc.c	/^void help(GtkWidget * widget, gpointer data)$/;"	f
+help_menu	gwc.c	/^GnomeUIInfo help_menu[] = {$/;"	v
+help_menu_old	gwc.c	/^GnomeUIInfo help_menu_old[] = {$/;"	v
+high_pass	tap_reverb.c	/^biquad high_pass[2];$/;"	v
+high_pass_IR	tap_reverb.c	/^biquad high_pass_IR;$/;"	v
+high_pass_filter	declick.c	/^double high_pass_filter(fftw_real x[], int N)$/;"	f
+highlight_color	drawing.c	/^GdkColor *highlight_color = &white_gdk_color;$/;"	v
+highlight_pixmap	gwc.c	/^GdkPixmap *highlight_pixmap = NULL;$/;"	v
+hp_set_params	tap_reverb.c	/^hp_set_params(biquad *f, float fc, float bw, float fs) {$/;"	f	file:
+hscrollbar	gwc.c	/^GtkWidget *hscrollbar;$/;"	v
+hypergeom	denoise.c	/^double hypergeom(double theta)$/;"	f
+i	stat.c	/^static int row, col, N, i ;$/;"	v	file:
+i0	i0.c	/^double i0(x)$/;"	f
+i0e	i0.c	/^double i0e( x )$/;"	f
+i1	i1.c	/^double i1(x)$/;"	f
+i1e	i1.c	/^double i1e( x )$/;"	f
+imax	godsill_wolfe.c	/^int imax ;$/;"	v
+in_fd	encode.c	/^SNDFILE *in_fd;$/;"	v
+in_gain	tap_reverb.c	/^	float in_gain;$/;"	m	struct:__anon10	file:
+info	gwc.c	/^void info(char *msg)$/;"	f
+init_reg	stat.c	/^void init_reg(int n)$/;"	f
+insfinfo	encode.c	/^SF_INFO insfinfo, outsfinfo;	\/* sound file format descriptions for input and output *\/$/;"	v
+is_region_selected	gwc.c	/^static int is_region_selected(void)$/;"	f	file:
+is_valid_audio_file	audio_util.c	/^int is_valid_audio_file(char *filename)$/;"	f
+jg_lower	denoise.c	/^double jg_lower[DENOISE_MAX_FFT][11] ;$/;"	v
+jg_upper	denoise.c	/^double jg_upper[DENOISE_MAX_FFT][11] ;$/;"	v
+jw_psk_to_color	drawing.c	/^int jw_psk_to_color(double pwr, double max_amp, int max_color)$/;"	f
+key_press_cb	gwc.c	/^gboolean  key_press_cb(GtkWidget * widget, GdkEventKey * event, gpointer data)$/;"	f
+l_file_samples	gwc.c	/^GtkWidget *l_file_samples;$/;"	v
+l_file_time	gwc.c	/^GtkWidget *l_file_time;$/;"	v
+l_first_time	gwc.c	/^GtkWidget *l_first_time;$/;"	v
+l_last_time	gwc.c	/^GtkWidget *l_last_time;$/;"	v
+l_samples	gwc.c	/^GtkWidget *l_samples;$/;"	v
+l_selected_time	gwc.c	/^GtkWidget *l_selected_time;$/;"	v
+label	encode.c	/^static GtkWidget *label;$/;"	v	file:
+last_cursor_x	drawing.c	/^int last_cursor_x = -1;$/;"	v
+last_filename	gwc.c	/^gchar last_filename[255];$/;"	v
+last_out	tap_reverb.c	/^	rev_t last_out;$/;"	m	struct:__anon10	file:
+last_out	tap_reverb.c	/^	rev_t last_out;$/;"	m	struct:__anon9	file:
+last_pick_x	drawing.c	/^int first_pick_x, last_pick_x ;$/;"	v
+leave_click_marks_widget	gwc.c	/^GtkWidget *leave_click_marks_widget;$/;"	v
+led_bar_class_init	gtkledbar.c	/^led_bar_class_init (LedBarClass *class)$/;"	f	file:
+led_bar_clear	gtkledbar.c	/^led_bar_clear (GtkWidget *bar)$/;"	f
+led_bar_get_num_segments	gtkledbar.c	/^led_bar_get_num_segments (GtkWidget *bar)$/;"	f
+led_bar_get_type	gtkledbar.c	/^led_bar_get_type ()$/;"	f
+led_bar_init	gtkledbar.c	/^led_bar_init (LedBar *led_bar)$/;"	f	file:
+led_bar_light_percent	gtkledbar.c	/^led_bar_light_percent (GtkWidget *bar, gfloat percent)$/;"	f
+led_bar_light_segment	gtkledbar.c	/^led_bar_light_segment (GtkWidget *bar, gint segment)$/;"	f
+led_bar_light_segments	gtkledbar.c	/^led_bar_light_segments (GtkWidget *bar, gint num)$/;"	f
+led_bar_new	gtkledbar.c	/^led_bar_new (gint segments, gint orientation )$/;"	f
+led_bar_sequence_step	gtkledbar.c	/^led_bar_sequence_step (GtkWidget *bar)$/;"	f
+led_bar_unlight_segment	gtkledbar.c	/^led_bar_unlight_segment (GtkWidget *bar, gint segment)$/;"	f
+led_bar_unlight_segments	gtkledbar.c	/^led_bar_unlight_segments (GtkWidget *bar, gint num)$/;"	f
+load_denoise_preferences	preferences.c	/^void load_denoise_preferences(void)$/;"	f
+load_filter_preferences	biquad.c	/^void load_filter_preferences(void)$/;"	f
+load_mp3_encoding_preferences	preferences.c	/^void load_mp3_encoding_preferences(void)$/;"	f
+load_ogg_encoding_preferences	preferences.c	/^void load_ogg_encoding_preferences(void)$/;"	f
+load_preferences	gwc.c	/^void load_preferences(void)$/;"	f
+load_reverb_preferences	reverb.c	/^void load_reverb_preferences(void)$/;"	f
+load_revtype_data	tap_reverb.c	/^load_revtype_data(void) {$/;"	f
+load_sample_block_data	sample_block.c	/^int load_sample_block_data(struct sound_prefs *p)$/;"	f
+looped_count	audio_util.c	/^int looped_count ;$/;"	v
+low_pass	tap_reverb.c	/^biquad low_pass[2];$/;"	v
+low_pass_IR	tap_reverb.c	/^biquad low_pass_IR;$/;"	v
+lp_set_params	tap_reverb.c	/^lp_set_params(biquad *f, float fc, float bw, float fs) {$/;"	f	file:
+lsar_sample_restore	declick.c	/^int lsar_sample_restore(fftw_real data[], int firstbad, int lastbad, int siglen)$/;"	f
+macosx_audio_out_callback	audio_osx.c	/^macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_time,$/;"	f	file:
+main	crackle.c	/^int main(int argc, char **argv)$/;"	f
+main	gwc.c	/^int main(int argc, char *argv[])$/;"	f
+main_redraw	gwc.c	/^void main_redraw(int cursor_flag, int redraw_data)$/;"	f
+main_window	gwc.c	/^GtkWidget *main_window;$/;"	v
+manual_declick	gwc.c	/^void manual_declick(GtkWidget * widget, gpointer data)$/;"	f
+mark_songs	markers.c	/^void mark_songs(GtkWidget * widget, gpointer data)$/;"	f
+marker_menu	gwc.c	/^GnomeUIInfo marker_menu[] = {$/;"	v
+markers	gwc.c	/^long markers[MAX_MARKERS];$/;"	v
+matrix_solve	stat.c	/^void matrix_solve(MAT *A)$/;"	f
+menubar	gwc.c	/^GnomeUIInfo menubar[] = {$/;"	v
+middle_time	denoise.c	/^struct timeb start_time, middle_time, end_time ;$/;"	v	typeref:struct:
+middle_time	denoise.c	/^struct timeval start_time, middle_time, end_time ;$/;"	v	typeref:struct:
+mk_label_and_pack	gwc.c	/^GtkWidget *mk_label_and_pack(GtkBox * box, char *text)$/;"	f
+move_song_marker	markers.c	/^void move_song_marker(void)$/;"	f
+myLUsolve	stat.c	/^VEC	*myLUsolve(A,pivot,b,x)$/;"	f
+n_blocks	sample_block.c	/^static long n_blocks ;$/;"	v	file:
+n_in_buf	audio_util.c	/^long n_in_buf = 0 ;$/;"	v
+n_markers	gwc.c	/^long n_markers = 0;$/;"	v
+n_pn_rows	pinknoise.c	/^static int n_pn_rows = 32 ;$/;"	v	file:
+noise_method_window_select	preferences.c	/^void noise_method_window_select(GtkWidget * clist, gint row, gint column,$/;"	f
+noise_sample	gwc.c	/^void noise_sample(GtkWidget * widget, gpointer data)$/;"	f
+noise_suppression_method	preferences.c	/^static int noise_suppression_method, window_type;$/;"	v	file:
+nonzero_seek	audio_util.c	/^int nonzero_seek ;$/;"	v
+null_error_func	gwcmad.c	/^static void null_error_func(const char* string UNUSED, va_list va UNUSED)$/;"	f	file:
+null_error_func	mp3.c	/^static void null_error_func(const char* string UNUSED, va_list va UNUSED)$/;"	f	file:
+num_allps	tap_reverb.c	/^unsigned long num_allps; \/* total number of allpass filters *\/$/;"	v
+num_buffers	audio_osx.c	/^long num_buffers; \/\/ The number of buffers we will send.$/;"	v
+num_combs	tap_reverb.c	/^unsigned long num_combs; \/* total number of comb filters *\/$/;"	v
+num_song_markers	gwc.c	/^long num_song_markers = 0;$/;"	v
+ogg_enc_window_select	preferences.c	/^void ogg_enc_window_select(GtkWidget * clist, gint row, gint column,$/;"	f
+oggencopt	preferences.c	/^static int svbr_mode, encpresets, oggencopt;$/;"	v	file:
+oggfile	audio_util.c	/^OggVorbis_File oggfile ;$/;"	v
+old_open_wave_filename	gwc.c	/^void old_open_wave_filename(void)$/;"	f
+only_blank	markers.c	/^int only_blank(char *str)$/;"	f
+open_file_selection	gwc.c	/^void open_file_selection(GtkWidget * widget, gpointer data)$/;"	f
+open_wave_filename	gwc.c	/^void open_wave_filename(void)$/;"	f
+open_wavefile	audio_util.c	/^struct sound_prefs open_wavefile(char *filename, struct view *v)$/;"	f
+options	encode.c	/^char *options[255];$/;"	v
+orange_color	drawing.c	/^GdkColor *orange_color = &orange_gdk_color ;$/;"	v
+orange_gdk_color	drawing.c	/^GdkColor orange_gdk_color = {6, 65535, 42240, 0} ;$/;"	v
+out	denoise.c	/^static fftw_real out[DENOISE_MAX_FFT] ;$/;"	v	file:
+out_fd	encode.c	/^SNDFILE *out_fd;$/;"	v
+outsfinfo	encode.c	/^SF_INFO insfinfo, outsfinfo;	\/* sound file format descriptions for input and output *\/$/;"	v
+pL_global	audio_osx.c	/^gfloat* pL_global;$/;"	v
+pR_global	audio_osx.c	/^gfloat* pR_global;$/;"	v
+p_global_mem_alloced	audio_osx.c	/^bool p_global_mem_alloced = FALSE; \/\/Tells if we have reserved memory for the two above arrays.$/;"	v
+paint_screen_with_highlight	drawing.c	/^void paint_screen_with_highlight(struct view *v, GtkWidget *da, int y1, int y2, int cursor_flag)$/;"	f
+parent_class	gtkcurve.c	/^static GtkDrawingAreaClass *parent_class = NULL;$/;"	v	file:
+parent_class	gtkgamma.c	/^static GtkVBoxClass *parent_class = NULL;$/;"	v	file:
+parent_class	gtkled.c	/^static GtkMiscClass *parent_class = NULL;$/;"	v	file:
+parse_reverb_input_file	tap_reverb_file_io.c	/^parse_reverb_input_file(void) {$/;"	f
+parser_state	tap_reverb_file_io.c	/^int parser_state = 0;$/;"	v
+paste_callback	gwc.c	/^void paste_callback(GtkWidget * widget, gpointer data)$/;"	f
+pathname	gwc.c	/^char pathname[256] = ".\/";$/;"	v
+pbar	encode.c	/^static GtkWidget *pbar;$/;"	v	file:
+perr	soundfile.c	/^static void perr(char *text)$/;"	f	file:
+pinkMax	pinknoise.c	/^	float pinkMax = -999.0;$/;"	v
+pinkMin	pinknoise.c	/^	float pinkMin =  999.0;$/;"	v
+pink_Index	pinknoise.c	/^	int       pink_Index;        \/* Incremented each sample. *\/$/;"	m	struct:__anon7	file:
+pink_IndexMask	pinknoise.c	/^	int       pink_IndexMask;    \/* Index wrapped by ANDing with this mask. *\/$/;"	m	struct:__anon7	file:
+pink_Rows	pinknoise.c	/^	long      pink_Rows[PINK_MAX_RANDOM_ROWS];$/;"	m	struct:__anon7	file:
+pink_RunningSum	pinknoise.c	/^	long      pink_RunningSum;   \/* Used to optimize summing of generators. *\/$/;"	m	struct:__anon7	file:
+pink_Scalar	pinknoise.c	/^	float     pink_Scalar;       \/* Used to scale within range of -1.0 to +1.0 *\/$/;"	m	struct:__anon7	file:
+pinknoise	pinknoise.c	/^void pinknoise(struct sound_prefs *p, long first, long last, int channel_mask)$/;"	f
+pinknoise_cb	gwc.c	/^void pinknoise_cb(GtkWidget * widget, gpointer data)$/;"	f
+pinknoise_dialog	pinknoise.c	/^int pinknoise_dialog(struct sound_prefs current, struct view *v)$/;"	f
+pixel_to_sample	drawing.c	/^long pixel_to_sample(struct view *v, int pixel)$/;"	f
+play_a_block	gwc.c	/^gint play_a_block(gpointer data)$/;"	f
+playback_bytes_per_block	audio_util.c	/^int playback_bytes_per_block ;$/;"	v
+playback_end_position	audio_util.c	/^long playback_end_position ;$/;"	v
+playback_just_started	audio_osx.c	/^bool playback_just_started = FALSE;$/;"	v
+playback_position	audio_util.c	/^long playback_position ;$/;"	v
+playback_samples_per_block	gwc.c	/^long playback_samples_per_block;$/;"	v
+playback_samples_remaining	audio_util.c	/^long playback_samples_remaining = 0 ;$/;"	v
+playback_start_position	audio_util.c	/^long playback_start_position ;$/;"	v
+playback_start_time	audio_osx.c	/^struct timeval playback_start_time;$/;"	v	typeref:struct:timeval
+playback_timer	gwc.c	/^gint playback_timer = -1 ;$/;"	v
+playback_total_bytes	audio_util.c	/^long playback_total_bytes ;$/;"	v
+point_color	drawing.c	35;"	d	file:
+point_handle_width	drawing.c	37;"	d	file:
+pop_status_text	gwc.c	/^void pop_status_text(void)$/;"	f
+position_wavefile_pointer	audio_util.c	/^void position_wavefile_pointer(long sample_number)$/;"	f
+prefs	gwc.c	/^struct sound_prefs prefs = { 16, 44100, 1 };$/;"	v	typeref:struct:sound_prefs
+presets_window_select	preferences.c	/^void presets_window_select(GtkWidget * clist, gint row, gint column,$/;"	f
+prev_cursor_millisec	gwc.c	/^long prev_cursor_millisec = -1;$/;"	v
+prev_sample	denoise.c	/^int prev_sample[2] ;$/;"	v
+print_denoise	denoise.c	/^void print_denoise(char *header, struct denoise_prefs *pDnprefs) {}$/;"	f
+print_denoise	denoise.c	/^void print_denoise(char *header, struct denoise_prefs *pDnprefs)$/;"	f
+print_noise_sample	denoise.c	/^int print_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs, long noise_start, long noise_end)$/;"	f
+print_spectral	dethunk.c	/^void print_spectral(char *str, fftw_real tmp_l[], long FFT_SIZE)$/;"	f
+priv_t	gwcmad.c	/^} priv_t;$/;"	t	typeref:struct:__anon5	file:
+priv_t	mp3.c	/^} priv_t;$/;"	t	typeref:struct:__anon6	file:
+private_data	gwcmad.c	/^static priv_t private_data ;$/;"	v	file:
+process_audio	audio_osx.c	/^int process_audio(gfloat *pL, gfloat *pR)  \/\/This function must be called repeatedly from the gint play_a_block until the section is played. $/;"	f
+process_audio	audio_util.c	/^int process_audio(gfloat *pL, gfloat *pR)$/;"	f
+process_impresp	tap_reverb.c	/^process_impresp(float * data, long int nframes) {$/;"	f
+progress_dialog	encode.c	/^static GtkWidget *progress_dialog;$/;"	v	file:
+project	gtkcurve.c	/^project (gfloat value, gfloat min, gfloat max, int norm)$/;"	f	file:
+psk_to_color	drawing.c	/^int psk_to_color(double pwr, double max_amp, int max_color)$/;"	f
+push_buffer	tap_reverb.c	/^push_buffer(rev_t insample, rev_t * buffer,$/;"	f	file:
+push_status_text	gwc.c	/^void push_status_text(gchar * msg)$/;"	f
+query_processed_bytes	audio_alsa.c	/^long query_processed_bytes(void)$/;"	f
+quickstart_help	gwc.c	/^void quickstart_help(GtkWidget * widget, gpointer data)$/;"	f
+rate	audio_util.c	/^int rate = 44100 ;$/;"	v
+read_buffer	tap_reverb.c	/^read_buffer(rev_t * buffer, unsigned long buflen,$/;"	f	file:
+read_fft_real_wavefile_data	audio_util.c	/^int read_fft_real_wavefile_data(fftw_real left[], fftw_real right[], long first, long last)$/;"	f
+read_float_wavefile_data	audio_util.c	/^int read_float_wavefile_data(float left[], float right[], long first, long last)$/;"	f
+read_raw_wavefile_data	audio_util.c	/^int read_raw_wavefile_data(char buf[], long first, long last)$/;"	f
+read_wavefile_data	audio_util.c	/^int read_wavefile_data(long left[], long right[], long first, long last)$/;"	f
+record	gwc.c	/^void record(GtkWidget * widget, gpointer data)$/;"	f
+recover_snd_handle	audio_alsa.c	/^static int recover_snd_handle(int err)$/;"	f	file:
+red_color	drawing.c	/^GdkColor *red_color = &red_gdk_color ;$/;"	v
+red_gdk_color	drawing.c	/^GdkColor red_gdk_color = {0, 65535, 0, 0} ;$/;"	v
+redraw	drawing.c	/^void redraw(struct view *v, struct sound_prefs *p, GtkWidget *da, int cursor_flag, int redraw_data, int sonogram_flag)$/;"	f
+region_select_max_x	drawing.c	/^int region_select_max_x = -1 ;$/;"	v
+region_select_min_x	drawing.c	/^int region_select_min_x = -1 ;$/;"	v
+remove_noise	gwc.c	/^void remove_noise(GtkWidget * widget, gpointer data)$/;"	f
+repair_clicks	gwc.c	/^gint repair_clicks = 1;$/;"	v
+resample	audio_edit.c	/^static void resample(long first, long last)$/;"	f	file:
+resample_audio_data	sample_block.c	/^void resample_audio_data(struct sound_prefs *p, long first, long last)$/;"	f
+rescan_sample_buffer	sample_block.c	/^void rescan_sample_buffer(struct sound_prefs *p)$/;"	f
+resize_sample_buffer	sample_block.c	/^void resize_sample_buffer(struct sound_prefs *p)$/;"	f
+rev_t	tap_reverb.c	/^    typedef float rev_t;$/;"	t	file:
+rev_t	tap_reverb.c	/^typedef signed int rev_t;$/;"	t	file:
+reverb	gwc.c	/^void reverb(GtkWidget * widget, gpointer data)$/;"	f
+reverb_audio	reverb.c	/^void reverb_audio(struct sound_prefs *p, long first, long last, int channel_mask)$/;"	f
+reverb_data_format	tap_reverb_file_io.c	/^int reverb_data_format = FROM_FILE ;$/;"	v
+reverb_dialog	reverb.c	/^int reverb_dialog(struct sound_prefs current, struct view *v)$/;"	f
+reverb_fgetc	tap_reverb_file_io.c	/^int reverb_fgetc(FILE *infile)$/;"	f
+reverb_init	tap_reverb.c	/^void reverb_init(void) {$/;"	f
+reverb_method_name	reverb.c	/^static char reverb_method_name[128] ;$/;"	v	file:
+reverb_process	tap_reverb.c	/^reverb_process(long nframes, reverb_audio_sample_t *output_L, reverb_audio_sample_t *input_L, reverb_audio_sample_t *output_R, reverb_audio_sample_t *input_R) {$/;"	f
+reverb_root	tap_reverb.c	/^REVTYPE * reverb_root = NULL ;$/;"	v
+reverb_selection_made	reverb.c	/^void reverb_selection_made( GtkWidget      *clist,$/;"	f
+reverb_setup	tap_reverb.c	/^void reverb_setup(long rate, double decay_d, double wet_d, double dry_d, char *name)$/;"	f
+reverse_extrapolate	dethunk.c	/^int reverse_extrapolate(fftw_real data[], int firstbad, int lastbad, int siglen)$/;"	f
+ringbuffer	tap_reverb.c	/^	rev_t ringbuffer[(int)MAX_ALLP_DELAY * MAX_SAMPLERATE \/ 1000];$/;"	m	struct:__anon10	file:
+ringbuffer	tap_reverb.c	/^	rev_t ringbuffer[(int)MAX_COMB_DELAY * MAX_SAMPLERATE \/ 1000];$/;"	m	struct:__anon9	file:
+row	stat.c	/^static int row, col, N, i ;$/;"	v	file:
+row2filter	biquad.c	/^int row2filter(int row)$/;"	f
+sample_buffer	sample_block.c	/^struct sample_block *sample_buffer = NULL ;$/;"	v	typeref:struct:sample_block
+sample_rate	tap_reverb.c	/^unsigned long sample_rate;$/;"	v
+sample_to_pixel	drawing.c	/^int sample_to_pixel(struct view *v, long sample)$/;"	f
+sample_to_time_text	gwc.c	/^char *sample_to_time_text(long i, int rate, char *prefix, char *buf)$/;"	f
+save_as_encoded	gwc.c	/^void save_as_encoded()$/;"	f
+save_as_mp3_selection	gwc.c	/^void save_as_mp3_selection(GtkWidget * widget, gpointer data)$/;"	f
+save_as_ogg_selection	gwc.c	/^void save_as_ogg_selection(GtkWidget * widget, gpointer data)$/;"	f
+save_as_selection	gwc.c	/^void save_as_selection(GtkWidget * widget, gpointer data)$/;"	f
+save_cdrdao_toc	markers.c	/^void save_cdrdao_toc(GtkWidget * widget, gpointer data)$/;"	f
+save_cdrdao_toc_filename	markers.c	/^gchar save_cdrdao_toc_filename[255] ;$/;"	v
+save_cdrdao_tocp	markers.c	/^void save_cdrdao_tocp(GtkWidget * widget, gpointer data)$/;"	f
+save_cdrdao_tocs	markers.c	/^void save_cdrdao_tocs(GtkWidget * widget, gpointer data)$/;"	f
+save_denoise_preferences	preferences.c	/^void save_denoise_preferences(void)$/;"	f
+save_filter_preferences	biquad.c	/^void save_filter_preferences(void)$/;"	f
+save_mp3_encoding_preferences	preferences.c	/^void save_mp3_encoding_preferences(void)$/;"	f
+save_ogg_encoding_preferences	preferences.c	/^void save_ogg_encoding_preferences(void)$/;"	f
+save_preferences	gwc.c	/^void save_preferences(void)$/;"	f
+save_reverb_preferences	reverb.c	/^void save_reverb_preferences(void)$/;"	f
+save_sample_block_data	sample_block.c	/^void save_sample_block_data(struct sound_prefs *p)$/;"	f
+save_selection_as_encoded	gwc.c	/^void save_selection_as_encoded(int fmt, char *filename, char *filename_new, struct view *v)$/;"	f
+save_selection_as_wavfile	audio_util.c	/^void save_selection_as_wavfile(char *filename_new, struct view *v)$/;"	f
+save_selection_filename	gwc.c	/^gchar save_selection_filename[255];$/;"	v
+save_undo_data	undo.c	/^int save_undo_data(long first_sample, long last_sample, struct sound_prefs *p, int status_update_flag)$/;"	f
+save_undo_data_insert	undo.c	/^int save_undo_data_insert(long first_sample, long last_sample, int status_update_flag)$/;"	f
+save_undo_data_remove	undo.c	/^int save_undo_data_remove(long first_sample, long last_sample, int status_update_flag)$/;"	f
+sb_size	sample_block.c	/^static size_t sb_size ;$/;"	v	file:
+scale_down_callback	gwc.c	/^void scale_down_callback(GtkWidget * widget, gpointer data)$/;"	f
+scale_reset_callback	gwc.c	/^void scale_reset_callback(GtkWidget * widget, gpointer data)$/;"	f
+scale_up_callback	gwc.c	/^void scale_up_callback(GtkWidget * widget, gpointer data)$/;"	f
+scroll_bar_changed	gwc.c	/^void scroll_bar_changed(GtkWidget * widget, gpointer data)$/;"	f
+scroll_pos	gwc.c	/^GtkObject *scroll_pos;$/;"	v
+select_all	gwc.c	/^void select_all(GtkWidget * widget, gpointer data)$/;"	f
+select_markers	gwc.c	/^void select_markers(GtkWidget * widget, gpointer data)$/;"	f
+select_song_marker	markers.c	/^void select_song_marker(void)$/;"	f
+selected_filename	gwc.c	/^gchar *selected_filename;$/;"	v
+selected_filename	markers.c	/^gchar *selected_filename;$/;"	v
+selecting_region	drawing.c	/^int selecting_region = FALSE ;$/;"	v
+set_misc_preferences	preferences.c	/^void set_misc_preferences(GtkWidget * widget, gpointer data)$/;"	f
+set_mp3_encoding_preferences	preferences.c	/^void set_mp3_encoding_preferences(GtkWidget * widget, gpointer data)$/;"	f
+set_ogg_encoding_preferences	preferences.c	/^void set_ogg_encoding_preferences(GtkWidget * widget, gpointer data)$/;"	f
+set_playback_cursor_position	audio_util.c	/^long set_playback_cursor_position(struct view *v, long millisec_per_visual_frame)$/;"	f
+set_scroll_bar	gwc.c	/^void set_scroll_bar(long n, long first, long last)$/;"	f
+set_status_text	gwc.c	/^void set_status_text(gchar * msg)$/;"	f
+settings_menu	gwc.c	/^GnomeUIInfo settings_menu[] = {$/;"	v
+sf_write_values	audio_util.c	/^int sf_write_values(void *ptr, int n_samples)$/;"	f
+sfinfo	audio_osx.c	/^	SF_INFO 		sfinfo ;$/;"	m	struct:__anon1	file:
+sfinfo	audio_util.c	/^SF_INFO      sfinfo ;$/;"	v
+shellsort_long	gwc.c	/^void shellsort_long(long a[], int n)$/;"	f
+show_help	gwc.c	/^void show_help(const char *filename)$/;"	f
+show_response	biquad.c	/^void show_response(GtkWidget *w, gpointer gdata)$/;"	f
+silence_callback	gwc.c	/^void silence_callback(GtkWidget * widget, gpointer data)$/;"	f
+simple_amplify_audio	amplify.c	/^void simple_amplify_audio(struct sound_prefs *p, long first, long last, int channel_mask, double amount)$/;"	f
+snd_perr	audio_alsa.c	/^static void snd_perr(char *text, int err)$/;"	f	file:
+sndfile	audio_osx.c	/^	SNDFILE 		*sndfile ;$/;"	m	struct:__anon1	file:
+sndfile	audio_util.c	/^SNDFILE      *sndfile = NULL ;$/;"	v
+sndfile_truncate	audio_util.c	/^void sndfile_truncate(long n_samples)$/;"	f
+song_key_highlight_interval	gwc.c	/^double song_key_highlight_interval;$/;"	v
+song_mark_silence	gwc.c	/^double song_mark_silence;$/;"	v
+song_markers	gwc.c	/^long song_markers[MAX_MARKERS];$/;"	v
+sonogram_color	drawing.c	/^GdkColor sonogram_color[256] ;$/;"	v
+sonogram_log	gwc.c	/^int sonogram_log;$/;"	v
+soundfile_count_samples	soundfile.c	/^long soundfile_count_samples(void)$/;"	f
+soundfile_count_samples_in_file	soundfile.c	/^long soundfile_count_samples_in_file(char *filename)$/;"	f
+soundfile_insert_samples	soundfile.c	/^int soundfile_insert_samples(long linsert_pos, long lsample_count,$/;"	f
+soundfile_insert_silence	soundfile.c	/^int soundfile_insert_silence(long linsert_pos, long lsample_count,$/;"	f
+soundfile_load_file	soundfile.c	/^int soundfile_load_file(char *filename, long lpos, long lsample_count,$/;"	f
+soundfile_remove_samples	soundfile.c	/^int soundfile_remove_samples(long lfirst_pos, long lsample_count,$/;"	f
+soundfile_save_file	soundfile.c	/^int soundfile_save_file(char *filename, long lpos, long lsample_count,$/;"	f
+soundfile_shift_samples_left	soundfile.c	/^int soundfile_shift_samples_left(long lfirst_pos, long lsample_count,$/;"	f
+soundfile_shift_samples_right	soundfile.c	/^int soundfile_shift_samples_right(long lfirst_pos, long lsample_count,$/;"	f
+sox_mp3_input	gwcmad.c	/^static int sox_mp3_input(sox_format_t * ft)$/;"	f	file:
+sox_mp3_input	mp3.c	/^static int sox_mp3_input(sox_format_t * ft)$/;"	f	file:
+sox_mp3_inputtag	gwcmad.c	/^static int sox_mp3_inputtag(sox_format_t * ft)$/;"	f	file:
+sox_mp3_inputtag	mp3.c	/^static int sox_mp3_inputtag(sox_format_t * ft)$/;"	f	file:
+sox_mp3read	gwcmad.c	/^static size_t sox_mp3read(sox_format_t * ft, sox_sample_t *buf, size_t len)$/;"	f	file:
+sox_mp3read	mp3.c	/^static size_t sox_mp3read(sox_format_t * ft, sox_sample_t *buf, size_t len)$/;"	f	file:
+sox_mp3read	mp3.c	341;"	d	file:
+sox_mp3write	gwcmad.c	/^static size_t sox_mp3write(sox_format_t * ft, const sox_sample_t *buf, size_t samp)$/;"	f	file:
+sox_mp3write	gwcmad.c	488;"	d	file:
+sox_mp3write	mp3.c	/^static size_t sox_mp3write(sox_format_t * ft, const sox_sample_t *buf, size_t samp)$/;"	f	file:
+sox_mp3write	mp3.c	501;"	d	file:
+spectral_amp	drawing.c	/^double spectral_amp = 1.0 ;$/;"	v
+spectral_view_flag	gwc.c	/^gint spectral_view_flag = FALSE;$/;"	v
+spline_eval	gtkcurve.c	/^spline_eval (int n, gfloat x[], gfloat y[], gfloat y2[], gfloat val)$/;"	f	file:
+spline_solve	gtkcurve.c	/^spline_solve (int n, gfloat x[], gfloat y[], gfloat y2[])$/;"	f	file:
+sqr	drawing.c	426;"	d	file:
+start_encode	encode.c	/^int start_encode(int mode, char *newfilename, long start, long length)$/;"	f
+start_gwc_playback	gwc.c	/^void start_gwc_playback(GtkWidget * widget, gpointer data)$/;"	f
+start_playback	audio_util.c	/^long start_playback(char *output_device, struct view *v, struct sound_prefs *p, double seconds_per_block, double seconds_to_preload)$/;"	f
+start_sample_time	audio_osx.c	/^Float64 start_sample_time;$/;"	v
+start_save_undo	undo.c	/^int start_save_undo(char *undo_msg, struct view *v)$/;"	f
+start_time	denoise.c	/^struct timeb start_time, middle_time, end_time ;$/;"	v	typeref:struct:timeb
+start_time	denoise.c	/^struct timeval start_time, middle_time, end_time ;$/;"	v	typeref:struct:timeval
+start_timer	denoise.c	/^void start_timer(void)$/;"	f
+startread	gwcmad.c	/^static int startread(sox_format_t * ft)$/;"	f	file:
+startread	mp3.c	/^static int startread(sox_format_t * ft)$/;"	f	file:
+startwrite	gwcmad.c	/^static int startwrite(sox_format_t * ft UNUSED)$/;"	f	file:
+startwrite	gwcmad.c	/^static int startwrite(sox_format_t * ft)$/;"	f	file:
+startwrite	mp3.c	/^static int startwrite(sox_format_t * ft UNUSED)$/;"	f	file:
+startwrite	mp3.c	/^static int startwrite(sox_format_t * ft)$/;"	f	file:
+stat_sample_block	sample_block.c	/^void stat_sample_block(struct sample_block *sb, struct sound_prefs *p, long block_number)$/;"	f
+stats	declick.c	/^void stats(double x[], int n, double *pMean, double *pStderr, double *pVar, double *pCv, double *pStddev)$/;"	f
+status_bar	gwc.c	/^GtkWidget *status_bar;$/;"	v
+stereo	audio_util.c	/^int stereo = 1 ;$/;"	v
+stereo_en	tap_reverb.c	/^int stereo_en = 1; \/* on\/off *\/$/;"	v
+stop_all_playback_functions	gwc.c	/^void stop_all_playback_functions(GtkWidget * widget, gpointer data)$/;"	f
+stop_encoding	encode.c	/^gint stop_encoding = FALSE ;$/;"	v
+stop_key_highlight_interval	gwc.c	/^double stop_key_highlight_interval;$/;"	v
+stop_playback	audio_util.c	/^void stop_playback(int force)$/;"	f
+stop_playback_force	gwc.c	/^int stop_playback_force = 1 ;$/;"	v
+stop_timer	denoise.c	/^void stop_timer(char *message)$/;"	f
+stopread	gwcmad.c	/^static int stopread(sox_format_t * ft)$/;"	f	file:
+stopread	mp3.c	/^static int stopread(sox_format_t * ft)$/;"	f	file:
+stopread	mp3.c	342;"	d	file:
+stopwrite	gwcmad.c	/^static int stopwrite(sox_format_t * ft)$/;"	f	file:
+stopwrite	gwcmad.c	489;"	d	file:
+stopwrite	mp3.c	/^static int stopwrite(sox_format_t * ft)$/;"	f	file:
+stopwrite	mp3.c	502;"	d	file:
+store_cdrdao_toc	markers.c	/^void store_cdrdao_toc(GtkFileSelection * selector, gpointer user_data)$/;"	f
+store_filename	gwc.c	/^void store_filename(GtkFileSelection * selector, gpointer user_data)$/;"	f
+store_selected_filename_as_encoded	gwc.c	/^void store_selected_filename_as_encoded(GtkFileSelection * selector,$/;"	f
+store_selection_filename	gwc.c	/^    void store_selection_filename(GtkFileSelection * selector,$/;"	f
+strong_declick_sensitivity	gwc.c	/^double strong_declick_sensitivity = 0.75;$/;"	v
+strong_fft_declick_sensitivity	gwc.c	/^double strong_fft_declick_sensitivity = 5.0 ;$/;"	v
+sum_reg	stat.c	/^void sum_reg(double x[], double y)$/;"	f
+sum_sample_block	sample_block.c	/^void sum_sample_block(struct sample_block *sb, fftw_real left[], fftw_real right[], long n)$/;"	f
+sum_window_wgts	denoise.c	/^double sum_window_wgts[DENOISE_MAX_FFT] ;$/;"	v
+svbr_mode	preferences.c	/^static int svbr_mode, encpresets, oggencopt;$/;"	v	file:
+table	encode.c	/^static GtkWidget *table;$/;"	v	file:
+tagtype	gwcmad.c	/^static int tagtype(const unsigned char *data, size_t length)$/;"	f	file:
+tagtype	mp3.c	/^static int tagtype(const unsigned char *data, size_t length)$/;"	f	file:
+tap_decay	tap_reverb.c	/^float tap_decay = 2500.0f;$/;"	v
+test_clicks_as_dB	declick.c	1062;"	d	file:
+thr_hearing_val	godsill_wolfe.c	/^double thr_hearing_val[N_BANDS] = {38,31,22,18.5,15.5,13,11,9.5,8.75,7.25,4.75,2.75,1.5,0.5,0,0,0,0,2,7,12,15.5,18,24,29} ;$/;"	v
+time_to_sample	gwc.c	/^long time_to_sample(char *time, struct sound_prefs *p)$/;"	f
+tiny	stat.c	16;"	d	file:
+toggle_end_marker	gwc.c	/^void toggle_end_marker(GtkWidget * widget, gpointer data)$/;"	f
+toggle_marker_at	gwc.c	/^void toggle_marker_at(long sample)$/;"	f
+toggle_start_marker	gwc.c	/^void toggle_start_marker(GtkWidget * widget, gpointer data)$/;"	f
+transport_toolbar	gwc.c	/^GtkWidget *transport_toolbar;$/;"	v
+transport_toolbar_info	gwc.c	/^GnomeUIInfo transport_toolbar_info[] = {$/;"	v
+truncate_wavfile	audio_edit.c	/^void truncate_wavfile(struct view *v, int save_undo)$/;"	f
+truncate_wavfile	audio_util.c	/^void truncate_wavfile(struct view *v)$/;"	f
+type_window_select	biquad.c	/^void type_window_select(GtkWidget * clist, gint row, gint column,$/;"	f
+tzp	denoise.c	/^struct timezone tzp;$/;"	v	typeref:struct:timezone
+undo	undo.c	/^int undo(struct view *v, struct sound_prefs *p)$/;"	f
+undo_callback	gwc.c	/^void undo_callback(GtkWidget * widget, gpointer data)$/;"	f
+undo_fd	undo.c	/^static int undo_fd = -1 ;$/;"	v	file:
+undo_level	undo.c	/^static int undo_level = 0 ;$/;"	v	file:
+undo_purge	undo.c	/^void undo_purge(void)$/;"	f
+unproject	gtkcurve.c	/^unproject (gint value, gfloat min, gfloat max, int norm)$/;"	f	file:
+update_cursor	gwc.c	/^gint update_cursor(gpointer data)$/;"	f
+update_status_bar	gwc.c	/^void update_status_bar(gfloat percentage, gfloat min_delta,$/;"	f
+vbr_mode_window_select	preferences.c	/^void vbr_mode_window_select(GtkWidget * clist, gint row, gint column,$/;"	f
+view_all	gwc.c	/^void view_all(GtkWidget * widget, gpointer data)$/;"	f
+view_menu	gwc.c	/^GnomeUIInfo view_menu[] = {$/;"	v
+view_scale	gwc.c	/^double view_scale = 1.0;$/;"	v
+warning	declick.c	28;"	d	file:
+warning	gwc.c	/^void warning(char *msg)$/;"	f
+wave_filename	gwc.c	/^gchar wave_filename[255];$/;"	v
+wave_image	drawing.c	/^GdkPixmap *wave_image = NULL ;$/;"	v
+wavefile_data	audio_util.c	/^void *wavefile_data ;$/;"	v
+wavefile_data_start	audio_util.c	/^long wavefile_data_start ;$/;"	v
+wavefile_fd	audio_util.c	/^int wavefile_fd = -1 ;$/;"	v
+weak_declick_sensitivity	gwc.c	/^double weak_declick_sensitivity = 1.00;$/;"	v
+weak_fft_declick_sensitivity	gwc.c	/^double weak_fft_declick_sensitivity = 3.0 ;$/;"	v
+welty_alpha	denoise.c	/^double welty_alpha(double w, double x)$/;"	f
+wet_level	reverb.c	/^static gfloat wet_level = -40.1 ;$/;"	v	file:
+wetlevel	tap_reverb.c	/^float wetlevel = 0.0f;$/;"	v
+white_color	drawing.c	/^GdkColor *white_color = &white_gdk_color ;$/;"	v
+white_gdk_color	drawing.c	/^GdkColor white_gdk_color = {4, 65535, 65535, 65535} ;$/;"	v
+window_coef	denoise.c	/^double window_coef[DENOISE_MAX_FFT] ;$/;"	v
+window_type	preferences.c	/^static int noise_suppression_method, window_type;$/;"	v	file:
+windowed	denoise.c	/^static fftw_real windowed[DENOISE_MAX_FFT] ;$/;"	v	file:
+write_buffer	tap_reverb.c	/^write_buffer(rev_t insample, rev_t * buffer, unsigned long buflen,$/;"	f	file:
+write_fft_real_wavefile_data	audio_util.c	/^int write_fft_real_wavefile_data(fftw_real left[], fftw_real right[], long first, long last)$/;"	f
+write_float_wavefile_data	audio_util.c	/^int write_float_wavefile_data(float left[], float right[], long first, long last)$/;"	f
+write_raw_wavefile_data	audio_util.c	/^int write_raw_wavefile_data(char buf[], long first, long last)$/;"	f
+write_silence	soundfile.c	/^static int write_silence(sf_count_t pos, sf_count_t sample_count)$/;"	f	file:
+write_wav_header	audio_util.c	/^void write_wav_header(int thefd, int speed, long bcount, int bits, int stereo)$/;"	f
+write_wavefile_data	audio_util.c	/^int write_wavefile_data(long left[], long right[], long first, long last)$/;"	f
+written_frames	audio_alsa.c	/^static snd_pcm_uframes_t written_frames = 0;$/;"	v	file:
+x1	tap_reverb.c	/^        rev_t x1;$/;"	m	struct:__anon8	file:
+x2	tap_reverb.c	/^        rev_t x2;$/;"	m	struct:__anon8	file:
+xpm	gtkgamma.c	/^static char *xpm[][27] =$/;"	v	file:
+y1	tap_reverb.c	/^        rev_t y1;$/;"	m	struct:__anon8	file:
+y2	tap_reverb.c	/^        rev_t y2;$/;"	m	struct:__anon8	file:
+yellow_color	drawing.c	/^GdkColor *yellow_color = &yellow_gdk_color ;$/;"	v
+yellow_gdk_color	drawing.c	/^GdkColor yellow_gdk_color = {2, 65535, 65535, 0} ;$/;"	v
+yesno	gwc.c	/^int yesno(char *msg)$/;"	f
+yesnocancel	gwc.c	/^int yesnocancel(char *msg)$/;"	f
+zoom_in	gwc.c	/^void zoom_in(GtkWidget * widget, gpointer data)$/;"	f
+zoom_out	gwc.c	/^void zoom_out(GtkWidget * widget, gpointer data)$/;"	f
+zoom_select	gwc.c	/^void zoom_select(GtkWidget * widget, gpointer data)$/;"	f

@@ -1,0 +1,410 @@
+GWC Changelog
+0.21-19
+Feb 2,2013
+BUGFIX: warning on opening audio device incorrectly displayed pulse audio message when neither alsa or pulse audio was being used
+BUGFIX: Encoding to ogg or mp3 has always been broken, can only encode to once during GWC session.  Fixed by using named pipe
+NEW: A simple front end for encoding to MP3s.  Only a -V xx encoding option,
+but can have default artist and album tags now, and enter trackname when
+encoding the selection.  Kind of klunky user interface, but it works.
+
+0.21-18
+Feb 1,2013
+BUGFIX: pulse audio using pulse_simple_new was incorrectly checking error return
+Apr 10, 2012
+BUGFIX: length of tracks on cdrdao toc file was too short by 1 sample
+
+0.21-17
+Apr 8, 2012
+CODE: Remove executable permissions from undo and .gwc files, thanks quadrispro
+BUGFIX: Alsa device was not opened correctly with interleaved samples
+BUGFIX: Create cdrdao toc file not using marker pairs was badly broken.
+
+0.21-16
+Mar 17, 2011
+CODE: Better implementation of ALSA driver for detecting number of processed frames
+
+0.21-15
+Mar 17, 2011
+BUGFIX: Configure script was not working for ALSA
+CODE: Small upgrade for alsa driver, should attach even when other apps have alsa open
+
+0.21-14
+Mar 16, 2011
+BUGFIX: Configure script was out of date with regards to alsa, pulseaudio.  Fixed
+COPYRIGHT: Some important copyright notices from the cephes library now included in i0.c i1.c and chbevl.c
+CODE: added shortcut keys '3' which moves view forward by 1 revolution of 33 1/3 rpm, '2' moves view back
+
+0.21-13
+CODE: Better information feedback when libsndfile fails to open file
+BUGFIX: pulse audio playback does not register completion
+BUGFIX: Makefile.in did not have dependency for audio_pa.c
+
+0.21-12
+NEW: Alpha code -- pulse audio audio driver by default
+
+0.21-11
+BUGFIX: Amplify had a bug when only amplifying a single channel.
+NEW: Alpha code -- trying to read MP3's and OGG file types.
+NEW: Experimental -- defining click detector in terms of decibles rather than the previous unintuitive values
+NEW: Ifdefs for DENOISE_TRY_ONE_SAMPLE.  Generally a horrendously bad idea to denoise using a window width of 1.
+EXPERIMENTAL: Started playing around with code to restore harmonic content on very old recordings (aka harmonic exciters...)
+*Many* improvements from Michael Gruhn follow:
+---
+BUGFIX: disallow closing while file is being processed (preventing segfault)
+BUGFIX: long filenames handled better
+BUGFIX: removed some buffer overruns in sprintfs and probably aboided somemore
+BUGFIX: disallow closing while processing in batch mode (preventing segfault)
+BUGFIX: return EXIT_SUCCESS on success instead of 1 for better batch integration
+NEW: allow selection of hpf declick for batch processing
+NEW: end keyword to set stop_position to end of file for batch processing
+NEW: usage message explaining batch mode for batch processing
+
+0.21-10
+Mar 22, 2009
+CODE: leave click marks option in declicking
+BUGFIX: biquad fixed -- 
+BUGFIX: cdrdao output was unnecessarily constrained by blocksizes
+
+0.21-09
+Dec 19, 2008
+CODE: undo needed to use off_t in lseek calls (Thanks Dave Hill, from Feb 2007)
+BUGFIX: alsa playback would at times crash, fixed
+
+
+
+0.21-08
+Feb 23, 2007
+CODE:   Add info for setting device in settings->miscellaneous
+Feb 21, 2007
+BUGFIX: Big endian machines had playback problem, using patch from Paul Brossier fixes the problem
+Jan 12, 2007
+BUGFIX: Paul Sanders found declick bug in get_hpf(), which is probably why some clicks were not getting repaired.
+CODE:   Paul Sanders sent a speed improvement which makes declick run about 80 percent faster
+
+0.21-07
+Oct 20, 2006
+BUGFIX: Ok. I messed up.  The save changes stuff on exit was broken.  Hopefully fixed now :-)
+
+0.21-06
+Feb 8, 2006
+BUGFIX: In biquad.c the filter parameters could be incorrectly displayed with the defaults rather than
+        as saved in preferences (Thanks Simon Lavender-Jones)
+BUGFIX: In declick.c, stderr variable changed to std_err to avoid conflicts with stderr file pointer.
+BUGFIX: In audio_util.c, make sure n_samples is > 1 when on audio file open.
+BUGFIX: Make install was not installing the help files in the proper place
+CODE:   Manual declick shortcut changed from CTRL-A to ALT-A (to avoid conflict with select all)
+CODE:   When exiting, or closing audio file, user can committed changes, undo changes or cancel.
+CODE:   shortcut "a" now appends to cdrdao toc file only the selected region, not everthing between all markers.
+NEW:    Incorporated tap_reverb algorithm, uses internally stored settings if external ~/.reverbed is not found
+NEW:	Added many functions to batch capability
+
+
+0.21-05
+Jan 20, 2006
+CODE:   zooming in on a selection of only 1 sample gives a 2 second zoom (thanks David Gesswein)
+BUGFIX: opening a new audio file would corrupt the previously opened audio file's *.gwc (thanks David Gesswein)
+BUGFIX: CDTEXT output for cdrdao improved (thanks David Gesswein)
+BUGFIX: The Lorber-Hoeldrich algorithms had a big bug, fixed.
+CODE:   new expand selection to markers feature (thanks David Gesswein for the idea)
+CODE:   using rectangular window on all pre-sampling.
+CODE:   configure script suggests installation of libsnd-devel package.
+
+0.21-04
+Nov 10, 2005
+BUGFIX: In function declick_with_sensitivity in gwc.c repair_clicks variable needed to be set before start_save_undo.
+	(Thanks Simon Lavender-Jones)
+BUGFIX: In audio_alsa, the snd_pcm_delay call could return an underrun code (-EPIPE) which means the handle needs reset.
+BUGFIX: In denoise.c, the blackman windowing algorithm implementation was incorrect.
+CODE:   In audio_alsa.c, make minimum size audio device buffer 4096, as a multiple of the reported frame size. 
+CODE:   Started experimenting with Wolfe & Godsill noise removal process.  Not well understood yet...
+
+0.21-03
+July 15, 2005
+DOC: Error in documentation for FFT Strong Declick Sensitivity fixed
+BUGFIX: Failure to open an audio file would create near infinite looping of warning messages
+BUGFIX: set_playback_cursor_position now uses audio_state == AUDIO_IS_PLAYBACK to determine if the audio is playing.
+
+0.21-02
+Feb 3, 2005
+CODE: second attempt at merging in Rob's OSX stuff
+CODE: getting the meschach headers copied up (properly!) to the gwc source directory
+
+0.21-01
+Feb 2, 2005
+CODE: First attempt at merging in Rob's OSX stuff
+
+0.20-10b
+April 27, 2005
+BUGFIX: Fixed left,right variable references in declick.c when using the old FFTW libs(lines 575 ...)
+
+0.20-10a
+April 13, 2005
+BUGFIX: Fixed p variable in declick.c when using the old FFTW libs(lines 470, 490)
+BUGFIX: Biquad.c needed a prototype
+
+0.20-10
+Feb 1, 2005
+CODE: IIR high/low/band/notch filtering, with known public domain source code
+CODE: FFT click detection
+CODE: Can limit frequency range applied in denoising (experimental)
+
+0.20-10
+Feb 1, 2005
+CODE: IIR high/low/band/notch filtering, with known public domain source code
+CODE: FFT click detection
+CODE: Can limit frequency range applied in denoising (experimental)
+
+0.20-09
+Dec 28, 2004
+BUGFIX: Markers could be drawn at inappropriate places
+BUGFIX: Selection in areas with 2 markers w/in 10 pixels would jump to first marker.
+BUGFIX: Playing audio could freeze with change make in 0.20-08
+BUGFIX: Makefile didn't recognize --prefix as passed to configure script. Thanks to Thiemo Gehrke
+CODE: Thiemo Ghehrke did nice cleanup on config.in and Makefile.in
+CODE: Can generate pink/white noise (useful if you don't have a good noise sample for denoising)
+CODE: Adding IIR lowpass filtering
+CODE: Adding left/right mixing functions to amplify
+CODE: Expanding the main window vertically now only expands the audio view, not the text at the bottom.
+      -- thanks to joseph daly
+
+0.20-08
+Dec 14, 2004
+BUGFIX: Increased stack limit to 6 megabytes, some denoising ops needed this or they would segfault
+BUGFIX: Undo skip,save,cancel dialog windo was not destroyed properly
+BUGFIX: Declick would try to declick outside the current selection window
+CODE: Using an updated meschach library from http://www.math.uiowa.edu/~dstewart/meschach/
+CODE: Attempting to stop playback without generating artificial "clicks" by gracefully closing audio device.
+CODE: Estimate large gap actually works now :-)
+CODE: Insert silence asks for confirmation
+
+0.20-07
+August 2, 2004
+BUGFIX: Declicking errors via meschach singular matricies could generate too many errors, now fixed. (stat.c)
+BUGFIX: Warning message about fftw libs not found clarified to indicate fftw 3.x libs not found
+
+0.20-06
+August 2, 2004
+BUGFIX: Fixed configure.in to work properly with gnome2 developement libs (removed old GNOME_INIT stuff).
+CODE: Fixed warning messages in default typecast in markers.c
+
+0.20-05
+July 29, 2004
+BUGFIX: Uhhhh, errrr, Really fixed configure error complaining about needing libsndfile 2.x
+
+0.20-04
+May 21, 2004
+BUGFIX: Fixed configure error complaining about needing libsndfile 2.x
+
+April 1, 2004
+BUGFIX: audio_alsa.c, audio_device_open did not open user defined device.
+0.20-03
+April 8, 2004
+BUGFIX: Hanning-overlap-add method would alter channel not selected for denoising.
+April 1, 2004
+BUGFIX: audio_alsa.c, audio_device_open did not open user defined device.
+
+0.20-02
+March 5, 2004
+CODE:Frank Freudenberg supplied cut & paste code for audio
+CODE:Rob Fair adding option for selecting audio device
+CODE:Jeff Welty Gnome-2.x -ified GWC
+CODE:Lindsay Harris tracked down segfault issue with denoise
+
+0.19-10
+September 26, 2003
+CODE:Frank Freudenberg supplied audio device abstraction, so we now have alsa and oss drivers
+CODE:Bill Jetzer supplied the means for setting up GWC in batch mode.
+
+0.19-9
+September 6, 2003
+BUGFIX: windowed and out arrays needed inside fft_remove_noise regardless of HAVE_FFTW3
+
+0.19-8
+CODE: Thanks to Frank Freudenberg, we now can compile with FFTW 3.x libs
+CODE: Worked on the online help system, not complete but getting there.
+BUGFIX: Hopefully nailed the "declick until end of file" crash bug.
+
+0.19-5
+-----
+August 21, 2003
+CODE: Streamlined encoding_selection code in gwc.c
+CODE: Added progress meter in the encoding process
+
+0.19-4
+-----
+Added interface (frontend) to lame/oggenc for MP3 and Ogg encodings of selected waveform portions.
+
+Fixed issue with warnings if closing pop up windows via X in corner.
+
+Fixed issues with performing tasks with no file opened causing segfault.
+
+Fixed issue of trying to play when sonogram is being built.
+
+Fixed issue of trying to display sonogram(or do anything) while file is being played.
+
+Added some fixes to improve speed of display/amplify and some other functions.
+(do not cast if not needed and when you must cast do it wisely. See http://www.mega-nerd.com/FPcast/
+by Eric De Castro Lopo Author of libsndfile API).
+
+0.19-3
+------
+April 7, 2003
+CODE: Lame libs incorporated, to save selection as MP3 (Thanks Charles!)
+BUGFIX: The Lorber-Hoeldrich and Ephram denoise algorithms had a small bug, fixed.
+
+0.19-2
+------
+Mar 1, 2003
+CODE: Determined cause of some libsndfile config checks failing, added notice about /etc/ld.so.conf
+
+Feb 17, 2003
+CODE: Fixed netbsd bug, and a configuration bug (now copying machine.h from meschach after meschach build).
+
+0.19-1
+------
+Feb 16, 2003
+CODE: Faster audio redraws, added song markers (thanks to David Gesswein).  Also started netbsd-izing
+
+0.18
+------
+November, 2002
+CODE: Made the markers persistent, and can now have up to 200 markers
+
+0.17-6
+------
+October 29, 2002
+BUGFIX: Detect only checkbox now doesn't toggle on/off when pressing spacebar after it has focus
+CODE: Improved click detection speed.
+
+0.17-5
+------
+September 29, 2002
+BUGFIX: Check for FFT_SIZE < n_noise_samples.
+BUGFIX: Sonogram could crash in some cases.
+CODE: Pop a dialogue warning if failed reading audio data.
+NEW: 'a' key creates, or appends cdrdao.toc, with info about the audio between the 2 markers. Can be used with cdrdao.
+
+0.17-4
+------
+September 24, 2002
+BUGFIX: fixed is_valid_audio function, sndfile point was not being set...
+
+0.17-3
+------
+September 21, 2002
+NEW:    Hanning Window with overlap-add implemented.  Much, much faster...
+BUGFIX: Denoise window and suppression method are no longer mishandled by the preferences dialogue.
+BUGFIX: Audio files no longer need to end in .wav extension, must only be recognized by libsndfile
+
+0.17-2
+------
+September 15, 2002
+BUGFIX: The Lorber - Hoeldrich denoise algorithm had a bug, fixed.  Results will be greatly improved.
+CODE: Now integrated with libsndfile
+CODE: Left and right channels now display unique levels at all zoom levels (previously the average
+      was displayed when the compressed audio image was used
+CODE: Amplify can now feather in the amplification amount, this prevents creating discontinuities
+      in signal values at the start or end of the amplification region.
+
+0.16-5
+------
+September 7, 2002
+BUGFIX: Changed AC_INIT in configure.in from "gwc" to "gwc.c", so configure script would work properly
+
+0.16-4
+------
+August 24, 2002
+BUGFIX: Undo improperly assumed a region was highlighted, resulting in mysterious undo results.
+
+0.16-3
+------
+July 31, 2002
+BUGFIX: Playback was hosed on some audio cards.  This hopefully will fix it...
+CODE: Icons now appear on menus (though they need spacing...)
+
+0.16-2 (not released)
+------
+DOC: How to clear markers
+CODE: Warn before saving selection over existing file
+DOC: Better description of manual click repair versus click detection and repair
+CODE: Declicking information now appears in status bar instead of popup
+CODE: Select between markers (with keypress 'm') -- still needs a button
+CODE: 's' key selection time is configurable with prefs->misc
+CODE: 'z' key zooms in on selection
+
+0.16-1 (not released)
+------
+CODE: Added undo button to toolbar
+
+0.15
+----
+June 17, 2002
+CODE: Fixed annoyance -- selection didn't select enough samples on the right side of selection
+CODE: Now using 2 toolbars, with no text
+GRAPHICS: Cool icons from Ian Leonard
+EXPERIMENTAL: Can declick in "batch" mode.
+
+0.14
+----
+May 14, 2002
+CODE: Massive speedup of "Save selection as"
+
+0.13
+----
+April 27, 2002
+CODE: Cleaned up all of the warning messages generated during the compile, almost all were unused variables...
+CODE: Improved buffering of audio during playback, finer resolution also achieved on playback.
+
+0.12
+----
+April 21, 2002
+BUGFIX: Lorber denoise method was always used, regardless of parameter settings. This bug was introduced in 0.06-4
+CODE: Denoise preferences moved to Settings menu, Dialogue box for denoise made more meaningful
+
+0.11
+----
+April 18, 2002
+BUGFIX: Memory leak in the delicking algorithm, it was partly in the meschach package...
+NEW: The memory mapped mode of accessing audio files is deprecated, file size is no longer a limitation, swap space usage is way down...
+
+0.10
+----
+April 15, 2002
+KNOWN PROBLEM: Still a memory leak somewhere in the delicking algorithm, it may be in the meschach package...
+NEW: Declick sensitivity setting available from Settings drop-down menu
+NEW: Iterate in declick -- will iterate in delick until no more repairs are made in a delick window
+CODE: Some dialog widget functions are now in dialog.c, 
+
+
+0.09
+----
+April 13, 2002
+BUGFIX: Memory leak in declicking algorithm, could eat up a few hundred megabytes declicking a 15 minute track
+BUGFIX: The idle function was consuming large amounts of CPU, this is completely reworked.
+BUGFIX: Markers were previously reset to -1, selecting near the start of song would snap to -1, now set to large negative
+
+0.08
+----
+April 10, 2002
+BUGFIX: Save selection to same file as current file would core dump, this is now disallowed.
+BUGFIX: The Lorber-Hoeldrich noise reduction method had an error, fixed.  No perceptable difference in sound output.
+NEW: Ephraim and Malah's noise suppression method (1984) was added.
+NEW: configure now works with fft libs for Suse-linux
+
+0.07
+----
+April 1, 2002
+
+NEW: Created gwc.spec file for generation of binary rpm
+BUGFIX: Fixed bug in declick, unrepaired clicks now appear highlighted in red
+
+0.06-2
+------
+BUGFIX: Fixed buffering problem with audio on playback systems with heavy loads.
+
+0.06-1
+------
+
+NEW:  Can now have the declicking algorithm only identifiy clicks, not repair them
+NEW:  Hitting the "s" key, stops playback, and highlights the last 1/2 second of audio played
+NEW:  GWC remembers the last directory where a wavfile was opened from.

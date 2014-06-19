@@ -1,0 +1,25 @@
+Issue the command:
+
+"make install"
+
+This installs the gwc binary in /usr/local/bin/gwc
+
+Document files are installed in /usr/share/doc/gwc
+
+---
+Problems with linking:
+
+1) You don't have libsndfile in a standard place, like /usr/lib, but /usr/local/lib
+	-- make sure /usr/local/lib is in your /etc/ld.so.conf file, and reload the runtime loader (man ldconf)
+	-- you will need to add /usr/local/lib/pkgconfig to your PKG_CONFIG_PATH environment variable, like so:
+
+	       export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+
+Problems with Slackware Gnome libs:
+	(Thanks to Kevin Hass, April 24, 2006  for this info)
+
+	Go to www.linuxpackages.net (which focuses on Slackware), and install the
+	Freerock-gnome for slackware.  Then also get the libsndfile from there
+	(or get it's source, and compile it yourself).  Then GWC builds cleanly.
+	[ But the Help menu option does not work, if you don't use GNOME (I use KDE),
+	but I can read the help files manually ]
