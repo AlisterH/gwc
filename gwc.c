@@ -36,8 +36,6 @@
 #include <gtk/gtk.h>
 #include <libgnome/libgnome.h>
 #include <libgnomeui/libgnomeui.h>
-#include <libgnomeui/gnome-window-icon.h> /* gnome_window_icon_set_default_from_file
-                                           * ...frank 31.08.03  */
 #include "gtkledbar.h"
 #include "encoding.h"
 #include "soundfile.h"
@@ -2959,7 +2957,7 @@ int main(int argc, char *argv[])
 		       GNOME_PARAM_POPT_TABLE, NULL,
 		       GNOME_PROGRAM_STANDARD_PROPERTIES, NULL);
 
-    gnome_window_icon_set_default_from_file("gwc-logo.png");
+    gtk_window_set_default_icon_from_file("gwc-logo.png", NULL);
     main_window = gnome_app_new("gwc", "Dehiss, declick audio file");
     gnome_app_create_menus(GNOME_APP(main_window), menubar);
 
