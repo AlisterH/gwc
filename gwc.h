@@ -99,6 +99,7 @@
 #define GWC_MP3 2
 #define GWC_MP3_SIMPLE 3
 
+#define SETTINGS_FILE "gwc.conf"
 
 struct sound_prefs {
     int playback_bits ;
@@ -252,6 +253,9 @@ void adjust_marker_positions(long start, long delta);
 void move_song_marker(void) ;
 void delete_song_marker(void) ;
 void select_song_marker(void) ;
+// do we need these two?
+GKeyFile* read_config(void) ;
+void write_config(GKeyFile *key_file) ;
 struct sound_prefs open_wavefile(char *filename, struct view *v) ;
 void pinknoise(struct sound_prefs *p, long first, long last, int channel_mask) ;
 int  pinknoise_dialog(struct sound_prefs current, struct view *) ;

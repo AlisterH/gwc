@@ -34,6 +34,7 @@
 
 #include "gwc.h"
 #include <gtk/gtk.h>
+#include <glib.h>
 #include <libgnome/libgnome.h>
 #include <libgnomeui/libgnomeui.h>
 #include "gtkledbar.h"
@@ -336,79 +337,114 @@ void get_region_of_interest(long *first, long *last, struct view *v)
     }
 }
 
+GKeyFile* read_config(void)
+{
+    gchar     *config_file;
+    GKeyFile  *key_file = NULL;
+    GError    *error = NULL;
+
+    config_file = g_build_filename (g_get_user_config_dir (), SETTINGS_FILE, NULL);
+    //fprintf(stderr, "%s \n", config_file);
+    key_file = g_key_file_new ();
+    if (! g_key_file_load_from_file (key_file, config_file, G_KEY_FILE_KEEP_COMMENTS, &error)) {
+	if (error->code != G_IO_ERROR_NOT_FOUND)
+            g_warning ("Could not load options file: %s\n", error->message);
+        g_clear_error (&error);
+    }
+    g_free (config_file);
+    return(key_file);
+}
+
+void write_config(GKeyFile *key_file)
+{
+    gchar     *file_data;
+    gchar     *config_file;
+
+    file_data = g_key_file_to_data (key_file, NULL, NULL);
+    if (g_mkdir_with_parents (g_get_user_config_dir (), 0755) != -1) {
+        config_file = g_build_filename (g_get_user_config_dir (), SETTINGS_FILE, NULL);
+        g_file_set_contents (config_file, file_data, -1, NULL);
+        g_free (config_file);
+    }
+    else
+        g_printerr ("Could not write settings file: %s\n", strerror (errno)); 
+    g_free (file_data);
+    g_key_file_free (key_file);
+}
+
 void load_preferences(void)
 {
-    gnome_config_push_prefix(APPNAME"/config/");
-    strcpy(pathname, gnome_config_get_string("pathname=./"));
-    strcpy(last_filename, gnome_config_get_string("last_filename=./"));
-    prefs.rate = gnome_config_get_int("rate=44100");
-    prefs.bits = gnome_config_get_int("bits=16");
-    prefs.stereo = gnome_config_get_int("stereo=1");
+    GKeyFile  *key_file = read_config();
+    // We should probably have a separate test for each preference...
+    if (g_key_file_has_group(key_file, "config") == TRUE) {
+        strcpy(pathname, g_key_file_get_string(key_file, "config", "pathname", NULL));
+        strcpy(last_filename, g_key_file_get_string(key_file, "config", "last_filename", NULL));
+        prefs.rate = g_key_file_get_integer(key_file, "config", "rate", NULL);
+        prefs.bits = g_key_file_get_integer(key_file, "config", "bits", NULL);
+        prefs.stereo = g_key_file_get_integer(key_file, "config", "stereo", NULL);
     audio_view.first_sample =
-	gnome_config_get_int("first_sample_viewed=-1");
-    audio_view.last_sample = gnome_config_get_int("last_sample_viewed=-1");
+    	g_key_file_get_integer(key_file, "config", "first_sample_viewed", NULL);
+        audio_view.last_sample = g_key_file_get_integer(key_file, "config", "last_sample_viewed", NULL);
+        // What's going on here with num_song_markers?
     num_song_markers = 0;
     audio_view.channel_selection_mask =
-	gnome_config_get_int("channel_selection_mask=0");
-    weak_declick_sensitivity = gnome_config_get_float("weak_declick_sensitivity=1.0");
-    strong_declick_sensitivity = gnome_config_get_float("strong_declick_sensitivity=0.75");
-    declick_iterate_flag = gnome_config_get_int("declick_iterate=0");
-    weak_fft_declick_sensitivity = gnome_config_get_float("weak_fft_declick_sensitivity=3.0");
-    strong_fft_declick_sensitivity = gnome_config_get_float("strong_fft_declick_sensitivity=5.0");
-    declick_detector_type = gnome_config_get_int("declick_detector_type=0");
-    decrackle_level = gnome_config_get_float("decrackle_level=0.2");
-    decrackle_window = gnome_config_get_int("decrackle_window=2000");
-    decrackle_average = gnome_config_get_int("decrackle_average=3");
+    	g_key_file_get_integer(key_file, "config", "channel_selection_mask", NULL);
+        weak_declick_sensitivity = g_key_file_get_double(key_file, "config", "weak_declick_sensitivity", NULL);
+        strong_declick_sensitivity = g_key_file_get_double(key_file, "config", "strong_declick_sensitivity", NULL);
+        declick_iterate_flag = g_key_file_get_integer(key_file, "config", "declick_iterate", NULL);
+        weak_fft_declick_sensitivity = g_key_file_get_double(key_file, "config", "weak_fft_declick_sensitivity", NULL);
+        strong_fft_declick_sensitivity = g_key_file_get_double(key_file, "config", "strong_fft_declick_sensitivity", NULL);
+        declick_detector_type = g_key_file_get_integer(key_file, "config", "declick_detector_type", NULL);
+        decrackle_level = g_key_file_get_double(key_file, "config", "decrackle_level", NULL);
+        decrackle_window = g_key_file_get_integer(key_file, "config", "decrackle_window", NULL);
+        decrackle_average = g_key_file_get_integer(key_file, "config", "decrackle_average", NULL);
     stop_key_highlight_interval =
-	gnome_config_get_float("stop_key_highlight_interval=0.5");
+    	g_key_file_get_double(key_file, "config", "stop_key_highlight_interval", NULL);
     song_key_highlight_interval =
-	gnome_config_get_float("song_key_highlight_interval=15");
-    song_mark_silence = gnome_config_get_float("song_mark_silence=2.0");
-    sonogram_log = gnome_config_get_float("sonogram_log=0");
+    	g_key_file_get_double(key_file, "config", "song_key_highlight_interval", NULL);
+        song_mark_silence = g_key_file_get_double(key_file, "config", "song_mark_silence", NULL);
+        sonogram_log = g_key_file_get_double(key_file, "config", "sonogram_log", NULL);
 
-/*      audio_view.truncate_tail = gnome_config_get_int("truncate_tail=-1") ;  */
-/*      audio_view.truncate_head = gnome_config_get_int("truncate_head=-1") ;  */
-#ifdef HAVE_ALSA
-    strcpy(audio_device, gnome_config_get_string("audio_device=plughw:0,0"));
-#else
-    strcpy(audio_device, gnome_config_get_string("audio_device=/dev/dsp"));
-#endif
-    gnome_config_pop_prefix();
+/*      audio_view.truncate_tail = g_key_file_get_integer(key_file, "config", "truncate_tail", NULL) ;  */
+/*      audio_view.truncate_head = g_key_file_get_integer(key_file, "config", "truncate_head", NULL) ;  */
+        strcpy(audio_device, g_key_file_get_string(key_file, "config", "audio_device", NULL));
+    }
+    g_key_file_free (key_file);
 }
 
 void save_preferences(void)
 {
-    gnome_config_push_prefix(APPNAME"/config/");
-    gnome_config_set_string("pathname", pathname);
-    gnome_config_set_string("last_filename", last_filename);
-    gnome_config_set_int("rate", prefs.rate);
-    gnome_config_set_int("bits", prefs.bits);
-    gnome_config_set_int("stereo", prefs.stereo);
-    gnome_config_set_int("first_sample_viewed", audio_view.first_sample);
-    gnome_config_set_int("last_sample_viewed", audio_view.last_sample);
-    gnome_config_set_int("channel_selection_mask",
-			 audio_view.channel_selection_mask);
-    gnome_config_set_float("weak_declick_sensitivity", weak_declick_sensitivity);
-    gnome_config_set_float("strong_declick_sensitivity", strong_declick_sensitivity);
-    gnome_config_set_int("declick_iterate", declick_iterate_flag);
-    gnome_config_set_float("weak_fft_declick_sensitivity", weak_fft_declick_sensitivity);
-    gnome_config_set_float("strong_fft_declick_sensitivity", strong_fft_declick_sensitivity);
-    gnome_config_set_int("declick_detector_type", declick_detector_type);
-    gnome_config_set_float("decrackle_level", decrackle_level);
-    gnome_config_set_int("decrackle_window", decrackle_window);
-    gnome_config_set_int("decrackle_average", decrackle_average);
-    gnome_config_set_float("stop_key_highlight_interval",
-			   stop_key_highlight_interval);
-    gnome_config_set_float("song_key_highlight_interval",
-			   song_key_highlight_interval);
-    gnome_config_set_float("song_mark_silence", song_mark_silence);
-    gnome_config_set_int("sonogram_log", sonogram_log);
-    gnome_config_set_string("audio_device", audio_device);
+    GKeyFile  *key_file = read_config();
 
-/*      gnome_config_set_int("truncate_head", audio_view.truncate_head) ;  */
-/*      gnome_config_set_int("truncate_tail", audio_view.truncate_tail) ;  */
-    gnome_config_sync();
-    gnome_config_pop_prefix();
+    g_key_file_set_string(key_file, "config", "pathname", pathname);
+    g_key_file_set_string(key_file, "config", "last_filename", last_filename);
+    g_key_file_set_integer(key_file, "config", "rate", prefs.rate);
+    g_key_file_set_integer(key_file, "config", "bits", prefs.bits);
+    g_key_file_set_integer(key_file, "config", "stereo", prefs.stereo);
+    g_key_file_set_integer(key_file, "config", "first_sample_viewed", audio_view.first_sample);
+    g_key_file_set_integer(key_file, "config", "last_sample_viewed", audio_view.last_sample);
+    g_key_file_set_integer(key_file, "config", "channel_selection_mask",
+			 audio_view.channel_selection_mask);
+    g_key_file_set_double(key_file, "config", "weak_declick_sensitivity", weak_declick_sensitivity);
+    g_key_file_set_double(key_file, "config", "strong_declick_sensitivity", strong_declick_sensitivity);
+    g_key_file_set_integer(key_file, "config", "declick_iterate", declick_iterate_flag);
+    g_key_file_set_double(key_file, "config", "weak_fft_declick_sensitivity", weak_fft_declick_sensitivity);
+    g_key_file_set_double(key_file, "config", "strong_fft_declick_sensitivity", strong_fft_declick_sensitivity);
+    g_key_file_set_integer(key_file, "config", "declick_detector_type", declick_detector_type);
+    g_key_file_set_double(key_file, "config", "decrackle_level", decrackle_level);
+    g_key_file_set_integer(key_file, "config", "decrackle_window", decrackle_window);
+    g_key_file_set_integer(key_file, "config", "decrackle_average", decrackle_average);
+    g_key_file_set_double(key_file, "config", "stop_key_highlight_interval",
+			   stop_key_highlight_interval);
+    g_key_file_set_double(key_file, "config", "song_key_highlight_interval",
+			   song_key_highlight_interval);
+    g_key_file_set_double(key_file, "config", "song_mark_silence", song_mark_silence);
+    g_key_file_set_integer(key_file, "config", "sonogram_log", sonogram_log);
+    g_key_file_set_string(key_file, "config", "audio_device", audio_device);
+
+/*      g_key_file_set_integer(key_file, "config", "truncate_head", audio_view.truncate_head) ;  */
+/*      g_key_file_set_integer(key_file, "config", "truncate_tail", audio_view.truncate_tail) ;  */
+    write_config(key_file);
 }
 
 /*  void main_set_preferences(GtkWidget * widget, gpointer data)  */
@@ -591,7 +627,6 @@ void show_help(const char *filename)
 // This is silly - better check if gvfs is installed, or try the gtk_show_uri and see if it fails
 # if GTK_CHECK_VERSION(2,14,0)
   char *uri = g_strconcat ("file://", HELPDIR, "/", filename, NULL);
-printf(uri);
 // not sure if this does what I want
   GdkScreen *screen = gtk_widget_get_screen (main_window);
   gtk_show_uri(screen, uri, gtk_get_current_event_time (), NULL);
@@ -2977,6 +3012,7 @@ int main(int argc, char *argv[])
     load_preferences();
 
     /* load all encoding preferences on start */
+    // Why load these but not the filter and reverb preferences?
     load_ogg_encoding_preferences();
     load_mp3_encoding_preferences();
     load_mp3_simple_encoding_preferences();

@@ -20,6 +20,7 @@
 /* reverb.c */
 #include <stdlib.h>
 #include <gnome.h>
+#include <glib.h>
 #include "gtkledbar.h"
 #include "gwc.h"
 
@@ -37,32 +38,32 @@ static gfloat decay = 1500 ;
 
 void load_reverb_preferences(void)
 {
-    gnome_config_push_prefix(APPNAME"/reverb_params/");
+    GKeyFile  *key_file = read_config();
 
-    if (gnome_config_get_string("reverb_method_name") != NULL) {
-	strcpy(reverb_method_name, gnome_config_get_string("reverb_method_name"));
+    // We should probably have a separate test for each preference...
+    if (g_key_file_has_group(key_file, "reverb_params") == TRUE) {
+	strcpy(reverb_method_name, g_key_file_get_string(key_file, "reverb_params", "reverb_method_name", NULL));
+        wet_level = g_key_file_get_double(key_file, "reverb_params", "wet_level", NULL);
+        dry_level = g_key_file_get_double(key_file, "reverb_params", "dry_level", NULL);
+        decay = g_key_file_get_double(key_file, "reverb_params", "decay", NULL);
     } else {
+        // Not sure why this is set here rather than declared above like the other three preferences...
 	strcpy(reverb_method_name, "Ambience (Thick) - HD") ;
     }
 
-    wet_level = gnome_config_get_float("wet_level=-10.0");
-    dry_level = gnome_config_get_float("dry_level=-1.0");
-    decay = gnome_config_get_float("decay=1500.0");
-
-    gnome_config_pop_prefix();
+    g_key_file_free (key_file);
 }
 
 void save_reverb_preferences(void)
 {
-    gnome_config_push_prefix(APPNAME"/reverb_params/");
+    GKeyFile  *key_file = read_config();
 
-    gnome_config_set_string("reverb_method_name", reverb_method_name);
-    gnome_config_set_float("wet_level", wet_level);
-    gnome_config_set_float("dry_level", dry_level);
-    gnome_config_set_float("decay", decay);
+    g_key_file_set_string(key_file, "reverb_params", "reverb_method_name", reverb_method_name);
+    g_key_file_set_double(key_file, "reverb_params", "wet_level", wet_level);
+    g_key_file_set_double(key_file, "reverb_params", "dry_level", dry_level);
+    g_key_file_set_double(key_file, "reverb_params", "decay", decay);
 
-    gnome_config_sync();
-    gnome_config_pop_prefix();
+    write_config(key_file);
 }
 
 

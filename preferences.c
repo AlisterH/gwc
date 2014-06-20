@@ -22,6 +22,7 @@
 /* preference settings for GWC */
 
 #include <gnome.h>
+#include <glib.h>
 #include <string.h>
 #include "gwc.h"
 #include "encoding.h"
@@ -975,189 +976,204 @@ void decrackle_set_preferences(GtkWidget * widget, gpointer data)
 
 void load_mp3_simple_encoding_preferences(void)
 {
-    gnome_config_push_prefix("/gnome_wave_cleaner/mp3_simple_encoding_params/");
+    GKeyFile  *key_file = read_config();
+
+    if (g_key_file_has_group(key_file, "mp3_simple_encoding_params") == TRUE) {
 /* MP3 */
 
-    if (gnome_config_get_string("enc_quality_level") != NULL)
+    if (g_key_file_get_string(key_file, "mp3_simple_encoding_params", "enc_quality_level", NULL) != NULL)
 	strcpy(encoding_prefs.mp3_quality_level,
-	       gnome_config_get_string("enc_quality_level"));
+	       g_key_file_get_string(key_file, "mp3_simple_encoding_params", "enc_quality_level", NULL));
 
-    if (gnome_config_get_string("mp3_location") != NULL)
+    if (g_key_file_get_string(key_file, "mp3_simple_encoding_params", "mp3_location", NULL) != NULL)
 	strcpy(encoding_prefs.mp3loc,
-	       gnome_config_get_string("mp3_location"));
+	       g_key_file_get_string(key_file, "mp3_simple_encoding_params", "mp3_location", NULL));
 
-    if (gnome_config_get_string("artist") != NULL)
+    if (g_key_file_get_string(key_file, "mp3_simple_encoding_params", "artist", NULL) != NULL)
 	strcpy(encoding_prefs.artist,
-	       gnome_config_get_string("artist"));
+	       g_key_file_get_string(key_file, "mp3_simple_encoding_params", "artist", NULL));
 
-    if (gnome_config_get_string("album") != NULL)
+    if (g_key_file_get_string(key_file, "mp3_simple_encoding_params", "album", NULL) != NULL)
 	strcpy(encoding_prefs.album,
-	       gnome_config_get_string("album"));
+	       g_key_file_get_string(key_file, "mp3_simple_encoding_params", "album", NULL));
 
-    gnome_config_pop_prefix();
+    }
+    
+    g_key_file_free (key_file);
 }
 
 void load_mp3_encoding_preferences(void)
 {
-    gnome_config_push_prefix("/gnome_wave_cleaner/mp3_encoding_params/");
+    GKeyFile  *key_file = read_config();
+
+    if (g_key_file_has_group(key_file, "mp3_encoding_params") == TRUE) {
 /* MP3 */
 
-    if (gnome_config_get_string("enc_bitrate") != NULL)
+     if (g_key_file_get_string(key_file, "mp3_encoding_params", "enc_bitrate", NULL) != NULL)
 	strcpy(encoding_prefs.mp3_bitrate,
-	       gnome_config_get_string("enc_bitrate"));
+	       g_key_file_get_string(key_file, "mp3_encoding_params", "enc_bitrate", NULL));
 
-    if (gnome_config_get_string("enc_quality_level") != NULL)
+    if (g_key_file_get_string(key_file, "mp3_encoding_params", "enc_quality_level", NULL) != NULL)
 	strcpy(encoding_prefs.mp3_quality_level,
-	       gnome_config_get_string("enc_quality_level"));
+	       g_key_file_get_string(key_file, "mp3_encoding_params", "enc_quality_level", NULL));
 
-    if (gnome_config_get_string("lowpass_freq") != NULL)
+    if (g_key_file_get_string(key_file, "mp3_encoding_params", "lowpass_freq", NULL) != NULL)
 	strcpy(encoding_prefs.mp3_lowpass_freq,
-	       gnome_config_get_string("lowpass_freq"));
+	       g_key_file_get_string(key_file, "mp3_encoding_params", "lowpass_freq", NULL));
 
-    if (gnome_config_get_string("highpass_freq") != NULL)
+    if (g_key_file_get_string(key_file, "mp3_encoding_params", "highpass_freq", NULL) != NULL)
 	strcpy(encoding_prefs.mp3_highpass_freq,
-	       gnome_config_get_string("highpass_freq"));
+	       g_key_file_get_string(key_file, "mp3_encoding_params", "highpass_freq", NULL));
 
-    encoding_prefs.mp3_br_mode = gnome_config_get_int("br_mode");
-    encoding_prefs.mp3presets = gnome_config_get_int("presets");
-    encoding_prefs.mp3_sse = gnome_config_get_int("sse");
-    encoding_prefs.mp3_threednow = gnome_config_get_int("threednow");
+    encoding_prefs.mp3_br_mode = g_key_file_get_integer(key_file, "mp3_encoding_params", "br_mode", NULL);
+    encoding_prefs.mp3presets = g_key_file_get_integer(key_file, "mp3_encoding_params", "presets", NULL);
+    encoding_prefs.mp3_sse = g_key_file_get_integer(key_file, "mp3_encoding_params", "sse", NULL);
+    encoding_prefs.mp3_threednow = g_key_file_get_integer(key_file, "mp3_encoding_params", "threednow", NULL);
     encoding_prefs.mp3_lame_mmx_enabled =
-	gnome_config_get_int("lame_mmx_enabled");
-    encoding_prefs.mp3_mmx = gnome_config_get_int("mmx");
-    encoding_prefs.mp3_copyrighted = gnome_config_get_int("copyrighted");
-    encoding_prefs.mp3_add_crc = gnome_config_get_int("protected");
-    encoding_prefs.mp3_strict_iso = gnome_config_get_int("strictiso");
-    encoding_prefs.mp3_nofilters = gnome_config_get_int("nofilters");
-    encoding_prefs.mp3_use_lowpass = gnome_config_get_int("uselowpass");
-    encoding_prefs.mp3_use_highpass = gnome_config_get_int("usehighpass");
+	g_key_file_get_integer(key_file, "mp3_encoding_params", "lame_mmx_enabled", NULL);
+    encoding_prefs.mp3_mmx = g_key_file_get_integer(key_file, "mp3_encoding_params", "mmx", NULL);
+    encoding_prefs.mp3_copyrighted = g_key_file_get_integer(key_file, "mp3_encoding_params", "copyrighted", NULL);
+    encoding_prefs.mp3_add_crc = g_key_file_get_integer(key_file, "mp3_encoding_params", "protected", NULL);
+    encoding_prefs.mp3_strict_iso = g_key_file_get_integer(key_file, "mp3_encoding_params", "strictiso", NULL);
+    encoding_prefs.mp3_nofilters = g_key_file_get_integer(key_file, "mp3_encoding_params", "nofilters", NULL);
+    encoding_prefs.mp3_use_lowpass = g_key_file_get_integer(key_file, "mp3_encoding_params", "uselowpass", NULL);
+    encoding_prefs.mp3_use_highpass = g_key_file_get_integer(key_file, "mp3_encoding_params", "usehighpass", NULL);
 
-    if (gnome_config_get_string("mp3_location") != NULL)
+    if (g_key_file_get_string(key_file, "mp3_encoding_params", "mp3_location", NULL) != NULL)
 	strcpy(encoding_prefs.mp3loc,
-	       gnome_config_get_string("mp3_location"));
-    gnome_config_pop_prefix();
+	       g_key_file_get_string(key_file, "mp3_encoding_params", "mp3_location", NULL));
+    }
+    
+    g_key_file_free (key_file);
 }
 
 void load_ogg_encoding_preferences(void)
 {
 /* OGG */
-    gnome_config_push_prefix("/gnome_wave_cleaner/ogg_encoding_params/");
+    GKeyFile  *key_file = read_config();
 
-    if (gnome_config_get_string("ogg_quality_level") != NULL)
+    if (g_key_file_has_group(key_file, "ogg_encoding_params") == TRUE) {
+
+    if (g_key_file_get_string(key_file, "ogg_encoding_params", "ogg_quality_level", NULL) != NULL)
 	strcpy(encoding_prefs.ogg_quality_level,
-	       gnome_config_get_string("ogg_quality_level"));
+	       g_key_file_get_string(key_file, "ogg_encoding_params", "ogg_quality_level", NULL));
 
-    if (gnome_config_get_string("ogg_location") != NULL)
+    if (g_key_file_get_string(key_file, "ogg_encoding_params", "ogg_location", NULL) != NULL)
 	strcpy(encoding_prefs.oggloc,
-	       gnome_config_get_string("ogg_location"));
+	       g_key_file_get_string(key_file, "ogg_encoding_params", "ogg_location", NULL));
 
-    if (gnome_config_get_string("ogg_bitrate") != NULL)
+    if (g_key_file_get_string(key_file, "ogg_encoding_params", "ogg_bitrate", NULL) != NULL)
 	strcpy(encoding_prefs.ogg_bitrate,
-	       gnome_config_get_string("ogg_bitrate"));
+	       g_key_file_get_string(key_file, "ogg_encoding_params", "ogg_bitrate", NULL));
 
-    if (gnome_config_get_string("ogg_maxbitrate") != NULL)
+    if (g_key_file_get_string(key_file, "ogg_encoding_params", "ogg_maxbitrate", NULL) != NULL)
 	strcpy(encoding_prefs.ogg_maxbitrate,
-	       gnome_config_get_string("ogg_maxbitrate"));
+	       g_key_file_get_string(key_file, "ogg_encoding_params", "ogg_maxbitrate", NULL));
 
-    if (gnome_config_get_string("ogg_minbitrate") != NULL)
+    if (g_key_file_get_string(key_file, "ogg_encoding_params", "ogg_minbitrate", NULL) != NULL)
 	strcpy(encoding_prefs.ogg_minbitrate,
-	       gnome_config_get_string("ogg_minbitrate"));
+	       g_key_file_get_string(key_file, "ogg_encoding_params", "ogg_minbitrate", NULL));
 
-    encoding_prefs.ogg_downmix = gnome_config_get_int("ogg_downmix");
+    encoding_prefs.ogg_downmix = g_key_file_get_integer(key_file, "ogg_encoding_params", "ogg_downmix", NULL);
 
-    if (gnome_config_get_string("ogg_resample") != NULL)
+    if (g_key_file_get_string(key_file, "ogg_encoding_params", "ogg_resample", NULL) != NULL)
 	strcpy(encoding_prefs.ogg_resample,
-	       gnome_config_get_string("ogg_resample"));
+	       g_key_file_get_string(key_file, "ogg_encoding_params", "ogg_resample", NULL));
 
-    if (gnome_config_get_string("ogg_lowpass") != NULL)
+    if (g_key_file_get_string(key_file, "ogg_encoding_params", "ogg_lowpass", NULL) != NULL)
 	strcpy(encoding_prefs.ogg_lowpass_frequency,
-	       gnome_config_get_string("ogg_lowpass"));
+	       g_key_file_get_string(key_file, "ogg_encoding_params", "ogg_lowpass", NULL));
 
-    if (gnome_config_get_string("ogg_bitrateavgwindow") != NULL)
+    if (g_key_file_get_string(key_file, "ogg_encoding_params", "ogg_bitrateavgwindow", NULL) != NULL)
 	strcpy(encoding_prefs.ogg_bitrate_average_window,
-	       gnome_config_get_string("ogg_bitrateavgwindow"));
+	       g_key_file_get_string(key_file, "ogg_encoding_params", "ogg_bitrateavgwindow", NULL));
 
     encoding_prefs.ogg_useadvbravgwindow =
-	gnome_config_get_int("ogg_useadvbravgwindow");
+	g_key_file_get_integer(key_file, "ogg_encoding_params", "ogg_useadvbravgwindow", NULL);
     encoding_prefs.ogg_useresample =
-	gnome_config_get_int("ogg_useresample");
+	g_key_file_get_integer(key_file, "ogg_encoding_params", "ogg_useresample", NULL);
     encoding_prefs.ogg_useadvlowpass =
-	gnome_config_get_int("ogg_useadvlowpass");
+	g_key_file_get_integer(key_file, "ogg_encoding_params", "ogg_useadvlowpass", NULL);
     encoding_prefs.ogg_useadvlowpass =
-	gnome_config_get_int("ogg_uselowpass");
-    encoding_prefs.ogg_encopt = gnome_config_get_int("ogg_encopt");
-    gnome_config_pop_prefix();
+	g_key_file_get_integer(key_file, "ogg_encoding_params", "ogg_uselowpass", NULL);
+    encoding_prefs.ogg_encopt = g_key_file_get_integer(key_file, "ogg_encoding_params", "ogg_encopt", NULL);
+    }
+    
+    g_key_file_free (key_file);
 }
 
 void save_mp3_simple_encoding_preferences(void)
 {
 /* MP3 */
-    gnome_config_push_prefix("/gnome_wave_cleaner/mp3_simple_encoding_params/");
-    gnome_config_set_string("enc_quality_level",
+    GKeyFile  *key_file = read_config();
+
+    g_key_file_set_string(key_file, "mp3_simple_encoding_params", "enc_quality_level",
 			    encoding_prefs.mp3_quality_level);
-    gnome_config_set_string("mp3_location", encoding_prefs.mp3loc);
-    gnome_config_set_string("artist", encoding_prefs.artist);
-    gnome_config_set_string("album", encoding_prefs.album);
-    gnome_config_sync();
-    gnome_config_pop_prefix();
+    g_key_file_set_string(key_file, "mp3_simple_encoding_params", "mp3_location", encoding_prefs.mp3loc);
+    g_key_file_set_string(key_file, "mp3_simple_encoding_params", "artist", encoding_prefs.artist);
+    g_key_file_set_string(key_file, "mp3_simple_encoding_params", "album", encoding_prefs.album);
+
+    write_config(key_file);
 }
 
 void save_mp3_encoding_preferences(void)
 {
 /* MP3 */
-    gnome_config_push_prefix("/gnome_wave_cleaner/mp3_encoding_params/");
-    gnome_config_set_string("enc_bitrate", encoding_prefs.mp3_bitrate);
-    gnome_config_set_string("enc_quality_level",
+    GKeyFile  *key_file = read_config();
+
+    g_key_file_set_string(key_file, "mp3_encoding_params", "enc_bitrate", encoding_prefs.mp3_bitrate);
+    g_key_file_set_string(key_file, "mp3_encoding_params", "enc_quality_level",
 			    encoding_prefs.mp3_quality_level);
-    gnome_config_set_string("lowpass_freq",
+    g_key_file_set_string(key_file, "mp3_encoding_params", "lowpass_freq",
 			    encoding_prefs.mp3_lowpass_freq);
-    gnome_config_set_string("highpass_freq",
+    g_key_file_set_string(key_file, "mp3_encoding_params", "highpass_freq",
 			    encoding_prefs.mp3_highpass_freq);
-    gnome_config_set_int("br_mode", encoding_prefs.mp3_br_mode);
-    gnome_config_set_int("presets", encoding_prefs.mp3presets);
-    gnome_config_set_int("lame_mmx_enabled",
+    g_key_file_set_integer(key_file, "mp3_encoding_params", "br_mode", encoding_prefs.mp3_br_mode);
+    g_key_file_set_integer(key_file, "mp3_encoding_params", "presets", encoding_prefs.mp3presets);
+    g_key_file_set_integer(key_file, "mp3_encoding_params", "lame_mmx_enabled",
 			 encoding_prefs.mp3_lame_mmx_enabled);
-    gnome_config_set_int("sse", encoding_prefs.mp3_sse);
-    gnome_config_set_int("mmx", encoding_prefs.mp3_mmx);
-    gnome_config_set_int("threednow", encoding_prefs.mp3_threednow);
-    gnome_config_set_int("nofilters", encoding_prefs.mp3_nofilters);
-    gnome_config_set_int("uselowpass", encoding_prefs.mp3_use_lowpass);
-    gnome_config_set_int("usehighpass", encoding_prefs.mp3_use_highpass);
-    gnome_config_set_int("copyrighted", encoding_prefs.mp3_copyrighted);
-    gnome_config_set_int("protected", encoding_prefs.mp3_add_crc);
-    gnome_config_set_int("strictiso", encoding_prefs.mp3_strict_iso);
-    gnome_config_set_string("mp3_location", encoding_prefs.mp3loc);
-    gnome_config_sync();
-    gnome_config_pop_prefix();
+    g_key_file_set_integer(key_file, "mp3_encoding_params", "sse", encoding_prefs.mp3_sse);
+    g_key_file_set_integer(key_file, "mp3_encoding_params", "mmx", encoding_prefs.mp3_mmx);
+    g_key_file_set_integer(key_file, "mp3_encoding_params", "threednow", encoding_prefs.mp3_threednow);
+    g_key_file_set_integer(key_file, "mp3_encoding_params", "nofilters", encoding_prefs.mp3_nofilters);
+    g_key_file_set_integer(key_file, "mp3_encoding_params", "uselowpass", encoding_prefs.mp3_use_lowpass);
+    g_key_file_set_integer(key_file, "mp3_encoding_params", "usehighpass", encoding_prefs.mp3_use_highpass);
+    g_key_file_set_integer(key_file, "mp3_encoding_params", "copyrighted", encoding_prefs.mp3_copyrighted);
+    g_key_file_set_integer(key_file, "mp3_encoding_params", "protected", encoding_prefs.mp3_add_crc);
+    g_key_file_set_integer(key_file, "mp3_encoding_params", "strictiso", encoding_prefs.mp3_strict_iso);
+    g_key_file_set_string(key_file, "mp3_encoding_params", "mp3_location", encoding_prefs.mp3loc);
+
+    write_config(key_file);
 }
 
 void save_ogg_encoding_preferences(void)
 {
 /* OGG */
-    gnome_config_push_prefix("/gnome_wave_cleaner/ogg_encoding_params/");
-    gnome_config_set_string("ogg_quality_level",
+    GKeyFile  *key_file = read_config();
+
+    g_key_file_set_string(key_file, "ogg_encoding_params", "ogg_quality_level",
 			    encoding_prefs.ogg_quality_level);
-    gnome_config_set_string("ogg_location", encoding_prefs.oggloc);
-    gnome_config_set_string("ogg_bitrate", encoding_prefs.ogg_bitrate);
-    gnome_config_set_string("ogg_minbitrate",
+    g_key_file_set_string(key_file, "ogg_encoding_params", "ogg_location", encoding_prefs.oggloc);
+    g_key_file_set_string(key_file, "ogg_encoding_params", "ogg_bitrate", encoding_prefs.ogg_bitrate);
+    g_key_file_set_string(key_file, "ogg_encoding_params", "ogg_minbitrate",
 			    encoding_prefs.ogg_minbitrate);
-    gnome_config_set_string("ogg_maxbitrate",
+    g_key_file_set_string(key_file, "ogg_encoding_params", "ogg_maxbitrate",
 			    encoding_prefs.ogg_maxbitrate);
-    gnome_config_set_int("ogg_downmix", encoding_prefs.ogg_downmix);
-    gnome_config_set_string("ogg_resample", encoding_prefs.ogg_resample);
-    gnome_config_set_string("ogg_bitrateavgwindow",
+    g_key_file_set_integer(key_file, "ogg_encoding_params", "ogg_downmix", encoding_prefs.ogg_downmix);
+    g_key_file_set_string(key_file, "ogg_encoding_params", "ogg_resample", encoding_prefs.ogg_resample);
+    g_key_file_set_string(key_file, "ogg_encoding_params", "ogg_bitrateavgwindow",
 			    encoding_prefs.ogg_bitrate_average_window);
-    gnome_config_set_string("ogg_lowpass",
+    g_key_file_set_string(key_file, "ogg_encoding_params", "ogg_lowpass",
 			    encoding_prefs.ogg_lowpass_frequency);
-    gnome_config_set_int("ogg_uselowpass",
+    g_key_file_set_integer(key_file, "ogg_encoding_params", "ogg_uselowpass",
 			 encoding_prefs.ogg_useadvlowpass);
-    gnome_config_set_int("ogg_useresample",
+    g_key_file_set_integer(key_file, "ogg_encoding_params", "ogg_useresample",
 			 encoding_prefs.ogg_useresample);
-    gnome_config_set_int("ogg_useadvbravgwindow",
+    g_key_file_set_integer(key_file, "ogg_encoding_params", "ogg_useadvbravgwindow",
 			 encoding_prefs.ogg_useadvbravgwindow);
-    gnome_config_set_int("ogg_encopt", encoding_prefs.ogg_encopt);
-    gnome_config_sync();
-    gnome_config_pop_prefix();
+    g_key_file_set_integer(key_file, "ogg_encoding_params", "ogg_encopt", encoding_prefs.ogg_encopt);
+
+    write_config(key_file);
 }
 
 extern struct denoise_prefs denoise_prefs;
@@ -1165,44 +1181,49 @@ static int noise_suppression_method, window_type;
 
 void load_denoise_preferences(void)
 {
-    gnome_config_push_prefix(APPNAME"/denoise_params/");
+    GKeyFile  *key_file = read_config();
+    
+    if (g_key_file_has_group(key_file, "denoise_params") == TRUE) {
     denoise_prefs.n_noise_samples =
-	gnome_config_get_int("n_noise_samples=16");
-    denoise_prefs.smoothness = gnome_config_get_int("smoothness=11");
-    denoise_prefs.FFT_SIZE = gnome_config_get_int("FFT_SIZE=8192");
-    denoise_prefs.amount = gnome_config_get_float("amount=0.3");
-    denoise_prefs.dn_gamma = gnome_config_get_float("dn_gamma=0.95");
-    denoise_prefs.randomness = gnome_config_get_float("randomness=0.0");
-    denoise_prefs.window_type = gnome_config_get_int("window_type=1");
-    denoise_prefs.freq_filter = gnome_config_get_int("freq_filter=0");
-    denoise_prefs.estimate_power_floor = gnome_config_get_int("estimate_power_floor=0");
-    denoise_prefs.min_sample_freq = gnome_config_get_float("min_sample_freq=0.0");
-    denoise_prefs.max_sample_freq = gnome_config_get_float("max_sample_freq=44100.0");
+	g_key_file_get_integer(key_file, "denoise_params", "n_noise_samples=16", NULL);
+    denoise_prefs.smoothness = g_key_file_get_integer(key_file, "denoise_params", "smoothness=11", NULL);
+    denoise_prefs.FFT_SIZE = g_key_file_get_integer(key_file, "denoise_params", "FFT_SIZE=8192", NULL);
+    denoise_prefs.amount = g_key_file_get_double(key_file, "denoise_params", "amount=0.3", NULL);
+    denoise_prefs.dn_gamma = g_key_file_get_double(key_file, "denoise_params", "dn_gamma=0.95", NULL);
+    denoise_prefs.randomness = g_key_file_get_double(key_file, "denoise_params", "randomness=0.0", NULL);
+    denoise_prefs.window_type = g_key_file_get_integer(key_file, "denoise_params", "window_type=1", NULL);
+    denoise_prefs.freq_filter = g_key_file_get_integer(key_file, "denoise_params", "freq_filter=0", NULL);
+    denoise_prefs.estimate_power_floor = g_key_file_get_integer(key_file, "denoise_params", "estimate_power_floor=0", NULL);
+    denoise_prefs.min_sample_freq = g_key_file_get_double(key_file, "denoise_params", "min_sample_freq=0.0", NULL);
+    denoise_prefs.max_sample_freq = g_key_file_get_double(key_file, "denoise_params", "max_sample_freq=44100.0", NULL);
     denoise_prefs.noise_suppression_method =
-    gnome_config_get_int("noise_suppression_method=1");
-    gnome_config_pop_prefix();
+    g_key_file_get_integer(key_file, "denoise_params", "noise_suppression_method=1", NULL);
+    }
+    
+    g_key_file_free (key_file);
 }
 
 void save_denoise_preferences(void)
 {
-    gnome_config_push_prefix(APPNAME"/denoise_params/");
-    gnome_config_set_int("n_noise_samples", denoise_prefs.n_noise_samples);
-    gnome_config_set_int("smoothness", denoise_prefs.smoothness);
-    gnome_config_set_int("FFT_SIZE", denoise_prefs.FFT_SIZE);
-    gnome_config_set_float("amount", denoise_prefs.amount);
-    gnome_config_set_float("dn_gamma", denoise_prefs.dn_gamma);
-    gnome_config_set_float("randomness", denoise_prefs.randomness);
-    gnome_config_set_int("window_type", denoise_prefs.window_type);
+    GKeyFile  *key_file = read_config();
 
-    gnome_config_set_int("freq_filter", denoise_prefs.freq_filter);
-    gnome_config_set_int("estimate_power_floor", denoise_prefs.estimate_power_floor);
-    gnome_config_set_float("min_sample_freq", denoise_prefs.min_sample_freq);
-    gnome_config_set_float("max_sample_freq", denoise_prefs.max_sample_freq);
+    g_key_file_set_integer(key_file, "denoise_params", "n_noise_samples", denoise_prefs.n_noise_samples);
+    g_key_file_set_integer(key_file, "denoise_params", "smoothness", denoise_prefs.smoothness);
+    g_key_file_set_integer(key_file, "denoise_params", "FFT_SIZE", denoise_prefs.FFT_SIZE);
+    g_key_file_set_double(key_file, "denoise_params", "amount", denoise_prefs.amount);
+    g_key_file_set_double(key_file, "denoise_params", "dn_gamma", denoise_prefs.dn_gamma);
+    g_key_file_set_double(key_file, "denoise_params", "randomness", denoise_prefs.randomness);
+    g_key_file_set_integer(key_file, "denoise_params", "window_type", denoise_prefs.window_type);
 
-    gnome_config_set_int("noise_suppression_method",
+    g_key_file_set_integer(key_file, "denoise_params", "freq_filter", denoise_prefs.freq_filter);
+    g_key_file_set_integer(key_file, "denoise_params", "estimate_power_floor", denoise_prefs.estimate_power_floor);
+    g_key_file_set_double(key_file, "denoise_params", "min_sample_freq", denoise_prefs.min_sample_freq);
+    g_key_file_set_double(key_file, "denoise_params", "max_sample_freq", denoise_prefs.max_sample_freq);
+
+    g_key_file_set_integer(key_file, "denoise_params", "noise_suppression_method",
 			 denoise_prefs.noise_suppression_method);
-    gnome_config_sync();
-    gnome_config_pop_prefix();
+
+    write_config(key_file);
 }
 
 
