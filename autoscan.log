@@ -1,0 +1,250 @@
+autoscan: warning: missing AC_CHECK_FUNCS([ftime]) wanted by: 
+	denoise.c:56
+	denoise.c:61
+autoscan: warning: missing AC_CHECK_FUNCS([memmove]) wanted by: 
+	gwcmad.c:101
+	mp3.c:105
+	sox/mp3.c:105
+autoscan: warning: missing AC_CHECK_FUNCS([memset]) wanted by: 
+	sample_block.c:255
+	gtkcurve.c:844
+	audio_util.c:1365
+	audio_osx.c:110
+autoscan: warning: missing AC_CHECK_FUNCS([mkfifo]) wanted by: 
+	encode.c:781
+autoscan: warning: missing AC_CHECK_FUNCS([pow]) wanted by: 
+	gtkcurve.c:670
+	godsill_wolfe.c:33
+	biquad.c:484
+	denoise.c:103
+	denoise.c:115
+	denoise.c:286
+	denoise.c:439
+	denoise.c:456
+	drawing.c:1091
+	drawing.c:1092
+	drawing.c:1093
+autoscan: warning: missing AC_CHECK_FUNCS([sqrt]) wanted by: 
+	sample_block.c:184
+	sample_block.c:185
+	sample_block.c:345
+	sample_block.c:346
+	declick.c:53
+	declick.c:78
+	declick.c:80
+	declick.c:631
+	declick.c:665
+	i1.c:370
+	i1.c:373
+	i1.c:389
+	i1.c:411
+	dethunk.c:59
+	dethunk.c:431
+	dethunk.c:432
+	dethunk.c:474
+	dethunk.c:475
+	biquad.c:489
+	denoise.c:87
+	denoise.c:101
+	denoise.c:113
+	denoise.c:209
+	denoise.c:223
+	denoise.c:384
+	denoise.c:387
+	denoise.c:417
+	denoise.c:437
+	denoise.c:454
+	denoise.c:594
+	drawing.c:497
+	drawing.c:1187
+	drawing.c:1188
+	i0.c:371
+	i0.c:373
+	i0.c:389
+	i0.c:409
+autoscan: warning: missing AC_CHECK_FUNCS([strcasecmp]) wanted by: 
+	gwc.c:2749
+	gwc.c:2773
+	gwc.c:2797
+	gwc.c:2821
+	gwc.c:2856
+	gwc.c:2860
+	gwc.c:2883
+	gwc.c:2905
+	gwc.c:3250
+	gwc.c:3250
+autoscan: warning: missing AC_CHECK_FUNCS([strerror]) wanted by: 
+	markers.c:189
+autoscan: warning: missing AC_CHECK_FUNCS([strrchr]) wanted by: 
+	gwc.c:2152
+	gwc.c:2155
+autoscan: warning: missing AC_CHECK_HEADERS([float.h]) wanted by: 
+	declick.c:25
+	machine.h:101
+	denoise.c:27
+autoscan: warning: missing AC_CHECK_HEADERS([stddef.h]) wanted by: 
+	machine.h:99
+autoscan: warning: missing AC_CHECK_HEADER_STDBOOL wanted by: 
+	audio_osx.c:53
+	audio_osx.c:74
+	audio_osx.c:78
+	audio_osx.c:189
+	audio_osx.c:212
+	audio_osx.c:238
+	audio_osx.c:272
+	audio_osx.c:309
+autoscan: warning: missing AC_CHECK_TYPES([ptrdiff_t]) wanted by: 
+	gwcmad.c:38
+	gwcmad.c:394
+	mp3.c:41
+	mp3.c:407
+	sox/mp3.c:41
+	sox/mp3.c:407
+autoscan: warning: missing AC_C_INLINE wanted by: 
+	tap_reverb.c:165
+	tap_reverb.c:183
+	tap_reverb.c:195
+	tap_reverb.c:207
+	tap_reverb.c:218
+	tap_reverb.c:237
+	tap_reverb.c:256
+autoscan: warning: missing AC_FUNC_ERROR_AT_LINE wanted by: 
+	zmatrix.h:68
+	zmatrix.h:71
+	zmatrix.h:74
+	zmatrix.h:76
+	zmatrix.h:78
+	zmatrix.h:81
+	zmatrix.h:84
+	zmatrix.h:86
+	stat.c:31
+	stat.c:33
+	matrix.h:232
+	matrix.h:234
+	matrix.h:236
+	matrix.h:238
+	matrix.h:240
+	matrix.h:242
+	matrix.h:244
+	matrix.h:246
+	matrix.h:249
+	matrix.h:252
+	matrix.h:255
+	err.h:143
+	err.h:177
+autoscan: warning: missing AC_FUNC_FORK wanted by: 
+	encode.c:623
+	encode.c:790
+autoscan: warning: missing AC_FUNC_FSEEKO wanted by: 
+	mp3-duration.h:139
+	sox/mp3-duration.h:139
+autoscan: warning: missing AC_FUNC_MALLOC wanted by: 
+	biquad.c:479
+	tap_reverb_file_io.c:130
+	tap_reverb_file_io.c:151
+	ar.c:22
+	ar.c:26
+	ar.c:30
+	ar.c:34
+	ar.c:38
+	ar.c:43
+	ar.c:50
+	ar.c:177
+	ar.c:179
+	audio_osx.c:232
+	audio_osx.c:233
+	markers.c:580
+	matrix.h:83
+	matrix.h:85
+autoscan: warning: missing AC_FUNC_REALLOC wanted by: 
+	sample_block.c:252
+	undo.c:256
+	matrix.h:83
+	matrix.h:87
+	matrix.h:127
+	matrix.h:143
+autoscan: warning: missing AC_FUNC_STRTOD wanted by: 
+	gtkgamma.c:360
+autoscan: warning: missing AC_PROG_AWK wanted by: 
+	ltmain.sh:7065
+	ltmain.sh:7067
+autoscan: warning: missing AC_PROG_CXX wanted by: 
+	ltmain.sh:960
+	ltmain.sh:1380
+	ltmain.sh:1383
+	ltmain.sh:1388
+	ltmain.sh:1388
+	ltmain.sh:1398
+	ltmain.sh:1402
+	ltmain.sh:1405
+	ltmain.sh:1405
+	ltmain.sh:2442
+autoscan: warning: missing AC_PROG_INSTALL wanted by: 
+	Makefile.in:66
+	Makefile.in:67
+	Makefile.in:68
+	Makefile.in:69
+	Makefile.in:70
+	Makefile.in:71
+	Makefile.in:72
+	Makefile.in:73
+	Makefile.in:74
+	ltmain.sh:1028
+	ltmain.sh:1029
+	ltmain.sh:1106
+	ltmain.sh:2377
+	ltmain.sh:2379
+	ltmain.sh:2384
+	ltmain.sh:2391
+	ltmain.sh:2420
+	ltmain.sh:2420
+	ltmain.sh:2421
+	ltmain.sh:2491
+	ltmain.sh:2497
+	ltmain.sh:2856
+	ltmain.sh:2967
+	ltmain.sh:3176
+	ltmain.sh:3230
+	ltmain.sh:5675
+	ltmain.sh:5680
+	ltmain.sh:5685
+	ltmain.sh:5686
+	ltmain.sh:7764
+autoscan: warning: missing AC_PROG_LN_S wanted by: 
+	ltmain.sh:2149
+	ltmain.sh:3720
+	ltmain.sh:9164
+autoscan: warning: missing AC_PROG_MAKE_SET wanted by: 
+	Makefile.in:87
+	Makefile.in:87
+	Makefile.in:87
+	Makefile.in:94
+	ltmain.sh:2163
+	ltmain.sh:2217
+	ltmain.sh:2266
+	ltmain.sh:4401
+	ltmain.sh:4862
+	ltmain.sh:6342
+	ltmain.sh:6963
+	ltmain.sh:7710
+	ltmain.sh:7753
+	ltmain.sh:7764
+	ltmain.sh:7841
+	ltmain.sh:7895
+autoscan: warning: missing AC_PROG_RANLIB wanted by: 
+	ltmain.sh:2455
+autoscan: warning: missing AC_TYPE_OFF_T wanted by: 
+	mp3-duration.h:139
+	undo.c:205
+	undo.c:236
+	undo.c:236
+	undo.c:237
+	undo.c:252
+	undo.c:256
+	undo.c:256
+	undo.c:258
+	audio_util.c:751
+	audio_util.c:752
+	audio_util.c:779
+	audio_util.c:784
+	sox/mp3-duration.h:139
