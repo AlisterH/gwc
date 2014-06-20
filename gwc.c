@@ -1809,6 +1809,10 @@ void destroy(GtkWidget * widget, gpointer data)
 	gtk_main_quit();
 }
 
+/* need to fix this - it crashes if you click outside the about dialog:
+   (gwc:26737): GLib-GObject-WARNING **: invalid cast from 'GtkImageMenuItem' to 'GtkWindow'
+   (gwc:26737): Gtk-CRITICAL **: IA__gtk_window_set_transient_for: assertion 'parent == NULL || GTK_IS_WINDOW (parent)' failed
+   Floating point exception */
 void about(GtkWidget *window)
 {
     const gchar *authors[] = { "Jeffrey J. Welty", "James Tappin", "Ian Leonard", "Bill Jetzer", "Charles Morgon", "Frank Freudenberg", "Thiemo Gehrke", "Rob Frohne", NULL };
