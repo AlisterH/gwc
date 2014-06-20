@@ -2969,7 +2969,7 @@ int main(int argc, char *argv[])
 		       GNOME_PARAM_POPT_TABLE, NULL,
 		       GNOME_PROGRAM_STANDARD_PROPERTIES, NULL);
 
-    gtk_window_set_default_icon_from_file("gwc-logo.png", NULL);
+    gtk_window_set_default_icon_from_file(DATADIR "/pixmaps/gwc-logo.png", NULL);
     main_window = gnome_app_new("gwc", "Dehiss, declick audio file");
     gnome_app_create_menus(GNOME_APP(main_window), menubar);
 
