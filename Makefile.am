@@ -18,14 +18,12 @@ APPNAME = gnome_wave_cleaner
 GNOME = @GNOME_BASE@
 
 pixmapdir = $(DATADIR)/pixmaps
-HELPDIR = ${prefix}/$(GNOME)/share/gnome/help/$(APPNAME)
-HELPDIRC = $(HELPDIR)/C
 DOCDIR = $(DATADIR)/doc/gwc
+HELPDIR = $(DOCDIR)
 
 # use these entries for SuSE and maybe other distros
 #DOCDIR = /usr/share/doc/packages/gwc
 #HELPDIR = $(DOCDIR)
-#HELPDIRC = $(DOCDIR)
 
 # Where the user preferences for gwc are stored (~user/.gnome/...)
 CONFIGDIR = /$(APPNAME)/config/
@@ -41,8 +39,8 @@ OBJS = $(SRC:.c=.o)
 BINFILES = gwc
 pixmap_DATA = gwc-logo.png
 DOCFILES = README INSTALL TODO COPYING Changelog
-HELPFILES = gwc_qs.html gwc.html topic.dat
-HELPFILESSRCD = doc/C
+HELPFILES = gwc_qs.html gwc.html
+HELPFILESSRCD = doc
 
 ###
 CC = @CC@
@@ -67,10 +65,9 @@ install : gwc
 	install -d $(BINDIR)
 	install -d $(DOCDIR)
 	install -d $(pixmapdir)
-	install -d $(HELPDIRC)
 	install -p -s $(BINFILES) $(BINDIR)
 	install -p -m 0644 $(DOCFILES) $(DOCDIR)
-	for hf in $(HELPFILES) ; do install -p -m 0644 $(HELPFILESSRCD)/$$hf $(HELPDIRC) ; done
+	for hf in $(HELPFILES) ; do install -p -m 0644 $(HELPFILESSRCD)/$$hf $(HELPDIR) ; done
 	install -p -m 0644 $(pixmap_DATA) $(pixmapdir)
 
 uninstall :
@@ -78,7 +75,9 @@ uninstall :
 	( cd $(DOCDIR) && rm -f $(DOCFILES) )
 	( cd $(HELPDIRC) && rm -f $(HELPFILES) )
 	( cd $(pixmapdir) && rm -f $(pixmap_DATA) )
-	( rmdir --ignore-fail-on-non-empty $(DOCDIR) $(HELPDIRC) $(HELPDIR) $(pixmapdir) )
+	( rmdir --ignore-fail-on-non-empty $(DOCDIR) $(pixmapdir) )
+# gives an error message because we have DOCDIR=HELPDIR
+#	( rmdir --ignore-fail-on-non-empty $(DOCDIR) $(HELPDIR) $(pixmapdir) )
 
 meschach.a : meschach/meschach.a
 	cp meschach/meschach.a .
