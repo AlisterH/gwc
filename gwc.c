@@ -590,7 +590,8 @@ void show_help(const char *filename)
 
 // This is silly - better check if gvfs is installed, or try the gtk_show_uri and see if it fails
 # if GTK_CHECK_VERSION(2,14,0)
-  char *uri = g_strconcat ("file://", DATADIR, "/doc/gwc/", filename, NULL);
+  char *uri = g_strconcat ("file://", HELPDIR, "/", filename, NULL);
+printf(uri);
 // not sure if this does what I want
   GdkScreen *screen = gtk_widget_get_screen (main_window);
   gtk_show_uri(screen, uri, gtk_get_current_event_time (), NULL);
@@ -2969,7 +2970,7 @@ int main(int argc, char *argv[])
 		       GNOME_PARAM_POPT_TABLE, NULL,
 		       GNOME_PROGRAM_STANDARD_PROPERTIES, NULL);
 
-    gtk_window_set_default_icon_from_file(DATADIR "/pixmaps/gwc-logo.png", NULL);
+    gtk_window_set_default_icon_from_file(pixmapdir "/gwc-logo.png", NULL);
     main_window = gnome_app_new("gwc", "Dehiss, declick audio file");
     gnome_app_create_menus(GNOME_APP(main_window), menubar);
 
