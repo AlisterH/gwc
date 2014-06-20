@@ -573,25 +573,35 @@ int prompt_user(char *msg, char *s, int maxlen)
 
 void show_help(const char *filename)
 {
-    GError *err = NULL ;
-    gboolean r ;
+/*
+//  Can't figure out how to get ghelp to display gwc_qs.html
+//  But yelp isn't really better than a browser, is it?
+#if GTK_CHECK_VERSION(2,14,0)
+  GdkScreen *screen;
+//  Need some more includes or something for this display stuff
+//  DDisplay *ddisp;
+//  ddisp = ddisplay_active();
+//  screen = gtk_widget_get_screen (GTK_WIDGET(ddisp->menu_bar));
+//  opens /usr/share/gnome/help/gwc/gwc.html (or similar, if not using html documentation)
+  if (gtk_show_uri(screen, "ghelp:gwc", gtk_get_current_event_time (), NULL))
+    return;
+#endif
+*/
 
-    r = gnome_help_display(filename, NULL, &err) ;
-
-    if(!r) {
-	char buf[256] ;
-	strcpy(buf, "C/") ;
-	strcat(buf, filename) ;
-
-	r = gnome_help_display(buf, NULL, &err) ;
-
-	if(!r) {
-	    fprintf(stderr, "gnome_help_display failed: %s\n", err->message) ;
-	    g_error_free(err) ;
-	}
-    }
-
-    main_redraw(FALSE, TRUE);
+// This is silly - better check if gvfs is installed, or try the gtk_show_uri and see if it fails
+# if GTK_CHECK_VERSION(2,14,0)
+  char *uri = g_strconcat ("file://", DATADIR, "/doc/gwc/", filename, NULL);
+// not sure if this does what I want
+  GdkScreen *screen = gtk_widget_get_screen (main_window);
+  gtk_show_uri(screen, uri, gtk_get_current_event_time (), NULL);
+// haven't tested this; not sure if I've got it right
+# else
+   command = getenv("BROWSER");
+   command = g_strdup_printf("%s %s &", command ? command : "xdg-open", uri);
+   system(command);
+   g_free(command);
+# endif
+   g_free(uri);
 }
 
 void help(GtkWidget * widget, gpointer data)
