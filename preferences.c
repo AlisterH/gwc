@@ -1181,12 +1181,12 @@ static int noise_suppression_method, window_type;
 
 void load_denoise_preferences(void)
 {
-    denoise_prefs.noise_suppression_method = 1 ;
-    denoise_prefs.window_type = 1 ;
+    denoise_prefs.noise_suppression_method = 3 ;
+    denoise_prefs.window_type = 2 ;
     denoise_prefs.smoothness = 11;
-    denoise_prefs.FFT_SIZE = 8192 ;
+    denoise_prefs.FFT_SIZE = 4096 ;
     denoise_prefs.n_noise_samples = 16 ;
-    denoise_prefs.amount = 0.3 ;
+    denoise_prefs.amount = 0.5 ;
     denoise_prefs.dn_gamma = 0.95 ;
     denoise_prefs.randomness = 0.0 ;
     denoise_prefs.min_sample_freq = 0.0 ;
