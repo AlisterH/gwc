@@ -1896,6 +1896,7 @@ void open_wave_filename(void)
 
        /* Close writes to wave_filename so put back the name of the
 	  current open file */
+       // Note that the current file is closed (but still visible) even if opening the new file fails!
     strcpy(tmp,wave_filename);
     strcpy(wave_filename, last_filename);
 
@@ -1905,15 +1906,21 @@ void open_wave_filename(void)
     strcpy(wave_filename,tmp);
 
        /* all this to store the last directory where a file was opened */
-    strcpy(tmp, wave_filename);
+       // Eh?  It was storing the full path, but mangling it if the file was in /
+/*    strcpy(tmp, wave_filename);
     strcpy(pathname, dirname(tmp));
     strcat(pathname, "/");
 
     strcpy(tmp, wave_filename);
     strcat(pathname, basename(tmp));
+*/
+    // This seems to do the job
+    // But note that it still stores the file location even if it isn't able to be opened (e.g. because it isn't a wav file).  Is this intended?
+    strcpy(pathname, tmp);
     
     l = strlen(wave_filename);
 
+    // Should also really reject wav files that we can't work with (e.g. mono recordings), or fix it so they do work! 
     if (is_valid_audio_file(wave_filename)) {
 	tmp_prefs = open_wavefile((char *) wave_filename, &audio_view);
 	if (tmp_prefs.successful_open) {
