@@ -467,7 +467,11 @@ void display_message(char *msg, char *title)
 
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox), txt, TRUE, TRUE, 0) ;
 
-gtk_window_set_keep_above(GTK_WINDOW(dlg), TRUE);
+    if (file_selector) {
+        gtk_window_set_transient_for((GtkWindow*) dlg, (GtkWindow*) file_selector);
+    } else {
+        gtk_window_set_transient_for((GtkWindow*) dlg, (GtkWindow*) dlg->parent);
+    }
     gtk_widget_show_all(dlg) ;
 
     gtk_dialog_run(GTK_DIALOG(dlg)) ;
@@ -511,7 +515,11 @@ int yesnocancel(char *msg)
 
     gtk_widget_show_all(dlg) ;
 
-gtk_window_set_keep_above(GTK_WINDOW(dlg), TRUE);
+    if (file_selector) {
+        gtk_window_set_transient_for((GtkWindow*) dlg, (GtkWindow*) file_selector);
+    } else {
+        gtk_window_set_transient_for((GtkWindow*) dlg, (GtkWindow*) dlg->parent);
+    }
     dres = gtk_dialog_run(GTK_DIALOG(dlg));
 
     gtk_widget_destroy(dlg) ;
@@ -547,7 +555,11 @@ int yesno(char *msg)
     text = gtk_label_new(msg);
     gtk_widget_show(text);
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox), text, TRUE, TRUE, 0);
-gtk_window_set_keep_above(GTK_WINDOW(dlg), TRUE);
+    if (file_selector) {
+        gtk_window_set_transient_for((GtkWindow*) dlg, (GtkWindow*) file_selector);
+    } else {
+        gtk_window_set_transient_for((GtkWindow*) dlg, (GtkWindow*) dlg->parent);
+    }
     gtk_widget_show_all(dlg) ;
 
     dres = gtk_dialog_run(GTK_DIALOG(dlg));
@@ -591,7 +603,11 @@ int prompt_user(char *msg, char *s, int maxlen)
 
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox), entry, TRUE, TRUE, 0);
 
-gtk_window_set_keep_above(GTK_WINDOW(dlg), TRUE);
+    if (file_selector) {
+        gtk_window_set_transient_for((GtkWindow*) dlg, (GtkWindow*) file_selector);
+    } else {
+        gtk_window_set_transient_for((GtkWindow*) dlg, (GtkWindow*) dlg->parent);
+    }
     gtk_widget_show_all(dlg) ;
 
     dres = gtk_dialog_run(GTK_DIALOG(dlg));
