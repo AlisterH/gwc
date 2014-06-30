@@ -950,6 +950,7 @@ void decrackle_set_preferences(GtkWidget * widget, gpointer data)
 	add_number_entry_with_label_int(decrackle_window,
 					"Decrackling window (default = 2000)",
 					dialog_table, 2);
+// What on earth does "3 [7]" mean?
     dca_entry =
 	add_number_entry_with_label_int(decrackle_average,
 					"Decrackling average window (default = 3 [7])",
