@@ -1181,6 +1181,19 @@ static int noise_suppression_method, window_type;
 
 void load_denoise_preferences(void)
 {
+    denoise_prefs.noise_suppression_method = 1 ;
+    denoise_prefs.window_type = 1 ;
+    denoise_prefs.smoothness = 11;
+    denoise_prefs.FFT_SIZE = 8192 ;
+    denoise_prefs.n_noise_samples = 16 ;
+    denoise_prefs.amount = 0.3 ;
+    denoise_prefs.dn_gamma = 0.95 ;
+    denoise_prefs.randomness = 0.0 ;
+    denoise_prefs.min_sample_freq = 0.0 ;
+    denoise_prefs.max_sample_freq = 44100.0 ;
+    denoise_prefs.freq_filter = 0 ;
+    denoise_prefs.estimate_power_floor = 0 ;
+
     GKeyFile  *key_file = read_config();
     
     if (g_key_file_has_group(key_file, "denoise_params") == TRUE) {

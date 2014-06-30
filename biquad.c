@@ -43,10 +43,12 @@ struct {
 
 #define BUFSIZE 10000
 
-static gfloat dbGain = 3 ;
-static gfloat bandwidth ;
+//looks like confusion in the previous source.  Should this default to 3?
+static gfloat dbGain = 2 ;
+static gfloat bandwidth = 0.5 ;
 static gfloat Fc = 120 ;
-static int filter_type = NOTCH ;
+//looks like confusion in the previous source.  Should this default to NOTCH?
+static int filter_type = LPF ;
 static int feather_width = 20 ;
 
 int row2filter(int row)

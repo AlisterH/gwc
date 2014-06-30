@@ -32,8 +32,10 @@ static char reverb_method_name[128] ;
 
 #define BUFSIZE 10000
 
-static gfloat wet_level = -40.1 ;
-static gfloat dry_level = -0.5 ;
+//looks like confusion in the previous source.  Should this default to -40.1?
+static gfloat wet_level = -10 ;
+//looks like confusion in the previous source.  Should this default to -0.5?
+static gfloat dry_level = -1.0 ;
 static gfloat decay = 1500 ;
 
 void load_reverb_preferences(void)
