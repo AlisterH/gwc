@@ -305,13 +305,13 @@ void cdrdao_toc_info(char *filename)
     gtk_widget_destroy(dlg) ;
 }
 
-void store_cdrdao_toc(GtkFileSelection * selector, gpointer user_data)
+void store_cdrdao_toc(GtkWidget * selector, gpointer user_data)
 {
    int fd_new;
 
     gtk_widget_hide_all (GTK_WIDGET(file_selector));
     strcpy(save_cdrdao_toc_filename, 
-	gtk_file_selection_get_filename(GTK_FILE_SELECTION(file_selector))) ;
+	gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(file_selector))) ;
 
     if(strcmp(save_cdrdao_toc_filename, wave_filename)) {
 	int l ;
@@ -347,29 +347,26 @@ void save_cdrdao_toc(GtkWidget * widget, gpointer data)
    } else {
 	/* Create the selector */
 	file_selector =
-	    gtk_file_selection_new("Filename to save cdrdao toc to:");
+	    gtk_file_chooser_dialog_new("Filename to save cdrdao toc to:",
+                                        NULL,
+                                        GTK_FILE_CHOOSER_ACTION_SAVE,
+                                        GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                        GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
+                                        NULL);
 
-	gtk_file_selection_set_filename(GTK_FILE_SELECTION(file_selector), pathname) ;
+	gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(file_selector), pathname) ;
 
-	gtk_signal_connect(GTK_OBJECT
-			   (GTK_FILE_SELECTION(file_selector)->ok_button),
-			   "clicked", GTK_SIGNAL_FUNC(store_cdrdao_toc), NULL);
 
-	/* Ensure that the dialog box is destroyed when the user clicks a button. */
-	gtk_signal_connect_object(GTK_OBJECT
-				  (GTK_FILE_SELECTION(file_selector)->
-				   ok_button), "clicked",
-				  GTK_SIGNAL_FUNC(gtk_widget_destroy),
-				  (gpointer) file_selector);
-
-	gtk_signal_connect_object(GTK_OBJECT
-				  (GTK_FILE_SELECTION(file_selector)->
-				   cancel_button), "clicked",
-				  GTK_SIGNAL_FUNC(gtk_widget_destroy),
-				  (gpointer) file_selector);
 
 	/* Display the dialog */
-	gtk_widget_show(file_selector);
+        if (gtk_dialog_run (GTK_DIALOG (file_selector)) == GTK_RESPONSE_ACCEPT)
+        {
+                strncpy(save_cdrdao_toc_filename,
+                        gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
+ 					              (file_selector)), PATH_MAX);
+                store_cdrdao_toc(file_selector, wave_filename);
+        }
+        gtk_widget_destroy (GTK_WIDGET (file_selector));
    }
 }
 

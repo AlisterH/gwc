@@ -2027,29 +2027,18 @@ void old_open_wave_filename(void)
     }
 }
 
-void store_filename(GtkFileSelection * selector, gpointer user_data)
-{
-    strncpy(wave_filename,
-	   gtk_file_selection_get_filename(GTK_FILE_SELECTION
-					   (file_selector)), PATH_MAX);
-
-    open_wave_filename();
-
-    }
-
-    void store_selection_filename(GtkFileSelection * selector,
+void store_selection_filename(GtkWidget * selector,
 			      gpointer user_data)
-    {
+{
 
     strncpy(save_selection_filename,
-	   gtk_file_selection_get_filename(GTK_FILE_SELECTION
+	   gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
 					   (file_selector)), PATH_MAX);
 
     if (strcmp(save_selection_filename, wave_filename)) {
 	int l;
 
 	l = strlen(save_selection_filename);
-
 
 	save_selection_as_wavfile(save_selection_filename, &audio_view);
 
@@ -2062,36 +2051,30 @@ void store_filename(GtkFileSelection * selector, gpointer user_data)
 void open_file_selection(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (audio_playback == FALSE)
-	&& (cursor_playback == FALSE)) {
+	&& (cursor_playback == FALSE))
+    {
 
 	/* Create the selector */
 	file_selector =
-	    gtk_file_selection_new("Please select a file for editing.");
+	    gtk_file_chooser_dialog_new("Please select a file for editing.",
+                                        NULL,
+                                        GTK_FILE_CHOOSER_ACTION_OPEN,
+                                        GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                        GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+                                        NULL);
 
-	gtk_file_selection_set_filename(GTK_FILE_SELECTION(file_selector),
-					pathname);
-
-	gtk_signal_connect(GTK_OBJECT
-			   (GTK_FILE_SELECTION(file_selector)->ok_button),
-			   "clicked", GTK_SIGNAL_FUNC(store_filename),
-			   NULL);
-
-	/* Ensure that the dialog box is destroyed when the user clicks a button. */
-	gtk_signal_connect_object(GTK_OBJECT
-				  (GTK_FILE_SELECTION(file_selector)->
-				   ok_button), "clicked",
-				  GTK_SIGNAL_FUNC(gtk_widget_destroy),
-				  (gpointer) file_selector);
-
-	gtk_signal_connect_object(GTK_OBJECT
-				  (GTK_FILE_SELECTION(file_selector)->
-				   cancel_button), "clicked",
-				  GTK_SIGNAL_FUNC(gtk_widget_destroy),
-				  (gpointer) file_selector);
-
+	gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(file_selector),
+				      pathname);
 
 	/* Display the dialog */
-	gtk_widget_show(file_selector);
+	if (gtk_dialog_run (GTK_DIALOG (file_selector)) == GTK_RESPONSE_ACCEPT)
+        {
+                strncpy(wave_filename,
+	                gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
+						      (file_selector)), PATH_MAX);
+                open_wave_filename();
+        }
+        gtk_widget_destroy (GTK_WIDGET (file_selector));
     }
 }
 
@@ -2106,12 +2089,11 @@ void save_selection_as_encoded(int fmt, char *filename, char *filename_new, stru
     }
 
     /* save part of file as encoded fmt - fmt,old file, new file, start sample, number of samples */
-
     encode(fmt, filename, filename_new, v->selected_first_sample,
 	   total_samples, trackname);
 }
 
-void store_selected_filename_as_encoded(GtkFileSelection * selector,
+void store_selected_filename_as_encoded(GtkWidget * selector,
 				    gpointer user_data)
 {
     int enc_format = NULL ;
@@ -2123,7 +2105,7 @@ void store_selected_filename_as_encoded(GtkFileSelection * selector,
     if (encoding_type == GWC_MP3_SIMPLE) enc_format = MP3_SIMPLE_FMT ;
 
     strncpy(save_selection_filename,
-	   gtk_file_selection_get_filename(GTK_FILE_SELECTION
+	   gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
 					   (file_selector)), PATH_MAX);
 
     gtk_widget_destroy(file_selector);
@@ -2151,7 +2133,12 @@ void save_as_encoded()
 	    strcpy(tmppath, pathname);
 
 	    /* Create the selector */
-	    file_selector = gtk_file_selection_new("Encode to filename:");
+	    file_selector = gtk_file_chooser_dialog_new("Encode to filename:",
+                                                        NULL,
+                                                        GTK_FILE_CHOOSER_ACTION_SAVE,
+                                                        GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                                        GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
+                                                        NULL);
 
 	    if (encoding_type == GWC_OGG) {
 		/* make it a .ogg extension */
@@ -2161,24 +2148,18 @@ void save_as_encoded()
 		bcopy(".mp3", strrchr(tmppath, '.'), 4);
 	    }
 
-	    gtk_file_selection_set_filename(GTK_FILE_SELECTION
+	    gtk_file_chooser_set_filename(GTK_FILE_CHOOSER
 					    (file_selector), tmppath);
 
-	    gtk_signal_connect(GTK_OBJECT
-			       (GTK_FILE_SELECTION(file_selector)->
-				ok_button), "clicked",
-			       GTK_SIGNAL_FUNC
-			       (store_selected_filename_as_encoded), NULL);
-
-
-	    gtk_signal_connect_object(GTK_OBJECT
-				      (GTK_FILE_SELECTION(file_selector)->
-				       cancel_button), "clicked",
-				      GTK_SIGNAL_FUNC(gtk_widget_destroy),
-				      (gpointer) file_selector);
-
 	    /* Display the dialog */
-	    gtk_widget_show(file_selector);
+	    if (gtk_dialog_run (GTK_DIALOG (file_selector)) == GTK_RESPONSE_ACCEPT)
+            {
+                    strncpy(save_selection_filename,
+	                    gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
+	    					      (file_selector)), PATH_MAX);
+                    store_selected_filename_as_encoded(file_selector, wave_filename);
+            }
+            gtk_widget_destroy (GTK_WIDGET (file_selector));
 	} else {
 	    info("Please highlight a region to save first");
 	}
@@ -2214,32 +2195,26 @@ void save_as_selection(GtkWidget * widget, gpointer data)
 
 	    /* Create the selector */
 	    file_selector =
-		gtk_file_selection_new("Filename to save selection to:");
+		gtk_file_chooser_dialog_new("Filename to save selection to:",
+                                            NULL,
+                                            GTK_FILE_CHOOSER_ACTION_SAVE,
+                                            GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+                                            GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
+                                            NULL);
 
-	    gtk_file_selection_set_filename(GTK_FILE_SELECTION
+	    gtk_file_chooser_set_filename(GTK_FILE_CHOOSER
 					    (file_selector), pathname);
 
-	    gtk_signal_connect(GTK_OBJECT
-			       (GTK_FILE_SELECTION(file_selector)->
-				ok_button), "clicked",
-			       GTK_SIGNAL_FUNC(store_selection_filename),
-			       NULL);
 
-	    /* Ensure that the dialog box is destroyed when the user clicks a button. */
-	    gtk_signal_connect_object(GTK_OBJECT
-				      (GTK_FILE_SELECTION(file_selector)->
-				       ok_button), "clicked",
-				      GTK_SIGNAL_FUNC(gtk_widget_destroy),
-				      (gpointer) file_selector);
 
-	    gtk_signal_connect_object(GTK_OBJECT
-				      (GTK_FILE_SELECTION(file_selector)->
-				       cancel_button), "clicked",
-				      GTK_SIGNAL_FUNC(gtk_widget_destroy),
-				      (gpointer) file_selector);
-
-	    /* Display the dialog */
-	    gtk_widget_show(file_selector);
+	    if (gtk_dialog_run (GTK_DIALOG (file_selector)) == GTK_RESPONSE_ACCEPT)
+            {
+                    strncpy(save_selection_filename,
+	                    gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
+	    					      (file_selector)), PATH_MAX);
+                    store_selection_filename(file_selector, wave_filename);
+            }
+            gtk_widget_destroy (GTK_WIDGET (file_selector));
 	} else {
 	    info("Please highlight a region to save first");
 	}
