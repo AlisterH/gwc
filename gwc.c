@@ -1809,6 +1809,11 @@ void destroy(GtkWidget * widget, gpointer data)
 	gtk_main_quit();
 }
 
+/* need to fix this - it sometimes crashes if you click outside the about dialog:
+Floating point exception
+
+Also don't know why it won't open the website link!
+*/
 void about(GtkWidget *window)
 {
     const gchar *authors[] = { "Jeffrey J. Welty", "James Tappin", "Ian Leonard", "Bill Jetzer", "Charles Morgon", "Frank Freudenberg", "Thiemo Gehrke", "Rob Frohne", NULL };
