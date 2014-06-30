@@ -1185,19 +1185,19 @@ void load_denoise_preferences(void)
     
     if (g_key_file_has_group(key_file, "denoise_params") == TRUE) {
     denoise_prefs.n_noise_samples =
-	g_key_file_get_integer(key_file, "denoise_params", "n_noise_samples=16", NULL);
-    denoise_prefs.smoothness = g_key_file_get_integer(key_file, "denoise_params", "smoothness=11", NULL);
-    denoise_prefs.FFT_SIZE = g_key_file_get_integer(key_file, "denoise_params", "FFT_SIZE=8192", NULL);
-    denoise_prefs.amount = g_key_file_get_double(key_file, "denoise_params", "amount=0.3", NULL);
-    denoise_prefs.dn_gamma = g_key_file_get_double(key_file, "denoise_params", "dn_gamma=0.95", NULL);
-    denoise_prefs.randomness = g_key_file_get_double(key_file, "denoise_params", "randomness=0.0", NULL);
-    denoise_prefs.window_type = g_key_file_get_integer(key_file, "denoise_params", "window_type=1", NULL);
-    denoise_prefs.freq_filter = g_key_file_get_integer(key_file, "denoise_params", "freq_filter=0", NULL);
-    denoise_prefs.estimate_power_floor = g_key_file_get_integer(key_file, "denoise_params", "estimate_power_floor=0", NULL);
-    denoise_prefs.min_sample_freq = g_key_file_get_double(key_file, "denoise_params", "min_sample_freq=0.0", NULL);
-    denoise_prefs.max_sample_freq = g_key_file_get_double(key_file, "denoise_params", "max_sample_freq=44100.0", NULL);
+	g_key_file_get_integer(key_file, "denoise_params", "n_noise_samples", NULL);
+    denoise_prefs.smoothness = g_key_file_get_integer(key_file, "denoise_params", "smoothness", NULL);
+    denoise_prefs.FFT_SIZE = g_key_file_get_integer(key_file, "denoise_params", "FFT_SIZE", NULL);
+    denoise_prefs.amount = g_key_file_get_double(key_file, "denoise_params", "amount", NULL);
+    denoise_prefs.dn_gamma = g_key_file_get_double(key_file, "denoise_params", "dn_gamma", NULL);
+    denoise_prefs.randomness = g_key_file_get_double(key_file, "denoise_params", "randomness", NULL);
+    denoise_prefs.window_type = g_key_file_get_integer(key_file, "denoise_params", "window_type", NULL);
+    denoise_prefs.freq_filter = g_key_file_get_integer(key_file, "denoise_params", "freq_filter", NULL);
+    denoise_prefs.estimate_power_floor = g_key_file_get_integer(key_file, "denoise_params", "estimate_power_floor", NULL);
+    denoise_prefs.min_sample_freq = g_key_file_get_double(key_file, "denoise_params", "min_sample_freq", NULL);
+    denoise_prefs.max_sample_freq = g_key_file_get_double(key_file, "denoise_params", "max_sample_freq", NULL);
     denoise_prefs.noise_suppression_method =
-    g_key_file_get_integer(key_file, "denoise_params", "noise_suppression_method=1", NULL);
+    g_key_file_get_integer(key_file, "denoise_params", "noise_suppression_method", NULL);
     }
     
     g_key_file_free (key_file);
