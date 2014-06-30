@@ -1809,10 +1809,6 @@ void destroy(GtkWidget * widget, gpointer data)
 	gtk_main_quit();
 }
 
-/* need to fix this - it crashes if you click outside the about dialog:
-   (gwc:26737): GLib-GObject-WARNING **: invalid cast from 'GtkImageMenuItem' to 'GtkWindow'
-   (gwc:26737): Gtk-CRITICAL **: IA__gtk_window_set_transient_for: assertion 'parent == NULL || GTK_IS_WINDOW (parent)' failed
-   Floating point exception */
 void about(GtkWidget *window)
 {
     const gchar *authors[] = { "Jeffrey J. Welty", "James Tappin", "Ian Leonard", "Bill Jetzer", "Charles Morgon", "Frank Freudenberg", "Thiemo Gehrke", "Rob Frohne", NULL };
@@ -1828,7 +1824,7 @@ void about(GtkWidget *window)
 			 "along with this program; if not, write to the Free Software "
 			 "Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.";
 
-    gtk_show_about_dialog(GTK_WINDOW( window ),
+    gtk_show_about_dialog(GTK_WINDOW( NULL ),
 				    "program-name", "Gnome Wave Cleaner",
 				    "version", VERSION,
 				    "copyright", "Copyright 2001, 2002, 2003, 2004, 2005 Redhawk.org",
