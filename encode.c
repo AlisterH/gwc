@@ -592,9 +592,22 @@ int start_encode(int mode, char *newfilename, long start, long length, char *ori
     long numframes = 0;
     int f_des[2], child_pid;
     int i=0 ;
+    int use_sox = 1 ;
     char cmd[2048] ;
+    char *exec_loc ;
 
-    printf("Encoding using %s\n", encoding_prefs.mp3loc) ;
+    if (mode == OGG_FMT) {
+	/* execute ogg encoder using prebuilt options */
+	exec_loc = encoding_prefs.oggloc ;
+    } else if (mode == MP3_FMT) {
+	/* execute mp3 encoder using prebuilt options */
+	exec_loc = encoding_prefs.mp3loc ;
+    } else if (mode == MP3_SIMPLE_FMT) {
+	/* execute mp3 encoder using prebuilt options */
+	exec_loc = encoding_prefs.mp3loc ;
+    }
+
+    printf("Encoding using %s\n", exec_loc) ;
     printf("   ") ;
 
     for(i = 0 ; options[i] != (char *)NULL ; i++)
@@ -602,6 +615,7 @@ int start_encode(int mode, char *newfilename, long start, long length, char *ori
 
     printf("\n") ;
 
+    if(use_sox) {
     sprintf(cmd, "sox %s -t raw - trim %ld\s %ld\s |", origfilename, start, length) ;
 
     for(i = 0 ; options[i] != (char *)NULL ; i++) {
@@ -628,6 +642,8 @@ int start_encode(int mode, char *newfilename, long start, long length, char *ori
     printf("CMD:\n'%s\'\n", cmd) ;
     system(cmd) ;
     return 0 ;
+    }
+
 
 
 
@@ -649,25 +665,9 @@ int start_encode(int mode, char *newfilename, long start, long length, char *ori
 
 	close(f_des[1]);	/* child proc does not need stdout of pipe */
 
-	if (mode == OGG_FMT) {
-	    /* execute ogg encoder using prebuilt options */
-	    if (execvp(encoding_prefs.oggloc, options) == -1) {
-		warning("Failed to process audio file\n");
-		return (1);
-	    }
-	} else if (mode == MP3_FMT) {
-	    /* execute mp3 encoder using prebuilt options */
-	    if (execvp(encoding_prefs.mp3loc, options) == -1) {
-		warning("Failed to process audio file\n");
-		return (1);
-	    }
-	} else if (mode == MP3_SIMPLE_FMT) {
-	    /* execute mp3 encoder using prebuilt options */
-	    if (execvp(encoding_prefs.mp3loc, options) == -1) {
-		warning("Failed to process audio file\n");
-		return (1);
-	    }
-
+	if (execvp(exec_loc, options) == -1) {
+	    warning("Failed to process audio file\n");
+	    return (1);
 	}
 
     } else {
