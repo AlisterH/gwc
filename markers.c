@@ -340,11 +340,13 @@ void store_cdrdao_toc(GtkWidget * selector, gpointer user_data)
 
 void save_cdrdao_toc(GtkWidget * widget, gpointer data)
 {
-   char pathname[256] = "./cdrdao.toc";
+   char tmppath[PATH_MAX+6];
 
    if (num_song_markers == 0) {
       info("No songs marked,  Use Markers->Mark Songs");
    } else {
+	strcpy(tmppath, wave_filename);
+
 	/* Create the selector */
 	file_selector =
 	    gtk_file_chooser_dialog_new("Filename to save cdrdao toc to:",
@@ -354,7 +356,11 @@ void save_cdrdao_toc(GtkWidget * widget, gpointer data)
                                         GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
                                         NULL);
 
-	gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(file_selector), pathname) ;
+	bcopy(".toc", strrchr(tmppath, '.'), 4);
+	gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER
+					  (file_selector), basename(tmppath));
+	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER
+					    (file_selector), dirname(tmppath));
 
 
 

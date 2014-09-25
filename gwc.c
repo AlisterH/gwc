@@ -2175,8 +2175,10 @@ void save_as_encoded()
 		bcopy(".mp3", strrchr(tmppath, '.'), 4);
 	    }
 
-	    gtk_file_chooser_set_filename(GTK_FILE_CHOOSER
-					    (file_selector), tmppath);
+	    gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER
+					    (file_selector), basename(tmppath));
+	    gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER
+					    (file_selector), dirname(tmppath));
 
 	    /* Display the dialog */
 	    if (gtk_dialog_run (GTK_DIALOG (file_selector)) == GTK_RESPONSE_ACCEPT)
