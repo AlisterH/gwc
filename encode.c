@@ -93,6 +93,7 @@ int build_options(int fmt, char *newfilename, char *trackname)
 	options[optcnt] = "-R";	/* Sample Rate */
 	optcnt++;
 
+// Alister: I think if we are using sox we could get rid of the warning below and allow the user to choose the samplerate instead of getting it from the input file.
 	switch (insfinfo.samplerate) {
 	case 48000:
 	    options[optcnt] = "48000";
@@ -216,6 +217,7 @@ int build_options(int fmt, char *newfilename, char *trackname)
 	options[optcnt] = "-s";	/* Sample Rate */
 	optcnt++;
 
+// Alister: I think if we are using sox we could get rid of the warning below and allow the user to choose the samplerate instead of getting it from the input file.
 	switch (insfinfo.samplerate) {
 	case 48000:
 	    options[optcnt] = "48";
@@ -481,6 +483,46 @@ int build_options(int fmt, char *newfilename, char *trackname)
 	optcnt++;
 	options[optcnt] = encoding_prefs.mp3_quality_level ;
 	optcnt++;
+	options[optcnt] = "-s";	/* Sample Rate */
+	optcnt++;
+
+// Alister: I think if we are using sox we could get rid of the warning below and allow the user to choose the samplerate instead of getting it from the input file.
+	switch (insfinfo.samplerate) {
+	case 48000:
+	    options[optcnt] = "48";
+	    break;
+	case 44100:
+	    options[optcnt] = "44.1";
+	    break;
+	case 32000:
+	    options[optcnt] = "32";
+	    break;
+	case 24000:
+	    options[optcnt] = "24";
+	    break;
+	case 22050:
+	    options[optcnt] = "22.05";
+	    break;
+	case 16000:
+	    options[optcnt] = "16";
+	    break;
+	case 12000:
+	    options[optcnt] = "12";
+	    break;
+	case 11025:
+	    options[optcnt] = "11.025";
+	    break;
+	case 8000:
+	    options[optcnt] = "8";
+	    break;
+	default:
+	    warning
+		("Please resample audio file to standard 8/11.025/12/16/22.05/24/32/44.1/48 Khz\n");
+	    return (1);
+	    break;
+	}
+	optcnt++;
+
 	options[optcnt] = "-m";	/*  Mode */
 	optcnt++;
 	if (insfinfo.channels == 2) {
