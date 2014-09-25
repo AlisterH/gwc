@@ -257,9 +257,10 @@ int build_options(int fmt, char *newfilename, char *trackname)
 	}
 	optcnt++;
 
-	options[optcnt] = "-x";	/* Swap bytes */
+//	Alister: this creates a file that is just a loud hiss for at least me and John Cirillo (see mailing list)
+//	options[optcnt] = "-x";	/* Swap bytes */
 
-	optcnt++;
+//	optcnt++;
 
 	/* asm options only for MMX enabled version of lame */
 	if (encoding_prefs.mp3_lame_mmx_enabled) {
@@ -469,7 +470,14 @@ int build_options(int fmt, char *newfilename, char *trackname)
 	optcnt++;
 	options[optcnt] = encoding_prefs.mp3_quality_level ;
 	optcnt++;
-
+	options[optcnt] = "-m";	/*  Mode */
+	optcnt++;
+	if (insfinfo.channels == 2) {
+	    options[optcnt] = "s";	/* stereo */
+	} else {
+	    options[optcnt] = "m";	/* mono */
+	}
+	optcnt++;
 	if ((strlen(encoding_prefs.artist) > 0)) {
 	    options[optcnt] = "--ta";
 	    options[optcnt + 1] = encoding_prefs.artist;
@@ -490,7 +498,8 @@ int build_options(int fmt, char *newfilename, char *trackname)
 
 	/* All other options come before the input and output filenames */
 	options[optcnt] = "-";	/* Stdin */
-	options[optcnt] = pipe_name ;	/* named pipe */
+//	Alister: disable this because I'm using the "old" encoding function
+//	options[optcnt] = pipe_name ;	/* named pipe */
 	options[optcnt + 1] = newfilename;
     }
 
@@ -565,7 +574,7 @@ gint encode_progress (gfloat pvalue) ;
 void destroy_progress_window(void) ;
 gint stop_encoding = FALSE ;
 
-int start_encode_old(int mode, char *newfilename, long start, long length, char *origfilename)
+int start_encode(int mode, char *newfilename, long start, long length, char *origfilename)
 {
     long samples_read;
     long ctr;
@@ -714,7 +723,8 @@ int start_encode_old(int mode, char *newfilename, long start, long length, char 
 
 }
 
-int start_encode(int mode, char *newfilename, long start, long length, char *origfilename)
+// Alister: if using this, need to uncomment the line noted above so the pipe name is inserted for the "simple encode..." function
+int start_encode_new_disabled(int mode, char *newfilename, long start, long length, char *origfilename)
 {
     long samples_read;
     long ctr;
