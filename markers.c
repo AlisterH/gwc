@@ -341,6 +341,7 @@ void store_cdrdao_toc(GtkWidget * selector, gpointer user_data)
 void save_cdrdao_toc(GtkWidget * widget, gpointer data)
 {
    char tmppath[PATH_MAX+6];
+   GtkFileFilter * ff, * ffa;
 
    if (num_song_markers == 0) {
       info("No songs marked,  Use Markers->Mark Songs");
@@ -362,6 +363,16 @@ void save_cdrdao_toc(GtkWidget * widget, gpointer data)
 	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER
 					    (file_selector), dirname(tmppath));
 
+	ff = gtk_file_filter_new();
+	gtk_file_filter_set_name(ff,"TOC files");
+	gtk_file_filter_add_pattern(ff,"*.toc");
+	gtk_file_filter_add_pattern(ff,"*.TOC");
+	gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(file_selector),ff);
+  
+	ffa = gtk_file_filter_new();
+	gtk_file_filter_set_name(ffa,"All files");
+	gtk_file_filter_add_pattern(ffa,"*");
+	gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(file_selector),ffa);
 
 
 	/* Display the dialog */

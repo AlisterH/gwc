@@ -2077,6 +2077,8 @@ void store_selection_filename(GtkWidget * selector,
 
 void open_file_selection(GtkWidget * widget, gpointer data)
 {
+    GtkFileFilter * ff, * ffa;
+
     if ((file_processing == FALSE) && (audio_playback == FALSE)
 	&& (cursor_playback == FALSE))
     {
@@ -2092,6 +2094,17 @@ void open_file_selection(GtkWidget * widget, gpointer data)
 
 	gtk_file_chooser_set_filename(GTK_FILE_CHOOSER(file_selector),
 				      pathname);
+
+	ff = gtk_file_filter_new();
+	gtk_file_filter_set_name(ff,"Wave files");
+	gtk_file_filter_add_pattern(ff,"*.wav");
+	gtk_file_filter_add_pattern(ff,"*.WAV");
+	gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(file_selector),ff);
+  
+	ffa = gtk_file_filter_new();
+	gtk_file_filter_set_name(ffa,"All files");
+	gtk_file_filter_add_pattern(ffa,"*");
+	gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(file_selector),ffa);
 
 	/* Display the dialog */
 	if (gtk_dialog_run (GTK_DIALOG (file_selector)) == GTK_RESPONSE_ACCEPT)
@@ -2151,6 +2164,8 @@ void store_selected_filename_as_encoded(GtkWidget * selector,
 
 void save_as_encoded()
 {
+    GtkFileFilter * ff, * ffa;
+
     if ((file_processing == FALSE) && (file_is_open == TRUE)
 	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
 
@@ -2167,13 +2182,27 @@ void save_as_encoded()
                                                         GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
                                                         NULL);
 
+	    ff = gtk_file_filter_new();
+	    ffa = gtk_file_filter_new();
+	    gtk_file_filter_set_name(ffa,"All files");
+	    gtk_file_filter_add_pattern(ffa,"*");
+
 	    if (encoding_type == GWC_OGG) {
 		/* make it a .ogg extension */
 		bcopy(".ogg", strrchr(tmppath, '.'), 4);
+		gtk_file_filter_set_name(ff,"OGG files");
+		gtk_file_filter_add_pattern(ff,"*.ogg");
+		gtk_file_filter_add_pattern(ff,"*.OGG");
 	    } else {
 		/* make it a .mp3 extension */
 		bcopy(".mp3", strrchr(tmppath, '.'), 4);
+		gtk_file_filter_set_name(ff,"MP3 files");
+		gtk_file_filter_add_pattern(ff,"*.mp3");
+		gtk_file_filter_add_pattern(ff,"*.MP3");
 	    }
+
+	    gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(file_selector),ff);
+	    gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(file_selector),ffa);
 
 	    gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER
 					    (file_selector), basename(tmppath));
@@ -2216,6 +2245,7 @@ void save_as_mp3_simple_selection(GtkWidget * widget, gpointer data)
 
 void save_as_selection(GtkWidget * widget, gpointer data)
 {
+    GtkFileFilter * ff, * ffa;
 
     if ((file_processing == FALSE) && (file_is_open == TRUE)
 	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
@@ -2234,7 +2264,16 @@ void save_as_selection(GtkWidget * widget, gpointer data)
 	    gtk_file_chooser_set_filename(GTK_FILE_CHOOSER
 					    (file_selector), pathname);
 
-
+	ff = gtk_file_filter_new();
+	gtk_file_filter_set_name(ff,"Wave files");
+	gtk_file_filter_add_pattern(ff,"*.wav");
+	gtk_file_filter_add_pattern(ff,"*.WAV");
+	gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(file_selector),ff);
+  
+	ffa = gtk_file_filter_new();
+	gtk_file_filter_set_name(ffa,"All files");
+	gtk_file_filter_add_pattern(ffa,"*");
+	gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(file_selector),ffa);
 
 	    if (gtk_dialog_run (GTK_DIALOG (file_selector)) == GTK_RESPONSE_ACCEPT)
             {
