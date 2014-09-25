@@ -73,6 +73,8 @@ int build_options(int fmt, char *newfilename, char *trackname)
 	options[optcnt] = (char *) basename(encoding_prefs.oggloc);	/* argv[0] is the excutable */
 	optcnt++;
 	options[optcnt] = "-";	/* read from stdin */
+//	Alister: need to comment this out if use_sox=0.
+	options[optcnt] = pipe_name ;	/* named pipe */
 	optcnt++;
 	options[optcnt] = "-o";	/* Output to newfilename */
 	optcnt++;
@@ -458,6 +460,8 @@ int build_options(int fmt, char *newfilename, char *trackname)
 
 	/* All other options come before the input and output filenames */
 	options[optcnt] = "-";	/* Stdin */
+//	Alister: need to comment this out if use_sox=0.
+	options[optcnt] = pipe_name ;	/* named pipe */
 	options[optcnt + 1] = newfilename;
     } else {
 	/* fmt == MP3_SIMPLE_FMT */
@@ -551,9 +555,8 @@ int build_options(int fmt, char *newfilename, char *trackname)
 
 	/* All other options come before the input and output filenames */
 	options[optcnt] = "-";	/* Stdin */
-//	Alister: disable this because I'm using the "old" encoding function because the "new" one freezes.
-//	eh?! If I set use_sox to 1 then I can also use the "new" function without it freezing.  But only if I comment this out.
-//	options[optcnt] = pipe_name ;	/* named pipe */
+//	Alister: need to comment this out if use_sox=0.
+	options[optcnt] = pipe_name ;	/* named pipe */
 	options[optcnt + 1] = newfilename;
     }
 
@@ -628,7 +631,7 @@ gint encode_progress (gfloat pvalue) ;
 void destroy_progress_window(void) ;
 gint stop_encoding = FALSE ;
 
-int start_encode(int mode, char *newfilename, long start, long length, char *origfilename)
+int start_encode_old(int mode, char *newfilename, long start, long length, char *origfilename)
 {
     long samples_read;
     long ctr;
@@ -778,7 +781,7 @@ int start_encode(int mode, char *newfilename, long start, long length, char *ori
 }
 
 // Alister: if using this, need to uncomment the line noted above so the pipe name is inserted for the "simple encode..." function
-int start_encode_new_disabled(int mode, char *newfilename, long start, long length, char *origfilename)
+int start_encode(int mode, char *newfilename, long start, long length, char *origfilename)
 {
     long samples_read;
     long ctr;
