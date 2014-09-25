@@ -509,7 +509,8 @@ int build_options(int fmt, char *newfilename, char *trackname)
 
 	/* All other options come before the input and output filenames */
 	options[optcnt] = "-";	/* Stdin */
-//	Alister: disable this because I'm using the "old" encoding function
+//	Alister: disable this because I'm using the "old" encoding function because the "new" one freezes.
+//	eh?! If I set use_sox to 1 then I can also use the "new" function without it freezing.  But only if I comment this out.
 //	options[optcnt] = pipe_name ;	/* named pipe */
 	options[optcnt + 1] = newfilename;
     }
