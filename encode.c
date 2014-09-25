@@ -73,7 +73,7 @@ int build_options(int fmt, char *newfilename, char *trackname)
 	options[optcnt] = (char *) basename(encoding_prefs.oggloc);	/* argv[0] is the excutable */
 	optcnt++;
 	options[optcnt] = "-";	/* read from stdin */
-//	Alister: need to comment this out if use_sox=0.
+//	Alister: need to comment this out if use_sox=1.
 	options[optcnt] = pipe_name ;	/* named pipe */
 	optcnt++;
 	options[optcnt] = "-o";	/* Output to newfilename */
@@ -460,7 +460,7 @@ int build_options(int fmt, char *newfilename, char *trackname)
 
 	/* All other options come before the input and output filenames */
 	options[optcnt] = "-";	/* Stdin */
-//	Alister: need to comment this out if use_sox=0.
+//	Alister: need to comment this out if use_sox=1.
 	options[optcnt] = pipe_name ;	/* named pipe */
 	options[optcnt + 1] = newfilename;
     } else {
@@ -555,7 +555,7 @@ int build_options(int fmt, char *newfilename, char *trackname)
 
 	/* All other options come before the input and output filenames */
 	options[optcnt] = "-";	/* Stdin */
-//	Alister: need to comment this out if use_sox=0.
+//	Alister: need to comment this out if use_sox=1.
 	options[optcnt] = pipe_name ;	/* named pipe */
 	options[optcnt + 1] = newfilename;
     }
