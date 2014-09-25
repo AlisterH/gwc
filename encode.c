@@ -164,6 +164,11 @@ int build_options(int fmt, char *newfilename, char *trackname)
 		       encoding_prefs.ogg_bitrate_average_window);
 	    optcnt = optcnt + 2;
 	}
+	if ((strlen(trackname) > 0)) {
+	    options[optcnt] = "-t";
+	    options[optcnt + 1] = trackname ;
+	    optcnt += 2;
+	}
 	/* check Encoding Mode options */
 
 	switch (encoding_prefs.ogg_encopt) {
@@ -441,6 +446,12 @@ int build_options(int fmt, char *newfilename, char *trackname)
 		break;
 	    }
 
+	}
+
+	if ((strlen(trackname) > 0)) {
+	    options[optcnt] = "--tt";
+	    options[optcnt + 1] = trackname ;
+	    optcnt += 2;
 	}
 
 	/* All other options come before the input and output filenames */
