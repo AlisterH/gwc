@@ -43,7 +43,7 @@ char *cdtext_data = NULL;
 
 GtkWidget *file_selector;
 gchar *selected_filename;
-gchar save_cdrdao_toc_filename[255] ;
+gchar save_cdrdao_toc_filename[PATH_MAX+1];
 extern long num_song_markers, song_markers[] ;
 extern gchar wave_filename[] ;
 extern struct sound_prefs prefs ;
@@ -310,8 +310,8 @@ void store_cdrdao_toc(GtkWidget * selector, gpointer user_data)
    int fd_new;
 
     gtk_widget_hide_all (GTK_WIDGET(file_selector));
-    strcpy(save_cdrdao_toc_filename, 
-	gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(file_selector))) ;
+    strncpy(save_cdrdao_toc_filename, 
+	gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(file_selector)), PATH_MAX) ;
 
     if(strcmp(save_cdrdao_toc_filename, wave_filename)) {
 	int l ;
