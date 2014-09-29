@@ -95,7 +95,7 @@ int build_options(int fmt, char *newfilename, char *trackname)
 	options[optcnt] = "-R";	/* Sample Rate */
 	optcnt++;
 
-// Alister: I think if we are using sox we could get rid of the warning below and allow the user to choose the samplerate instead of getting it from the input file.
+// Alister: I think we could get rid of the warning below and possibly allow the user to choose the samplerate instead of getting it from the input file.
 	switch (insfinfo.samplerate) {
 	case 48000:
 	    options[optcnt] = "48000";
@@ -219,7 +219,7 @@ int build_options(int fmt, char *newfilename, char *trackname)
 	options[optcnt] = "-s";	/* Sample Rate */
 	optcnt++;
 
-// Alister: I think if we are using sox we could get rid of the warning below and allow the user to choose the samplerate instead of getting it from the input file.
+// Alister: I think we could get rid of the warning below and possibly allow the user to choose the samplerate instead of getting it from the input file.
 	switch (insfinfo.samplerate) {
 	case 48000:
 	    options[optcnt] = "48";
@@ -490,7 +490,7 @@ int build_options(int fmt, char *newfilename, char *trackname)
 	options[optcnt] = "-s";	/* Sample Rate */
 	optcnt++;
 
-// Alister: I think if we are using sox we could get rid of the warning below and allow the user to choose the samplerate instead of getting it from the input file.
+// Alister: I think we could get rid of the warning below.
 	switch (insfinfo.samplerate) {
 	case 48000:
 	    options[optcnt] = "48";
