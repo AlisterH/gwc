@@ -570,7 +570,7 @@ smp_type srate, smp_type bandwidth)
     b->a4 = a2 /a0;
 
 #ifdef HARDWIRE
-    /* hardwire BPF at 10 Khz, srate = 44.1 Khz */
+    /* hardwire BPF at 10 kHz, srate = 44.1 kHz */
     b->a0 =  1.0 ;
     b->a1 =  0.0 ;
     b->a2 = -1.0 ;

@@ -126,7 +126,7 @@ int build_options(int fmt, char *newfilename, char *trackname)
 	    break;
 	default:
 	    warning
-		("Please resample audio file to standard 8/11.025/12/16/22.05/24/32/44.1/48 Khz\n");
+		("Please resample audio file to standard 8/11.025/12/16/22.05/24/32/44.1/48 kHz\n");
 	    return (1);
 	    break;
 	}
@@ -250,7 +250,7 @@ int build_options(int fmt, char *newfilename, char *trackname)
 	    break;
 	default:
 	    warning
-		("Please resample audio file to standard 8/11.025/12/16/22.05/24/32/44.1/48 Khz\n");
+		("Please resample audio file to standard 8/11.025/12/16/22.05/24/32/44.1/48 kHz\n");
 	    return (1);
 	    break;
 	}
@@ -521,7 +521,7 @@ int build_options(int fmt, char *newfilename, char *trackname)
 	    break;
 	default:
 	    warning
-		("Please resample audio file to standard 8/11.025/12/16/22.05/24/32/44.1/48 Khz\n");
+		("Please resample audio file to standard 8/11.025/12/16/22.05/24/32/44.1/48 kHz\n");
 	    return (1);
 	    break;
 	}

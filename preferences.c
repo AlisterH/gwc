@@ -197,7 +197,7 @@ void set_ogg_encoding_preferences(GtkWidget * widget, gpointer data)
 	add_number_entry_with_label_int(atoi
 					(encoding_prefs.
 					 ogg_lowpass_frequency),
-					"Adv Low Pass (Khz)", dialog_table,
+					"Adv Low Pass (kHz)", dialog_table,
 					row++);
     gtk_entry_set_max_length(GTK_ENTRY(Advlowpass_entry), 5);	/* 5 digits */
     AdvBitrateAvgWindow_entry =
@@ -606,7 +606,7 @@ void set_mp3_encoding_preferences(GtkWidget * widget, gpointer data)
 
     bitrate_entry =
 	add_number_entry_with_label_int(atoi(encoding_prefs.mp3_bitrate),
-					"MP3 Encoding Bitrate (Kbps)",
+					"MP3 Encoding Bitrate (kbps)",
 					dialog_table, row++);
     gtk_entry_set_max_length(GTK_ENTRY(bitrate_entry), 5);	/* 5 digits */
     quality_entry =
@@ -618,13 +618,13 @@ void set_mp3_encoding_preferences(GtkWidget * widget, gpointer data)
 
     lowpassfreq_entry =
 	add_number_entry_with_label(encoding_prefs.mp3_lowpass_freq,
-				    "Lowpass Filter (Khz)", dialog_table,
+				    "Lowpass Filter (kHz)", dialog_table,
 				    row++);
     gtk_entry_set_max_length(GTK_ENTRY(lowpassfreq_entry), 5);	/* 5 digits */
 
     highpassfreq_entry =
 	add_number_entry_with_label(encoding_prefs.mp3_highpass_freq,
-				    "Highpass Filter (Khz)", dialog_table,
+				    "Highpass Filter (kHz)", dialog_table,
 				    row++);
     gtk_entry_set_max_length(GTK_ENTRY(highpassfreq_entry), 5);	/* 5 digits */
 
@@ -1378,7 +1378,7 @@ void denoise_set_preferences(GtkWidget * widget, gpointer data)
 
     fft_size_entry =
 	add_number_entry_with_label_int(denoise_prefs.FFT_SIZE,
-					"FFT_SIZE (4096 for 44.1khz sample rate)", dialog_table, 0);
+					"FFT_SIZE (4096 for 44.1kHz sample rate)", dialog_table, 0);
     amount_entry =
 	add_number_entry_with_label_double(denoise_prefs.amount,
 					   "Reduction (0.0-1.0)",
@@ -1407,11 +1407,11 @@ void denoise_set_preferences(GtkWidget * widget, gpointer data)
 
     min_sample_freq_entry =
 	add_number_entry_with_label_int(denoise_prefs.min_sample_freq,
-					"Minimum frequency to use in noise sample (hz)", dialog_table, 7);
+					"Minimum frequency to use in noise sample (Hz)", dialog_table, 7);
 
     max_sample_freq_entry =
 	add_number_entry_with_label_int(denoise_prefs.max_sample_freq,
-					"Maximum frequency to use in noise sample (hz)", dialog_table, 8);
+					"Maximum frequency to use in noise sample (Hz)", dialog_table, 8);
 
 
 /*      combo_entry1 = gnome_number_entry_gtk_entry (GNOME_NUMBER_ENTRY (numberentry1));  */
