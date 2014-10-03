@@ -36,10 +36,8 @@ dnl Checks for programs.
 AC_PROG_CC
 AC_LANG(C)
 
-AC_SUBST(UNAME_MACHINE)
  AC_SUBST(GNOME_BASE)
 
-UNAME_MACHINE=`uname -m`
 #GNOME_BASE=`gnome-config --prefix`
 
 dnl Checks for libraries.

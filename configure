@@ -645,7 +645,6 @@ FFTWPREC
 FFTWHDR
 FFTWLIB
 GNOME_BASE
-UNAME_MACHINE
 am__fastdepCC_FALSE
 am__fastdepCC_TRUE
 CCDEPMODE
@@ -4207,8 +4206,6 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-
-UNAME_MACHINE=`uname -m`
 #GNOME_BASE=`gnome-config --prefix`
 
 
