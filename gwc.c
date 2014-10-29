@@ -1725,21 +1725,25 @@ gboolean  key_press_cb(GtkWidget * widget, GdkEventKey * event, gpointer data)
 	    if (audio_playback == FALSE) {
 		/* go foward by one revolution of a 33 1/3 rpm record */
 		int sample_shift = prefs.rate * 60.0 / 33.333333333 ;
-		printf("shift is %d samples\n", sample_shift) ;
-		audio_view.last_sample += sample_shift ;
-		audio_view.first_sample += sample_shift ;
-		set_scroll_bar(prefs.n_samples - 1, audio_view.first_sample,
+		//printf("shift is %d samples\n", sample_shift) ;
+		if ( sample_shift + audio_view.last_sample < prefs.n_samples - 1) {
+		    audio_view.last_sample += sample_shift ;
+		    audio_view.first_sample += sample_shift ;
+		    set_scroll_bar(prefs.n_samples - 1, audio_view.first_sample,
 		       audio_view.last_sample);
+		}
 	    }
 	    break;
 	case GDK_2:
 	    if (audio_playback == FALSE) {
 		/* go backward by one revolution of a 33 1/3 rpm record */
 		int sample_shift = prefs.rate * 60.0 / 33.333333333 ;
-		audio_view.last_sample -= sample_shift ;
-		audio_view.first_sample -= sample_shift ;
-		set_scroll_bar(prefs.n_samples - 1, audio_view.first_sample,
+		if (sample_shift < audio_view.first_sample) {
+		    audio_view.last_sample -= sample_shift ;
+		    audio_view.first_sample -= sample_shift ;
+		    set_scroll_bar(prefs.n_samples - 1, audio_view.first_sample,
 		       audio_view.last_sample);
+		}
 	    }
 	    break;
 	case GDK_d:
