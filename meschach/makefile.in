@@ -16,6 +16,7 @@ LIBS = @LIBS@
 RANLIB = @RANLIB@
 
 
+CFLAGS = $(OPT_CFLAGS)
 
 
 .c.o:
