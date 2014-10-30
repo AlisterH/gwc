@@ -684,9 +684,6 @@ meschach.a : meschach/meschach.a
 meschach/meschach.a :
 	(cd meschach ; ./configure --with-sparse ; make part1 ; make part2 ; make part3 ; cp machine.h ..)
 
-test : test.c
-	$(CC) test.c $(LDFLAGS) -g -lrfftw -lfftw -lm -o test
-
 clean :
 	rm -f gwc *.o core meschach.a meschach/meschach.a
 	(cd meschach ; make realclean)
