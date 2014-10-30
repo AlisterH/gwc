@@ -171,7 +171,7 @@ AWK = @AWK@
 ###
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
-CFLAGS = -D_FILE_OFFSET_BITS=64 -Wall -O6 @GNOMEUI_CFLAGS@ @SNDFILE_CFLAGS@
+CFLAGS = -D_FILE_OFFSET_BITS=64 -Wall @CFLAGS@ @GNOMEUI_CFLAGS@ @SNDFILE_CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CYGPATH_W = @CYGPATH_W@
@@ -652,7 +652,7 @@ uninstall-am: uninstall-pixmapDATA
 all : gwc
 
 gwc : $(OBJS) meschach.a
-	$(CC) $(OBJS) $(EFENCE) $(LFLAGS) $(LIBS) -o gwc
+	$(CC) $(OBJS) $(EFENCE) $(LDFLAGS) $(LIBS) -o gwc
 
 audio_device.o : audio_device.c audio_alsa.c audio_oss.c audio_osx.c audio_pa.c Makefile
 	$(COMPILE) -c audio_device.c
@@ -685,7 +685,7 @@ meschach/meschach.a :
 	(cd meschach ; ./configure --with-sparse ; make part1 ; make part2 ; make part3 ; cp machine.h ..)
 
 test : test.c
-	$(CC) test.c $(LFLAGS) -g -lrfftw -lfftw -lm -o test
+	$(CC) test.c $(LDFLAGS) -g -lrfftw -lfftw -lm -o test
 
 clean :
 	rm -f gwc *.o core meschach.a meschach/meschach.a

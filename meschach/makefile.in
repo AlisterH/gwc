@@ -16,7 +16,6 @@ LIBS = @LIBS@
 RANLIB = @RANLIB@
 
 
-CFLAGS = -O6
 
 
 .c.o:
