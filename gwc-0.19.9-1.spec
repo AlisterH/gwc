@@ -20,13 +20,11 @@ PreReq: fftw libsndfile1 db1 gnome-libs
 BuildPreReq: fftw-devel libsndfile1-devel db1-devel gnome-libs-devel
 
 %description
-Gnome Wave Cleaner (GWC), is a tool for cleaning
-up noisey audio files, in preparation for burning
-to CD's.  The typical application is to record
-the audio from vinyl LP's, 45's, 78's, etc to a
-hard disk as a 16bit,stereo,44.1khz wave formated file,
-and then use GWC to apply denoising and declicking
-algorithms.
+GNOME Wave Cleaner (GWC) is a tool for cleaning up noisy audio files in
+preparation for burning to CDs. The typical application is to record
+the audio from vinyl LPs, 45s, 78s, etc, to a hard disk as a 16-bit,
+stereo, 44.1khz wave formatted file and then use GWC to apply denoising
+and declicking algorithms.
 
 %prep
 rm -rf $RPM_BUILD_ROOT
