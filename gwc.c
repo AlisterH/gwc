@@ -2767,27 +2767,27 @@ long time_to_sample(char *time, struct sound_prefs *p)
     return position;
 }
 
+long batch_atol(char *time)
+{
+	if( strcmp(time,"end") == 0 )
+		return prefs.n_samples;
+	else
+		return atol(time);
+}
+
+long batch_time_to_sample(char *time, struct sound_prefs *p)
+{
+	if( strcmp(time,"end") == 0 )
+		return p->n_samples;
+	else
+		return time_to_sample(time, p);	
+}
+
 /* bj Sep 2003 re-write batch declick, add batch denoise, batch truncate */
 void batch(int argc, char **argv)
 {
 #define BYTIME 0
 #define BYSAMPLE 1
-
-	long batch_atol(char *time)
-	{
-		if( strcmp(time,"end") == 0 )
-			return prefs.n_samples;
-		else
-			return atol(time);
-	}
-
-	long batch_time_to_sample(char *time, struct sound_prefs *p)
-	{
-		if( strcmp(time,"end") == 0 )
-			return p->n_samples;
-		else
-			return time_to_sample(time, p);	
-	}
 
     int type = BYTIME ; 
 
