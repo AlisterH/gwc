@@ -20,10 +20,10 @@ fi
 AC_ARG_ENABLE(debug,
 AS_HELP_STRING([--enable-debug],
                [enable debugging, default: no]),
-[case "${enableval}" in
+[case "${enable_debug}" in
              yes) debug=true ;;
              no)  debug=false ;;
-             *)   AC_MSG_ERROR([bad value ${enableval} for --enable-debug]) ;;
+             *)   AC_MSG_ERROR([bad value ${enable_debug} for --enable-debug]) ;;
 esac],
 [debug=false])
 
@@ -66,7 +66,7 @@ OGGHDR=""
 AC_ARG_ENABLE(ogg, [  --enable-ogg           compile Ogg file reading support (default disabled)])
 
 AC_MSG_CHECKING([for ogg])
-if test "$enableval" = "yes"
+if test "$enable_ogg" = "yes"
 then
     ogg="yes";OGGLIB="-lvorbis -logg -lvorbisfile";OGGHDR="-DHAVE_OGG"
 else
@@ -81,7 +81,7 @@ MP3HDR=""
 AC_ARG_ENABLE(mp3, [  --enable-mp3           compile mp3 file reading support (default disabled)])
 
 AC_MSG_CHECKING([for mp3])
-if test "$enableval" = "yes"
+if test "$enable_mp3" = "yes"
 then
     mp3="yes";MP3LIB="-lmpg123";MP3HDR="-DHAVE_MP3"
 else
@@ -96,7 +96,7 @@ alsa="enabled"
 
 AC_ARG_ENABLE(alsa, [  --disable-alsa           disable ALSA support (default enabled)])
 
-if test "$enableval" != "no"
+if test "$enable_alsa" != "no"
 then
     PKG_CHECK_MODULES(ALSA, alsa >= 0.9.0, alsa="yes";ALSALIB=$ALSA_LIBS;ALSADEF="-DHAVE_ALSA";ALSACFLAGS=$ALSA_CFLAGS, alsa="disabled")
 else
