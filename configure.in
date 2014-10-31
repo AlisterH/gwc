@@ -94,16 +94,16 @@ ALSALIB=""
 ALSADEF=""
 alsa="enabled"
 
-AC_ARG_ENABLE(alsa, [  --enable-alsa           compile ALSA >= 0.9 support (default enabled)])
+AC_ARG_ENABLE(alsa, [  --disable-alsa           disable ALSA support (default enabled)])
 
-AC_MSG_CHECKING([for ALSA version >= 0.9])
 if test "$enableval" != "no"
 then
     PKG_CHECK_MODULES(ALSA, alsa >= 0.9.0, alsa="yes";ALSALIB=$ALSA_LIBS;ALSADEF="-DHAVE_ALSA";ALSACFLAGS=$ALSA_CFLAGS, alsa="disabled")
 else
     alsa="disabled"
+    AC_MSG_CHECKING([for ALSA])
+    AC_MSG_RESULT($alsa)
 fi
-AC_MSG_RESULT($alsa)
 
 dnl enable pulseaudio on user request and check installation
 PALIB=""
@@ -124,15 +124,15 @@ then
 	ALSADEF="";
 	AC_MSG_NOTICE([
 ***********************!!!!!!! Notice !!!!!!!**********************
-Pulseaudio libraries were found, and the pulse audio driver
-is being compiled and used by GWC.  If this is not desired, you may
-use the ALSA sound driver with the "--enable-alsa" flag, ALSA is a
-better sound driver to use, but on some system (Ubuntu for one), getting
-ALSA to work is complicated.
+The Pulseaudio libraries were found and you have chosen to use the
+Pulseaudio driver.  Note that ALSA is recommended as a better sound
+driver to use, but on some systems (e.g. Ubuntu), getting ALSA to
+work may be complicated.
 *******************************************************************
 ])
     fi
 else
+    AC_MSG_RESULT($enablepa)
     pa="disabled"
 fi
 

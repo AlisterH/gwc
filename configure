@@ -1392,7 +1392,7 @@ Optional Features:
                           speeds up one-time build
   --enable-ogg           compile Ogg file reading support (default disabled)
   --enable-mp3           compile mp3 file reading support (default disabled)
-  --enable-alsa           compile ALSA >= 0.9 support (default enabled)
+  --disable-alsa           disable ALSA support (default enabled)
   --enable-pa           compile Pulse Audio support (default disabled)
   --enable-single-fftw3    compile single precision FFTW3 support (default double precision)
 
@@ -4319,8 +4319,6 @@ if test "${enable_alsa+set}" = set; then :
 fi
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ALSA version >= 0.9" >&5
-$as_echo_n "checking for ALSA version >= 0.9... " >&6; }
 if test "$enableval" != "no"
 then
 
@@ -4396,9 +4394,11 @@ $as_echo "yes" >&6; }
 fi
 else
     alsa="disabled"
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $alsa" >&5
+    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ALSA" >&5
+$as_echo_n "checking for ALSA... " >&6; }
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $alsa" >&5
 $as_echo "$alsa" >&6; }
+fi
 
 PALIB=""
 PAHDR=""
@@ -4425,24 +4425,24 @@ then
 	ALSADEF="";
 	{ $as_echo "$as_me:${as_lineno-$LINENO}:
 ***********************!!!!!!! Notice !!!!!!!**********************
-Pulseaudio libraries were found, and the pulse audio driver
-is being compiled and used by GWC.  If this is not desired, you may
-use the ALSA sound driver with the \"--enable-alsa\" flag, ALSA is a
-better sound driver to use, but on some system (Ubuntu for one), getting
-ALSA to work is complicated.
+The Pulseaudio libraries were found and you have chosen to use the
+Pulseaudio driver.  Note that ALSA is recommended as a better sound
+driver to use, but on some systems (e.g. Ubuntu), getting ALSA to
+work may be complicated.
 *******************************************************************
 " >&5
 $as_echo "$as_me:
 ***********************!!!!!!! Notice !!!!!!!**********************
-Pulseaudio libraries were found, and the pulse audio driver
-is being compiled and used by GWC.  If this is not desired, you may
-use the ALSA sound driver with the \"--enable-alsa\" flag, ALSA is a
-better sound driver to use, but on some system (Ubuntu for one), getting
-ALSA to work is complicated.
+The Pulseaudio libraries were found and you have chosen to use the
+Pulseaudio driver.  Note that ALSA is recommended as a better sound
+driver to use, but on some systems (e.g. Ubuntu), getting ALSA to
+work may be complicated.
 *******************************************************************
 " >&6;}
     fi
 else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $enablepa" >&5
+$as_echo "$enablepa" >&6; }
     pa="disabled"
 fi
 
