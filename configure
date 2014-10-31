@@ -3067,10 +3067,10 @@ fi
 
 # Check whether --enable-debug was given.
 if test "${enable_debug+set}" = set; then :
-  enableval=$enable_debug; case "${enableval}" in
+  enableval=$enable_debug; case "${enable_debug}" in
              yes) debug=true ;;
              no)  debug=false ;;
-             *)   as_fn_error $? "bad value ${enableval} for --enable-debug" "$LINENO" 5 ;;
+             *)   as_fn_error $? "bad value ${enable_debug} for --enable-debug" "$LINENO" 5 ;;
 esac
 else
   debug=false
@@ -4280,7 +4280,7 @@ fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ogg" >&5
 $as_echo_n "checking for ogg... " >&6; }
-if test "$enableval" = "yes"
+if test "$enable_ogg" = "yes"
 then
     ogg="yes";OGGLIB="-lvorbis -logg -lvorbisfile";OGGHDR="-DHAVE_OGG"
 else
@@ -4300,7 +4300,7 @@ fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for mp3" >&5
 $as_echo_n "checking for mp3... " >&6; }
-if test "$enableval" = "yes"
+if test "$enable_mp3" = "yes"
 then
     mp3="yes";MP3LIB="-lmpg123";MP3HDR="-DHAVE_MP3"
 else
@@ -4319,7 +4319,7 @@ if test "${enable_alsa+set}" = set; then :
 fi
 
 
-if test "$enableval" != "no"
+if test "$enable_alsa" != "no"
 then
 
 pkg_failed=no
