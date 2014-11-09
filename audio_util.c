@@ -159,6 +159,7 @@ void config_audio_device(int rate_set, int bits_set, int stereo_set)
 /*      }  */
 
     channels = stereo + 1 ;
+// Alister: Eh?  Isn't this set above?
     rate = rate_set ;
 
     if (audio_device_set_params(&format_set, &channels, &rate) == -1) {
@@ -189,6 +190,7 @@ void config_audio_device(int rate_set, int bits_set, int stereo_set)
     }
     stereo_set = channels - 1 ;
 
+// Alister: eh? does this make sense if rate has been set from rate_set above?
     if(ABS(rate_set-rate) > 10) {
 	char buf[80] ;
 	snprintf(buf, sizeof(buf), "Rate set to %d instead of %d\nYour sound card may not support the desired rate\n",
@@ -196,6 +198,7 @@ void config_audio_device(int rate_set, int bits_set, int stereo_set)
 	warning(buf) ;
     }
 
+// Alister: Eh?  Isn't this set above?
     rate = rate_set ;
     audio_bits = bits_set ;
     stereo = stereo_set ;
