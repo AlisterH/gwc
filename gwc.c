@@ -2602,10 +2602,11 @@ GnomeUIInfo edit_toolbar_info[] = {
 
 GtkWidget *status_bar;
 
+//temporarily disable status bar
 void update_status_bar(gfloat percentage, gfloat min_delta,
 		   gboolean init_flag)
 {
-#ifdef BY_DATA_LENGTH
+/*#ifdef BY_DATA_LENGTH
     static gfloat last_percentage_displayed = -1.0;
 
     if (percentage - last_percentage_displayed > min_delta
@@ -2636,22 +2637,22 @@ void update_status_bar(gfloat percentage, gfloat min_delta,
 	doing_statusbar_update = FALSE;
 	last_displayed = this;
     }
-    #endif
+    #endif*/
 }
 
 void set_status_text(gchar * msg)
 {
-    gnome_appbar_set_status(GNOME_APPBAR(status_bar), msg);
+//    gnome_appbar_set_status(GNOME_APPBAR(status_bar), msg);
 }
 
 void push_status_text(gchar * msg)
 {
-    gnome_appbar_push(GNOME_APPBAR(status_bar), msg);
+//    gnome_appbar_push(GNOME_APPBAR(status_bar), msg);
 }
 
 void pop_status_text(void)
 {
-    gnome_appbar_pop(GNOME_APPBAR(status_bar));
+//    gnome_appbar_pop(GNOME_APPBAR(status_bar));
 }
 
 /* Create a new backing pixmap of the appropriate size */
@@ -3127,11 +3128,11 @@ int main(int argc, char *argv[])
     {
 	/* setup appbar (bottom of window bar for status, menu hints and
 	 * progress display) */
-	status_bar = gnome_appbar_new(TRUE, TRUE, GNOME_PREFERENCES_USER);
-	gnome_app_set_statusbar(GNOME_APP(main_window), status_bar);
+	//status_bar = gnome_appbar_new(TRUE, TRUE, GNOME_PREFERENCES_USER);
+	//gnome_app_set_statusbar(GNOME_APP(main_window), status_bar);
 
 	/* make menu hints display on the appbar */
-	gnome_app_install_menu_hints(GNOME_APP(main_window), menubar);
+	//gnome_app_install_menu_hints(GNOME_APP(main_window), menubar);
 
 	/* create a new canvas */
 	audio_drawing_area = gtk_drawing_area_new();
