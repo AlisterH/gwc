@@ -3017,7 +3017,7 @@ int main(int argc, char *argv[])
     /*   g_signal_connect (GTK_OBJECT (stop_button), "clicked",  */
     /*  		     GTK_SIGNAL_FUNC (stop), NULL);  */
 
-    main_vbox = gtk_vbox_new(FALSE, 1);
+    main_vbox = gtk_vbox_new(FALSE, 0);
     track_times_vbox = gtk_vbox_new(FALSE, 1);
     times_vbox = gtk_vbox_new(FALSE, 1);
     led_vbox = gtk_vbox_new(FALSE, 1);
