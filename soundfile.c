@@ -19,6 +19,7 @@
 
 /* soundfile.c some functions to manipulate the sound file ...frank 4.10.03 */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <sndfile.h>
 #include "soundfile.h"

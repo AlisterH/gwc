@@ -15,7 +15,6 @@ DATAROOTDIR = @datarootdir@
 LIBDIR = @libdir@
 SYSCONFDIR = @sysconfdir@
 APPNAME = gnome_wave_cleaner
-GNOME = @GNOME_BASE@
 
 pixmapdir = $(DATADIR)/pixmaps
 DOCDIR = $(DATADIR)/doc/gwc
@@ -25,13 +24,10 @@ HELPDIR = $(DOCDIR)
 #DOCDIR = /usr/share/doc/packages/gwc
 #HELPDIR = $(DOCDIR)
 
-# Where the user preferences for gwc are stored (~user/.gnome/...)
-CONFIGDIR = /$(APPNAME)/config/
-
 DEFS = -DDATADIR=\"$(DATADIR)\" -DHELPDIR=\"$(HELPDIR)\" -DLIBDIR=\"$(LIBDIR)\" -Dpixmapdir=\"$(pixmapdir)\" -DAPPNAME=\"$(APPNAME)\" @ALSADEF@ @PAHDR@ @FFTWHDR@ @FFTWPREC@ @OGGHDR@ @MP3HDR@
-CFLAGS = -D_FILE_OFFSET_BITS=64 -Wall -g @CFLAGS@ @GNOMEUI_CFLAGS@ @SNDFILE_CFLAGS@
+CFLAGS = -D_FILE_OFFSET_BITS=64 -Wall -g @CFLAGS@ @GTK_CFLAGS@ @SNDFILE_CFLAGS@
 
-LIBS= meschach.a @GNOMEUI_LIBS@ @SNDFILE_LIBS@ @ALSALIB@ @PALIB@ @FFTWLIB@ @OGGLIB@ @MP3LIB@ -lm
+LIBS= meschach.a @GTK_LIBS@ @SNDFILE_LIBS@ @ALSALIB@ @PALIB@ @FFTWLIB@ @OGGLIB@ @MP3LIB@ -lm
 
 SRC = tap_reverb_file_io.c tap_reverb.c reverb.c dialog.c gwc.c audio_device.c audio_edit.c audio_util.c gtkled.c gtkledbar.c preferences.c drawing.c amplify.c denoise.c undo.c declick.c sample_block.c decrackle.c stat.c dethunk.c i0.c i1.c chbevl.c markers.c encode.c soundfile.c pinknoise.c biquad.c
 OBJS = $(SRC:.c=.o)

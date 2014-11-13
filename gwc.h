@@ -24,7 +24,7 @@
 #define __USE_ISOC99    1
 #include <math.h>
 
-#include <gnome.h>
+#include <gtk/gtk.h>
 #ifdef HAVE_FFTW3
 #include <fftw3.h>
 #if (FFTWPREC == 1)

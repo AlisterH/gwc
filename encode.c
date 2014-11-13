@@ -22,13 +22,11 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sndfile.h>
-#include <gnome.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <signal.h>
-#include <gnome.h>
 #include <libgen.h> /* for basename() */
 
 #include "gwc.h"

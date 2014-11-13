@@ -21,7 +21,6 @@
 /* utility routines to help with gnome dialog boxes */
 
 #include <stdlib.h>
-#include <libgnome/libgnome.h>
 #include "gwc.h"
 
 GtkWidget *add_number_entry_with_label(char *entry_text, char *label_text, GtkWidget *table,

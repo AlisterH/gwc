@@ -34,9 +34,8 @@
 
 #include "gwc.h"
 #include <gtk/gtk.h>
+#include <gdk/gdkkeysyms.h>
 #include <glib.h>
-#include <libgnome/libgnome.h>
-#include <libgnomeui/libgnomeui.h>
 #include "gtkledbar.h"
 #include "encoding.h"
 #include "soundfile.h"

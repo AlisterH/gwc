@@ -36,10 +36,6 @@ dnl Checks for programs.
 AC_PROG_CC
 AC_LANG(C)
 
- AC_SUBST(GNOME_BASE)
-
-#GNOME_BASE=`gnome-config --prefix`
-
 dnl Checks for libraries.
 
 dnl Replace `main' with a function in -lm:
@@ -169,17 +165,7 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_TYPE_SIZE_T
 
-dnl GNOME_INIT
-dnl GNOME_COMPILE_WARNINGS
-
- PKG_CHECK_MODULES(GNOMEUI, libgnomeui-2.0,
-                    HAVE_LIBGNOMEUI2="yes", HAVE_LIBGNOMEUI2="no")
-
- if test "x$HAVE_LIBGNOMEUI2" = xno ; then
-     AC_MSG_ERROR([
- Gnomeui2 development libraries not found.
- ])
- fi
+PKG_CHECK_MODULES(GTK, gtk+-2.0)
 
 dnl Checks for library functions.
 AC_PROG_GCC_TRADITIONAL

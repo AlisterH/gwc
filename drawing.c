@@ -20,7 +20,6 @@
 /* drawing.c */
 
 #include <stdlib.h>
-#include <gnome.h>
 #include <gdk/gdk.h>
 /*  #include <gdk-pixbuf/gnome-canvas-pixbuf.h>  */
 #include "gwc.h"

@@ -171,10 +171,14 @@ AWK = @AWK@
 ###
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
-CFLAGS = -D_FILE_OFFSET_BITS=64 -Wall -g @CFLAGS@ @GNOMEUI_CFLAGS@ @SNDFILE_CFLAGS@
+CFLAGS = -D_FILE_OFFSET_BITS=64 -Wall -g @CFLAGS@ @GTK_CFLAGS@ @SNDFILE_CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CYGPATH_W = @CYGPATH_W@
+
+# use these entries for SuSE and maybe other distros
+#DOCDIR = /usr/share/doc/packages/gwc
+#HELPDIR = $(DOCDIR)
 DEFS = -DDATADIR=\"$(DATADIR)\" -DHELPDIR=\"$(HELPDIR)\" -DLIBDIR=\"$(LIBDIR)\" -Dpixmapdir=\"$(pixmapdir)\" -DAPPNAME=\"$(APPNAME)\" @ALSADEF@ @PAHDR@ @FFTWHDR@ @FFTWPREC@ @OGGHDR@ @MP3HDR@
 DEPDIR = @DEPDIR@
 ECHO_C = @ECHO_C@
@@ -185,10 +189,9 @@ EXEEXT = @EXEEXT@
 FFTWHDR = @FFTWHDR@
 FFTWLIB = @FFTWLIB@
 FFTWPREC = @FFTWPREC@
-GNOMEUI_CFLAGS = @GNOMEUI_CFLAGS@
-GNOMEUI_LIBS = @GNOMEUI_LIBS@
-GNOME_BASE = @GNOME_BASE@
 GREP = @GREP@
+GTK_CFLAGS = @GTK_CFLAGS@
+GTK_LIBS = @GTK_LIBS@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -196,7 +199,7 @@ INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
-LIBS = meschach.a @GNOMEUI_LIBS@ @SNDFILE_LIBS@ @ALSALIB@ @PALIB@ @FFTWLIB@ @OGGLIB@ @MP3LIB@ -lm
+LIBS = meschach.a @GTK_LIBS@ @SNDFILE_LIBS@ @ALSALIB@ @PALIB@ @FFTWLIB@ @OGGLIB@ @MP3LIB@ -lm
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
@@ -278,17 +281,9 @@ DATAROOTDIR = @datarootdir@
 LIBDIR = @libdir@
 SYSCONFDIR = @sysconfdir@
 APPNAME = gnome_wave_cleaner
-GNOME = @GNOME_BASE@
 pixmapdir = $(DATADIR)/pixmaps
 DOCDIR = $(DATADIR)/doc/gwc
 HELPDIR = $(DOCDIR)
-
-# use these entries for SuSE and maybe other distros
-#DOCDIR = /usr/share/doc/packages/gwc
-#HELPDIR = $(DOCDIR)
-
-# Where the user preferences for gwc are stored (~user/.gnome/...)
-CONFIGDIR = /$(APPNAME)/config/
 SRC = tap_reverb_file_io.c tap_reverb.c reverb.c dialog.c gwc.c audio_device.c audio_edit.c audio_util.c gtkled.c gtkledbar.c preferences.c drawing.c amplify.c denoise.c undo.c declick.c sample_block.c decrackle.c stat.c dethunk.c i0.c i1.c chbevl.c markers.c encode.c soundfile.c pinknoise.c biquad.c
 OBJS = $(SRC:.c=.o)
 BINFILES = gwc

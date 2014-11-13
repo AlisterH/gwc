@@ -1,7 +1,7 @@
 gwc 0.20
 --------------
 
-This is the README for Gnome Wave Cleaner, a GNOME
+This is the README for Gnome Wave Cleaner, a GTK
 application to remove noise (hiss, pops and clicks)
 from audio files in WAV format (must be 16 bit, stereo).
 

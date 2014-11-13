@@ -21,9 +21,9 @@
 /* preferences.c */
 /* preference settings for GWC */
 
-#include <gnome.h>
 #include <glib.h>
 #include <string.h>
+#include <stdlib.h>
 #include "gwc.h"
 #include "encoding.h"
 
