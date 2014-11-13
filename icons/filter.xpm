@@ -1,5 +1,5 @@
 /* XPM */
-static char * filter_xpm[] = {
+static const char * filter_xpm[] = {
 "28 28 2 1",
 " 	c None",
 ".	c #000000",

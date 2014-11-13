@@ -1,5 +1,5 @@
 /* XPM */
-static char * decrackle_xpm[] = {
+static const char * decrackle_xpm[] = {
 "28 28 10 1",
 " 	c None",
 ".	c #FF0519",

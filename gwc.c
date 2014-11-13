@@ -2293,312 +2293,228 @@ void save_as_selection(GtkWidget * widget, gpointer data)
     }
 }
 
-#define GNOMEUIINFO_ITEM_ACCEL(label, tooltip, callback, xpm_data, accel) \
-{ GNOME_APP_UI_ITEM, label, tooltip,\
-  (gpointer)callback, NULL, NULL, \
-  GNOME_APP_PIXMAP_DATA, xpm_data, accel, (GdkModifierType) 0, NULL}
-
-
-GnomeUIInfo file_menu[] = {
-    GNOMEUIINFO_MENU_OPEN_ITEM(open_file_selection, NULL),
-    GNOMEUIINFO_ITEM_NONE("Save Selection As...",
-		      "Saves the current selection to a new wavfile",
-		      save_as_selection),
-    GNOMEUIINFO_ITEM_NONE("Simple Encode Selection as MP3",
-		      "Saves the current selection to a new MP3 encoded format, simple options",
-		      save_as_mp3_simple_selection),
-    GNOMEUIINFO_ITEM_NONE("Encode Selection as MP3",
-		      "Saves the current selection to a new MP3 encoded format",
-		      save_as_mp3_selection),
-    GNOMEUIINFO_ITEM_NONE("Encode Selection as OGG/Vorbis",
-		      "Encodes entire waveform as OGG Vorbis",
-		      save_as_ogg_selection),
-    GNOMEUIINFO_ITEM_NONE("Create cdrdao toc file As...",
-		      "Create a cdrtao table of contents file for marked songs",
-		      save_cdrdao_tocs),
-    GNOMEUIINFO_ITEM_NONE("Create cdrdao toc file, using marker pairs,  As...",
-		      "Create a cdrtao table of contents file for marked songs, using pairs of song markers",
-		      save_cdrdao_tocp),
-    GNOMEUIINFO_ITEM_NONE("Split audio on song markers",
-		      "Create individual track files",
-		      split_audio_on_markers),
-    GNOMEUIINFO_MENU_EXIT_ITEM(destroy, NULL),
-    GNOMEUIINFO_END
+static struct {
+	gchar *stockid;
+	const char **icon_xpm;
+} stock_icons[] = {
+	{"filter_icon", filter_xpm },
+	{"pinknoise_icon", pinknoise_xpm },
+	{"amplify_icon", amplify_xpm },
+	{"declick_icon", declick_xpm },
+	{"declick_w_icon", declick_w_xpm },
+	{"declick_m_icon", declick_m_xpm },
+	{"decrackle_icon", decrackle_xpm },
+	{"estimate_icon", estimate_xpm },
+	{"noise_sample_icon", noise_sample_xpm },
+	{"remove_noise_icon", remove_noise_xpm },
+	{"silence_icon", silence_xpm },
+	{"zoom_sel_icon", zoom_sel_xpm },
+	{"zoom_in_icon", zoom_in_xpm },
+	{"zoom_out_icon", zoom_out_xpm },
+	{"view_all_icon", view_all_xpm },
+	{"select_all_icon", select_all_xpm },
+	{"spectral_icon", spectral_xpm },
+	{"start_icon", start_xpm },
+	{"stop_icon", stop_xpm }
 };
 
-/* the spaces before the first item's text prevent
-* the item text from overwriting the icon
-* in the drop-down menus */
+static gint n_stock_icons = G_N_ELEMENTS (stock_icons);
 
-GnomeUIInfo edit_menu[] = {
-    GNOMEUIINFO_MENU_UNDO_ITEM(undo_callback, NULL),
+static void
+register_stock_icons (void)
+{
+	GtkIconFactory *icon_factory;
+	GtkIconSet *icon_set;
+	GdkPixbuf *pixbuf;
+	gint i;
 
-    GNOMEUIINFO_ITEM("    Apply DSP Frequency Filters", "lowpass,highpass,notch or bandpass biquad filtering",
-		 filter_cb, filter_xpm),
+	icon_factory = gtk_icon_factory_new ();
 
-    GNOMEUIINFO_ITEM("    Generate Pink Noise", "Replace current view or selection with pink noise",
-		 pinknoise_cb, pinknoise_xpm),
+	for (i = 0; i < n_stock_icons; i++)
+	{
+		pixbuf = gdk_pixbuf_new_from_xpm_data(stock_icons[i].icon_xpm);
+		icon_set = gtk_icon_set_new_from_pixbuf (pixbuf);
+		g_object_unref(pixbuf);
+		gtk_icon_factory_add (icon_factory, stock_icons[i].stockid, icon_set);
+		gtk_icon_set_unref (icon_set);
+	}
 
-    GNOMEUIINFO_ITEM("    Amplify", "Amplify the current view or selection",
-		 amplify, amplify_xpm),
+	gtk_icon_factory_add_default(icon_factory);
 
-    GNOMEUIINFO_ITEM("    Declick Strong",
-		 "Remove pops/clicks from current view or selection",
-		 declick, declick_xpm),
+	g_object_unref(icon_factory);
+}
 
-    GNOMEUIINFO_ITEM("    Declick Weak",
-		 "Remove weaker pops/clicks from current view or selection",
-		 declick_weak, declick_w_xpm),
-
-    GNOMEUIINFO_ITEM("    Declick Manual",
-		 "Apply LSAR signal estimation  to current view or selection",
-		 manual_declick, declick_m_xpm),
-
-    GNOMEUIINFO_ITEM_ACCEL("    Decrackle",
-		       "Remove crackle from old, deteriorated vinyl",
-		       decrackle, decrackle_xpm, GDK_c),
-
-    GNOMEUIINFO_ITEM("    Estimate",
-		 "Estimate signal (> 300 samples) in current view or selection",
-		 estimate, estimate_xpm),
-
-    GNOMEUIINFO_ITEM("    Sample",
-		 "Use current view or selection as a noise sample",
-		 noise_sample, noise_sample_xpm),
-
-    GNOMEUIINFO_ITEM("    Denoise",
-		 "Remove noise from  current view or selection",
-		 remove_noise, remove_noise_xpm),
-#ifdef TRUNCATE_OLD
-    GNOMEUIINFO_ITEM("    Cut", "Truncate head or tail from audio data",
-		 cut_callback, cut_xpm),
-#else
-    GNOMEUIINFO_ITEM("    Silence", "Insert silence with size of current selection to audio data",
-		 silence_callback, silence_xpm),
-    GNOMEUIINFO_SEPARATOR,
-    GNOMEUIINFO_ITEM_STOCK("    Cut", "Cut current selection to internal clipboard",
-		       cut_callback, GTK_STOCK_CUT),
-    GNOMEUIINFO_ITEM_STOCK("    Copy", "Copy current selection to internal clipboard",
-		       copy_callback, GTK_STOCK_COPY),
-    GNOMEUIINFO_ITEM_STOCK("    Paste", "Insert internal clipboard at begin of current selection",
-		       paste_callback, GTK_STOCK_PASTE),
-    GNOMEUIINFO_ITEM_STOCK("    Delete", "Delete current selection from audio data",
-		       delete_callback, GTK_STOCK_DELETE),
-#endif
-
-    GNOMEUIINFO_ITEM("    Reverb", "Apply reverberation the current view or selection",
-		 reverb, amplify_xpm),
-    GNOMEUIINFO_END
+/* Normal items */
+static const GtkActionEntry entries[] = {
+  { "FileMenu", NULL, "_File" },
+  { "Open", GTK_STOCK_OPEN, "_Open...", "<control>O", "Open a file", G_CALLBACK(open_file_selection) },
+  { "SaveSelection", NULL, "Save selection as...", "<control>O", "Save the current selection to a new wavfile", G_CALLBACK(save_as_selection) },
+  { "SaveSimple", NULL, "Simple encode selection as MP3...", NULL, "Save the current selection to an MP3 encoded file, simple options", G_CALLBACK(save_as_mp3_simple_selection) },
+  { "SaveMP3", NULL, "Encode selection as MP3...", NULL, "Save the current selection to an MP3 encoded file", G_CALLBACK(save_as_mp3_selection) },
+  { "SaveOGG", NULL, "Encode selection as OGG/Vorbis...", NULL, "Save the current selection to an OGG Vorbis encoded file", G_CALLBACK(save_as_ogg_selection) },
+  { "SaveCDRDAO", NULL, "Create cdrdao TOC file...", NULL, "Create a cdrtao table of contents file for marked songs", G_CALLBACK(save_cdrdao_tocs) },
+  { "SaveMarkers", NULL, "Create cdrdao TOC file, using marker pairs...", NULL, "Create a cdrtao table of contents file for marked songs, using pairs of song markers", G_CALLBACK(save_cdrdao_tocp) },
+  { "SaveSplit", NULL, "Split audio on song markers", NULL, "Create individual track files", G_CALLBACK(split_audio_on_markers) },
+  { "Quit", GTK_STOCK_QUIT, "Q_uit", "<control>Q", "Close GWC", G_CALLBACK(destroy) },
+  { "EditMenu", NULL, "_Edit" },
+  { "Undo", GTK_STOCK_UNDO, "Undo", "<control>Z", "Undo the last action", G_CALLBACK(undo_callback) },
+  { "Filter", "filter_icon", "Apply DSP Frequency Filters", NULL, "lowpass,highpass,notch or bandpass biquad filtering", G_CALLBACK(filter_cb) },
+  { "PinkNoise", "pinknoise_icon", "Generate Pink Noise", NULL, "Replace current view or selection with pink noise", G_CALLBACK(pinknoise_cb) },
+  { "Amplify", "amplify_icon", "Amplify", NULL, "Amplify the current view or selection", G_CALLBACK(amplify) },
+  { "DeclickStrong", "declick_icon", "Declick Strong", NULL, "Remove pops/clicks from current view or selection", G_CALLBACK(declick) },
+  { "DeclickWeak", "declick_w_icon", "Declick Weak", NULL, "Remove weaker pops/clicks from current view or selection", G_CALLBACK(declick_weak) },
+  { "DeclickManual", "declick_m_icon", "Declick Manual", NULL, "Apply LSAR signal estimation  to current view or selection", G_CALLBACK(manual_declick) },
+  { "Decrackle", "decrackle_icon", "Decrackle", "C", "Remove crackle from old, deteriorated vinyl", G_CALLBACK(decrackle) },
+  { "Estimate", "estimate_icon", "Estimate", NULL, "Estimate signal (> 300 samples) in current view or selection", G_CALLBACK(estimate) },
+  { "Sample", "noise_sample_icon", "Sample", NULL, "Use current view or selection as a noise sample", G_CALLBACK(noise_sample) },
+  { "Denoise", "remove_noise_icon", "Denoise", NULL, "Remove noise from  current view or selection", G_CALLBACK(remove_noise) },
+  { "Silence", "silence_icon", "Silence", NULL, "Overwrite current selection with silence", G_CALLBACK(silence_callback) },
+  { "Reverb", NULL, "Reverb", NULL, "Apply reverberation to the current view or selection", G_CALLBACK(reverb) },
+  { "Cut", GTK_STOCK_CUT, "Cut", NULL, "Cut current selection to internal clipboard", G_CALLBACK(cut_callback) },
+  { "Copy", GTK_STOCK_COPY, "Copy", NULL, "Copy current selection to internal clipboard", G_CALLBACK(copy_callback) },
+  { "Paste", GTK_STOCK_PASTE, "Paste", NULL, "Insert internal clipboard at beginning of current selection", G_CALLBACK(paste_callback) },
+  { "Delete", GTK_STOCK_DELETE, "Delete", NULL, "Delete current selection from audio data", G_CALLBACK(delete_callback) },
+  { "ViewMenu", NULL, "_View" },
+  { "ZoomSelect", "zoom_sel_icon", "Zoom to selection", NULL, "Zoom in on selected portion", G_CALLBACK(zoom_select) },
+  { "ZoomIn", "zoom_in_icon", "Zoom in", NULL, "Zoom in", G_CALLBACK(zoom_in) },
+  { "ZoomOut", "zoom_out_icon", "Zoom out", NULL, "Zoom out", G_CALLBACK(zoom_out) },
+  { "ViewAll", "view_all_icon", "View all", NULL, "View entire audio file", G_CALLBACK(view_all) },
+  { "SelectAll", "select_all_icon", "Select current view", NULL, "Select everything visible in the window", G_CALLBACK(select_all) },
+  { "Spectral", "spectral_icon", "Spectral view", NULL, "Toggle sonagram", G_CALLBACK(display_sonogram) },
+  { "MarkersMenu", NULL, "_Markers" },
+  { "ToggleBegin", NULL, "Toggle beginning marker", "B", "Toggle marker at beginning of current selection or view", G_CALLBACK(toggle_start_marker) },
+  { "ToggleEnd", NULL, "Toggle ending marker", "E", "Toggle marker at end of current selection or view", G_CALLBACK(toggle_end_marker) },
+  { "ClearMarkers", NULL, "Clear markers", NULL, "Clear all markers in the current selection or view", G_CALLBACK(clear_markers_in_view) },
+  { "ExpandSelection", NULL, "Expand selection to nearest markers", "M", "Select region between two markers", G_CALLBACK(select_markers) },
+  { "MarkSongs", NULL, "Mark songs", NULL, "Find songs in current selection or view", G_CALLBACK(mark_songs) },
+  { "MoveMarker", NULL, "Move song marker", NULL, "Move closest song marker to start of selection", G_CALLBACK(move_song_marker) },
+  { "AddMarker", NULL, "Add song marker", NULL, "Add song marker at start of selection", G_CALLBACK(add_song_marker) },
+  { "AddMarkerPair", NULL, "Add song marker pair", NULL, "Add song marker at start AND end of selection", G_CALLBACK(add_song_marker_pair) },
+  { "DeleteMarker", NULL, "Delete song marker", NULL, "Delete closest song marker to start of selection", G_CALLBACK(delete_song_marker) },
+  { "NextMarker", NULL, "Next song marker", "N", "Select around song marker after start of selection", G_CALLBACK(select_song_marker) },
+  { "SettingsMenu", NULL, "_Settings" },
+  { "DeclickPrefs", NULL, "Declick", NULL, "Set declick sensitivity, iteration", G_CALLBACK(declick_set_preferences) },
+  { "DecracklePrefs", NULL, "Decrackle", NULL, "Set decrackle sensitivity", G_CALLBACK(decrackle_set_preferences) },
+  { "DenoisePrefs", NULL, "Denoise", NULL, "Set denoise parameters", G_CALLBACK(denoise_set_preferences) },
+  { "MP3SimplePrefs", NULL, "MP3 simple encoding", NULL, "Set MP3 Simple Encoding parameters", G_CALLBACK(set_mp3_simple_encoding_preferences) },
+  { "MP3Prefs", NULL, "MP3 encoding", NULL, "Set MP3 Encoding parameters", G_CALLBACK(set_mp3_encoding_preferences) },
+  { "OggPrefs", NULL, "Ogg encoding", NULL, "Set Ogg Encoding parameters", G_CALLBACK(set_ogg_encoding_preferences) },
+  { "MiscPrefs", NULL, "Miscellaneous", NULL, "Miscellaneous parameters", G_CALLBACK(set_misc_preferences) },
+  { "HelpMenu", NULL, "_Help" },
+  { "Help", NULL, "How to use", NULL, "Basic instructions for using gwc", G_CALLBACK(help) },
+  { "Quickstart", NULL, "Quickstart", NULL, "For the impatient, how to start using gwc quickly", G_CALLBACK(quickstart_help) },
+  { "About", NULL, "About", NULL, "Info about this program", G_CALLBACK(about) },
+  { "PlayAudio", "start_icon", "Start audio playback", NULL, "Playback the selected or current view of audio", G_CALLBACK(start_gwc_playback) },
+  { "StopAudio", "stop_icon", "Stop", NULL, "Stop audio playback", G_CALLBACK(stop_all_playback_functions) }
 };
 
-GnomeUIInfo marker_menu[] = {
-    GNOMEUIINFO_ITEM_ACCEL("Toggle Beginning Marker",
-		       "Toggle marker at beginning of current selection or view",
-		       toggle_start_marker, NULL, GDK_b),
+static const char *ui_description =
+"<ui>"
+"  <menubar name='MainMenu'>"
+"    <menu action='FileMenu'>"
+"      <menuitem action='Open'/>"
+"      <menuitem action='SaveSelection'/>"
+"      <menuitem action='SaveSimple'/>"
+"      <menuitem action='SaveMP3'/>"
+"      <menuitem action='SaveOGG'/>"
+"      <menuitem action='SaveCDRDAO'/>"
+"      <menuitem action='SaveMarkers'/>"
+"      <menuitem action='SaveSplit'/>"
+"      <menuitem action='Quit'/>"
+"    </menu>"
+"    <menu action='EditMenu'>"
+"      <menuitem action='Undo'/>"
+"      <menuitem action='Filter'/>"
+"      <menuitem action='PinkNoise'/>"
+"      <menuitem action='Amplify'/>"
+"      <menuitem action='DeclickStrong'/>"
+"      <menuitem action='DeclickWeak'/>"
+"      <menuitem action='DeclickManual'/>"
+"      <menuitem action='Decrackle'/>"
+"      <menuitem action='Estimate'/>"
+"      <menuitem action='Sample'/>"
+"      <menuitem action='Denoise'/>"
+"      <menuitem action='Silence'/>"
+"      <menuitem action='Reverb'/>"
+"      <separator/>"
+"      <menuitem action='Cut'/>"
+"      <menuitem action='Copy'/>"
+"      <menuitem action='Paste'/>"
+"      <menuitem action='Delete'/>"
+"    </menu>"
+"    <menu action='ViewMenu'>"
+"      <menuitem action='ZoomSelect'/>"
+"      <menuitem action='ZoomIn'/>"
+"      <menuitem action='ZoomOut'/>"
+"      <menuitem action='ViewAll'/>"
+"      <menuitem action='SelectAll'/>"
+"      <menuitem action='Spectral'/>"
+"    </menu>"
+"    <menu action='MarkersMenu'>"
+"      <menuitem action='ToggleBegin'/>"
+"      <menuitem action='ToggleEnd'/>"
+"      <menuitem action='ClearMarkers'/>"
+"      <menuitem action='ExpandSelection'/>"
+"      <menuitem action='MarkSongs'/>"
+"      <menuitem action='MoveMarker'/>"
+"      <menuitem action='AddMarker'/>"
+"      <menuitem action='AddMarkerPair'/>"
+"      <menuitem action='DeleteMarker'/>"
+"      <menuitem action='NextMarker'/>"
+"    </menu>"
+"    <menu action='SettingsMenu'>"
+"      <menuitem action='DeclickPrefs'/>"
+"      <menuitem action='DecracklePrefs'/>"
+"      <menuitem action='DenoisePrefs'/>"
+"      <menuitem action='MP3SimplePrefs'/>"
+"      <menuitem action='MP3Prefs'/>"
+"      <menuitem action='OggPrefs'/>"
+"      <menuitem action='MiscPrefs'/>"
+"    </menu>"
+"    <menu action='HelpMenu'>"
+"      <menuitem action='Help'/>"
+"      <menuitem action='Quickstart'/>"
+"      <separator/>"
+"      <menuitem action='About'/>"
+"    </menu>"
+"  </menubar>"
+"  <toolbar name='MainToolbar' action='MainToolbarAction'>"
+"    <placeholder name='ToolItems'>"
+"      <separator/>"
+"      <toolitem action='Undo'/>"
+"      <toolitem action='Amplify'/>"
+"      <toolitem action='DeclickStrong'/>"
+"      <toolitem action='DeclickWeak'/>"
+"      <toolitem action='DeclickManual'/>"
+"      <toolitem action='Decrackle'/>"
+"      <toolitem action='Estimate'/>"
+"      <toolitem action='Sample'/>"
+"      <toolitem action='Denoise'/>"
+"      <toolitem action='Silence'/>"
+"      <toolitem action='Cut'/>"
+"      <toolitem action='Copy'/>"
+"      <toolitem action='Paste'/>"
+"      <toolitem action='Delete'/>"
+"      <separator/>"
+"      <separator/>"
+"      <toolitem action='PlayAudio'/>"
+"      <toolitem action='StopAudio'/>"
+"      <toolitem action='ZoomSelect'/>"
+"      <toolitem action='ZoomIn'/>"
+"      <toolitem action='ZoomOut'/>"
+"      <toolitem action='ViewAll'/>"
+"      <toolitem action='SelectAll'/>"
+"      <toolitem action='Spectral'/>"
+"      <separator/>"
+"    </placeholder>"
+"  </toolbar>"
+"</ui>";
 
-    GNOMEUIINFO_ITEM_ACCEL("Toggle Ending Marker",
-		       "Toggle marker at end of current selection or view",
-		       toggle_end_marker, NULL, GDK_e),
-
-    GNOMEUIINFO_ITEM("Clear Markers",
-		 "Clear all markers in the current selection or view",
-		 clear_markers_in_view, NULL),
-    GNOMEUIINFO_ITEM_ACCEL("Expand selection to nearest markers",
-		 "Select region between two markers",
-		 select_markers, NULL, GDK_m),
-    GNOMEUIINFO_ITEM("Mark Songs",
-		 "Find songs in current selection or view",
-		 mark_songs, NULL),
-    GNOMEUIINFO_ITEM("Move Song Marker",
-		 "Move closest song marker to start of selection",
-		 move_song_marker, NULL),
-    GNOMEUIINFO_ITEM("Add Song Marker",
-		 "Add song marker at start of selection",
-		 add_song_marker, NULL),
-    GNOMEUIINFO_ITEM("Add Song Marker Pair",
-		 "Add song marker at start AND end of selection",
-		 add_song_marker_pair, NULL),
-    GNOMEUIINFO_ITEM("Delete Song Marker",
-		 "Delete closest song marker to start of selection",
-		 delete_song_marker, NULL),
-    GNOMEUIINFO_ITEM_ACCEL("Next Song Marker",
-		       "Select around song marker after start of selection",
-		       select_song_marker, NULL, GDK_n),
-    GNOMEUIINFO_END
-};
-
-GnomeUIInfo view_menu[] = {
-
-    GNOMEUIINFO_ITEM_ACCEL("    ZoomSelect", "Zoom in on selected portion",
-		       zoom_select, zoom_sel_xpm, GDK_z),
-
-    GNOMEUIINFO_ITEM("    ZoomIn", "Zoom in", zoom_in,
-		 zoom_in_xpm),
-
-    GNOMEUIINFO_ITEM("    ZoomOut", "Zoom out", zoom_out,
-		 zoom_out_xpm),
-
-    GNOMEUIINFO_ITEM("    ViewAll", "View Entire audio file",
-		 view_all,
-		 view_all_xpm),
-
-    GNOMEUIINFO_ITEM("    SelectAll", "Select current view",
-		 select_all,
-		 select_all_xpm),
-
-    GNOMEUIINFO_ITEM("    SpectralView", "Toggle Sonagram",
-		 display_sonogram,
-		 spectral_xpm),
-    GNOMEUIINFO_END
-};
-
-GnomeUIInfo settings_menu[] = {
-    GNOMEUIINFO_ITEM("Declick", "Set declick sensitivity, iteration",
-		 declick_set_preferences, NULL),
-    GNOMEUIINFO_ITEM("Decrackle", "Set decrackle sensitivity",
-		 decrackle_set_preferences, NULL),
-    GNOMEUIINFO_ITEM("Denoise", "Set denoise parameters",
-		 denoise_set_preferences, NULL),
-    GNOMEUIINFO_ITEM("MP3 Simple Settings", "Set MP3 Simple Encoding parameters",
-		 set_mp3_simple_encoding_preferences, NULL),
-    GNOMEUIINFO_ITEM("MP3 Settings", "Set MP3 Encoding parameters",
-		 set_mp3_encoding_preferences, NULL),
-    GNOMEUIINFO_ITEM("Ogg Settings", "Set Ogg Encoding parameters",
-		 set_ogg_encoding_preferences, NULL),
-    GNOMEUIINFO_ITEM("Miscellaneous", "Miscellaneous parameters",
-		 set_misc_preferences, NULL),
-    GNOMEUIINFO_END
-};
-
-GnomeUIInfo help_menu[] = {
-    GNOMEUIINFO_ITEM("How To Use", "Basic instructions for using gwc",
-		 help, NULL),
-    GNOMEUIINFO_SEPARATOR,
-    GNOMEUIINFO_ITEM("Quickstart", "For the impatient, how to start using gwc quickly",
-		 quickstart_help, NULL),
-	   GNOMEUIINFO_SEPARATOR,
-	  {GNOME_APP_UI_ITEM, 
-	   N_("About"), N_("Info about this program"),
-	   about, NULL, NULL, 
-	   GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_ABOUT,
-	   0, 0, NULL},
-    GNOMEUIINFO_END
-};
-
-GnomeUIInfo help_menu_old[] = {
-	  {GNOME_APP_UI_ITEM, 
-	   N_("About"), N_("Info about this program"),
-	   about, NULL, NULL, 
-	   GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_ABOUT,
-	   0, 0, NULL},
-	   GNOMEUIINFO_SEPARATOR,
-	   GNOMEUIINFO_HELP("gwc"),
-	   GNOMEUIINFO_END
-      };
-
-
-
-GnomeUIInfo menubar[] = {
-    GNOMEUIINFO_MENU_FILE_TREE(file_menu),
-    GNOMEUIINFO_MENU_EDIT_TREE(edit_menu),
-    GNOMEUIINFO_MENU_VIEW_TREE(view_menu),
-    GNOMEUIINFO_SUBTREE("_Markers", marker_menu),
-    GNOMEUIINFO_MENU_SETTINGS_TREE(settings_menu),
-    GNOMEUIINFO_MENU_HELP_TREE(help_menu),
-    GNOMEUIINFO_END
-};
-
-GnomeUIInfo transport_toolbar_info[] = {
-    GNOMEUIINFO_ITEM("Start",
-		 "Playback the selected or current view of audio",
-		 start_gwc_playback, start_xpm),
-    GNOMEUIINFO_ITEM("Stop", "Stop audio playback",
-		 stop_all_playback_functions, stop_xpm),
-
-    GNOMEUIINFO_ITEM("ZoomSelect", "Zoom in on selected portion",
-		 zoom_select, zoom_sel_xpm),
-
-    GNOMEUIINFO_ITEM("ZoomIn", "Zoom in", zoom_in,
-		 zoom_in_xpm),
-
-    GNOMEUIINFO_ITEM("ZoomOut", "Zoom out", zoom_out,
-		 zoom_out_xpm),
-
-    GNOMEUIINFO_ITEM("ViewAll", "View Entire audio file",
-		 view_all,
-		 view_all_xpm),
-
-    GNOMEUIINFO_ITEM("SelectAll", "Select current view",
-		 select_all,
-		 select_all_xpm),
-
-    GNOMEUIINFO_ITEM("SpectralView", "Toggle Sonagram",
-		 display_sonogram,
-		 spectral_xpm),
-
-    GNOMEUIINFO_END
-};
-
-GnomeUIInfo edit_toolbar_info[] = {
-#ifdef TRUNCATE_OLD
-    GNOMEUIINFO_ITEM("Undo", "Undo the last edit action",
-		 undo_callback, undo_xpm),
-
-    GNOMEUIINFO_ITEM("Amplify", "Amplify the current view or selection",
-		 amplify, amplify_xpm),
-#else
-    GNOMEUIINFO_ITEM_STOCK("Undo", "Undo the last edit action",
-		       undo_callback, GTK_STOCK_UNDO),
-
-    GNOMEUIINFO_ITEM("Amplify", "Amplify the current view or selection",
-		 amplify, amplify_xpm),
-#endif
-    GNOMEUIINFO_ITEM("Declick Strong",
-		 "Remove pops/clicks from current view or selection",
-		 declick, declick_xpm),
-
-    GNOMEUIINFO_ITEM("Declick Weak",
-		 "Remove weaker pops/clicks from current view or selection",
-		 declick_weak, declick_w_xpm),
-
-    GNOMEUIINFO_ITEM("Declick Manual",
-		 "Apply LSAR signal estimation to current view or selection",
-		 manual_declick, declick_m_xpm),
-
-    GNOMEUIINFO_ITEM("Decrackle",
-		 "Remove crackle from old, deteriorated vinyl",
-		 decrackle, decrackle_xpm),
-
-    GNOMEUIINFO_ITEM("Estimate",
-		 "Estimate signal (> 300 samples) in current view or selection",
-		 estimate, estimate_xpm),
-
-    GNOMEUIINFO_ITEM("Sample",
-		 "Use current view or selection as a noise sample",
-		 noise_sample, noise_sample_xpm),
-
-    GNOMEUIINFO_ITEM("Denoise",
-		 "Remove noise from  current view or selection",
-		 remove_noise, remove_noise_xpm),
-
-#ifdef TRUNCATE_OLD
-    GNOMEUIINFO_ITEM("Cut", "Truncate head or tail from audio data",
-		 cut_callback, cut_xpm),
-#else
-    GNOMEUIINFO_ITEM("Silence", "Insert silence with size of current selection to audio data",
-		 silence_callback, silence_xpm),
-    GNOMEUIINFO_SEPARATOR,
-    GNOMEUIINFO_ITEM_STOCK("Cut", "Cut current selection to internal clipboard",
-		       cut_callback, GTK_STOCK_CUT),
-    GNOMEUIINFO_ITEM_STOCK("Copy", "Copy current selection to internal clipboard",
-		       copy_callback, GTK_STOCK_COPY),
-    GNOMEUIINFO_ITEM_STOCK("Paste", "Insert internal clipboard at begin of current selection",
-		       paste_callback, GTK_STOCK_PASTE),
-    GNOMEUIINFO_ITEM_STOCK("Delete", "Delete current selection from audio data",
-		       delete_callback, GTK_STOCK_DELETE),
-#endif
-    GNOMEUIINFO_END
-};
+/* Toggle items */
+// todo
+/*static const GtkToggleActionEntry toggle_entries[] = {
+  { "FullScreen", NULL, "_Full Screen", "F11", "Switch between full screen and windowed mode", full_screen_action_callback, FALSE }
+};*/
 
 GtkWidget *status_bar;
 
@@ -3004,21 +2920,14 @@ void batch(int argc, char **argv)
     return ;
 }
 
-
-GtkWidget *edit_toolbar;
-GtkWidget *transport_toolbar;
-
 int main(int argc, char *argv[])
 {
-    /* GtkWidget is the storage type for widgets */
-    GnomeProgram *gwc_app ;
-
-    GtkWidget *main_vbox, *led_vbox, *led_sub_vbox, *track_times_vbox,
-	*times_vbox, *bottom_hbox;
-    GtkWidget *detect_only_box;
-    GtkWidget *leave_click_marks_box;
-
-
+    GtkWidget *main_vbox, *menubar, *toolbar,
+	*led_vbox, *led_sub_vbox, *track_times_vbox, *times_vbox, 
+	*bottom_hbox, *detect_only_box, *leave_click_marks_box;
+    GtkActionGroup *action_group;
+    GtkUIManager *ui_manager;
+    GError *error;
 
     int i;
 
@@ -3059,20 +2968,8 @@ int main(int argc, char *argv[])
 	}
     }
 
-    /* This is called in all GTK applications. Arguments are parsed
-     * from the command line and are returned to the application. */
-    /*      gtk_init(&argc, &argv);  */
-
     #define PREFIX "."
     #define SYSCONFDIR "."
-
-    gwc_app = gnome_program_init(APPNAME, VERSION, LIBGNOMEUI_MODULE, argc, argv,
-		       GNOME_PARAM_POPT_TABLE, NULL,
-		       GNOME_PROGRAM_STANDARD_PROPERTIES, NULL);
-
-    gtk_window_set_default_icon_from_file(pixmapdir "/gwc-logo.png", NULL);
-    main_window = gnome_app_new("gwc", "Dehiss, declick audio file");
-    gnome_app_create_menus(GNOME_APP(main_window), menubar);
 
     load_preferences();
 
@@ -3082,8 +2979,15 @@ int main(int argc, char *argv[])
     load_mp3_encoding_preferences();
     load_mp3_simple_encoding_preferences();
 
-    /* create a new window */
-    /*   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);  */
+    /* This is called in all GTK applications. Arguments are parsed
+     * from the command line and are returned to the application. */
+    gtk_init(&argc, &argv);
+
+    register_stock_icons ();
+
+    gtk_window_set_default_icon_from_file(pixmapdir "/gwc-logo.png", NULL);
+    gtk_window_set_title(GTK_WINDOW(main_window), "Dehiss, declick audio files");
+    main_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 
     /* When the window is given the "delete_event" signal (this is given
      * by the window manager, usually by the "close" option, or on the
@@ -3120,10 +3024,56 @@ int main(int argc, char *argv[])
     led_vbox = gtk_vbox_new(FALSE, 1);
     led_sub_vbox = gtk_vbox_new(TRUE, 1);
     bottom_hbox = gtk_hbox_new(FALSE, 1);
+    gtk_container_add (GTK_CONTAINER (main_window), main_vbox);
 
-    /* This packs the button into the window (a gtk container). */
-    gnome_app_set_contents(GNOME_APP(main_window), main_vbox);
+    ui_manager = gtk_ui_manager_new ();
 
+    action_group = gtk_action_group_new ("MenuActions");
+    gtk_action_group_add_actions (action_group, entries, 
+				  G_N_ELEMENTS (entries), main_window);
+    /*gtk_action_group_add_toggle_actions (action_group, toggle_entries, 
+					 G_N_ELEMENTS (toggle_entries), main_window);
+    gtk_action_group_add_radio_actions (action_group, radio_entries, 
+					G_N_ELEMENTS (radio_entries), 0, 
+					radio_action_callback, main_window);*/
+
+    gtk_ui_manager_insert_action_group (ui_manager, action_group, 0);
+
+    gtk_window_add_accel_group (GTK_WINDOW (main_window), 
+				gtk_ui_manager_get_accel_group (ui_manager));
+
+    error = NULL;
+    if (!gtk_ui_manager_add_ui_from_string (ui_manager, ui_description, -1, &error))
+      {
+        g_message ("building menus failed: %s", error->message);
+        g_error_free (error);
+        exit (EXIT_FAILURE);
+      }
+
+    menubar = gtk_ui_manager_get_widget (ui_manager, "/MainMenu");
+    gtk_box_pack_start (GTK_BOX (main_vbox), menubar, FALSE, FALSE, 0);
+    toolbar = gtk_ui_manager_get_widget (ui_manager, "/MainToolbar");
+    gtk_toolbar_set_style (GTK_TOOLBAR(toolbar), GTK_TOOLBAR_ICONS);
+    gtk_box_pack_start (GTK_BOX (main_vbox), toolbar, FALSE, FALSE, 0);
+
+/*// Need to do stuff like this if we want handles so we can rearrange things.
+//  https://developer.gnome.org/gtk2/stable/GtkHandleBox.html
+//  GtkHandleBox is deprecated since GTK+ 3.4
+//  Maybe GDL is an alternative?
+//  https://developer.gnome.org/gdl/
+    edit_toolbar = gtk_ui_manager_get_widget (ui_manager, "/EditToolbar");
+    gtk_toolbar_set_style (edit_toolbar, GTK_TOOLBAR_ICONS);
+    GtkWidget* handlebox1;
+    handlebox1 = gtk_handle_box_new ();
+    gtk_container_add (handlebox1, edit_toolbar);
+    gtk_box_pack_start (GTK_BOX (main_vbox), handlebox1, FALSE, FALSE, 0);
+    transport_toolbar = gtk_ui_manager_get_widget (ui_manager, "/TransportToolbar");
+    gtk_toolbar_set_style (transport_toolbar, GTK_TOOLBAR_ICONS);
+    GtkWidget* handlebox2;
+    handlebox2 = gtk_handle_box_new ();
+    gtk_container_add (handlebox2, transport_toolbar);
+    gtk_box_pack_start (GTK_BOX (main_vbox), handlebox2, FALSE, FALSE, 0);
+*/
 
     {
 	/* setup appbar (bottom of window bar for status, menu hints and
@@ -3180,32 +3130,6 @@ int main(int argc, char *argv[])
 		       NULL);
 
     gtk_box_pack_start(GTK_BOX(main_vbox), hscrollbar, FALSE, TRUE, 0);
-
-    {
-	edit_toolbar = gtk_toolbar_new() ;
-
-	gnome_app_fill_toolbar(GTK_TOOLBAR(edit_toolbar),
-			       edit_toolbar_info, NULL);
-
-	gnome_app_add_toolbar(GNOME_APP(main_window),
-			      GTK_TOOLBAR(edit_toolbar), "Edit tools",
-			      BONOBO_DOCK_ITEM_BEH_NORMAL, BONOBO_DOCK_TOP,
-			      2, 0, 0);
-
-	transport_toolbar = gtk_toolbar_new() ;
-
-	gnome_app_fill_toolbar(GTK_TOOLBAR(transport_toolbar),
-			       transport_toolbar_info, NULL);
-
-	gnome_app_add_toolbar(GNOME_APP(main_window),
-			      GTK_TOOLBAR(transport_toolbar),
-			      "Playback/selection tools",
-			      BONOBO_DOCK_ITEM_BEH_NORMAL, BONOBO_DOCK_TOP,
-			      2, 0, 0);
-
-	gtk_toolbar_set_style(GTK_TOOLBAR(transport_toolbar), GTK_TOOLBAR_ICONS) ;
-	gtk_toolbar_set_style(GTK_TOOLBAR(edit_toolbar), GTK_TOOLBAR_ICONS) ;
-    }
 
     l_file_time =
 	mk_label_and_pack(GTK_BOX(track_times_vbox), "Track 0:00:000");

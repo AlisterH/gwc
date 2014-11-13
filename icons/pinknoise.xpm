@@ -1,5 +1,5 @@
 /* XPM */
-static char * pinknoise_xpm[] = {
+static const char * pinknoise_xpm[] = {
 "28 28 15 1",
 " 	c None",
 ".	c #000000",

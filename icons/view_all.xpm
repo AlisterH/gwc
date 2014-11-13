@@ -1,5 +1,5 @@
 /* XPM */
-static char * view_all_xpm[] = {
+static const char * view_all_xpm[] = {
 "28 28 11 1",
 " 	c None",
 ".	c #4F548C",

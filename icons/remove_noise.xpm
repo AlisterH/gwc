@@ -1,5 +1,5 @@
 /* XPM */
-static char * remove_noise_xpm[] = {
+static const char * remove_noise_xpm[] = {
 "28 28 36 1",
 " 	c None",
 ".	c #F90404",

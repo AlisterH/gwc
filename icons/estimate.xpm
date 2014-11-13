@@ -1,5 +1,5 @@
 /* XPM */
-static char * estimate_xpm[] = {
+static const char * estimate_xpm[] = {
 "28 28 11 1",
 " 	c None",
 ".	c #F90404",
