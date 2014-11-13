@@ -2630,7 +2630,7 @@ gint audio_expose_event(GtkWidget * widget, GdkEventExpose * event)
 void gwc_window_set_title(char *title)
 {
     char buf[255];
-    snprintf(buf, sizeof(buf), "GWC: %s", title);
+    snprintf(buf, sizeof(buf), "%s - Gnome Wave Cleaner", title);
     gtk_window_set_title(GTK_WINDOW(main_window), buf);
 }
 
@@ -2984,9 +2984,9 @@ int main(int argc, char *argv[])
 
     register_stock_icons ();
 
-    gtk_window_set_default_icon_from_file(pixmapdir "/gwc-logo.png", NULL);
-    gtk_window_set_title(GTK_WINDOW(main_window), "Dehiss, declick audio files");
     main_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_default_icon_from_file(pixmapdir "/gwc-logo.png", NULL);
+    gtk_window_set_title(GTK_WINDOW(main_window), "Gnome Wave Cleaner: Dehiss, declick audio files");
 
     /* When the window is given the "delete_event" signal (this is given
      * by the window manager, usually by the "close" option, or on the
