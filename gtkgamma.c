@@ -22,18 +22,6 @@
 
 #include "gtkgamma.h"
 #include "gtkcurve.h"
-#include "gtkdialog.h"
-#include "gtkdrawingarea.h"
-#include "gtkentry.h"
-#include "gtkhbox.h"
-#include "gtklabel.h"
-#include "gtkmain.h"
-#include "gtkpixmap.h"
-#include "gtkradiobutton.h"
-#include "gtksignal.h"
-#include "gtktable.h"
-#include "gtkvbox.h"
-#include "gtkwindow.h"
 
 static GtkVBoxClass *parent_class = NULL;
 

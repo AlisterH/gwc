@@ -23,7 +23,7 @@
 
 
 #include <gdk/gdk.h>
-#include <gtk/gtkmisc.h>
+#include <gtk/gtk.h>
 
 
 #ifdef __cplusplus

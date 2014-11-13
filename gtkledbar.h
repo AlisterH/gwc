@@ -24,7 +24,6 @@
 #define __GTKLEDBAR_H__
 
 #include <gdk/gdk.h>
-#include <gtk/gtkvbox.h>
 #include "gtkled.h"
 
 #ifdef __cplusplus

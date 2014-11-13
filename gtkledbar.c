@@ -23,7 +23,6 @@
 
 #include <gtk/gtk.h>
 #include "gtkledbar.h"
-#include <gtk/gtktable.h>
 
 static void     led_bar_class_init        (LedBarClass *klass);
 static void     led_bar_init              (LedBar      *led_bar);
