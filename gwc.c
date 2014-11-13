@@ -2638,7 +2638,6 @@ GtkWidget *mk_label_and_pack(GtkBox * box, char *text)
 {
     GtkWidget *w = gtk_label_new(text);
     gtk_box_pack_start(box, w, TRUE, TRUE, 0);
-    gtk_widget_show(w);
     return w;
 }
 
@@ -3119,7 +3118,6 @@ int main(int argc, char *argv[])
 
     scroll_pos = gtk_adjustment_new(1.0, 0.0, 100.0, 5.0, 5.0, 0.0);
     hscrollbar = gtk_hscrollbar_new(GTK_ADJUSTMENT(scroll_pos));
-    gtk_widget_show(hscrollbar);
 
     gtk_signal_connect(GTK_OBJECT(GTK_ADJUSTMENT(scroll_pos)), "changed",
 		       (GtkSignalFunc) scroll_bar_changed, NULL);
@@ -3143,7 +3141,6 @@ int main(int argc, char *argv[])
     for (i = 0; i < 2; i++) {
 	dial[i] = led_bar_new(20, 0);
 	gtk_box_pack_start(GTK_BOX(led_vbox), dial[i], TRUE, TRUE, 0);
-	gtk_widget_show(dial[i]);
     }
 
     led_bar_light_percent(dial[0], (0.0));
