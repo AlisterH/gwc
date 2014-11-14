@@ -125,6 +125,12 @@ char audio_device[256]="hw:0,0";
 char audio_device[256]="/dev/dsp";
 #endif
 
+gint window_x;
+gint window_y;
+gint window_width = 800;
+gint window_height = 580;
+gboolean window_maximised;
+
 gint doing_statusbar_update = FALSE;
 
 DENOISE_DATA denoise_data = { 0, 0, 0, 0, FALSE };
@@ -403,10 +409,16 @@ void load_preferences(void)
     	g_key_file_get_double(key_file, "config", "song_key_highlight_interval", NULL);
         song_mark_silence = g_key_file_get_double(key_file, "config", "song_mark_silence", NULL);
         sonogram_log = g_key_file_get_double(key_file, "config", "sonogram_log", NULL);
-
 /*      audio_view.truncate_tail = g_key_file_get_integer(key_file, "config", "truncate_tail", NULL) ;  */
 /*      audio_view.truncate_head = g_key_file_get_integer(key_file, "config", "truncate_head", NULL) ;  */
         strcpy(audio_device, g_key_file_get_string(key_file, "config", "audio_device", NULL));
+    }
+    if (g_key_file_has_group(key_file, "window") == TRUE) {
+    window_width = g_key_file_get_integer(key_file, "window", "width", NULL);
+    window_height = g_key_file_get_integer(key_file, "window", "height", NULL);
+    window_x = g_key_file_get_integer(key_file, "window", "x", NULL);
+    window_y = g_key_file_get_integer(key_file, "window", "y", NULL);
+    window_maximised = g_key_file_get_boolean(key_file, "window", "maximised", NULL);
     }
     g_key_file_free (key_file);
 }
@@ -440,6 +452,11 @@ void save_preferences(void)
     g_key_file_set_double(key_file, "config", "song_mark_silence", song_mark_silence);
     g_key_file_set_integer(key_file, "config", "sonogram_log", sonogram_log);
     g_key_file_set_string(key_file, "config", "audio_device", audio_device);
+    g_key_file_set_integer(key_file, "window", "width", window_width);
+    g_key_file_set_integer(key_file, "window", "height", window_height);
+    g_key_file_set_integer(key_file, "window", "x", window_x);
+    g_key_file_set_integer(key_file, "window", "y", window_y);
+    g_key_file_set_boolean(key_file, "window", "maximised", window_maximised);
 
 /*      g_key_file_set_integer(key_file, "config", "truncate_head", audio_view.truncate_head) ;  */
 /*      g_key_file_set_integer(key_file, "config", "truncate_tail", audio_view.truncate_tail) ;  */
@@ -1800,6 +1817,12 @@ int cleanup_and_close(struct view *v, struct sound_prefs *p)
 	save_sample_block_data(&prefs);
 
     if (close_wavefile(&audio_view)) {
+	window_maximised = gdk_window_get_state(gtk_widget_get_window(main_window)) & GDK_WINDOW_STATE_MAXIMIZED;
+	if(window_maximised == FALSE)
+	{
+		gtk_window_get_position(GTK_WINDOW(main_window), &window_x, &window_y); 
+		gtk_window_get_size(GTK_WINDOW(main_window), &window_width, &window_height);
+	}
 	save_preferences();
 	undo_purge();
     }
@@ -1820,15 +1843,10 @@ gint delete_event(GtkWidget * widget, GdkEvent * event, gpointer data)
 		warning("Can't quit while in batch mode. (Will automatically close.)");
 		return TRUE;
 	}
-    return FALSE;
-}
-
-
-/* Another callback */
-void destroy(GtkWidget * widget, gpointer data)
-{
-    if(cleanup_and_close(&audio_view, &prefs))
-	gtk_main_quit();
+	if(cleanup_and_close(&audio_view, &prefs))
+		gtk_main_quit();
+		return FALSE;
+		
 }
 
 /* need to fix this - it sometimes crashes if you click outside the about dialog:
@@ -2354,7 +2372,7 @@ static const GtkActionEntry entries[] = {
   { "SaveCDRDAO", NULL, "Create cdrdao TOC file...", NULL, "Create a cdrtao table of contents file for marked songs", G_CALLBACK(save_cdrdao_tocs) },
   { "SaveMarkers", NULL, "Create cdrdao TOC file, using marker pairs...", NULL, "Create a cdrtao table of contents file for marked songs, using pairs of song markers", G_CALLBACK(save_cdrdao_tocp) },
   { "SaveSplit", NULL, "Split audio on song markers", NULL, "Create individual track files", G_CALLBACK(split_audio_on_markers) },
-  { "Quit", GTK_STOCK_QUIT, "Q_uit", "<control>Q", "Close GWC", G_CALLBACK(destroy) },
+  { "Quit", GTK_STOCK_QUIT, "Q_uit", "<control>Q", "Close GWC", G_CALLBACK(delete_event) },
   { "EditMenu", NULL, "_Edit" },
   { "Undo", GTK_STOCK_UNDO, "Undo", "<control>Z", "Undo the last action", G_CALLBACK(undo_callback) },
   { "Filter", "filter_icon", "Apply DSP Frequency Filters", NULL, "lowpass,highpass,notch or bandpass biquad filtering", G_CALLBACK(filter_cb) },
@@ -2987,19 +3005,30 @@ int main(int argc, char *argv[])
     gtk_window_set_default_icon_from_file(pixmapdir "/gwc-logo.png", NULL);
     gtk_window_set_title(GTK_WINDOW(main_window), "Gnome Wave Cleaner: Dehiss, declick audio files");
 
+    // Remember the window geometry from the last time GWC was used, but check for sanity
+    // Looks like we don't actually need to get this information - see comments below.
+    GdkDisplay *display = gdk_display_get_default();
+    GdkScreen *screen = gdk_display_get_default_screen(display);
+    gint screen_width = gdk_screen_get_width(screen);
+    gint screen_height = gdk_screen_get_height(screen);
+    // Looks like we could just set it to window_width and window_height - perhaps because I have a helpful window manager?
+    gtk_window_set_default_size(GTK_WINDOW(main_window), MIN( window_width, screen_width), 
+				MIN(window_height, screen_height) );
+    // Looks like we could just set it to window_x and window_y - perhaps because I have a helpful window manager?
+    gtk_window_move(GTK_WINDOW(main_window), MIN( window_x, screen_width - 20), 
+		    MIN( window_y, screen_height - 20 ) );
+    if(window_maximised == TRUE)
+    {
+        gtk_window_maximize(GTK_WINDOW(main_window));
+    }
+
     /* When the window is given the "delete_event" signal (this is given
      * by the window manager, usually by the "close" option, or on the
      * titlebar), we ask it to call the delete_event () function
      * as defined above. The data passed to the callback
      * function is NULL and is ignored in the callback function. */
     gtk_signal_connect(GTK_OBJECT(main_window), "delete_event",
-		       GTK_SIGNAL_FUNC(gtk_main_quit), NULL);
-
-    /* Here we connect the "destroy" event to a signal handler.  
-     * This event occurs when we call gtk_widget_destroy() on the window,
-     * or if we return FALSE in the "delete_event" callback. */
-    gtk_signal_connect(GTK_OBJECT(main_window), "destroy",
-		       GTK_SIGNAL_FUNC(destroy), NULL);
+		       GTK_SIGNAL_FUNC(delete_event), NULL);
 
     g_signal_connect(GTK_OBJECT(main_window), "key_press_event",
 		       GTK_SIGNAL_FUNC(key_press_cb), NULL);
@@ -3084,7 +3113,6 @@ int main(int argc, char *argv[])
 
 	/* create a new canvas */
 	audio_drawing_area = gtk_drawing_area_new();
-	gtk_widget_set_size_request(GTK_WIDGET(audio_drawing_area), 600, 400);
 
 	gtk_signal_connect(GTK_OBJECT(audio_drawing_area), "expose_event",
 			   (GtkSignalFunc) audio_expose_event, NULL);
