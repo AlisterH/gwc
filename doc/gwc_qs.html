@@ -8,7 +8,14 @@
 <font size=+3>Using Gnome Wave Cleaner to record and clean up your old vinyl music</font>
 <br>
 <hr WIDTH="100%">
-<h1>Recording your wavfiles</h1>
+
+<h2> An <i>important</i>  note on GWC editing </h2>
+GWC commits all changes to the original
+file instantly, and undo saves the deltas needed to get back to the original,
+so on exit all your changes are already saved.  As of version 0.21-06, when you exit (or open a new file) GWC will
+notify you that changes have been made, and give you the chance to undo the changes.
+
+<h1>Creating your wavfiles</h1>
 <ul>
 <li>
 <em>CLEAN YOUR RECORDS AS WELL AS POSSIBLE!!</em>&nbsp; The safest method is to
@@ -27,7 +34,7 @@ groove may be able to dislodge more remaining particles.</li>
 <ul>
 
 <li>
-Make sure cpu and memory intensive apps are not running !!
+Make sure cpu, memory or disk access intensive apps are not running !!
 <br>For example the setiathome client uses enough of both to
     really make the playback (and recording) not be able to
     get data to and from the hard drive to the audio device.
@@ -45,16 +52,15 @@ Using cdrdao to burn the CDs also allows the use of a single
 audio file.
 
 Be sure to get some "silent" audio
-at the start of each track, this information is used by gwc to assess the
+at the start of each track, this information is used by GWC to assess the
 background noise level for noise elimination.</li>
 </ul>
-</ul>
 
-<h2> An <i>important</i>  note on GWC editing </h2>
-GWC commits all changes to the original
-file instantly, and undo saves the deltas needed to get back to the original,
-so on exit all your changes are already saved.  As of version 0.21-06, GWC will
-notify you that changes have been made, and give you the chance to undo the changes when you exit (or open a new file).
+<ul>
+<li>
+If you try to open a wav file created by software such as a recent ffmpeg, GWC will produce an error like this: "Failed to open /root/whistle.wav, 'Error : Cannot open file in read/write mode due to string data in header.'".  Libsndfile does not support RDWR mode for these files - one workaround is to open and save the file in mhwaveedit.
+</li>
+</ul>
 
 <h1>Selecting regions</h1>
 <ul>
@@ -159,7 +165,7 @@ spacebar, right hand on mouse - very efficient. <br>You can get a good
 idea where the click is by watching where the cursor is when you hear
 the click&lt;/HINT></li>
 <p><li>
-<p><em> If you hit the "s" key during playback, gwc will stop
+<p><em> If you hit the "s" key during playback, GWC will stop
 the playback and highlight the last 1/2 second of audio played</em>
 </i></b></li>
 
@@ -187,13 +193,12 @@ the playback and highlight the last 1/2 second of audio played</em>
 <li>
 <h2>De-crackling</h2>  -- that sound of bacon frying on your audio track. Crackle
 is mostly a bunch of closely spaced clicks. First try the decrackling
-algorithm.  Use the default settings in preferences. If that fails you,
+algorithm.  Use the default settings in preferences. If that fails,
 I have had success at times by repeatedly
 applying the "remove strong clicks" filter over an area until the reported
 repairs is zero.</li>
 </ul>
 
-<br>
 <ul>
 <li>
 <h2>Estimating</h2> Sometimes, there are large sections in the audio (200 to 8000
@@ -220,25 +225,24 @@ happen if you tried, it could be bad.  Always back up your data :-)</li>
 <p><li>
 You may want to look at the reverb and DSP filters if the audio needs
 a little bit of "presence".  They are documented in the main help file for GWC.
-</li>
-<p><li>
-Exit. -- gwc will ask if you really want to save your changes.
-</li>
-</ul>
-</ul>
-
+</li></ul>
 <ul>
-<li>
+<p><li>
+Exit. -- GWC will ask if you really want to save your changes.
+</li>
+</ul>
+<ul>
+<p><li>
 I wrote a little utility -- wavlist, which will list the *.wav files and
 append the time in minutes:sec to the list so you can use it with something
 like gcover to create jewel case covers.</li>
 </ul>
 
 <hr>
-<h2>KEYBOARD FUNCTIONS:</h2>
+<h2>DEFAULT KEYBOARD FUNCTIONS:</h2>
 <ul>
 <li>spacebar - starts and stops playback</li>
-<li>'a' - Creates or appends "cdrdao.toc", with the currently selected or viewed audio segment</li>
+<li>'a' - Creates or appends "cdrdao.toc", with the currently selected (or viewed) audio segment</li>
 <li><b>'Alt-a'</b> - Apply sample restoration algorithm (declick), to the currently selected (or viewed) audio segment</li>
 <li>'u' - increase the scale on audio display</li>
 <li>'d' - decrease the scale on audio display</li>
@@ -246,8 +250,8 @@ like gcover to create jewel case covers.</li>
 <li>'r' - reset the scale on audio display to 1.0</li>
 <li>'s' - stop playback, and automatically highlight last 1/2 second of audio played</li>
 <li>'z' - zoom in on the selected region</li>
-<li>B - this will toggle the marker at the start of the currently selected region
-<li>E - this will toggle the marker at the end of the currently selected region
+<li>B - toggle the marker at the start of the currently selected region
+<li>E - toggle the marker at the end of the currently selected region
 </ul>
 
 </body>
