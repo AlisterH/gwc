@@ -779,7 +779,7 @@ void set_misc_preferences(GtkWidget * widget, gpointer data)
 
     stop_interval_entry =
 	add_number_entry_with_label_double(stop_key_highlight_interval,
-					   "Seconds of audio pre-selected when \"s\" key is struck",
+					   "Seconds of audio pre-selected when \"s\" key is pressed",
 					   dialog_table, row++);
     song_interval_entry =
 	add_number_entry_with_label_double(song_key_highlight_interval,
@@ -806,7 +806,7 @@ void set_misc_preferences(GtkWidget * widget, gpointer data)
 
     audio_device_entry =
 	add_number_entry_with_label(audio_device,
-			   "Audio device try (/dev/dsp for OSS) (default, hw:0,0 or hw:1,0 ... for ALSA)", dialog_table, row++);
+			   "Audio device try (/dev/dsp for OSS) (default, plughw:0,0, hw:0,0 or hw:1,0 ... for ALSA)", dialog_table, row++);
 
 
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox), dialog_table,
@@ -942,6 +942,7 @@ void decrackle_set_preferences(GtkWidget * widget, gpointer data)
 
     gtk_widget_show(dialog_table);
 
+// No idea if "Decrackle" vs "Decrackling" means anything - maybe "Decrackle level" should be "Decrackling level".
     dcr_entry =
 	add_number_entry_with_label_double(decrackle_level,
 					   "Decrackle level (default = 0.2) ",
@@ -950,10 +951,9 @@ void decrackle_set_preferences(GtkWidget * widget, gpointer data)
 	add_number_entry_with_label_int(decrackle_window,
 					"Decrackling window (default = 2000)",
 					dialog_table, 2);
-// What on earth does "3 [7]" mean?
     dca_entry =
 	add_number_entry_with_label_int(decrackle_average,
-					"Decrackling average window (default = 3 [7])",
+					"Decrackling average window (default = 3)",
 					dialog_table, 3);
 
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox), dialog_table,
@@ -1385,7 +1385,7 @@ void denoise_set_preferences(GtkWidget * widget, gpointer data)
 					   dialog_table, 1);
     smoothness_entry =
 	add_number_entry_with_label_int(denoise_prefs.smoothness,
-					"(Smoothness for Blackman window (2-11)",
+					"Smoothness for Blackman window (2-11)",
 					dialog_table, 2);
     n_noise_entry =
 	add_number_entry_with_label_int(denoise_prefs.n_noise_samples,
@@ -1394,7 +1394,7 @@ void denoise_set_preferences(GtkWidget * widget, gpointer data)
 
     gamma_entry =
 	add_number_entry_with_label_double(denoise_prefs.dn_gamma,
-					   "gamma -- for Lorber & Hoelrich or Ephraim-Malah , (0.9-1, try 0.98)",
+					   "gamma -- for Lorber & Hoelrich or Ephraim-Malah, (0.9-1, try 0.98)",
 					   dialog_table, 4);
 
     freq_filter_entry =
