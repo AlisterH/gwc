@@ -2380,7 +2380,7 @@ static const GtkActionEntry entries[] = {
   { "Amplify", "amplify_icon", "Amplify", NULL, "Amplify or attenuate the current view or selection", G_CALLBACK(amplify) },
   { "DeclickStrong", "declick_icon", "Declick Strong", NULL, "Automatically find and repair pops/clicks in current view or selection", G_CALLBACK(declick) },
   { "DeclickWeak", "declick_w_icon", "Declick Weak", NULL, "Automatically find and repair weaker pops/clicks in current view or selection", G_CALLBACK(declick_weak) },
-  { "DeclickManual", "declick_m_icon", "Declick Manual", NULL, "Apply LSAR signal estimation to current view or selection", G_CALLBACK(manual_declick) },
+  { "DeclickManual", "declick_m_icon", "Declick Manual", NULL, "Apply LSAR signal estimation to repair a single selected/viewed click", G_CALLBACK(manual_declick) },
   { "Decrackle", "decrackle_icon", "Decrackle", "C", "Remove crackle from old, deteriorated vinyl", G_CALLBACK(decrackle) },
   { "Estimate", "estimate_icon", "Estimate", NULL, "Estimate signal (> 300 samples) in current view or selection", G_CALLBACK(estimate) },
   { "Sample", "noise_sample_icon", "Sample", NULL, "Use current view or selection as a noise sample", G_CALLBACK(noise_sample) },
