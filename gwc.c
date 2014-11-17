@@ -642,47 +642,37 @@ int prompt_user(char *msg, char *s, int maxlen)
     return dres;
 }
 
-void show_help(const char *filename)
+void help(GtkWidget * widget, gpointer data)
 {
-/*
-//  Can't figure out how to get ghelp to display gwc_qs.html
-//  But yelp isn't really better than a browser, is it?
+/* This shows the help in yelp and requires /usr/share/gnome/help/gwc/C/gwc.html (or similar, if not using html documentation)
 #if GTK_CHECK_VERSION(2,14,0)
-  GdkScreen *screen;
+//  GdkScreen *screen;
 //  Need some more includes or something for this display stuff
 //  DDisplay *ddisp;
 //  ddisp = ddisplay_active();
 //  screen = gtk_widget_get_screen (GTK_WIDGET(ddisp->menu_bar));
 //  opens /usr/share/gnome/help/gwc/gwc.html (or similar, if not using html documentation)
-  if (gtk_show_uri(screen, "ghelp:gwc", gtk_get_current_event_time (), NULL))
+//  if (gtk_show_uri(screen, "ghelp:gwc", gtk_get_current_event_time (), NULL))
+  if (gtk_show_uri(NULL, "ghelp:gwc", gtk_get_current_event_time (), NULL))
     return;
 #endif
 */
 
-// This is silly - better check if gvfs is installed, or try the gtk_show_uri and see if it fails
+  // We prefer to show the help in a browser than yelp.
+  // We should probably modify this so that it works if running GWC from the build directory without installing, and/or
+  // so that it shows a warning message if the help file does not exist.  But should figure out test for gvfs first.
+  char *uri = g_strconcat ("file://", HELPDIR, "/", "gwc.html", NULL);
+  // This is silly - better check if gvfs is installed, or try the gtk_show_uri and see if it fails
 # if GTK_CHECK_VERSION(2,14,0)
-  char *uri = g_strconcat ("file://", HELPDIR, "/", filename, NULL);
-// not sure if this does what I want
+  // not sure if this does what I want
   GdkScreen *screen = gtk_widget_get_screen (main_window);
   gtk_show_uri(screen, uri, gtk_get_current_event_time (), NULL);
-// haven't tested this; not sure if I've got it right
 # else
-   command = getenv("BROWSER");
-   command = g_strdup_printf("%s %s &", command ? command : "xdg-open", uri);
-   system(command);
-   g_free(command);
+  char *command = g_strdup_printf("%s %s &", command ? command : "xdg-open", uri);
+  system(command);
+  g_free(command);
 # endif
-   g_free(uri);
-}
-
-void help(GtkWidget * widget, gpointer data)
-{
-    show_help("gwc.html") ;
-}
-
-void quickstart_help(GtkWidget * widget, gpointer data)
-{
-    show_help("gwc_qs.html") ;
+  g_free(uri);
 }
 
 void declick_with_sensitivity(double sensitivity)
@@ -2418,9 +2408,8 @@ static const GtkActionEntry entries[] = {
   { "OggPrefs", NULL, "Ogg encoding", NULL, "Set Ogg Encoding parameters", G_CALLBACK(set_ogg_encoding_preferences) },
   { "MiscPrefs", NULL, "Miscellaneous", NULL, "Miscellaneous parameters", G_CALLBACK(set_misc_preferences) },
   { "HelpMenu", NULL, "_Help" },
-  { "Help", NULL, "How to use", NULL, "Basic instructions for using gwc", G_CALLBACK(help) },
-  { "Quickstart", NULL, "Quickstart", NULL, "For the impatient, how to start using gwc quickly", G_CALLBACK(quickstart_help) },
-  { "About", NULL, "About", NULL, "Info about this program", G_CALLBACK(about) },
+  { "Help", GTK_STOCK_HELP, "User Guide", NULL, "Instructions for using gwc", G_CALLBACK(help) },
+  { "About", GTK_STOCK_ABOUT, "About", NULL, "Info about this program", G_CALLBACK(about) },
   { "PlayAudio", "start_icon", "Start audio playback", NULL, "Playback the selected or current view of audio", G_CALLBACK(start_gwc_playback) },
   { "StopAudio", "stop_icon", "Stop", NULL, "Stop audio playback", G_CALLBACK(stop_all_playback_functions) }
 };
@@ -2491,8 +2480,6 @@ static const char *ui_description =
 "    </menu>"
 "    <menu action='HelpMenu'>"
 "      <menuitem action='Help'/>"
-"      <menuitem action='Quickstart'/>"
-"      <separator/>"
 "      <menuitem action='About'/>"
 "    </menu>"
 "  </menubar>"
