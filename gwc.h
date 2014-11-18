@@ -100,6 +100,7 @@
 #define GWC_MP3_SIMPLE 3
 
 #define SETTINGS_FILE "gwc.conf"
+#define ACCELERATORS_FILE "accels"
 
 struct sound_prefs {
     int playback_bits ;

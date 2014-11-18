@@ -348,7 +348,7 @@ GKeyFile* read_config(void)
     GKeyFile  *key_file = NULL;
     GError    *error = NULL;
 
-    config_file = g_build_filename (g_get_user_config_dir (), SETTINGS_FILE, NULL);
+    config_file = g_build_filename (g_get_user_config_dir (), "gnome-wave-cleaner", SETTINGS_FILE, NULL);
     //fprintf(stderr, "%s \n", config_file);
     key_file = g_key_file_new ();
     if (! g_key_file_load_from_file (key_file, config_file, G_KEY_FILE_KEEP_COMMENTS, &error)) {
@@ -366,8 +366,8 @@ void write_config(GKeyFile *key_file)
     gchar     *config_file;
 
     file_data = g_key_file_to_data (key_file, NULL, NULL);
-    if (g_mkdir_with_parents (g_get_user_config_dir (), 0755) != -1) {
-        config_file = g_build_filename (g_get_user_config_dir (), SETTINGS_FILE, NULL);
+    if (g_mkdir_with_parents (g_build_filename (g_get_user_config_dir (), "gnome-wave-cleaner", NULL), 0755) != -1) {
+        config_file = g_build_filename (g_get_user_config_dir (), "gnome-wave-cleaner", SETTINGS_FILE, NULL);
         g_file_set_contents (config_file, file_data, -1, NULL);
         g_free (config_file);
     }
@@ -1814,6 +1814,7 @@ int cleanup_and_close(struct view *v, struct sound_prefs *p)
 		gtk_window_get_size(GTK_WINDOW(main_window), &window_width, &window_height);
 	}
 	save_preferences();
+	gtk_accel_map_save( g_build_filename (g_get_user_config_dir (), "gnome-wave-cleaner", ACCELERATORS_FILE, NULL) );
 	undo_purge();
     }
 
@@ -2976,6 +2977,7 @@ int main(int argc, char *argv[])
     #define SYSCONFDIR "."
 
     load_preferences();
+    
 
     /* load all encoding preferences on start */
     // Why load these but not the filter and reverb preferences?
@@ -3054,6 +3056,7 @@ int main(int argc, char *argv[])
 
     gtk_ui_manager_insert_action_group (ui_manager, action_group, 0);
 
+    gtk_accel_map_load( g_build_filename (g_get_user_config_dir (), "gnome-wave-cleaner", ACCELERATORS_FILE, NULL) );
     gtk_window_add_accel_group (GTK_WINDOW (main_window), 
 				gtk_ui_manager_get_accel_group (ui_manager));
 
