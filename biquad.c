@@ -42,13 +42,11 @@ struct {
 
 #define BUFSIZE 10000
 
-//looks like confusion in the previous source.  Should this default to 3?
-static gfloat dbGain = 2 ;
-static gfloat bandwidth = 0.5 ;
-static gfloat Fc = 120 ;
-//looks like confusion in the previous source.  Should this default to NOTCH?
-static int filter_type = LPF ;
-static int feather_width = 20 ;
+static gfloat dbGain;
+static gfloat bandwidth;
+static gfloat Fc;
+static int filter_type;
+static int feather_width;
 
 int row2filter(int row)
 {
@@ -76,6 +74,14 @@ int filter2row(gint filter_type)
 
 void load_filter_preferences(void)
 {
+    //looks like confusion in the previous source.  Should this default to NOTCH?
+    filter_prefs.filter_type = 0;
+    filter_prefs.feather_width = 20;
+    //looks like confusion in the previous source.  Should this default to 3?
+    filter_prefs.dbGain = 2;
+    filter_prefs.Fc = 120;
+    filter_prefs.bandwidth = 0.5;
+
     GKeyFile  *key_file = read_config();
     int row ;
 
