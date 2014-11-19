@@ -2208,6 +2208,8 @@ void save_as_encoded()
 					    (file_selector), basename(tmppath));
 	    gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER
 					    (file_selector), dirname(tmppath));
+	    gtk_file_chooser_set_do_overwrite_confirmation
+            		                    (GTK_FILE_CHOOSER(file_selector), TRUE);
 
 	    /* Display the dialog */
 	    if (gtk_dialog_run (GTK_DIALOG (file_selector)) == GTK_RESPONSE_ACCEPT)
@@ -2266,6 +2268,8 @@ void save_as_selection(GtkWidget * widget, gpointer data)
 
 	    gtk_file_chooser_set_filename(GTK_FILE_CHOOSER
 					    (file_selector), pathname);
+	    gtk_file_chooser_set_do_overwrite_confirmation
+            		                    (GTK_FILE_CHOOSER(file_selector), TRUE);
 
 	ff = gtk_file_filter_new();
 	gtk_file_filter_set_name(ff,"Wave files");

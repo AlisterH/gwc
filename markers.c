@@ -307,8 +307,6 @@ void cdrdao_toc_info(char *filename)
 
 void store_cdrdao_toc(gpointer user_data)
 {
-   int fd_new;
-
     if(strcmp(save_cdrdao_toc_filename, wave_filename)) {
 	int l ;
 
@@ -316,18 +314,8 @@ void store_cdrdao_toc(gpointer user_data)
 
 	d_print("Save cdrdao_toc to %s\n", save_cdrdao_toc_filename) ;
 
-       fd_new = open(save_cdrdao_toc_filename, O_RDONLY) ;
-
-       if(fd_new > -1) {
-           char buf[1000] ;
-           close(fd_new) ;
-           sprintf(buf, "%s exists, overwrite ?", save_cdrdao_toc_filename) ;
-           if(yesno(buf))  {
-               return ;
-           }
-       }
-
 	cdrdao_toc_info(save_cdrdao_toc_filename) ;
+
     } else {
 	warning("Cannot save selection over the currently open file!") ;
     }
@@ -358,6 +346,8 @@ void save_cdrdao_toc(GtkWidget * widget, gpointer data)
 					  (file_selector), basename(tmppath));
 	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER
 					    (file_selector), dirname(tmppath));
+	gtk_file_chooser_set_do_overwrite_confirmation
+            		                    (GTK_FILE_CHOOSER(file_selector), TRUE);
 
 	ff = gtk_file_filter_new();
 	gtk_file_filter_set_name(ff,"TOC files");

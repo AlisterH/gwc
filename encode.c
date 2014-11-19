@@ -568,14 +568,6 @@ int encode(int mode, char *origfilename, char *newfilename, long start,
 
     int ret;
 
-    int fd_test = open(newfilename, O_RDONLY) ;
-
-    if(fd_test != -1) {
-	close(fd_test) ;
-	if(yesno("File exists, overwrite?"))
-	    return 0 ;
-    }
-
     signal(SIGCHLD, SIG_IGN);	/* Make sure we dont create a zombie */
     signal(SIGPIPE, SIG_IGN);	/*  Make sure broken pipe doesnt make us exit */
 

@@ -433,7 +433,6 @@ int close_wavefile(struct view *v)
 
 void save_as_wavfile(char *filename_new, long first_sample, long last_sample)
 {
-    int fd_new ;
     SNDFILE *sndfile_new ;
     SF_INFO sfinfo_new ;
 
@@ -448,18 +447,6 @@ void save_as_wavfile(char *filename_new, long first_sample, long last_sample)
     }
 
     total_bytes = total_samples*FRAMESIZE ;
-
-    fd_new = open(filename_new, O_RDONLY) ;
-
-    if(fd_new > -1) {
-	char buf[PATH_MAX] ;
-	close(fd_new) ;
-	snprintf(buf, sizeof(buf), "%s exists, overwrite ?", filename_new) ;
-	if(yesno(buf))  {
-	    return ;
-	}
-    }
-
 
     sfinfo_new = sfinfo ;
     sfinfo_new.frames = total_samples ;
@@ -517,7 +504,6 @@ void save_as_wavfile(char *filename_new, long first_sample, long last_sample)
 
 void save_selection_as_wavfile(char *filename_new, struct view *v)
 {
-    int fd_new ;
     SNDFILE *sndfile_new ;
     SF_INFO sfinfo_new ;
 
