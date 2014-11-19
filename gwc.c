@@ -481,6 +481,8 @@ void display_message(char *msg, char *title)
 
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox), txt, TRUE, TRUE, 0) ;
 
+    /* Alister: disable since we have the file_selector closing even if opening fails
+    // Also for the matching code in other functions
     // Alister: doing this (and for the other dialogs?) means that if the user raises
     // another window above gwc, then clicks on the dialog, the main_window
     // isn't raised, only the two dialogs.
@@ -488,7 +490,7 @@ void display_message(char *msg, char *title)
     // file_selector dialog above the display_message dialog.
     if (GTK_WIDGET_VISIBLE(file_selector)) {
         gtk_window_set_transient_for((GtkWindow*) dlg, (GtkWindow*) file_selector);
-    }
+    }*/
     gtk_widget_show_all(dlg) ;
 
     gtk_dialog_run(GTK_DIALOG(dlg)) ;
@@ -532,9 +534,10 @@ int yesnocancel(char *msg)
 
     gtk_widget_show_all(dlg) ;
 
+    /*
     if (GTK_WIDGET_VISIBLE(file_selector)) {
         gtk_window_set_transient_for((GtkWindow*) dlg, (GtkWindow*) file_selector);
-    }
+    }*/
     dres = gtk_dialog_run(GTK_DIALOG(dlg));
 
     gtk_widget_destroy(dlg) ;
@@ -570,9 +573,10 @@ int yesno(char *msg)
     text = gtk_label_new(msg);
     gtk_widget_show(text);
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox), text, TRUE, TRUE, 0);
+    /*
     if (GTK_WIDGET_VISIBLE(file_selector)) {
         gtk_window_set_transient_for((GtkWindow*) dlg, (GtkWindow*) file_selector);
-    }
+    }*/
     gtk_widget_show_all(dlg) ;
 
     dres = gtk_dialog_run(GTK_DIALOG(dlg));
@@ -616,9 +620,10 @@ int prompt_user(char *msg, char *s, int maxlen)
 
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox), entry, TRUE, TRUE, 0);
 
+    /*
     if (GTK_WIDGET_VISIBLE(file_selector)) {
         gtk_window_set_transient_for((GtkWindow*) dlg, (GtkWindow*) file_selector);
-    }
+    }*/
     gtk_widget_show_all(dlg) ;
 
     dres = gtk_dialog_run(GTK_DIALOG(dlg));
@@ -2061,14 +2066,8 @@ void old_open_wave_filename(void)
     }
 }
 
-void store_selection_filename(GtkWidget * selector,
-			      gpointer user_data)
+void store_selection_filename(gpointer user_data)
 {
-
-    strncpy(save_selection_filename,
-	   gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
-					   (file_selector)), PATH_MAX);
-
     if (strcmp(save_selection_filename, wave_filename)) {
 	int l;
 
@@ -2079,7 +2078,6 @@ void store_selection_filename(GtkWidget * selector,
     } else {
 	warning("Cannot save selection over the currently open file!");
     }
-
 }
 
 void open_file_selection(GtkWidget * widget, gpointer data)
@@ -2119,10 +2117,11 @@ void open_file_selection(GtkWidget * widget, gpointer data)
                 strncpy(wave_filename,
 	                gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
 						      (file_selector)), PATH_MAX);
+                gtk_widget_destroy (GTK_WIDGET (file_selector));
                 open_wave_filename();
-        }
-        g_object_ref_sink (GTK_WIDGET (file_selector));
+        } else {
         gtk_widget_destroy (GTK_WIDGET (file_selector));
+	}
     }
 }
 
@@ -2141,8 +2140,7 @@ void save_selection_as_encoded(int fmt, char *filename, char *filename_new, stru
 	   total_samples, trackname);
 }
 
-void store_selected_filename_as_encoded(GtkWidget * selector,
-				    gpointer user_data)
+void store_selected_filename_as_encoded(gpointer user_data)
 {
     int enc_format = NULL ;
     int l;
@@ -2151,13 +2149,6 @@ void store_selected_filename_as_encoded(GtkWidget * selector,
     if (encoding_type == GWC_OGG) enc_format = OGG_FMT ;
     if (encoding_type == GWC_MP3) enc_format = MP3_FMT ;
     if (encoding_type == GWC_MP3_SIMPLE) enc_format = MP3_SIMPLE_FMT ;
-
-    strncpy(save_selection_filename,
-	   gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
-					   (file_selector)), PATH_MAX);
-
-    g_object_ref_sink (GTK_WIDGET (file_selector));
-    gtk_widget_destroy(file_selector);
 
     if(!prompt_user("Enter the trackname:", trackname, 1023)) {
 	l = strlen(save_selection_filename);
@@ -2224,11 +2215,12 @@ void save_as_encoded()
                     strncpy(save_selection_filename,
 	                    gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
 	    					      (file_selector)), PATH_MAX);
-                    store_selected_filename_as_encoded(file_selector, wave_filename);
-            }
-
-            g_object_ref_sink (GTK_WIDGET (file_selector));
+	            gtk_widget_destroy (GTK_WIDGET (file_selector));
+                    store_selected_filename_as_encoded(wave_filename);
+            } else {
             gtk_widget_destroy (GTK_WIDGET (file_selector));
+	    }
+
 	} else {
 	    info("Please highlight a region to save first");
 	}
@@ -2291,10 +2283,11 @@ void save_as_selection(GtkWidget * widget, gpointer data)
                     strncpy(save_selection_filename,
 	                    gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
 	    					      (file_selector)), PATH_MAX);
-                    store_selection_filename(file_selector, wave_filename);
-            }
-            g_object_ref_sink (GTK_WIDGET (file_selector));
+            	    gtk_widget_destroy (GTK_WIDGET (file_selector));
+                    store_selection_filename(wave_filename);
+            } else {
             gtk_widget_destroy (GTK_WIDGET (file_selector));
+            }
 	} else {
 	    info("Please highlight a region to save first");
 	}

@@ -305,13 +305,9 @@ void cdrdao_toc_info(char *filename)
     gtk_widget_destroy(dlg) ;
 }
 
-void store_cdrdao_toc(GtkWidget * selector, gpointer user_data)
+void store_cdrdao_toc(gpointer user_data)
 {
    int fd_new;
-
-    gtk_widget_hide_all (GTK_WIDGET(file_selector));
-    strncpy(save_cdrdao_toc_filename, 
-	gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(file_selector)), PATH_MAX) ;
 
     if(strcmp(save_cdrdao_toc_filename, wave_filename)) {
 	int l ;
@@ -381,10 +377,11 @@ void save_cdrdao_toc(GtkWidget * widget, gpointer data)
                 strncpy(save_cdrdao_toc_filename,
                         gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
  					              (file_selector)), PATH_MAX);
-                store_cdrdao_toc(file_selector, wave_filename);
-        }
-        g_object_ref_sink (GTK_WIDGET (file_selector));
+        	gtk_widget_destroy (GTK_WIDGET (file_selector));
+                store_cdrdao_toc(wave_filename);
+        } else {
         gtk_widget_destroy (GTK_WIDGET (file_selector));
+	}
    }
 }
 
