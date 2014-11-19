@@ -2126,6 +2126,7 @@ void open_file_selection(GtkWidget * widget, gpointer data)
 						      (file_selector)), PATH_MAX);
                 open_wave_filename();
         }
+        g_object_ref_sink (GTK_WIDGET (file_selector));
         gtk_widget_destroy (GTK_WIDGET (file_selector));
     }
 }
@@ -2160,6 +2161,7 @@ void store_selected_filename_as_encoded(GtkWidget * selector,
 	   gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
 					   (file_selector)), PATH_MAX);
 
+    g_object_ref_sink (GTK_WIDGET (file_selector));
     gtk_widget_destroy(file_selector);
 
     if(!prompt_user("Enter the trackname:", trackname, 1023)) {
@@ -2229,6 +2231,8 @@ void save_as_encoded()
 	    					      (file_selector)), PATH_MAX);
                     store_selected_filename_as_encoded(file_selector, wave_filename);
             }
+
+            g_object_ref_sink (GTK_WIDGET (file_selector));
             gtk_widget_destroy (GTK_WIDGET (file_selector));
 	} else {
 	    info("Please highlight a region to save first");
@@ -2294,6 +2298,7 @@ void save_as_selection(GtkWidget * widget, gpointer data)
 	    					      (file_selector)), PATH_MAX);
                     store_selection_filename(file_selector, wave_filename);
             }
+            g_object_ref_sink (GTK_WIDGET (file_selector));
             gtk_widget_destroy (GTK_WIDGET (file_selector));
 	} else {
 	    info("Please highlight a region to save first");

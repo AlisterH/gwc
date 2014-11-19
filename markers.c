@@ -382,6 +382,7 @@ void save_cdrdao_toc(GtkWidget * widget, gpointer data)
  					              (file_selector)), PATH_MAX);
                 store_cdrdao_toc(file_selector, wave_filename);
         }
+        g_object_ref_sink (GTK_WIDGET (file_selector));
         gtk_widget_destroy (GTK_WIDGET (file_selector));
    }
 }
