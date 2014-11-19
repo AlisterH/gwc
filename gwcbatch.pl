@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+# for usage instructions run `perldoc gwcbatch.pl` 
 
 sub time2sec
 {
