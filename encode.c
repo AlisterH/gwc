@@ -948,6 +948,8 @@ void create_progress_window(void)
 {
     //progress_dialog = gtk_dialog_new("Encoding progress window", NULL);
     progress_dialog = gtk_dialog_new();
+    //Alister: this doesn't work for some reason
+    //gtk_window_set_transient_for(GTK_WINDOW(progress_dialog), GTK_WINDOW(main_window));
 
     gtk_container_border_width (GTK_CONTAINER (progress_dialog), 10);
     

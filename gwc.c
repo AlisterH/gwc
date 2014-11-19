@@ -64,8 +64,6 @@
 #include "icons/silence.xpm"
 #endif
 
-GtkWidget *main_window;
-
 char pathname[PATH_MAX+1] = "./";
 GtkWidget *dial[2];
 GtkWidget *audio_canvas_w;
@@ -483,10 +481,13 @@ void display_message(char *msg, char *title)
 
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox), txt, TRUE, TRUE, 0) ;
 
-    if (file_selector) {
+    // Alister: doing this (and for the other dialogs?) means that if the user raises
+    // another window above gwc, then clicks on the dialog, the main_window
+    // isn't raised, only the two dialogs.
+    // But that is better than if we don't do this, in which case the user can raise the
+    // file_selector dialog above the display_message dialog.
+    if (GTK_WIDGET_VISIBLE(file_selector)) {
         gtk_window_set_transient_for((GtkWindow*) dlg, (GtkWindow*) file_selector);
-    } else {
-        gtk_window_set_transient_for((GtkWindow*) dlg, (GtkWindow*) dlg->parent);
     }
     gtk_widget_show_all(dlg) ;
 
@@ -515,7 +516,7 @@ int yesnocancel(char *msg)
 
     dlg =
 	gtk_dialog_new_with_buttons("Question",
-				    NULL,
+				    GTK_WINDOW(main_window),
 				    GTK_DIALOG_DESTROY_WITH_PARENT,
 				    GTK_STOCK_YES,
 				    GTK_RESPONSE_YES,
@@ -531,10 +532,8 @@ int yesnocancel(char *msg)
 
     gtk_widget_show_all(dlg) ;
 
-    if (file_selector) {
+    if (GTK_WIDGET_VISIBLE(file_selector)) {
         gtk_window_set_transient_for((GtkWindow*) dlg, (GtkWindow*) file_selector);
-    } else {
-        gtk_window_set_transient_for((GtkWindow*) dlg, (GtkWindow*) dlg->parent);
     }
     dres = gtk_dialog_run(GTK_DIALOG(dlg));
 
@@ -571,10 +570,8 @@ int yesno(char *msg)
     text = gtk_label_new(msg);
     gtk_widget_show(text);
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox), text, TRUE, TRUE, 0);
-    if (file_selector) {
+    if (GTK_WIDGET_VISIBLE(file_selector)) {
         gtk_window_set_transient_for((GtkWindow*) dlg, (GtkWindow*) file_selector);
-    } else {
-        gtk_window_set_transient_for((GtkWindow*) dlg, (GtkWindow*) dlg->parent);
     }
     gtk_widget_show_all(dlg) ;
 
@@ -619,10 +616,8 @@ int prompt_user(char *msg, char *s, int maxlen)
 
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox), entry, TRUE, TRUE, 0);
 
-    if (file_selector) {
+    if (GTK_WIDGET_VISIBLE(file_selector)) {
         gtk_window_set_transient_for((GtkWindow*) dlg, (GtkWindow*) file_selector);
-    } else {
-        gtk_window_set_transient_for((GtkWindow*) dlg, (GtkWindow*) dlg->parent);
     }
     gtk_widget_show_all(dlg) ;
 
@@ -2098,7 +2093,7 @@ void open_file_selection(GtkWidget * widget, gpointer data)
 	/* Create the selector */
 	file_selector =
 	    gtk_file_chooser_dialog_new("Please select a file for editing.",
-                                        NULL,
+                                        GTK_WINDOW(main_window),
                                         GTK_FILE_CHOOSER_ACTION_OPEN,
                                         GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                         GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
@@ -2190,7 +2185,7 @@ void save_as_encoded()
 
 	    /* Create the selector */
 	    file_selector = gtk_file_chooser_dialog_new("Encode to filename:",
-                                                        NULL,
+                                                        GTK_WINDOW(main_window),
                                                         GTK_FILE_CHOOSER_ACTION_SAVE,
                                                         GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                                         GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
@@ -2271,7 +2266,7 @@ void save_as_selection(GtkWidget * widget, gpointer data)
 	    /* Create the selector */
 	    file_selector =
 		gtk_file_chooser_dialog_new("Filename to save selection to:",
-                                            NULL,
+                                            GTK_WINDOW(main_window),
                                             GTK_FILE_CHOOSER_ACTION_SAVE,
                                             GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                             GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,

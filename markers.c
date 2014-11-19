@@ -127,11 +127,12 @@ void cdrdao_toc_info(char *filename)
     char buf[200], buf2[200];
 
     dlg = gtk_dialog_new_with_buttons("Cdrdao CD Text Information",
-			NULL, GTK_DIALOG_DESTROY_WITH_PARENT,
+			GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT,
 			GTK_STOCK_OK, GTK_RESPONSE_OK,
 			 GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL, NULL);
 
-    gtk_window_set_policy(GTK_WINDOW(dlg), FALSE, TRUE, FALSE);
+    //Alister: I don't believe this does anything
+    //gtk_window_set_policy(GTK_WINDOW(dlg), FALSE, TRUE, FALSE);
 
     dialog_table = gtk_table_new(5,2,0) ;
 
@@ -350,7 +351,7 @@ void save_cdrdao_toc(GtkWidget * widget, gpointer data)
 	/* Create the selector */
 	file_selector =
 	    gtk_file_chooser_dialog_new("Filename to save cdrdao toc to:",
-                                        NULL,
+                                        GTK_WINDOW(main_window),
                                         GTK_FILE_CHOOSER_ACTION_SAVE,
                                         GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                         GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,

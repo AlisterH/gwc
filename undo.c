@@ -104,7 +104,7 @@ int save_undo_data(long first_sample, long last_sample, struct sound_prefs *p, i
 
 	sprintf(buf, "Undo will need %7.2f Mbytes of disk space (skipping undo commits changes to your original audio file)", n_sample*FRAMESIZE/1000000.0) ;
 
-	dialog = gtk_dialog_new_with_buttons(buf, NULL, GTK_DIALOG_DESTROY_WITH_PARENT,
+	dialog = gtk_dialog_new_with_buttons(buf, GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT,
 	   "Skip undo", 0, "Cancel edit action", 1, "Save undo data", 2, NULL) ;
 
 	ret = gtk_dialog_run(GTK_DIALOG(dialog));

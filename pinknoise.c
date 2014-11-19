@@ -265,7 +265,7 @@ int pinknoise_dialog(struct sound_prefs current, struct view *v)
     gtk_widget_show (dialog_table);
 
     dlg = gtk_dialog_new_with_buttons("Pink Noise",
-			NULL, GTK_DIALOG_DESTROY_WITH_PARENT,
+			GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT,
 			GTK_STOCK_OK, GTK_RESPONSE_OK,
 			 GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL, NULL);
 

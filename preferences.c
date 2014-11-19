@@ -94,7 +94,7 @@ void set_ogg_encoding_preferences(GtkWidget * widget, gpointer data)
 
     dlg =
 	gtk_dialog_new_with_buttons("Ogg Encoding preferences",
-			NULL, GTK_DIALOG_DESTROY_WITH_PARENT,
+			GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT,
 			GTK_STOCK_OK, GTK_RESPONSE_OK,
 			 GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL, NULL);
     dialog_table = gtk_table_new(14, 3, 0);
@@ -316,7 +316,7 @@ void set_mp3_simple_encoding_preferences(GtkWidget * widget, gpointer data)
     encpresets = encoding_prefs.mp3presets;
     dlg =
 	gtk_dialog_new_with_buttons("MP3 Simple Encoding preferences",
-			NULL, GTK_DIALOG_DESTROY_WITH_PARENT,
+			GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT,
 			GTK_STOCK_OK, GTK_RESPONSE_OK,
 			 GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL, NULL);
 
@@ -584,7 +584,7 @@ void set_mp3_encoding_preferences(GtkWidget * widget, gpointer data)
     gtk_widget_show(presets_window_list);
     dlg =
 	gtk_dialog_new_with_buttons("MP3 Encoding preferences",
-			NULL, GTK_DIALOG_DESTROY_WITH_PARENT,
+			GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT,
 			GTK_STOCK_OK, GTK_RESPONSE_OK,
 			 GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL, NULL);
 
@@ -765,7 +765,7 @@ void set_misc_preferences(GtkWidget * widget, gpointer data)
 
     dlg =
 	gtk_dialog_new_with_buttons("Miscellaneous preferences",
-			NULL, GTK_DIALOG_DESTROY_WITH_PARENT,
+			GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT,
 
 			 GTK_STOCK_OK, GTK_RESPONSE_OK, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 			 NULL, NULL);
@@ -858,7 +858,7 @@ void declick_set_preferences(GtkWidget * widget, gpointer data)
 
     dlg =
 	gtk_dialog_new_with_buttons("Declicking preferences",
-			NULL, GTK_DIALOG_DESTROY_WITH_PARENT,
+			GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT,
 			GTK_STOCK_OK, GTK_RESPONSE_OK,
 			 GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL, NULL);
 
@@ -931,7 +931,7 @@ void decrackle_set_preferences(GtkWidget * widget, gpointer data)
 
     dlg =
 	gtk_dialog_new_with_buttons("Decrackling preferences",
-			NULL, GTK_DIALOG_DESTROY_WITH_PARENT,
+			GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT,
 			GTK_STOCK_OK, GTK_RESPONSE_OK,
 			 GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL, NULL);
 
@@ -1365,7 +1365,7 @@ void denoise_set_preferences(GtkWidget * widget, gpointer data)
 
     dlg =
 	gtk_dialog_new_with_buttons("Denoise",
-			NULL, GTK_DIALOG_DESTROY_WITH_PARENT,
+			GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT,
 			GTK_STOCK_OK, GTK_RESPONSE_OK,
 			 GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL, NULL);
 
