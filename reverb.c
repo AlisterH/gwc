@@ -175,8 +175,8 @@ int reverb_dialog(struct sound_prefs current, struct view *v)
 
     dlg = gtk_dialog_new_with_buttons("Reverb",
 			GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT,
-			GTK_STOCK_OK, GTK_RESPONSE_OK,
-			 GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL, NULL);
+			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+			 GTK_STOCK_OK, GTK_RESPONSE_OK, NULL, NULL);
 
     row++ ;
 

@@ -520,12 +520,12 @@ int yesnocancel(char *msg)
 	gtk_dialog_new_with_buttons("Question",
 				    GTK_WINDOW(main_window),
 				    GTK_DIALOG_DESTROY_WITH_PARENT,
-				    GTK_STOCK_YES,
-				    GTK_RESPONSE_YES,
-				    GTK_STOCK_NO,
-				    GTK_RESPONSE_NO,
 				    GTK_STOCK_CANCEL,
 				    GTK_RESPONSE_CANCEL,
+				    GTK_STOCK_NO,
+				    GTK_RESPONSE_NO,
+				    GTK_STOCK_YES,
+				    GTK_RESPONSE_YES,
 				    NULL);
 
     text = gtk_label_new(msg);
@@ -564,10 +564,10 @@ int yesno(char *msg)
     dlg = gtk_dialog_new_with_buttons("Question",
     				        GTK_WINDOW(main_window),
 				        GTK_DIALOG_DESTROY_WITH_PARENT,
-					GTK_STOCK_YES,
-					GTK_RESPONSE_YES,
 					 GTK_STOCK_NO,
 					 GTK_RESPONSE_NO,
+					GTK_STOCK_YES,
+					GTK_RESPONSE_YES,
 					 NULL);
 
     text = gtk_label_new(msg);
@@ -601,10 +601,10 @@ int prompt_user(char *msg, char *s, int maxlen)
     dlg = gtk_dialog_new_with_buttons("Input Requested",
     				        GTK_WINDOW(main_window),
 				        GTK_DIALOG_DESTROY_WITH_PARENT,
-					GTK_STOCK_OK,
-					GTK_RESPONSE_OK,
 					 GTK_STOCK_CANCEL,
 					 GTK_RESPONSE_CANCEL,
+					GTK_STOCK_OK,
+					GTK_RESPONSE_OK,
 					 NULL);
 
     text = gtk_label_new(msg);

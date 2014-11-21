@@ -391,8 +391,8 @@ int filter_dialog(struct sound_prefs current, struct view *v)
 
     dlg = gtk_dialog_new_with_buttons("Biquad filter",
 			GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT,
-			GTK_STOCK_OK, GTK_RESPONSE_OK,
-			 GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL, NULL);
+			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+			 GTK_STOCK_OK, GTK_RESPONSE_OK, NULL, NULL);
 
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox), type_window_list,
 		       TRUE, TRUE, 0);

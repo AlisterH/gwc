@@ -128,8 +128,8 @@ void cdrdao_toc_info(char *filename)
 
     dlg = gtk_dialog_new_with_buttons("Cdrdao CD Text Information",
 			GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT,
-			GTK_STOCK_OK, GTK_RESPONSE_OK,
-			 GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL, NULL);
+			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+			 GTK_STOCK_OK, GTK_RESPONSE_OK, NULL, NULL);
 
     //Alister: I don't believe this does anything
     //gtk_window_set_policy(GTK_WINDOW(dlg), FALSE, TRUE, FALSE);
