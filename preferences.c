@@ -36,10 +36,10 @@ int gwc_dialog_run(GtkDialog *dlg)
 
     dres = gtk_dialog_run(GTK_DIALOG(dlg));
 
-    if (dres == GTK_RESPONSE_CANCEL)
-	return 1 ;
+    if (dres == GTK_RESPONSE_OK)
+	return 0 ;
 
-    return 0 ;
+    return 1 ;
 }
 
 void vbr_mode_window_select(GtkWidget * clist, gint row, gint column,
