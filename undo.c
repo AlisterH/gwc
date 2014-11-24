@@ -106,6 +106,7 @@ int save_undo_data(long first_sample, long last_sample, struct sound_prefs *p, i
 
 	dialog = gtk_dialog_new_with_buttons(buf, GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT,
 	   "Cancel edit action", 1, "Save undo data", 2, "Skip undo", 0, NULL) ;
+	gtk_dialog_set_default_response (GTK_DIALOG(dialog), 1);
 
 	ret = gtk_dialog_run(GTK_DIALOG(dialog));
 	gtk_widget_destroy(dialog) ;

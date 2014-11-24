@@ -177,6 +177,7 @@ int reverb_dialog(struct sound_prefs current, struct view *v)
 			GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT,
 			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 			 GTK_STOCK_OK, GTK_RESPONSE_OK, NULL, NULL);
+    gtk_dialog_set_default_response (GTK_DIALOG(dlg), GTK_RESPONSE_OK);
 
     row++ ;
 

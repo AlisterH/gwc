@@ -527,6 +527,9 @@ int yesnocancel(char *msg)
 				    GTK_STOCK_YES,
 				    GTK_RESPONSE_YES,
 				    NULL);
+    // This is right for the save changes dialog, but not for the truncation dialog #ifdef TRUNCATE_OLD
+    // But it is probably time to remove that... I didn't cater to it when migrating from GnomeUIInfo to GtkUIManager and GtkAction
+    gtk_dialog_set_default_response (GTK_DIALOG(dlg), GTK_RESPONSE_YES);
 
     text = gtk_label_new(msg);
     gtk_widget_show(text);
@@ -569,6 +572,7 @@ int yesno(char *msg)
 					GTK_STOCK_YES,
 					GTK_RESPONSE_YES,
 					 NULL);
+    gtk_dialog_set_default_response (GTK_DIALOG(dlg), GTK_RESPONSE_NO);
 
     text = gtk_label_new(msg);
     gtk_widget_show(text);
@@ -606,12 +610,14 @@ int prompt_user(char *msg, char *s, int maxlen)
 					GTK_STOCK_OK,
 					GTK_RESPONSE_OK,
 					 NULL);
+    gtk_dialog_set_default_response (GTK_DIALOG(dlg), GTK_RESPONSE_OK);
 
     text = gtk_label_new(msg);
     gtk_widget_show(text);
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox), text, TRUE, TRUE, 0);
 
     entry = gtk_entry_new_with_max_length(maxlen);
+    gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
 
     if(strlen(s) > 0)
 	gtk_entry_set_text(GTK_ENTRY(entry), s);

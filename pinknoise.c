@@ -268,6 +268,7 @@ int pinknoise_dialog(struct sound_prefs current, struct view *v)
 			GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT,
 			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 			 GTK_STOCK_OK, GTK_RESPONSE_OK, NULL, NULL);
+    gtk_dialog_set_default_response (GTK_DIALOG(dlg), GTK_RESPONSE_OK);
 
     amount_pink_entry = add_number_entry_with_label_double(amount_pink, "Amount Pink Noise(0-1)", dialog_table, row++) ;
     amount_white_entry = add_number_entry_with_label_double(amount_white, "Amount White Noise(0-1)", dialog_table, row++) ;

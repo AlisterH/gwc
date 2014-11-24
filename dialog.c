@@ -18,7 +18,7 @@
 *******************************************************************************/
 
 /* dialog.c */
-/* utility routines to help with gnome dialog boxes */
+/* utility routines to help with gtk boxes */
 
 #include <stdlib.h>
 #include "gwc.h"
@@ -30,6 +30,8 @@ GtkWidget *add_number_entry_with_label(char *entry_text, char *label_text, GtkWi
 
     entry = gtk_entry_new ();
     gtk_entry_set_text(GTK_ENTRY(entry), entry_text) ;
+    // enables the enter key to press the OK button
+    gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
     gtk_widget_show (entry);
     gtk_table_attach_defaults(GTK_TABLE(table), entry,  0, 1, row, row+1) ;
 
@@ -37,6 +39,9 @@ GtkWidget *add_number_entry_with_label(char *entry_text, char *label_text, GtkWi
     gtk_misc_set_alignment(GTK_MISC(label), 0.0, 0.5);
     gtk_widget_show (label);
     gtk_table_attach_defaults(GTK_TABLE(table), label,  1, 2, row, row+1) ;
+//  Alternative way to enable the enter key if we pass dlg to this function
+//    g_signal_connect_swapped (entry, "activate",
+//       G_CALLBACK (gtk_window_activate_default), dlg);
 
     return entry ;
     

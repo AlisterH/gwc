@@ -130,6 +130,7 @@ void cdrdao_toc_info(char *filename)
 			GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT,
 			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 			 GTK_STOCK_OK, GTK_RESPONSE_OK, NULL, NULL);
+    gtk_dialog_set_default_response (GTK_DIALOG(dlg), GTK_RESPONSE_OK);
 
     //Alister: I don't believe this does anything
     //gtk_window_set_policy(GTK_WINDOW(dlg), FALSE, TRUE, FALSE);
