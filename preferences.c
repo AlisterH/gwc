@@ -30,19 +30,6 @@
 extern struct encoding_prefs encoding_prefs;
 static int svbr_mode, encpresets, oggencopt;
 
-int gwc_dialog_run(GtkDialog *dlg)
-{
-    int dres ;
-    //we could do this and remove a bunch of other uses of gtk_widget_show()
-    //gtk_widget_show_all(GTK_WIDGET(dlg));
-    dres = gtk_dialog_run(GTK_DIALOG(dlg));
-
-    if (dres == GTK_RESPONSE_OK)
-	return 0 ;
-
-    return 1 ;
-}
-
 void vbr_mode_window_select(GtkWidget * clist, gint row, gint column,
 			    GdkEventButton * event, gpointer data)
 {

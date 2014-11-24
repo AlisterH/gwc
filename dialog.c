@@ -23,6 +23,20 @@
 #include <stdlib.h>
 #include "gwc.h"
 
+
+int gwc_dialog_run(GtkDialog *dlg)
+{
+    int dres ;
+    //we could do this and remove a bunch of other uses of gtk_widget_show()
+    //gtk_widget_show_all(GTK_WIDGET(dlg));
+    dres = gtk_dialog_run(GTK_DIALOG(dlg));
+
+    if (dres == GTK_RESPONSE_OK)
+	return 0 ;
+
+    return 1 ;
+}
+
 GtkWidget *add_number_entry_with_label(char *entry_text, char *label_text, GtkWidget *table,
                                        int row)
 {
