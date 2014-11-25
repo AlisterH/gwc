@@ -180,11 +180,11 @@ int amplify_dialog(struct sound_prefs current, struct view *v)
 /*      GtkWidget *curve ;  */
 /*      gfloat curve_data[20] ;  */
 
-    dialog_table = gtk_table_new(5,2,0) ;
+    dialog_table = gtk_table_new(3,1,0) ;
     l_tbl = gtk_table_new(5,2,0) ;
     r_tbl = gtk_table_new(5,2,0) ;
 
-    gtk_table_set_row_spacings(GTK_TABLE(dialog_table), 4) ;
+    gtk_table_set_row_spacings(GTK_TABLE(dialog_table), 12) ;
     gtk_table_set_col_spacings(GTK_TABLE(dialog_table), 6) ;
     gtk_widget_show (dialog_table);
 
@@ -208,7 +208,7 @@ int amplify_dialog(struct sound_prefs current, struct view *v)
 
     maxtext = gtk_label_new (buf);
     gtk_widget_show (maxtext);
-    gtk_box_pack_start (GTK_BOX (GTK_DIALOG(dlg)->vbox), maxtext, TRUE, TRUE, row++);
+    gtk_box_pack_start (GTK_BOX (GTK_DIALOG(dlg)->vbox), maxtext, TRUE, TRUE, 0);
 
 /*      curve = gtk_curve_new ();  */
 /*      gtk_box_pack_start (GTK_BOX (GTK_DIALOG(dlg)->vbox), curve, TRUE, TRUE, row++);  */
@@ -222,24 +222,24 @@ int amplify_dialog(struct sound_prefs current, struct view *v)
     leftframe = gtk_frame_new ("Left channel source");
     gtk_container_add(GTK_CONTAINER(leftframe), l_tbl) ;
     gtk_widget_show (leftframe);
-    gtk_table_attach_defaults(GTK_TABLE(dialog_table), leftframe,  0, 1, row, row+1) ;
+    gtk_table_attach_defaults(GTK_TABLE(dialog_table), leftframe,  0, 2, row, row+1) ;
     row++ ;
 
-    amount_first_entry_l[0] = add_number_entry_with_label_double(amount_first_l[0], "Left Channel beginning:", l_tbl, row++) ;
-    amount_last_entry_l[0] = add_number_entry_with_label_double(amount_last_l[0], "Left Channel end:", l_tbl, row++) ;
-    amount_first_entry_r[0] = add_number_entry_with_label_double(amount_first_r[0], "Right Channel beginning:", l_tbl, row++) ;
-    amount_last_entry_r[0] = add_number_entry_with_label_double(amount_last_r[0], "Right Channel end:", l_tbl, row++) ;
+    amount_first_entry_l[0] = add_number_entry_with_label_double(amount_first_l[0], "Left Channel beginning:", l_tbl, 0) ;
+    amount_last_entry_l[0] = add_number_entry_with_label_double(amount_last_l[0], "Left Channel end:", l_tbl, 1) ;
+    amount_first_entry_r[0] = add_number_entry_with_label_double(amount_first_r[0], "Right Channel beginning:", l_tbl, 2) ;
+    amount_last_entry_r[0] = add_number_entry_with_label_double(amount_last_r[0], "Right Channel end:", l_tbl, 3) ;
 
     rightframe = gtk_frame_new ("Right channel source");
     gtk_container_add(GTK_CONTAINER(rightframe), r_tbl) ;
     gtk_widget_show (rightframe);
-    gtk_table_attach_defaults(GTK_TABLE(dialog_table), rightframe,  0, 1, row, row+1) ;
+    gtk_table_attach_defaults(GTK_TABLE(dialog_table), rightframe,  0, 2, row, row+1) ;
     row++ ;
 
-    amount_first_entry_l[1] = add_number_entry_with_label_double(amount_first_l[1], "Left Channel beginning:", r_tbl, row++) ;
-    amount_last_entry_l[1] = add_number_entry_with_label_double(amount_last_l[1], "Left Channel end:", r_tbl, row++) ;
-    amount_first_entry_r[1] = add_number_entry_with_label_double(amount_first_r[1], "Right Channel beginning:", r_tbl, row++) ;
-    amount_last_entry_r[1] = add_number_entry_with_label_double(amount_last_r[1], "Right Channel end:", r_tbl, row++) ;
+    amount_first_entry_l[1] = add_number_entry_with_label_double(amount_first_l[1], "Left Channel beginning:", r_tbl, 0) ;
+    amount_last_entry_l[1] = add_number_entry_with_label_double(amount_last_l[1], "Left Channel end:", r_tbl, 1) ;
+    amount_first_entry_r[1] = add_number_entry_with_label_double(amount_first_r[1], "Right Channel beginning:", r_tbl, 2) ;
+    amount_last_entry_r[1] = add_number_entry_with_label_double(amount_last_r[1], "Right Channel end:", r_tbl, 3) ;
 
     feather_width_entry = add_number_entry_with_label_int(feather_width, "Feather width", dialog_table, row++) ;
 
