@@ -29,6 +29,8 @@
 
 extern struct encoding_prefs encoding_prefs;
 static int svbr_mode, encpresets, oggencopt;
+    GtkWidget *enc_opt_radio_button_0, *enc_opt_radio_button_1, *enc_opt_radio_button_2,
+          *enc_opt_radio_button_3;
 
 void vbr_mode_window_select(GtkWidget * clist, gint row, gint column,
 			    GdkEventButton * event, gpointer data)
@@ -42,10 +44,12 @@ void presets_window_select(GtkWidget * clist, gint row, gint column,
     encpresets = row;
 }
 
-void ogg_enc_window_select(GtkWidget * clist, gint row, gint column,
-			   GdkEventButton * event, gpointer data)
+void enc_opt_button_select(GdkEventButton * event, gpointer data)
 {
-    oggencopt = row;
+    if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(enc_opt_radio_button_0))==TRUE) oggencopt =0;
+    if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(enc_opt_radio_button_1))==TRUE) oggencopt =1;
+    if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(enc_opt_radio_button_2))==TRUE) oggencopt =2;
+    if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(enc_opt_radio_button_3))==TRUE) oggencopt =3;
 }
 
 void set_ogg_encoding_preferences(GtkWidget * widget, gpointer data)
@@ -65,14 +69,13 @@ void set_ogg_encoding_preferences(GtkWidget * widget, gpointer data)
     GtkWidget *AdvBitrateAvgWindow_entry;
     GtkWidget *Advlowpass_entry;
     GtkWidget *Resample_entry;
-    GtkWidget *enc_opt_window_list;
     GtkWidget *oggoptlabel_entry;
+    GtkWidget *encoptlabel_entry;
 
     int dres;
-    int row = 0;
+    int row=0;
 
-    gchar *enc_opt_window_titles[] = { "Ogg Encoding Mode" };
-    gchar *enc_opt_window_parms[4][1] = { {"Default"},
+    const gchar *enc_opt_parms[4][1] = { {"Default"},
     {"Managed"},
     {"Nominal Bitrate"},
     {"Quality Level"}
@@ -92,26 +95,28 @@ void set_ogg_encoding_preferences(GtkWidget * widget, gpointer data)
 
     gtk_widget_show(dialog_table);
 
-    enc_opt_window_list =
-	gtk_clist_new_with_titles(1, enc_opt_window_titles);
-    gtk_clist_set_selection_mode(GTK_CLIST(enc_opt_window_list),
-				 GTK_SELECTION_SINGLE);
-    gtk_clist_append(GTK_CLIST(enc_opt_window_list),
-		     enc_opt_window_parms[0]);
-    gtk_clist_append(GTK_CLIST(enc_opt_window_list),
-		     enc_opt_window_parms[1]);
-    gtk_clist_append(GTK_CLIST(enc_opt_window_list),
-		     enc_opt_window_parms[2]);
-    gtk_clist_append(GTK_CLIST(enc_opt_window_list),
-		     enc_opt_window_parms[3]);
+    GtkWidget *enc_opt_frame = gtk_frame_new ("Ogg Encoding Mode");
+    GtkWidget *enc_opt_tbl = gtk_table_new(4,1,0) ;
+    gtk_container_add(GTK_CONTAINER(enc_opt_frame), enc_opt_tbl) ;
 
-    gtk_clist_select_row(GTK_CLIST(enc_opt_window_list),
-			 encoding_prefs.ogg_encopt, 0);
-
-    gtk_signal_connect(GTK_OBJECT(enc_opt_window_list), "select_row",
-		       GTK_SIGNAL_FUNC(ogg_enc_window_select), NULL);
-
+//    encoptlabel_entry = gtk_label_new("Ogg Encoding Mode");
+    enc_opt_radio_button_0 = gtk_radio_button_new_with_label (NULL, *enc_opt_parms[0]);
+    enc_opt_radio_button_1 = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON(enc_opt_radio_button_0), *enc_opt_parms[1]);
+    enc_opt_radio_button_2 = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON(enc_opt_radio_button_0), *enc_opt_parms[2]);
+    enc_opt_radio_button_3 = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON(enc_opt_radio_button_0), *enc_opt_parms[3]);
+    gtk_signal_connect(GTK_OBJECT(enc_opt_radio_button_0), "toggled", GTK_SIGNAL_FUNC(enc_opt_button_select), NULL) ;
+    gtk_signal_connect(GTK_OBJECT(enc_opt_radio_button_1), "toggled", GTK_SIGNAL_FUNC(enc_opt_button_select), NULL) ;
+    gtk_signal_connect(GTK_OBJECT(enc_opt_radio_button_2), "toggled", GTK_SIGNAL_FUNC(enc_opt_button_select), NULL) ;
+    gtk_signal_connect(GTK_OBJECT(enc_opt_radio_button_3), "toggled", GTK_SIGNAL_FUNC(enc_opt_button_select), NULL) ;
+ 
     oggencopt = encoding_prefs.ogg_encopt;
+
+    switch (oggencopt) {
+        case 0: gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(enc_opt_radio_button_0), TRUE) ; break ;
+        case 1: gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(enc_opt_radio_button_1), TRUE) ; break ;
+        case 2: gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(enc_opt_radio_button_2), TRUE) ; break ;
+        case 3: gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(enc_opt_radio_button_3), TRUE) ; break ;
+    }
 
     oggloc_entry = gtk_entry_new_with_max_length(255);
     oggloclabel_entry = gtk_label_new("Oggenc Location (full path):");
@@ -208,7 +213,6 @@ void set_ogg_encoding_preferences(GtkWidget * widget, gpointer data)
     gtk_widget_show(useAdvlowpass_entry);
     gtk_widget_show(AdvBitrateAvgWindow_entry);
     gtk_widget_show(useAdvBitrateAvgWindow_entry);
-    gtk_widget_show(enc_opt_window_list);
 
     gtk_table_attach_defaults(GTK_TABLE(dialog_table), oggloclabel_entry,
 			      0, 1, row, row + 1);
@@ -234,10 +238,48 @@ void set_ogg_encoding_preferences(GtkWidget * widget, gpointer data)
 			      row + 1);
     row++;
 
+/*    gtk_table_attach_defaults(GTK_TABLE(dialog_table), encoptlabel_entry,
+			      0, 1, row, row + 1);
+    row++;
+
+    gtk_table_attach_defaults(GTK_TABLE(dialog_table), enc_opt_radio_button_0, 0, 1,
+			      row, row + 1);
+    row++;
+    gtk_table_attach_defaults(GTK_TABLE(dialog_table), enc_opt_radio_button_1, 0, 1,
+			      row, row + 1);
+    row++;
+    gtk_table_attach_defaults(GTK_TABLE(dialog_table), enc_opt_radio_button_2, 0, 1,
+			      row, row + 1);
+    row++;
+    gtk_table_attach_defaults(GTK_TABLE(dialog_table), enc_opt_radio_button_3, 0, 1,
+			      row, row + 1);
+    row++;*/
+    gtk_table_attach_defaults(GTK_TABLE(dialog_table), enc_opt_frame, 0, 2,
+			      row, row + 1);
+    row++;
+
+    gtk_table_attach_defaults(GTK_TABLE(enc_opt_tbl), enc_opt_radio_button_0, 0, 1,
+			      row, row + 1);
+    row++;
+    gtk_table_attach_defaults(GTK_TABLE(enc_opt_tbl), enc_opt_radio_button_1, 0, 1,
+			      row, row + 1);
+    row++;
+    gtk_table_attach_defaults(GTK_TABLE(enc_opt_tbl), enc_opt_radio_button_2, 0, 1,
+			      row, row + 1);
+    row++;
+    gtk_table_attach_defaults(GTK_TABLE(enc_opt_tbl), enc_opt_radio_button_3, 0, 1,
+			      row, row + 1);
+    row++;
+
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox), dialog_table,
 		       TRUE, TRUE, 0);
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox),
-		       enc_opt_window_list, TRUE, TRUE, 0);
+/*     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox), enc_opt_radio_button_0, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox), enc_opt_radio_button_1, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox), enc_opt_radio_button_2, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox), enc_opt_radio_button_3, TRUE, TRUE, 0);*/
+// Do this temporarily instead of showing all the radio buttons individually
+    gtk_widget_show_all(dlg);
+
 
     dres = gwc_dialog_run(GTK_DIALOG(dlg));
 

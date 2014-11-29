@@ -48,6 +48,11 @@ static gfloat Fc;
 static int filter_type;
 static int feather_width;
 
+
+GtkWidget *type_radio_button_0, *type_radio_button_1, *type_radio_button_2,
+          *type_radio_button_3, *type_radio_button_4, *type_radio_button_5,
+          *type_radio_button_6;
+
 int row2filter(int row)
 {
     if(row == 0) return LPF ;
@@ -83,13 +88,13 @@ void load_filter_preferences(void)
     filter_prefs.bandwidth = 0.5;
 
     GKeyFile  *key_file = read_config();
-    int row ;
+    int filter_row ;
 
     // We should probably have a separate test for each preference...
     //if (g_key_file_get_string(key_file, "filter_params", "filter_type", NULL) != NULL) {
     if (g_key_file_has_group(key_file, "filter_params") == TRUE) {
-        row = g_key_file_get_integer(key_file, "filter_params", "filter_type", NULL);
-    filter_prefs.filter_type = row2filter(row) ;
+        filter_row = g_key_file_get_integer(key_file, "filter_params", "filter_type", NULL);
+        filter_prefs.filter_type = row2filter(filter_row) ;
 
         filter_prefs.feather_width = g_key_file_get_integer(key_file, "filter_params", "feather_width", NULL);
         filter_prefs.dbGain = g_key_file_get_double(key_file, "filter_params", "dbGain", NULL);
@@ -102,9 +107,9 @@ void load_filter_preferences(void)
 void save_filter_preferences(void)
 {
     GKeyFile  *key_file = read_config();
-    int row = filter2row(filter_prefs.filter_type) ;
+    int filter_row = filter2row(filter_prefs.filter_type) ;
 
-    g_key_file_set_integer(key_file, "filter_params", "filter_type", row) ;
+    g_key_file_set_integer(key_file, "filter_params", "filter_type", filter_row) ;
     g_key_file_set_integer(key_file, "filter_params", "feather_width", filter_prefs.feather_width);
     g_key_file_set_double(key_file, "filter_params", "dbGain", filter_prefs.dbGain);
     g_key_file_set_double(key_file, "filter_params", "Fc", filter_prefs.Fc);
@@ -132,6 +137,7 @@ void filter_audio(struct sound_prefs *p, long first, long last, int channel_mask
     Fc = filter_prefs.Fc ;
     bandwidth = filter_prefs.bandwidth ;
 
+// Is this really necessary?
     switch(filter_type) {
 	case LPF: g_print("LPF") ; break ;
 	case HPF: g_print("HPF") ; break ;
@@ -293,10 +299,17 @@ extern biquad *BiQuad_new(int type, smp_type dbGain, /* gain of filter */
     main_redraw(FALSE, TRUE) ;
 }
 
-void type_window_select(GtkWidget * clist, gint row, gint column,
-		       GdkEventButton * event, gpointer data)
+void type_button_select(GdkEventButton * event, gpointer data)
 {
-    filter_type = row2filter(row) ;
+    int filter_row;
+    if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(type_radio_button_0))==TRUE) filter_row =0;
+    if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(type_radio_button_1))==TRUE) filter_row =1;
+    if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(type_radio_button_2))==TRUE) filter_row =2;
+    if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(type_radio_button_3))==TRUE) filter_row =3;
+    if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(type_radio_button_4))==TRUE) filter_row =4;
+    if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(type_radio_button_5))==TRUE) filter_row =5;
+    if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(type_radio_button_6))==TRUE) filter_row =6;
+    filter_type = row2filter(filter_row) ;
 }
 
 static GtkWidget *dbGain_entry ;
@@ -343,17 +356,16 @@ int filter_dialog(struct sound_prefs current, struct view *v)
     GtkWidget *feather_entry ;
     int dclose = 0 ;
     int row = 0 ;
+    int filter_row ;
     int dres ;
 
-    GtkWidget *type_window_list;
     GtkWidget *show_response_button ;
 
-    gchar *type_window_titles[] = { "Filter Type" };
-    gchar *type_window_parms[7][1] = { {"Low Pass"},
-    {"High Pass"},
-    {"Notch"},
-    {"Band Pass"},
-    {"Peaking EQ"},
+    const gchar *type_parms[7][1] = { {"Low Pass Filter"},
+    {"High Pass Filter"},
+    {"Notch Filter"},
+    {"Band Pass Filter"},
+    {"Peaking EQ Filter"},
     {"Low Shelf Filter"},
     {"High Shelf Filter"},
     };
@@ -363,25 +375,32 @@ int filter_dialog(struct sound_prefs current, struct view *v)
     last_sample = v->selected_last_sample ;
 
     load_filter_preferences();
-    filter_type = filter_prefs.filter_type ;
+    filter_row = filter2row(filter_prefs.filter_type);
 
-    type_window_list = gtk_clist_new_with_titles(1, type_window_titles);
-    gtk_clist_set_selection_mode(GTK_CLIST(type_window_list),
-				 GTK_SELECTION_SINGLE);
-    gtk_clist_append(GTK_CLIST(type_window_list), type_window_parms[0]);
-    gtk_clist_append(GTK_CLIST(type_window_list), type_window_parms[1]);
-    gtk_clist_append(GTK_CLIST(type_window_list), type_window_parms[2]);
-    gtk_clist_append(GTK_CLIST(type_window_list), type_window_parms[3]);
-    gtk_clist_append(GTK_CLIST(type_window_list), type_window_parms[4]);
-    gtk_clist_append(GTK_CLIST(type_window_list), type_window_parms[5]);
-    gtk_clist_append(GTK_CLIST(type_window_list), type_window_parms[6]);
+    type_radio_button_0 = gtk_radio_button_new_with_label (NULL, *type_parms[0]);
+    type_radio_button_1 = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON(type_radio_button_0), *type_parms[1]);
+    type_radio_button_2 = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON(type_radio_button_0), *type_parms[2]);
+    type_radio_button_3 = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON(type_radio_button_0), *type_parms[3]);
+    type_radio_button_4 = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON(type_radio_button_0), *type_parms[4]);
+    type_radio_button_5 = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON(type_radio_button_0), *type_parms[5]);
+    type_radio_button_6 = gtk_radio_button_new_with_label_from_widget (GTK_RADIO_BUTTON(type_radio_button_0), *type_parms[6]);
+    gtk_signal_connect(GTK_OBJECT(type_radio_button_0), "toggled", GTK_SIGNAL_FUNC(type_button_select), NULL) ;
+    gtk_signal_connect(GTK_OBJECT(type_radio_button_1), "toggled", GTK_SIGNAL_FUNC(type_button_select), NULL) ;
+    gtk_signal_connect(GTK_OBJECT(type_radio_button_2), "toggled", GTK_SIGNAL_FUNC(type_button_select), NULL) ;
+    gtk_signal_connect(GTK_OBJECT(type_radio_button_3), "toggled", GTK_SIGNAL_FUNC(type_button_select), NULL) ;
+    gtk_signal_connect(GTK_OBJECT(type_radio_button_4), "toggled", GTK_SIGNAL_FUNC(type_button_select), NULL) ;
+    gtk_signal_connect(GTK_OBJECT(type_radio_button_5), "toggled", GTK_SIGNAL_FUNC(type_button_select), NULL) ;
+    gtk_signal_connect(GTK_OBJECT(type_radio_button_6), "toggled", GTK_SIGNAL_FUNC(type_button_select), NULL) ;
 
-    gtk_clist_select_row(GTK_CLIST(type_window_list),
-			 filter2row(filter_prefs.filter_type), 0);
-    gtk_signal_connect(GTK_OBJECT(type_window_list), "select_row",
-		       GTK_SIGNAL_FUNC(type_window_select), NULL);
-
-    gtk_widget_show(type_window_list);
+    switch (filter_row) {
+        case 0: gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(type_radio_button_0), TRUE) ; break ;
+        case 1: gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(type_radio_button_1), TRUE) ; break ;
+        case 2: gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(type_radio_button_2), TRUE) ; break ;
+        case 3: gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(type_radio_button_3), TRUE) ; break ;
+        case 4: gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(type_radio_button_4), TRUE) ; break ;
+        case 5: gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(type_radio_button_5), TRUE) ; break ;
+        case 6: gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(type_radio_button_6), TRUE) ; break ;
+    }
 
     dialog_table = gtk_table_new(5,2,0) ;
 
@@ -395,12 +414,17 @@ int filter_dialog(struct sound_prefs current, struct view *v)
 			 GTK_STOCK_OK, GTK_RESPONSE_OK, NULL, NULL);
     gtk_dialog_set_default_response (GTK_DIALOG(dlg), GTK_RESPONSE_OK);
 
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox), type_window_list,
-		       TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox), type_radio_button_0, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox), type_radio_button_1, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox), type_radio_button_2, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox), type_radio_button_3, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox), type_radio_button_4, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox), type_radio_button_5, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox), type_radio_button_6, TRUE, TRUE, 0);
     feather_entry = add_number_entry_with_label_int(filter_prefs.feather_width, "Feather Width", dialog_table, row++) ;
     dbGain_entry = add_number_entry_with_label_double(filter_prefs.dbGain, "Gain (db)", dialog_table, row++) ;
     freq_entry = add_number_entry_with_label_double(filter_prefs.Fc, "Center frequency freq (hertz)", dialog_table, row++) ;
-    bandwidth_entry = add_number_entry_with_label_double(filter_prefs.bandwidth, "bandwidth (octaves)", dialog_table, row++) ;
+    bandwidth_entry = add_number_entry_with_label_double(filter_prefs.bandwidth, "Bandwidth (octaves)", dialog_table, row++) ;
 
     gtk_box_pack_start (GTK_BOX (GTK_DIALOG(dlg)->vbox), dialog_table, TRUE, TRUE, 0);
 
@@ -409,7 +433,8 @@ int filter_dialog(struct sound_prefs current, struct view *v)
     gtk_widget_show(show_response_button) ;
 
     gtk_box_pack_start (GTK_BOX (GTK_DIALOG(dlg)->vbox), show_response_button, TRUE, TRUE, 0);
-
+// Do this temporarily instead of showing all the radio buttons individually
+    gtk_widget_show_all(dlg);
     dres = gwc_dialog_run(GTK_DIALOG(dlg)) ;
 
     if(dres == 0) {
