@@ -63,7 +63,8 @@ int build_options(int fmt, char *newfilename, char *trackname)
 	/* Check if defined encoder location and it exists */
 	if ((strlen(encoding_prefs.oggloc) == 0)
 	    || (stat(encoding_prefs.oggloc, &filestat) == -1)) {
-	    warning("Encoder for Ogg is not defined correctly\n");
+	    // We should probably just set it to /usr/bin/ogg by default, or `which ogg`
+	    warning("Encoder for Ogg is not defined correctly - check the Settings menu\n");
 	    return 1;
 	}
 	/* Required Settings */
@@ -201,7 +202,8 @@ int build_options(int fmt, char *newfilename, char *trackname)
 	/* Check if defined encoder location and it exists */
 	if ((strlen(encoding_prefs.mp3loc) == 0)
 	    || (stat(encoding_prefs.mp3loc, &filestat) == -1)) {
-	    warning("Encoder for MP3 is not defined correctly\n");
+	    // We should probably just set it to /usr/bin/lame by default, or `which lame`
+	    warning("Encoder for MP3 is not defined correctly - check the Settings menu\n");
 	    return 1;
 	}
 	/* Required Settings */
@@ -466,7 +468,8 @@ int build_options(int fmt, char *newfilename, char *trackname)
 	/* Check if defined encoder location and it exists */
 	if ((strlen(encoding_prefs.mp3loc) == 0)
 	    || (stat(encoding_prefs.mp3loc, &filestat) == -1)) {
-	    warning("Encoder for MP3 is not defined correctly\n");
+	    // We should probably just set it to /usr/bin/lame by default, or `which lame`
+	    warning("Encoder for MP3 is not defined correctly - check the Settings menu\n");
 	    return 1;
 	}
 	/* Required Settings */
