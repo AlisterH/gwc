@@ -2526,18 +2526,19 @@ static const char *ui_description =
 };*/
 
 GtkStatusbar *status_bar;
+GtkWidget *progress_bar;
 guint status_message, push_message;
 
 void update_status_bar(gfloat percentage, gfloat min_delta,
 		   gboolean init_flag)
 {
-/*#ifdef BY_DATA_LENGTH
+#ifdef BY_DATA_LENGTH
     static gfloat last_percentage_displayed = -1.0;
 
     if (percentage - last_percentage_displayed > min_delta
 	|| init_flag == TRUE) {
 	doing_statusbar_update = TRUE;
-	gnome_appbar_set_progress_percentage(GNOME_APPBAR(status_bar), percentage);
+	gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR(progress_bar), percentage);
 	gnome_flush();
 	doing_statusbar_update = FALSE;
 	last_percentage_displayed = percentage;
@@ -2557,12 +2558,12 @@ void update_status_bar(gfloat percentage, gfloat min_delta,
 
     if (delta_ms > 1000 * min_delta || init_flag == TRUE) {
 	doing_statusbar_update = TRUE;
-	gnome_appbar_set_progress_percentage(GNOME_APPBAR(status_bar), percentage);
+	gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR(progress_bar), percentage);
 	gnome_flush();
 	doing_statusbar_update = FALSE;
 	last_displayed = this;
     }
-    #endif*/
+    #endif
 }
 
 // Show "tooltips" in the statusbar for menu items
@@ -3200,17 +3201,13 @@ int main(int argc, char *argv[])
 */
 
     {
-	/* setup status bar at bottom of window */
+	/* setup status bar at bottom of window including a progress display) */
+	progress_bar = gtk_progress_bar_new ();
 	status_bar = GTK_STATUSBAR(gtk_statusbar_new ());
 	status_message = gtk_statusbar_get_context_id (
 			status_bar, "status-message");
 	push_message = gtk_statusbar_get_context_id (
 			status_bar, "push-message");
-	//status_bar = gnome_appbar_new(TRUE, TRUE, GNOME_PREFERENCES_USER);
-	//gnome_app_set_statusbar(GNOME_APP(main_window), status_bar);
-
-	/* make menu hints display on the appbar */
-	//gnome_app_install_menu_hints(GNOME_APP(main_window), menubar);
 
 	/* create a new canvas */
 	audio_drawing_area = gtk_drawing_area_new();
@@ -3281,6 +3278,7 @@ int main(int argc, char *argv[])
     gtk_box_pack_start(GTK_BOX(bottom_hbox), times_vbox, TRUE, TRUE, 0);
 
     gtk_box_pack_start(GTK_BOX(main_vbox), bottom_hbox, FALSE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(status_bar), GTK_WIDGET(progress_bar), FALSE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(main_vbox), GTK_WIDGET(status_bar), FALSE, TRUE, 0);
 
     {
