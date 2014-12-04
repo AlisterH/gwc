@@ -83,9 +83,9 @@ extern int FRAMESIZE ;
 
 #ifndef TRUNCATE_OLD
 static int save_undo_data_impl(long first_sample, long last_sample,
-                               int undo_type, int status_update_flag)
+                               int undo_type, int progress_update_flag)
 #else
-int save_undo_data(long first_sample, long last_sample, struct sound_prefs *p, int status_update_flag)
+int save_undo_data(long first_sample, long last_sample, struct sound_prefs *p, int progress_update_flag)
 #endif
 {
     const int BLOCK_SIZE = 1024 ;
@@ -133,8 +133,8 @@ int save_undo_data(long first_sample, long last_sample, struct sound_prefs *p, i
 
     if (undo_type != UNDO_INSERT) {
 #endif        
-    if(status_update_flag)
-	update_status_bar(0.0, STATUS_UPDATE_INTERVAL, TRUE) ;
+    if(progress_update_flag)
+	update_progress_bar(0.0, PROGRESS_UPDATE_INTERVAL, TRUE) ;
 
     blocks = (last_sample - first_sample + 1) / BLOCK_SIZE;
 
@@ -142,8 +142,8 @@ int save_undo_data(long first_sample, long last_sample, struct sound_prefs *p, i
         long end;
 	gfloat p = (gfloat)(curr-first_sample)/n_sample ;
 
-	if(status_update_flag)
-	    update_status_bar(p,STATUS_UPDATE_INTERVAL,FALSE) ;
+	if(progress_update_flag)
+	    update_progress_bar(p,PROGRESS_UPDATE_INTERVAL,FALSE) ;
 
         end = curr + BLOCK_SIZE - 1;
         if (end > last_sample)
@@ -157,26 +157,26 @@ int save_undo_data(long first_sample, long last_sample, struct sound_prefs *p, i
 #ifndef TRUNCATE_OLD
     }
 #endif
-    if(status_update_flag)
-	update_status_bar(0.0, STATUS_UPDATE_INTERVAL, TRUE) ;
+    if(progress_update_flag)
+	update_progress_bar(0.0, PROGRESS_UPDATE_INTERVAL, TRUE) ;
 
     return 0 ;
 }
 
 #ifndef TRUNCATE_OLD
-int save_undo_data(long first_sample, long last_sample, struct sound_prefs *p, int status_update_flag)
+int save_undo_data(long first_sample, long last_sample, struct sound_prefs *p, int progress_update_flag)
 {
-    return save_undo_data_impl(first_sample, last_sample, UNDO_OVERWRITE, status_update_flag);
+    return save_undo_data_impl(first_sample, last_sample, UNDO_OVERWRITE, progress_update_flag);
 }
 
-int save_undo_data_remove(long first_sample, long last_sample, int status_update_flag)
+int save_undo_data_remove(long first_sample, long last_sample, int progress_update_flag)
 {
-    return save_undo_data_impl(first_sample, last_sample, UNDO_REMOVE, status_update_flag);
+    return save_undo_data_impl(first_sample, last_sample, UNDO_REMOVE, progress_update_flag);
 }
 
-int save_undo_data_insert(long first_sample, long last_sample, int status_update_flag)
+int save_undo_data_insert(long first_sample, long last_sample, int progress_update_flag)
 {
-    return save_undo_data_impl(first_sample, last_sample, UNDO_INSERT, status_update_flag);
+    return save_undo_data_impl(first_sample, last_sample, UNDO_INSERT, progress_update_flag);
 }
 #endif /* !TRUNCATE_OLD */
 
@@ -221,7 +221,7 @@ int undo(struct view *v, struct sound_prefs *p)
     }
 
     push_status_text("Performing Undo") ;
-    update_status_bar(0.0, STATUS_UPDATE_INTERVAL, TRUE) ;
+    update_progress_bar(0.0, PROGRESS_UPDATE_INTERVAL, TRUE) ;
 
     read(undo_fd, (char *)&l, sizeof(l)) ;
 
@@ -286,7 +286,7 @@ int undo(struct view *v, struct sound_prefs *p)
               long end;
 	    gfloat p = (gfloat)(curr-first_sample)/(last_sample - first_sample) * (total_sections - n_sections) / total_sections ;
 
-	    update_status_bar(p,STATUS_UPDATE_INTERVAL,FALSE) ;
+	    update_progress_bar(p,PROGRESS_UPDATE_INTERVAL,FALSE) ;
 
             end = curr + BLOCK_SIZE - 1;
             if (end > last_sample)
@@ -325,7 +325,7 @@ int undo(struct view *v, struct sound_prefs *p)
     undo_fd = -1 ;
     undo_level-- ;
 
-    update_status_bar(0.0, STATUS_UPDATE_INTERVAL, TRUE) ;
+    update_progress_bar(0.0, PROGRESS_UPDATE_INTERVAL, TRUE) ;
     pop_status_text();
 
     return undo_level ;

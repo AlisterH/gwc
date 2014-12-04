@@ -50,13 +50,13 @@ static void adjust_view(struct view *v)
 static void begin_operation(char *status_text)
 {
     push_status_text(status_text);
-    update_status_bar(0.0, STATUS_UPDATE_INTERVAL, TRUE) ;
+    update_progress_bar(0.0, PROGRESS_UPDATE_INTERVAL, TRUE) ;
 }
 
 static void end_operation(void)
 {
     pop_status_text();
-    update_status_bar(0.0, STATUS_UPDATE_INTERVAL, TRUE);
+    update_progress_bar(0.0, PROGRESS_UPDATE_INTERVAL, TRUE);
 }
 
 static void resample(long first, long last)

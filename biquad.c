@@ -201,7 +201,7 @@ extern biquad *BiQuad_new(int type, smp_type dbGain, /* gain of filter */
 
     push_status_text("Filtering audio") ;
     g_print("Filtering audio %ld to %ld\n", first, last) ;
-    update_status_bar(0.0,STATUS_UPDATE_INTERVAL,TRUE) ;
+    update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
 
     {
 
@@ -212,7 +212,7 @@ extern biquad *BiQuad_new(int type, smp_type dbGain, /* gain of filter */
 
 	    n = read_wavefile_data(left, right, current, tmplast) ;
 
-	    update_status_bar(p,STATUS_UPDATE_INTERVAL,FALSE) ;
+	    update_progress_bar(p,PROGRESS_UPDATE_INTERVAL,FALSE) ;
 
 	    for(i = 0 ; i < n ; i++) {
 		long icurrent = current + i ;
@@ -279,7 +279,7 @@ extern biquad *BiQuad_new(int type, smp_type dbGain, /* gain of filter */
 	save_sample_block_data(p) ;
     }
 
-    update_status_bar(0.0,STATUS_UPDATE_INTERVAL,TRUE) ;
+    update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
     pop_status_text() ;
 
 #ifdef BIQUAD

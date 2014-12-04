@@ -52,7 +52,7 @@
 #define VERSION "0.21-19"
 #define GWC_POINT_HANDLE 0x01
 #define SBW  128	/* Sample Block Width, the number of audio sammples summarized in one block  */
-#define STATUS_UPDATE_INTERVAL 0.5	/* update status bar every 1/2  second on long edit operations */
+#define PROGRESS_UPDATE_INTERVAL 0.5	/* update status bar every 1/2  second on long edit operations */
 #define MAX_AUDIO_BUFSIZE 32768
 
 /* defs for declicking results */
@@ -293,10 +293,10 @@ void save_selection_as_encoded(int fmt,char *oldname,char *filename_new, struct 
 int  encode(int fmt,char *origname, char *newname,long start,long length, char *trackname);
 int start_encode( int mode,char *newfilename,long start,long length, char *origfilename);
 
-int save_undo_data(long first_sample, long last_sample, struct sound_prefs *p, int status_update_flag) ;
+int save_undo_data(long first_sample, long last_sample, struct sound_prefs *p, int progress_update_flag) ;
 #ifndef TRUNCATE_OLD
-int save_undo_data_remove(long first_sample, long last_sample, int status_update_flag);
-int save_undo_data_insert(long first_sample, long last_sample, int status_update_flag);
+int save_undo_data_remove(long first_sample, long last_sample, int progress_update_flag);
+int save_undo_data_insert(long first_sample, long last_sample, int progress_update_flag);
 #endif
 void seek_to_audio_position(long playback_position) ;
 void set_misc_preferences(GtkWidget * widget, gpointer data) ;
@@ -320,7 +320,7 @@ int start_save_undo(char *undo_msg, struct view *v) ;
 void sum_sample_block(struct sample_block *sb, fftw_real left[], fftw_real right[], long n) ;
 int undo(struct view *v, struct sound_prefs *p) ;
 void undo_purge(void) ;
-void update_status_bar(gfloat percentage, gfloat min_delta, gboolean init_flag) ;
+void update_progress_bar(gfloat percentage, gfloat min_delta, gboolean init_flag) ;
 int yesno(char *) ;
 int yesnocancel(char *) ;
 void warning(char *) ;

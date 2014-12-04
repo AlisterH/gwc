@@ -49,7 +49,7 @@ int do_decrackle(struct sound_prefs *pPrefs, long first_sample,
   /*  scaled_factor = factor * pPrefs -> max_allowed; */
 
   push_status_text("Decrackling audio") ;
-  update_status_bar(0.0,STATUS_UPDATE_INTERVAL,TRUE) ;
+  update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
 
   for (current = first_sample; 
        current < last_sample;
@@ -58,7 +58,7 @@ int do_decrackle(struct sound_prefs *pPrefs, long first_sample,
 
     gfloat p = (gfloat)(current-first_sample)/
       (gfloat)(last_sample-first_sample) ;
-    update_status_bar(p,STATUS_UPDATE_INTERVAL,FALSE) ;
+    update_progress_bar(p,PROGRESS_UPDATE_INTERVAL,FALSE) ;
 
     final = current+nmax-1;
     if (final > last_sample) final=last_sample;
@@ -179,7 +179,7 @@ int do_decrackle(struct sound_prefs *pPrefs, long first_sample,
   }
 
 
-  update_status_bar(0.0,STATUS_UPDATE_INTERVAL,TRUE) ;
+  update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
 
   pop_status_text() ;
 

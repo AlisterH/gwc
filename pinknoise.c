@@ -187,7 +187,7 @@ void pinknoise(struct sound_prefs *p, long first, long last, int channel_mask)
     current = first ;
 
     push_status_text("Generating Pink Noise") ;
-    update_status_bar(0.0,STATUS_UPDATE_INTERVAL,TRUE) ;
+    update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
 
     {
 	long max_allowed = INT_MAX-1 ;
@@ -200,7 +200,7 @@ void pinknoise(struct sound_prefs *p, long first, long last, int channel_mask)
 
 	    n = read_wavefile_data(left, right, current, tmplast) ;
 
-	    update_status_bar(prog,STATUS_UPDATE_INTERVAL,FALSE) ;
+	    update_progress_bar(prog,PROGRESS_UPDATE_INTERVAL,FALSE) ;
 
 	    for(i = 0 ; i < n ; i++) {
 		long icurrent = current + i ;
@@ -242,7 +242,7 @@ void pinknoise(struct sound_prefs *p, long first, long last, int channel_mask)
 	save_sample_block_data(p) ;
     }
 
-    update_status_bar(0.0,STATUS_UPDATE_INTERVAL,TRUE) ;
+    update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
     pop_status_text() ;
 
     main_redraw(FALSE, TRUE) ;

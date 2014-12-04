@@ -115,7 +115,7 @@ int dethunk_new(struct sound_prefs *pPrefs,
     n_samples = last_sample - first_sample + 1 ;
 
     push_status_text("Dethunking audio") ;
-    update_status_bar(0.0,STATUS_UPDATE_INTERVAL,TRUE) ;
+    update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
 
     g_print("FFTSIZE:%d repair_size:%d\n", FFT_SIZE, repair_size) ;
 
@@ -317,7 +317,7 @@ int dethunk_new(struct sound_prefs *pPrefs,
     rfftw_destroy_plan(pBak);
 #endif /* HAVE_FFTW3 */
 
-    update_status_bar(0.0,STATUS_UPDATE_INTERVAL,TRUE) ;
+    update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
 
     pop_status_text() ;
 
@@ -377,7 +377,7 @@ int dethunk_current(struct sound_prefs *pPrefs,
     n_samples = last_sample - first_sample + 1 ;
 
     push_status_text("Dethunking audio") ;
-    update_status_bar(0.0,STATUS_UPDATE_INTERVAL,TRUE) ;
+    update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
 
     g_print("FFTSIZE:%d\n", FFT_SIZE) ;
     g_print("first_sample:%ld\n", first_sample) ;
@@ -488,7 +488,7 @@ int dethunk_current(struct sound_prefs *pPrefs,
 	double wgt_pre = 1.0 - wgt_post ;
 	double theta = ((double)i/(double)(FFT_SIZE-1))*2.0*M_PI ;
 
-	update_status_bar((double)i/(double)FFT_SIZE,STATUS_UPDATE_INTERVAL,FALSE) ;
+	update_progress_bar((double)i/(double)FFT_SIZE,PROGRESS_UPDATE_INTERVAL,FALSE) ;
 
 	if(channel_mask & 0x01)
 	    left[i] = wgt_pre*pre_left_amp[0] + wgt_post*post_left_amp[0] ;
@@ -523,7 +523,7 @@ int dethunk_current(struct sound_prefs *pPrefs,
     rfftw_destroy_plan(pFor);
 #endif /* HAVE_FFTW3 */
 
-    update_status_bar(0.0,STATUS_UPDATE_INTERVAL,TRUE) ;
+    update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
 
     pop_status_text() ;
 
@@ -647,7 +647,7 @@ int dethunk(struct sound_prefs *pPrefs,
     n_samples = last_sample - first_sample + 1 ;
 
     push_status_text("Dethunking audio") ;
-    update_status_bar(0.0,STATUS_UPDATE_INTERVAL,TRUE) ;
+    update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
 
     g_print("first_sample:%ld\n", first_sample) ;
     g_print("last_sample:%ld\n", last_sample) ;
@@ -665,7 +665,7 @@ int dethunk(struct sound_prefs *pPrefs,
     write_fft_real_wavefile_data(left,  right, first_sample-FFT_SIZE, last_sample+FFT_SIZE) ;
 
 
-    update_status_bar(0.0,STATUS_UPDATE_INTERVAL,TRUE) ;
+    update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
 
     pop_status_text() ;
     free(left) ;

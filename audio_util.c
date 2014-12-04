@@ -352,7 +352,7 @@ void truncate_wavfile(struct view *v)
     long left[TMPBUFSIZE], right[TMPBUFSIZE] ;
 
     push_status_text("Truncating audio data") ;
-    update_status_bar(0.0, STATUS_UPDATE_INTERVAL, TRUE) ;
+    update_progress_bar(0.0, PROGRESS_UPDATE_INTERVAL, TRUE) ;
 
     /* something like this, gotta buffer this or the disk head will
        burn a hole in the platter */
@@ -360,7 +360,7 @@ void truncate_wavfile(struct view *v)
     if(v->truncate_head > 0) {
 
 	for(prev = v->truncate_head ; prev <= v->truncate_tail ; prev += TMPBUFSIZE) {
-	    update_status_bar((gfloat)(prev-v->truncate_head)/(gfloat)(v->truncate_tail-v->truncate_head), STATUS_UPDATE_INTERVAL, FALSE) ;
+	    update_progress_bar((gfloat)(prev-v->truncate_head)/(gfloat)(v->truncate_tail-v->truncate_head), PROGRESS_UPDATE_INTERVAL, FALSE) ;
 	    last = MIN((prev+TMPBUFSIZE-1), v->truncate_tail) ;
 	    n_in_buf = read_wavefile_data(left, right, prev, last) ;
 	    new = prev - v->truncate_head ;
@@ -475,7 +475,7 @@ void save_as_wavfile(char *filename_new, long first_sample, long last_sample)
 	unsigned char buf[TMPBUFSIZE] ;
 	long framebufsize = (TMPBUFSIZE/FRAMESIZE) * FRAMESIZE ;
 
-	update_status_bar(0.0,STATUS_UPDATE_INTERVAL,TRUE) ;
+	update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
 
 	for(n_copied = 0 ; n_copied < total_bytes ; n_copied += framebufsize) {
 	    long n_to_copy = framebufsize ;
@@ -484,7 +484,7 @@ void save_as_wavfile(char *filename_new, long first_sample, long last_sample)
 	    usleep(2) ; // prevents segfault on OSX, who knows, something to do with status bar update...
 #endif
 
-	    update_status_bar((gfloat)(n_copied)/(gfloat)(total_bytes),STATUS_UPDATE_INTERVAL,FALSE) ;
+	    update_progress_bar((gfloat)(n_copied)/(gfloat)(total_bytes),PROGRESS_UPDATE_INTERVAL,FALSE) ;
 
 	    if(n_copied + n_to_copy > total_bytes) n_to_copy = total_bytes - n_copied ;
 
@@ -494,7 +494,7 @@ void save_as_wavfile(char *filename_new, long first_sample, long last_sample)
 
     }
 
-    update_status_bar((gfloat)0.0,STATUS_UPDATE_INTERVAL,TRUE) ;
+    update_progress_bar((gfloat)0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
 
     sf_close(sndfile_new) ;
 

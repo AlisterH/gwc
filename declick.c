@@ -728,7 +728,7 @@ struct click_data *clicks, int iterate_flag, int leave_click_marks)
     window_size = 801 ;
 
     g_print("Declick_fft first_sample:%ld last_sample:%ld window_size:%d\n", first_sample, last_sample, window_size) ;
-    update_status_bar(0.0,STATUS_UPDATE_INTERVAL,TRUE) ;
+    update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
 
 
 #ifdef HAVE_FFTW3
@@ -752,7 +752,7 @@ struct click_data *clicks, int iterate_flag, int leave_click_marks)
 	}
 
 	double percentage = (double)(window_first-first_sample)/(double)(last_sample-first_sample) ;
-	update_status_bar(percentage,STATUS_UPDATE_INTERVAL,FALSE) ;
+	update_progress_bar(percentage,PROGRESS_UPDATE_INTERVAL,FALSE) ;
 
 	for(i=0 ; i < window_size ; i += 2) {
 
@@ -945,7 +945,7 @@ struct click_data *clicks, int iterate_flag, int leave_click_marks)
 /*  	warning(results_buf) ;  */
     }
 
-    update_status_bar(0.0,STATUS_UPDATE_INTERVAL,TRUE) ;
+    update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
 
     return results_buf ;
 }
@@ -996,7 +996,7 @@ struct click_data *clicks, int iterate_flag, int leave_click_marks)
     if (window_step < 1) {window_step = window_size;}
 
     //g_print("Declick first_sample:%ld last_sample:%ld window_size:%d\n", first_sample, last_sample, window_size) ;
-    update_status_bar(0.0,STATUS_UPDATE_INTERVAL,TRUE) ;
+    update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
 
     for(window_first = first_sample ; window_first < last_sample ; window_first += window_step ) {
 	int nclicks_not_repaired_start = clicks->n_clicks ;
@@ -1004,7 +1004,7 @@ struct click_data *clicks, int iterate_flag, int leave_click_marks)
 	int loop_flag = 1 ;
 
 	double percentage = (double)(window_first-first_sample)/(double)(last_sample-first_sample) ;
-	update_status_bar(percentage,STATUS_UPDATE_INTERVAL,FALSE) ;
+	update_progress_bar(percentage,PROGRESS_UPDATE_INTERVAL,FALSE) ;
 
 
 	n_last_pass = INT_MAX;
@@ -1085,7 +1085,7 @@ struct click_data *clicks, int iterate_flag, int leave_click_marks)
 				if(repair == TRUE) {
 				    //g_print("Repairing %s start:%ld end:%ld\n", channel == 0 ? "left" : "right", click_start, click_end) ;
     /*  				push_status_text("Repairing a click") ;  */
-    /*  				update_status_bar(percentage,STATUS_UPDATE_INTERVAL,TRUE) ;  */
+    /*  				update_progress_bar(percentage,PROGRESS_UPDATE_INTERVAL,TRUE) ;  */
 				    result = declick_a_click(p, click_start, click_end, channel+1) ;
 
 				    if(result == SINGULAR_MATRIX) {
@@ -1097,7 +1097,7 @@ struct click_data *clicks, int iterate_flag, int leave_click_marks)
 				    }
 					
     /*  				pop_status_text() ;  */
-    /*  				update_status_bar(percentage,STATUS_UPDATE_INTERVAL,TRUE) ;  */
+    /*  				update_progress_bar(percentage,PROGRESS_UPDATE_INTERVAL,TRUE) ;  */
 				}
 			    } else {
 				result = REPAIR_OOB ;
@@ -1162,7 +1162,7 @@ struct click_data *clicks, int iterate_flag, int leave_click_marks)
 /*  	warning(results_buf) ;  */
     }
 
-    update_status_bar(0.0,STATUS_UPDATE_INTERVAL,TRUE) ;
+    update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
 
     return results_buf ;
 }

@@ -79,7 +79,7 @@ void reverb_audio(struct sound_prefs *p, long first, long last, int channel_mask
     current = first ;
 
     push_status_text("TAP Reverb audio") ;
-    update_status_bar(0.0,STATUS_UPDATE_INTERVAL,TRUE) ;
+    update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
 
     reverb_setup(p->rate, decay, wet_level, dry_level, reverb_method_name) ;
 
@@ -97,7 +97,7 @@ void reverb_audio(struct sound_prefs *p, long first, long last, int channel_mask
 
 	    reverb_process(n, left_out, left, right_out, right) ;
 
-	    update_status_bar(p,STATUS_UPDATE_INTERVAL,FALSE) ;
+	    update_progress_bar(p,PROGRESS_UPDATE_INTERVAL,FALSE) ;
 
 	    if(channel_mask & 0x01) {
 		for(i = 0 ; i < n ; i++) left[i] = left_out[i] ;
@@ -122,7 +122,7 @@ void reverb_audio(struct sound_prefs *p, long first, long last, int channel_mask
 	save_sample_block_data(p) ;
     }
 
-    update_status_bar(0.0,STATUS_UPDATE_INTERVAL,TRUE) ;
+    update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
     pop_status_text() ;
 
     main_redraw(FALSE, TRUE) ;

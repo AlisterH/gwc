@@ -42,7 +42,7 @@ void simple_amplify_audio(struct sound_prefs *p, long first, long last, int chan
     current = first ;
 
     push_status_text("Amplifying audio") ;
-    update_status_bar(0.0,STATUS_UPDATE_INTERVAL,TRUE) ;
+    update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
 
     {
 
@@ -53,7 +53,7 @@ void simple_amplify_audio(struct sound_prefs *p, long first, long last, int chan
 
 	    n = read_wavefile_data(left, right, current, tmplast) ;
 
-	    update_status_bar(p,STATUS_UPDATE_INTERVAL,FALSE) ;
+	    update_progress_bar(p,PROGRESS_UPDATE_INTERVAL,FALSE) ;
 
 	    for(i = 0 ; i < n ; i++) {
 		if(channel_mask & 0x01) {
@@ -81,7 +81,7 @@ void simple_amplify_audio(struct sound_prefs *p, long first, long last, int chan
 	save_sample_block_data(p) ;
     }
 
-    update_status_bar(0.0,STATUS_UPDATE_INTERVAL,TRUE) ;
+    update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
     pop_status_text() ;
 
     main_redraw(FALSE, TRUE) ;
@@ -97,7 +97,7 @@ void amplify_audio(struct sound_prefs *p, long first, long last, int channel_mas
     current = first ;
 
     push_status_text("Amplifying audio") ;
-    update_status_bar(0.0,STATUS_UPDATE_INTERVAL,TRUE) ;
+    update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
 
     {
 
@@ -108,7 +108,7 @@ void amplify_audio(struct sound_prefs *p, long first, long last, int channel_mas
 
 	    n = read_wavefile_data(left, right, current, tmplast) ;
 
-	    update_status_bar(p,STATUS_UPDATE_INTERVAL,FALSE) ;
+	    update_progress_bar(p,PROGRESS_UPDATE_INTERVAL,FALSE) ;
 
 	    for(i = 0 ; i < n ; i++) {
 		long icurrent = current + i ;
@@ -158,7 +158,7 @@ void amplify_audio(struct sound_prefs *p, long first, long last, int channel_mas
 	save_sample_block_data(p) ;
     }
 
-    update_status_bar(0.0,STATUS_UPDATE_INTERVAL,TRUE) ;
+    update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
     pop_status_text() ;
 
     main_redraw(FALSE, TRUE) ;

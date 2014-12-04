@@ -225,15 +225,15 @@ void rescan_sample_buffer(struct sound_prefs *p)
     n_blocks += (p->n_samples - n_blocks*SBW > 0 ? 1 : 0) ;
 
     push_status_text("Scanning audio for display information") ;
-    update_status_bar(0.0,STATUS_UPDATE_INTERVAL,TRUE) ;
+    update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
 
     for(current_block = 0 ; current_block < n_blocks ; current_block++) {
 	struct sample_block *sb = &sample_buffer[current_block] ;
-	update_status_bar((gfloat)current_block/(gfloat)n_blocks,STATUS_UPDATE_INTERVAL,FALSE) ;
+	update_progress_bar((gfloat)current_block/(gfloat)n_blocks,PROGRESS_UPDATE_INTERVAL,FALSE) ;
 	stat_sample_block(sb, p, current_block) ;
     }
     save_sample_block_data(p) ;
-    update_status_bar(0.0,STATUS_UPDATE_INTERVAL,TRUE) ;
+    update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
     pop_status_text() ;
 }
 

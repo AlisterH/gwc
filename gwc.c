@@ -129,7 +129,7 @@ gint window_width = 800;
 gint window_height = 580;
 gboolean window_maximised;
 
-gint doing_statusbar_update = FALSE;
+gint doing_progressbar_update = FALSE;
 
 DENOISE_DATA denoise_data = { 0, 0, 0, 0, FALSE };
 
@@ -1880,7 +1880,7 @@ void about(GtkWidget *window)
 
 void main_redraw(int cursor_flag, int redraw_data)
 {
-    if (doing_statusbar_update == TRUE)
+    if (doing_progressbar_update == TRUE)
 	return;
 
     if (file_is_open == TRUE)
@@ -2529,7 +2529,7 @@ GtkStatusbar *status_bar;
 GtkWidget *progress_bar;
 guint status_message, push_message;
 
-void update_status_bar(gfloat percentage, gfloat min_delta,
+void update_progress_bar(gfloat percentage, gfloat min_delta,
 		   gboolean init_flag)
 {
 #ifdef BY_DATA_LENGTH
@@ -2537,10 +2537,10 @@ void update_status_bar(gfloat percentage, gfloat min_delta,
 
     if (percentage - last_percentage_displayed > min_delta
 	|| init_flag == TRUE) {
-	doing_statusbar_update = TRUE;
+	doing_progressbar_update = TRUE;
 	gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR(progress_bar), percentage);
 	gnome_flush();
-	doing_statusbar_update = FALSE;
+	doing_progressbar_update = FALSE;
 	last_percentage_displayed = percentage;
     }
 #else
@@ -2557,10 +2557,10 @@ void update_status_bar(gfloat percentage, gfloat min_delta,
 							tv_usec) / 1000;
 
     if (delta_ms > 1000 * min_delta || init_flag == TRUE) {
-	doing_statusbar_update = TRUE;
+	doing_progressbar_update = TRUE;
 	gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR(progress_bar), percentage);
 	gnome_flush();
-	doing_statusbar_update = FALSE;
+	doing_progressbar_update = FALSE;
 	last_displayed = this;
     }
     #endif

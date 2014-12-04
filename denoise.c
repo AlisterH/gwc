@@ -785,7 +785,7 @@ int denoise(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs, long noi
     current = first_sample ;
 
     push_status_text("Denoising audio") ;
-    update_status_bar(0.0,STATUS_UPDATE_INTERVAL,TRUE) ;
+    update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
 
 #ifdef HAVE_FFTW3
     pFor =
@@ -855,7 +855,7 @@ int denoise(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs, long noi
 	    // This usleep fixes a segfault on OS X.  Rob Frohne
 	    usleep(2);
 #endif
-	    update_status_bar(p,STATUS_UPDATE_INTERVAL,FALSE) ;
+	    update_progress_bar(p,PROGRESS_UPDATE_INTERVAL,FALSE) ;
 
 	    /*
 	    */
@@ -936,7 +936,7 @@ int denoise(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs, long noi
 
     audio_normalize(1) ;
 
-    update_status_bar(0.0,STATUS_UPDATE_INTERVAL,TRUE) ;
+    update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
 
     pop_status_text() ;
 
