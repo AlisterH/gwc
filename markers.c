@@ -393,6 +393,7 @@ int _add_song_marker(long loc)
    int i,j;
 
    if (num_song_markers >= MAX_MARKERS - 1) {
+      // This should probably be shown in a dialog instead of the status bar
       set_status_text("No more song markers available");
       return 0 ;
    } else {
@@ -667,6 +668,7 @@ void mark_songs(GtkWidget * widget, gpointer data)
 		int loc = (i + (last_silence - min_silence_blocks)) / 2 * sample_buffer[i].n_samples;
 		song_markers[num_song_markers++] = (loc / SONG_BLOCK_LEN) * SONG_BLOCK_LEN;
 		if (num_song_markers >= MAX_MARKERS - 2)
+		   //Should probably inform the user in this case
 		   break;
                 last_song_block = i;
 	     }

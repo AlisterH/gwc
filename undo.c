@@ -327,6 +327,7 @@ int undo(struct view *v, struct sound_prefs *p)
 
     update_progress_bar(0.0, PROGRESS_UPDATE_INTERVAL, TRUE) ;
     pop_status_text();
+    set_status_text("Undo done.");
 
     return undo_level ;
 }

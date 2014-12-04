@@ -714,7 +714,7 @@ void declick_with_sensitivity(double sensitivity)
     }
 
     pop_status_text();
-    push_status_text(result_msg);
+    set_status_text(result_msg);
 
     if (repair_clicks == TRUE) {
 	close_undo();
@@ -995,6 +995,7 @@ void cut_callback(GtkWidget * widget, gpointer data)
             } else {
                 file_processing = TRUE;
                 audioedit_cut_selection(&audio_view);
+		set_status_text("Cut done.");
                 main_redraw(FALSE, TRUE);
                 file_processing = FALSE;
             }
@@ -1023,6 +1024,7 @@ void paste_callback(GtkWidget * widget, gpointer data)
             if (audioedit_has_clipdata()) {
                 file_processing = TRUE;
                 audioedit_paste_selection(&audio_view);
+		set_status_text("Paste done.");
                 main_redraw(FALSE, TRUE);
                 file_processing = FALSE;
             } else {
@@ -1045,6 +1047,7 @@ void delete_callback(GtkWidget * widget, gpointer data)
             } else {
                 file_processing = TRUE;
                 audioedit_delete_selection(&audio_view);
+		set_status_text("Delete done.");
                 main_redraw(FALSE, TRUE);
                 file_processing = FALSE;
             }
@@ -1061,6 +1064,7 @@ void silence_callback(GtkWidget * widget, gpointer data)
 	    if(!yesno("Insert silence can take a long time, continue?")) {
 		file_processing = TRUE;
 		audioedit_insert_silence(&audio_view);
+		set_status_text("Silence done.");
 		main_redraw(FALSE, TRUE);
 		file_processing = FALSE;
 	    }
@@ -1364,7 +1368,7 @@ void pinknoise_cb(GtkWidget * widget, gpointer data)
 		pinknoise(&prefs, first, last,
 			      audio_view.channel_selection_mask);
 		save_sample_block_data(&prefs);
-		set_status_text("Amplify done.");
+		set_status_text("Pink Noise done.");
 	    }
 	    main_redraw(FALSE, TRUE);
 	}
