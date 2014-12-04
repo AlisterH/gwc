@@ -2525,9 +2525,9 @@ static const char *ui_description =
   { "FullScreen", NULL, "_Full Screen", "F11", "Switch between full screen and windowed mode", full_screen_action_callback, FALSE }
 };*/
 
-GtkWidget *status_bar;
+GtkStatusbar *status_bar;
+guint status_message, push_message;
 
-//temporarily disable status bar
 void update_status_bar(gfloat percentage, gfloat min_delta,
 		   gboolean init_flag)
 {
@@ -2565,19 +2565,115 @@ void update_status_bar(gfloat percentage, gfloat min_delta,
     #endif*/
 }
 
+// Show "tooltips" in the statusbar for menu items
+static void on_menu_item_selected(GtkItem *proxy)
+{
+    guint id = gtk_statusbar_get_context_id(status_bar, "MenuItemHints");
+    gchar *hint;
+    g_object_get(gtk_widget_get_action(GTK_WIDGET(proxy)), "tooltip", &hint, NULL);
+    gtk_statusbar_push(status_bar, id, hint);
+    g_free(hint);
+}
+
+static void on_menu_item_deselected(GtkItem *item)
+{
+    guint id = gtk_statusbar_get_context_id(status_bar, "MenuItemHints");
+    gtk_statusbar_pop(status_bar, id);
+}
+
+// Also show "labels" in statusbar for toolbar items
+static gboolean on_tool_item_enter_event (GtkAction *action)
+{
+    guint id = gtk_statusbar_get_context_id(status_bar, "ToolItemHints");
+    const gchar *tooltip = gtk_action_get_label (action);
+    gtk_statusbar_push (status_bar, id, tooltip);
+    // don't prevent the normal gtk handlers from being invoked for the event.
+    return FALSE;
+}
+
+static gboolean on_tool_item_leave_event (GtkWidget *tool_item)
+{
+    guint id = gtk_statusbar_get_context_id(status_bar, "ToolItemHints");
+    gtk_statusbar_pop (status_bar, id);
+    // don't prevent the normal gtk handlers from being invoked for the event.
+    return FALSE;
+}
+
+// Set up callback functions to do the menu hints in the statusbar
+// Code adapted from mousepad
+static void ui_manager_connect_proxy (  GtkUIManager *ui_manager,
+					GtkAction *action,
+					GtkWidget *proxy )
+{
+  g_return_if_fail (GTK_IS_ACTION (action));
+  g_return_if_fail (GTK_IS_UI_MANAGER (ui_manager));
+
+  if (GTK_IS_MENU_ITEM (proxy))
+    {
+      /* menu item's don't work with gdk window events */
+      g_signal_connect (proxy, "select", G_CALLBACK (on_menu_item_selected), NULL);
+      g_signal_connect (proxy, "deselect", G_CALLBACK (on_menu_item_deselected), NULL);
+    }
+  else if (GTK_IS_TOOL_ITEM (proxy))
+    {
+      GtkWidget *child;
+
+      /* tool items will have GtkButton or other widgets in them, we want the child */
+      child = gtk_bin_get_child (GTK_BIN (proxy));
+
+      /* get events for mouse enter/leave and focus in/out */
+      gtk_widget_add_events (child, GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK);
+
+      /* connect to signals for the events */
+      g_signal_connect_swapped (child, "enter-notify-event", G_CALLBACK (on_tool_item_enter_event), action);
+      g_signal_connect (child, "leave-notify-event", G_CALLBACK (on_tool_item_leave_event), NULL);
+    }
+}
+
+// Do we actually need this?
+static void ui_manager_disconnect_proxy ( GtkUIManager *ui_manager,
+					  GtkAction *action,
+					  GtkWidget *proxy )
+{
+  g_return_if_fail (GTK_IS_ACTION (action));
+  g_return_if_fail (GTK_IS_MENU_ITEM (proxy) || GTK_IS_TOOL_ITEM (proxy));
+  g_return_if_fail (GTK_IS_UI_MANAGER (ui_manager));
+
+  if (GTK_IS_MENU_ITEM (proxy))
+    {
+      /* disconnect from the select/deselect signals */
+      g_signal_handlers_disconnect_by_func (proxy, on_menu_item_selected, NULL);
+      g_signal_handlers_disconnect_by_func (proxy, on_menu_item_deselected, NULL);
+    }
+  else if (GTK_IS_TOOL_ITEM (proxy))
+    {
+      GtkWidget *child;
+
+      /* tool items will have GtkButton or other widgets in them, we want the child */
+      child = gtk_bin_get_child (GTK_BIN (proxy));
+
+      /* disconnect from the gdk window event signals */
+      g_signal_handlers_disconnect_by_func (child, on_tool_item_enter_event, NULL);
+      g_signal_handlers_disconnect_by_func (child, on_tool_item_leave_event, NULL);
+    }
+}
+
 void set_status_text(gchar * msg)
 {
-//    gnome_appbar_set_status(GNOME_APPBAR(status_bar), msg);
+    gtk_statusbar_pop (status_bar, status_message);
+    gtk_statusbar_push (status_bar, status_message, msg);
 }
 
 void push_status_text(gchar * msg)
 {
-//    gnome_appbar_push(GNOME_APPBAR(status_bar), msg);
+    gtk_statusbar_push (status_bar, push_message, msg);
+//    push_values = g_list_prepend (push_values, GUINT_TO_POINTER (value));
 }
 
 void pop_status_text(void)
 {
-//    gnome_appbar_pop(GNOME_APPBAR(status_bar));
+    gtk_statusbar_pop (status_bar, push_message);
+//    push_values = g_list_remove_link (push_values, push_values);
 }
 
 /* Create a new backing pixmap of the appropriate size */
@@ -3048,6 +3144,13 @@ int main(int argc, char *argv[])
 
     ui_manager = gtk_ui_manager_new ();
 
+    // Set up the signals to do the menu hints in the statusbar
+    g_signal_connect (ui_manager, "connect-proxy",
+                      G_CALLBACK (ui_manager_connect_proxy), NULL);
+    // Do we actually need this?
+    g_signal_connect (ui_manager, "disconnect-proxy",
+                      G_CALLBACK (ui_manager_disconnect_proxy), NULL);
+
     action_group = gtk_action_group_new ("MenuActions");
     gtk_action_group_add_actions (action_group, entries, 
 				  G_N_ELEMENTS (entries), main_window);
@@ -3097,8 +3200,12 @@ int main(int argc, char *argv[])
 */
 
     {
-	/* setup appbar (bottom of window bar for status, menu hints and
-	 * progress display) */
+	/* setup status bar at bottom of window */
+	status_bar = GTK_STATUSBAR(gtk_statusbar_new ());
+	status_message = gtk_statusbar_get_context_id (
+			status_bar, "status-message");
+	push_message = gtk_statusbar_get_context_id (
+			status_bar, "push-message");
 	//status_bar = gnome_appbar_new(TRUE, TRUE, GNOME_PREFERENCES_USER);
 	//gnome_app_set_statusbar(GNOME_APP(main_window), status_bar);
 
@@ -3174,6 +3281,7 @@ int main(int argc, char *argv[])
     gtk_box_pack_start(GTK_BOX(bottom_hbox), times_vbox, TRUE, TRUE, 0);
 
     gtk_box_pack_start(GTK_BOX(main_vbox), bottom_hbox, FALSE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(main_vbox), GTK_WIDGET(status_bar), FALSE, TRUE, 0);
 
     {
 	detect_only_box = gtk_hbox_new(FALSE, 10);

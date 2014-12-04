@@ -189,6 +189,7 @@ typedef struct {
 void print_denoise(char *header, struct denoise_prefs *pDnprefs) ;
 
 GtkWidget *main_window;
+
 GtkWidget *add_number_entry_with_label(char *entry_text, char *label_text, GtkWidget *table, int row) ;
 GtkWidget *add_number_entry_with_label_int(int value, char *label_text, GtkWidget *table, int row) ;
 GtkWidget *add_number_entry_with_label_double(double value, char *label_text, GtkWidget *table, int row) ;
