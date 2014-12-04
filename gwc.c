@@ -3028,7 +3028,7 @@ void batch(int argc, char **argv)
 int main(int argc, char *argv[])
 {
     GtkWidget *main_vbox, *menubar, *toolbar,
-	*led_vbox, *led_sub_vbox, *track_times_vbox, *times_vbox, 
+	*led_vbox, *track_times_vbox, *times_vbox, 
 	*bottom_hbox, *detect_only_box, *leave_click_marks_box;
     GtkActionGroup *action_group;
     GtkUIManager *ui_manager;
@@ -3139,7 +3139,6 @@ int main(int argc, char *argv[])
     track_times_vbox = gtk_vbox_new(FALSE, 1);
     times_vbox = gtk_vbox_new(FALSE, 1);
     led_vbox = gtk_vbox_new(FALSE, 1);
-    led_sub_vbox = gtk_vbox_new(TRUE, 1);
     bottom_hbox = gtk_hbox_new(FALSE, 1);
     gtk_container_add (GTK_CONTAINER (main_window), main_vbox);
 
