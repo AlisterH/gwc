@@ -1,5 +1,5 @@
 /*
- * $Id: gtkledbar.h,v 1.1.1.1 2002/09/08 04:03:51 welty Exp $
+ * $Id$
  * GTKEXT - Extensions to The GIMP Toolkit
  * Copyright (C) 1998 Gregory McLean
  *
@@ -24,39 +24,39 @@
 #define __GTKLEDBAR_H__
 
 #include <gdk/gdk.h>
+#include <gtk/gtkvbox.h>
 #include "gtkled.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+G_BEGIN_DECLS
 
-#define LEDBAR(obj)          GTK_CHECK_CAST (obj, led_bar_get_type (), LedBar)
-#define LEDBAR_CLASS(klass)  GTK_CHECK_CLASS_CAST (klass, led_bar_get_type (), LedBarClass)
-#define IS_LEDBAR(obj)       GTK_CHECK_TYPE (obj, led_bar_get_type ())
+#define LED_BAR_TYPE (led_bar_get_type ())
+#define LEDBAR(obj)          G_TYPE_CHECK_INSTANCE_CAST ((obj), LED_BAR_TYPE, LedBar)
+#define LEDBAR_CLASS(klass)  G_TYPE_CHECK_CLASS_CAST ((klass), LED_BAR_TYPE (), LedBarClass)
+#define IS_LEDBAR(obj)       G_TYPE_CHECK_INSTANCE_TYPE ((obj), LED_BAR_TYPE)
 
-#define MAX_SEGMENTS         40
+#define MAX_SEGMENTS         20
 
 typedef struct _LedBar       LedBar;
 typedef struct _LedBarClass  LedBarClass;
 
 struct _LedBar
 {
-  GtkVBox   vbox;
-
-  GtkWidget *segments[MAX_SEGMENTS];
-  gint      num_segments;         /* How many segmanets in this bar */
-  gint      lit_segments;         /* last segment that is lit */
-  gint      seq_segment;          /* which led in the sequence we are at */
-  gint      seq_dir;              /* direction */
-  gint      orientation;          /* horizontal (0), or vertical (1) */
+	GtkVBox   vbox;
+	
+	GtkWidget *segments[MAX_SEGMENTS];
+	gint      num_segments;         /* How many segmanets in this bar */
+	gint      lit_segments;         /* last segment that is lit */
+	gint      seq_segment;          /* which led in the sequence we are at */
+	gint      seq_dir;              /* direction */
+	gint      orientation;          /* horizontal (0), or vertical (1) */
 };
 
 struct _LedBarClass
 {
-  GtkVBoxClass   parent_class;
+	GtkVBoxClass   parent_class;
 };
 
-guint         led_bar_get_type            (void);
+GType         led_bar_get_type            (void);
 GtkWidget*    led_bar_new                 (gint       segments,
 					   gint       orientation);
 gint          led_bar_get_num_segments    (GtkWidget  *bar);
@@ -73,9 +73,7 @@ void          led_bar_light_percent       (GtkWidget  *bar,
 void          led_bar_sequence_step       (GtkWidget  *bar);
 void          led_bar_clear               (GtkWidget  *bar);
 
-#ifdef __cplusplus
-}
-#endif
+G_END_DECLS
 
 #endif
 

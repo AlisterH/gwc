@@ -23,18 +23,14 @@
 
 
 #include <gdk/gdk.h>
-#include <gtk/gtk.h>
+#include <gtk/gtkmisc.h>
 
+G_BEGIN_DECLS
 
-#ifdef __cplusplus
-extern "C" {
-#pragma }
-#endif /* __cplusplus */
-
-
-#define GTK_LED(obj)	      (GTK_CHECK_CAST (obj, gtk_led_get_type (), GtkLed))
-#define GTK_LED_CLASS(klass)  (GTK_CHECK_CLASS_CAST (klass, gtk_led_get_type (), GtkLedClass))
-#define GTK_IS_LED(obj)	      (GTK_CHECK_TYPE (obj, gtk_led_get_type ()))
+#define GTK_LED_TYPE (gtk_led_get_type ())
+#define GTK_LED(obj)	      (G_TYPE_CHECK_INSTANCE_CAST ((obj), GTK_LED_TYPE, GtkLed))
+#define GTK_LED_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), GTK_LED_TYPE, GtkLedClass))
+#define GTK_IS_LED(obj)	      (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GTK_LED_TYPE))
 
 
 typedef struct _GtkLed	     GtkLed;
@@ -49,6 +45,7 @@ struct _GtkLed
   GdkGC    *gc;
 
   guint is_on;
+  gint width, height;
 };
 
 struct _GtkLedClass
@@ -57,7 +54,7 @@ struct _GtkLedClass
 };
 
 
-GtkType	   gtk_led_get_type    (void);
+GType	   gtk_led_get_type    (void);
 GtkWidget* gtk_led_new	       (void);
 void	   gtk_led_set_state   (GtkLed			*led,
 				GtkStateType		widget_state,
@@ -69,14 +66,6 @@ void       gtk_led_set_colors  (GtkLed                  *led,
 				GdkColor                *active,
 				GdkColor                *inactive);
 
-
-
-
-
-#ifdef __cplusplus
-#pragma {
-}
-#endif /* __cplusplus */
-
+G_END_DECLS
 
 #endif /* __GTK_LED_H__ */
