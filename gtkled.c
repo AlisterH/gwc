@@ -29,7 +29,7 @@
 /* these define initial width and height of the LED */
 #define	LED_WIDTH	(10)
 #define	LED_HEIGHT	(5)
-#define	BOTTOM_SPACE	(2)
+#define	BOTTOM_SPACE	(0)
 
 static void gtk_led_finalize (GObject *object);
 static void gtk_led_size_request (GtkWidget *widget,
