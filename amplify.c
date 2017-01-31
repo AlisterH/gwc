@@ -177,6 +177,10 @@ int amplify_dialog(struct sound_prefs current, struct view *v)
     int dres ;
     char buf[200] ;
 
+/*      Alister: everything using gtkcurve has been commented out since gwc-0.20-09 and it appears prior to that  */
+/*      the implementation was never actually completed i.e. the widget worked, but it didn't do anything except  */
+/*      print values to stdout.                                                                                   */
+
 /*      GtkWidget *curve ;  */
 /*      gfloat curve_data[20] ;  */
 
