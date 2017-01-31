@@ -17,7 +17,7 @@
 *******************************************************************************/
 
 /* fmtheaders.h */
-/* This is not an orginal file, it was copied from the gramofile application */
+/* This is not an original file, it was copied from the gramofile application */
 
 #ifndef _FMTHEADERS_H
 #define _FMTHEADERS_H	1
@@ -98,7 +98,7 @@ typedef struct wavhead {
   u_short	bit_p_spl;	/* 8, 12 or 16 bit */ 
 
   u_long	data_chunk;	/* 'data' */
-  u_long	data_length;	/* samplecount (lenth of rest of block?)*/
+  u_long	data_length;	/* samplecount (length of rest of block?)*/
 } wavhead;
 
 #endif

@@ -141,7 +141,7 @@ void config_audio_device(int rate_set, int bits_set, int stereo_set)
 
     bits_set = 16 ;
     /* play everything as 16 bit, signed integers */
-    /* using the appropriate endiannes */
+    /* using the appropriate endianness */
 
 #if __BYTE_ORDER == __BIG_ENDIAN
     format_set = GWC_S16_BE ;
@@ -334,7 +334,7 @@ void truncate_wavfile(struct view *v)
 {
 #define REALLY_TRUNCATE
 #ifndef REALLY_TRUNCATE
-    warning("Truncation temporailty disabled, while incorporating libsndfile...") ;
+    warning("Truncation temporarily disabled, while incorporating libsndfile...") ;
 #else
     /* we must do 3 things:
 	1. Shift all samples forward by v->truncate_head
@@ -600,7 +600,7 @@ struct sound_prefs open_wavefile(char *filename, struct view *v)
 {
     struct sound_prefs wfh ;
 
-    /* initialize all wfh structure members to defaults.  Will be overwritten on succesful file open */
+    /* initialize all wfh structure members to defaults.  Will be overwritten on successful file open */
     wfh.rate = 44100 ;
     wfh.n_channels = 2 ;
     wfh.stereo = 1 ;

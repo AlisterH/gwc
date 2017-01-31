@@ -1233,7 +1233,7 @@ void start_gwc_playback(GtkWidget * widget, gpointer data)
 	playback_samples_per_block = start_playback(audio_device, &audio_view, &prefs, 0.10, 0.25);
 
 	if(playback_samples_per_block < 1)
-	    return ; // an error occured
+	    return ; // an error occurred
 
 	audio_playback = TRUE;
 	audio_debug_print("playback_samples_per_block=%ld\n", playback_samples_per_block) ;

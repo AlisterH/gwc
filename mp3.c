@@ -427,8 +427,8 @@ static size_t sox_mp3write(sox_format_t * ft, const sox_sample_t *buf, size_t sa
 
     if (ft->signal.channels == 2)
     {
-        /* lame doesn't support iterleaved samples so we must break
-         * them out into seperate buffers.
+        /* lame doesn't support interleaved samples so we must break
+         * them out into separate buffers.
          */
         buffer_r = lsx_malloc(nsamples* sizeof(short signed int));
         j=0;

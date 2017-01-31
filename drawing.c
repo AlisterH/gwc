@@ -176,7 +176,7 @@ struct click_data *clicks = &click_data ;
 #if 0
 #define AtoS(a,max_a,channel,ch) (long)(a*1000*view_scale)*(long)((ch-16)/4)/((max_a)*1000) + (long)((ch-16)/4) + (long)(channel)*ch/2+8
 #endif
-/* Put 8 spaces in middle for seperator bar and prevent one channel from
+/* Put 8 spaces in middle for separator bar and prevent one channel from
    running over into the other */
 #define AtoS(a,max_a,channel,ch) (MAX(0,MIN(ch/2-5,lrint(((a)*view_scale/(max_a)+1.0)*(ch-9)/4.0))) + channel*(ch/2+4))
 

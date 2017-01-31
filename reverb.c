@@ -114,7 +114,7 @@ void reverb_audio(struct sound_prefs *p, long first, long last, int channel_mask
 	    if(last - current < 10) loops++ ;
 
 	    if(loops > 5) {
-		warning("inifinite loop in reverb_audio, programming error\n") ;
+		warning("infinite loop in reverb_audio, programming error\n") ;
 	    }
 	}
 

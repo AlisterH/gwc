@@ -1305,7 +1305,7 @@ void denoise_set_preferences(GtkWidget * widget, gpointer data)
 
     GtkWidget *noise_method_window_list;
 
-    gchar *noise_method_window_titles[] = { "Noise Suppresion Method" };
+    gchar *noise_method_window_titles[] = { "Noise Suppression Method" };
     gchar *noise_method_window_parms[6][1] = {
 						{"Weiner"},
 						{"Power Spectral Subtraction"},

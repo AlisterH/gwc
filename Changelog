@@ -45,14 +45,14 @@ NEW: Alpha code -- pulse audio audio driver by default
 0.21-11
 BUGFIX: Amplify had a bug when only amplifying a single channel.
 NEW: Alpha code -- trying to read MP3's and OGG file types.
-NEW: Experimental -- defining click detector in terms of decibles rather than the previous unintuitive values
+NEW: Experimental -- defining click detector in terms of decibels rather than the previous unintuitive values
 NEW: Ifdefs for DENOISE_TRY_ONE_SAMPLE.  Generally a horrendously bad idea to denoise using a window width of 1.
 EXPERIMENTAL: Started playing around with code to restore harmonic content on very old recordings (aka harmonic exciters...)
 *Many* improvements from Michael Gruhn follow:
 ---
 BUGFIX: disallow closing while file is being processed (preventing segfault)
 BUGFIX: long filenames handled better
-BUGFIX: removed some buffer overruns in sprintfs and probably aboided somemore
+BUGFIX: removed some buffer overruns in sprintfs and probably avoided some more
 BUGFIX: disallow closing while processing in batch mode (preventing segfault)
 BUGFIX: return EXIT_SUCCESS on success instead of 1 for better batch integration
 NEW: allow selection of hpf declick for batch processing
@@ -94,7 +94,7 @@ BUGFIX: In audio_util.c, make sure n_samples is > 1 when on audio file open.
 BUGFIX: Make install was not installing the help files in the proper place
 CODE:   Manual declick shortcut changed from CTRL-A to ALT-A (to avoid conflict with select all)
 CODE:   When exiting, or closing audio file, user can committed changes, undo changes or cancel.
-CODE:   shortcut "a" now appends to cdrdao toc file only the selected region, not everthing between all markers.
+CODE:   shortcut "a" now appends to cdrdao toc file only the selected region, not everything between all markers.
 NEW:    Incorporated tap_reverb algorithm, uses internally stored settings if external ~/.reverbed is not found
 NEW:	Added many functions to batch capability
 
@@ -170,7 +170,7 @@ CODE: Expanding the main window vertically now only expands the audio view, not 
 0.20-08
 Dec 14, 2004
 BUGFIX: Increased stack limit to 6 megabytes, some denoising ops needed this or they would segfault
-BUGFIX: Undo skip,save,cancel dialog windo was not destroyed properly
+BUGFIX: Undo skip,save,cancel dialog window was not destroyed properly
 BUGFIX: Declick would try to declick outside the current selection window
 CODE: Using an updated meschach library from http://www.math.uiowa.edu/~dstewart/meschach/
 CODE: Attempting to stop playback without generating artificial "clicks" by gracefully closing audio device.
@@ -179,12 +179,12 @@ CODE: Insert silence asks for confirmation
 
 0.20-07
 August 2, 2004
-BUGFIX: Declicking errors via meschach singular matricies could generate too many errors, now fixed. (stat.c)
+BUGFIX: Declicking errors via meschach singular matrices could generate too many errors, now fixed. (stat.c)
 BUGFIX: Warning message about fftw libs not found clarified to indicate fftw 3.x libs not found
 
 0.20-06
 August 2, 2004
-BUGFIX: Fixed configure.in to work properly with gnome2 developement libs (removed old GNOME_INIT stuff).
+BUGFIX: Fixed configure.in to work properly with gnome2 development libs (removed old GNOME_INIT stuff).
 CODE: Fixed warning messages in default typecast in markers.c
 
 0.20-05
@@ -387,7 +387,7 @@ BUGFIX: Markers were previously reset to -1, selecting near the start of song wo
 ----
 April 10, 2002
 BUGFIX: Save selection to same file as current file would core dump, this is now disallowed.
-BUGFIX: The Lorber-Hoeldrich noise reduction method had an error, fixed.  No perceptable difference in sound output.
+BUGFIX: The Lorber-Hoeldrich noise reduction method had an error, fixed.  No perceptible difference in sound output.
 NEW: Ephraim and Malah's noise suppression method (1984) was added.
 NEW: configure now works with fft libs for Suse-linux
 
@@ -405,6 +405,6 @@ BUGFIX: Fixed buffering problem with audio on playback systems with heavy loads.
 0.06-1
 ------
 
-NEW:  Can now have the declicking algorithm only identifiy clicks, not repair them
+NEW:  Can now have the declicking algorithm only identify clicks, not repair them
 NEW:  Hitting the "s" key, stops playback, and highlights the last 1/2 second of audio played
 NEW:  GWC remembers the last directory where a wavfile was opened from.

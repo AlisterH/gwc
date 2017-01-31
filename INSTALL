@@ -1,3 +1,7 @@
+---
+The README now includes instructions to install.  Can we delete this file now?
+---
+
 Issue the command:
 
 "make install"

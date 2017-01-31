@@ -8,7 +8,7 @@ Sped up declick
 
 Sped up save and restore of undo.  Also added progress bar and saved channel_selection_mask
 
-Changed scaling to use *= and /= so scaling woudn't go negative
+Changed scaling to use *= and /= so scaling wouldn't go negative
 
 Changed drawing waveform to look at all samples for pixel to give better
 display of amplitudes for your pseudo max.  I might prefer a true max so you
@@ -25,9 +25,9 @@ bar change not limiting end to number of samples
 Some changes to menus.  Added marker options, right aligned field labels
 
 Fixed some drawing where you zoomed in and coordinates overflowed short so
-things would draw in the wrong location (gint is actuall treated as short)
+things would draw in the wrong location (gint is actually treated as short)
 
-Changed AtoS to agree with the screen which was drawn with one seperator
+Changed AtoS to agree with the screen which was drawn with one separator
 down the middle instead of two unused areas at the top.  Also made it so
 it clipped to the two drawing areas so top waveform wouldn't leak into bottom.
 

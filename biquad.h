@@ -37,8 +37,8 @@ typedef double smp_type;
 /* this holds the data required to update samples thru a filter */
 typedef struct {
     smp_type a0, a1, a2, a3, a4;
-    smp_type can_a0, can_a1, can_a2 ; /* cannonical a0,a1,a2 */
-    smp_type can_b0, can_b1, can_b2 ; /* cannonical b0,b1,b2 */
+    smp_type can_a0, can_a1, can_a2 ; /* canonical a0,a1,a2 */
+    smp_type can_b0, can_b1, can_b2 ; /* canonical b0,b1,b2 */
     smp_type x1, x2, y1, y2;
 }
 biquad;

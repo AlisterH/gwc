@@ -271,7 +271,7 @@ extern biquad *BiQuad_new(int type, smp_type dbGain, /* gain of filter */
 	    if(last - current < 10) loops++ ;
 
 	    if(loops > 5) {
-		warning("inifinite loop in filter_audio, programming error\n") ;
+		warning("infinite loop in filter_audio, programming error\n") ;
 	    }
 	}
 
@@ -560,7 +560,7 @@ smp_type srate, smp_type bandwidth)
     }
 
 
-    /* the cannonical coefficients */
+    /* the canonical coefficients */
     b->can_a0 = a0 ;
     b->can_a1 = a1 ;
     b->can_a2 = a2 ;

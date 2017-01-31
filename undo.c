@@ -111,7 +111,7 @@ int save_undo_data(long first_sample, long last_sample, struct sound_prefs *p, i
 	ret = gtk_dialog_run(GTK_DIALOG(dialog));
 	gtk_widget_destroy(dialog) ;
 
-	if( ret!= 2) { /* Dont save undo */
+	if( ret!= 2) { /* Don't save undo */
 	    undo_level-- ;
 	    close(undo_fd) ;
 	    undo_fd = -1 ;

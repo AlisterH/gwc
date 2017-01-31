@@ -16,14 +16,14 @@ Help does not really explain that GWC commits all changes to the original
 file instantly, and undo saves the deltas needed to get back, so on
 exit all your changes are saved.  (Perhaps all that is really required
 is a "Save changes" on exit, and then if the answer is no execute all
-the undo's).
+the undos).
 
 "Save Selection As" does not save the current view, it requires a selection...
 
 FEATURE SUGGESTIONS (in order of implementation) :
 --------------------------------------------------
 
-Method to play from a arbitary point - i.e. play from current marker
+Method to play from a arbitrary point - i.e. play from current marker
 
 FEATURES THAT WOULD BE HARDER TO IMPLEMENT( but still good ideas :-)
 --------------------------------------------------------------------
@@ -31,7 +31,7 @@ Scroll when selecting
 
 Remember the last 3 files edited, and show them in the file drop-down menu for easier opening
 
-Put de-click itterator on main screen?
+Put de-click iterator on main screen?
 
 LADSPA-ize the filters. (Not possible)
 

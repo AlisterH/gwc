@@ -73,7 +73,7 @@ void simple_amplify_audio(struct sound_prefs *p, long first, long last, int chan
 	    if(last - current < 10) loops++ ;
 
 	    if(loops > 5) {
-		warning("inifinite loop in amplify_audio, programming error\n") ;
+		warning("infinite loop in amplify_audio, programming error\n") ;
 	    }
 	}
 
@@ -150,7 +150,7 @@ void amplify_audio(struct sound_prefs *p, long first, long last, int channel_mas
 	    if(last - current < 10) loops++ ;
 
 	    if(loops > 5) {
-		warning("inifinite loop in amplify_audio, programming error\n") ;
+		warning("infinite loop in amplify_audio, programming error\n") ;
 	    }
 	}
 
