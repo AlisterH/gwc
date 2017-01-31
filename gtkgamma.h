@@ -68,7 +68,7 @@ struct _GtkGammaCurveClass
 };
 
 
-guint      gtk_gamma_curve_get_type (void);
+GtkType    gtk_gamma_curve_get_type (void);
 GtkWidget* gtk_gamma_curve_new      (void);
 
 

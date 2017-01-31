@@ -190,10 +190,10 @@ static char *xpm[][27] =
     }
   };
 
-guint
+GtkType
 gtk_gamma_curve_get_type (void)
 {
-  static guint gamma_curve_type = 0;
+  static GtkType gamma_curve_type = 0;
 
   if (!gamma_curve_type)
     {

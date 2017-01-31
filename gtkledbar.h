@@ -56,7 +56,7 @@ struct _LedBarClass
   GtkVBoxClass   parent_class;
 };
 
-guint         led_bar_get_type            (void);
+GtkType       led_bar_get_type            (void);
 GtkWidget*    led_bar_new                 (gint       segments,
 					   gint       orientation);
 gint          led_bar_get_num_segments    (GtkWidget  *bar);
