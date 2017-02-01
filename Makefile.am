@@ -80,6 +80,8 @@ meschach.a : meschach/meschach.a
 	cp meschach/meschach.a .
 
 meschach/meschach.a :
+# Alister: a very old message on the mailing list seemed to imply that --with-sparse is necessary to build successfully,
+#          but this doesn't actually seem to be the case now
 	(cd meschach ; ./configure --with-sparse ; make part1 ; make part2 ; make part3 ; cp machine.h ..)
 
 clean :
