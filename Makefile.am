@@ -49,7 +49,7 @@ EFENCE =
 
 all : gwc
 
-gwc : $(OBJS) meschach.a
+gwc : meschach.a $(OBJS)
 	$(CC) $(OBJS) $(EFENCE) $(LDFLAGS) $(LIBS) -o gwc
 
 audio_device.o : audio_device.c audio_alsa.c audio_oss.c audio_osx.c audio_pa.c Makefile
