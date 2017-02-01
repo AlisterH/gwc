@@ -1,5 +1,5 @@
-#include "matrix.h"
-#include "matrix2.h"
+#include "meschach/matrix.h"
+#include "meschach/matrix2.h"
 
 int estimate_reg(double *) ;
 void init_reg(int) ;
