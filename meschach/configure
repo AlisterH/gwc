@@ -357,24 +357,28 @@ rm -f conftest*
 fi
 rm -f conftest*
 
-echo checking for complex.h
-cat > conftest.c <<EOF
-#include <complex.h>
-EOF
-err=`eval "($CPP \$DEFS conftest.c >/dev/null) 2>&1"`
-if test -z "$err"; then
-  {
-test -n "$verbose" && \
-echo '	defining' HAVE_COMPLEX_H
-DEFS="$DEFS -DHAVE_COMPLEX_H=1"
-SEDDEFS="${SEDDEFS}\${SEDdA}HAVE_COMPLEX_H\${SEDdB}HAVE_COMPLEX_H\${SEDdC}1\${SEDdD}
-\${SEDuA}HAVE_COMPLEX_H\${SEDuB}HAVE_COMPLEX_H\${SEDuC}1\${SEDuD}
-\${SEDeA}HAVE_COMPLEX_H\${SEDeB}HAVE_COMPLEX_H\${SEDeC}1\${SEDeD}
-"
-}
-
-fi
-rm -f conftest*
+# No no no no no!  Meschach does NOT support complex.h,
+# which uses a completely different definition of complex numbers
+# and has a different meaning for keyword "complex"!  Drew Parsons, 2001.
+#
+# echo checking for complex.h
+# cat > conftest.c <<EOF
+# #include <complex.h>
+# EOF
+# err=`eval "($CPP \$DEFS conftest.c >/dev/null) 2>&1"`
+# if test -z "$err"; then
+#   {
+# test -n "$verbose" && \
+# echo '	defining' HAVE_COMPLEX_H
+# DEFS="$DEFS -DHAVE_COMPLEX_H=1"
+# SEDDEFS="${SEDDEFS}\${SEDdA}HAVE_COMPLEX_H\${SEDdB}HAVE_COMPLEX_H\${SEDdC}1\${SEDdD}
+# \${SEDuA}HAVE_COMPLEX_H\${SEDuB}HAVE_COMPLEX_H\${SEDuC}1\${SEDuD}
+# \${SEDeA}HAVE_COMPLEX_H\${SEDeB}HAVE_COMPLEX_H\${SEDeC}1\${SEDeD}
+# "
+# }
+# 
+# fi
+# rm -f conftest*
 
 echo checking for malloc.h
 cat > conftest.c <<EOF
