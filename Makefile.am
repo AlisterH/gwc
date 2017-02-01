@@ -83,5 +83,5 @@ meschach/meschach.a :
 	(cd meschach ; ./configure --with-sparse ; make part1 ; make part2 ; make part3 ; cp machine.h ..)
 
 clean :
-	rm -f gwc *.o core meschach.a meschach/meschach.a
+	rm -f gwc *.o core meschach.a meschach/meschach.a machine.h
 	(cd meschach ; make realclean)
