@@ -1,6 +1,19 @@
 dnl Meschach autoconf script
 dnl Copyright (C) Brook Milligan and David Stewart, 1993, 2002
 dnl $Id: configure.in,v 1.3 1994/03/08 05:41:32 des Exp $
+
+dnl Alister 2017.02.01 
+dnl WARNING: if I try to regenerate configure using this I get a broken configure script.
+dnl
+dnl It may be an option to replace our meschach with the newer Debian version.
+dnl I could not get Debian's patch to apply!  But I tried it from here instead, and autoconf -f works, although autoreconf still does not:
+dnl https://github.com/JuliaParallel/rodinia
+dnl It is in the "common" folder.
+dnl
+dnl Note if we wanted to use an external meschach library, there is also a version ported to cmake at:
+dnl https://github.com/yageek/Meschach
+dnl This one actually builds the entire library successfully!
+
 dnl
 dnl I want to use this to see if the compiler can be made ANSI C compatible
 dnl AC_PROG_CC_STDC
@@ -29,7 +42,8 @@ dnl ----------------------------------------------------------------------
 AC_INIT(err.c)
 AC_CONFIG_HEADER(machine.h)
 PROGS=""
-AC_SUBST(PROGS)dnl
+AC_SUBST(PROGS)
+dnl
 LOCAL_PROG_ACC
 AC_PROGRAM_CHECK(CC, cc, cc, gcc)
 AC_PROG_CC
@@ -77,14 +91,14 @@ AC_TRY_COMPILE([u_int],[#include <stdio.h>
 echo 'computing machine epsilon(s)'
 echo $CC -o macheps dmacheps.c
 $CC -o macheps dmacheps.c
-AC_DEFINE_UNQUOTED(D_MACHEPS,`macheps`)
+AC_DEFINE_UNQUOTED(D_MACHEPS,`./macheps`)
 echo $CC -o macheps fmacheps.c
 $CC -o macheps fmacheps.c
-AC_DEFINE_UNQUOTED(F_MACHEPS,`macheps`)
+AC_DEFINE_UNQUOTED(F_MACHEPS,`./macheps`)
 echo computing M_MAX_INT
 echo $CC -o maxint maxint.c
 $CC -o maxint maxint.c
-AC_DEFINE_UNQUOTED(M_MAX_INT,`maxint`)
+AC_DEFINE_UNQUOTED(M_MAX_INT,`./maxint`)
 echo checking char '\\0' vs. float zeros
 AC_PROGRAM_EGREP(yes,[main() {
     char	*cp = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
