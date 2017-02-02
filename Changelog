@@ -1,4 +1,24 @@
 GWC Changelog
+0.22
+[unreleased]
+This release is by Alister Hood.  Jeff Welty has advised via email that he has not used GWC for several years and does not have time currently to look at any issues with it.
+A summary of the changes is below.  For full details of the changes please refer to the git commit log at https://github.com/AlisterH/gwc
+Patches or pull requests are of course encouraged!
+
+BUGFIX: apply Debian patch to prevent crash on x86_64.
+BUGFIX: apply Debian patch to build successfully if using clang.
+BUGFIX: solve various problems with ogg and mp3 encoding.
+CODE: reimplemented the gui to use plain gtk2, removing the dependencies on obsolete Gnome libraries.  This also fixes a number of minor gui bugs and modernises things like file choosers.
+CODE: various other gui bugfixes and improvements.
+CODE: support for gtk-can-change-accels = 1 (in ~/.gtkrc-2.0).
+CODE: follow more standards for where we install files.
+CODE: various fixes to the build system, including actually installing to --prefix.
+CODE: general cleanup including removing duplicated or unnecessary files, fixing typos etc.
+DOC: remove the old help manual in favour of the quickstart guide.
+KNOWN ISSUE: GWC fails to open wav files with metadata, such as those created by recent versions of ffmpeg. GWC will produce an error like this: "Failed to open /root/whistle.wav, 'Error : Cannot open file in read/write mode due to string data in header.'".  Libsndfile does not support RDWR mode for these files - one workaround is to open and save the file in mhwaveedit.
+NOTE: the location of the config file has changed - typically it was ~/.gnome2/gnome_wave_cleaner and is now ~/.config/gnome-wave-cleaner/gwc.conf
+The format has not changed so users are able to move an old file to the new location.
+
 0.21-19
 Feb 2,2013
 BUGFIX: warning on opening audio device incorrectly displayed pulse audio message when neither alsa or pulse audio was being used
@@ -394,7 +414,6 @@ NEW: configure now works with fft libs for Suse-linux
 0.07
 ----
 April 1, 2002
-
 NEW: Created gwc.spec file for generation of binary rpm
 BUGFIX: Fixed bug in declick, unrepaired clicks now appear highlighted in red
 
@@ -404,7 +423,6 @@ BUGFIX: Fixed buffering problem with audio on playback systems with heavy loads.
 
 0.06-1
 ------
-
 NEW:  Can now have the declicking algorithm only identify clicks, not repair them
 NEW:  Hitting the "s" key, stops playback, and highlights the last 1/2 second of audio played
 NEW:  GWC remembers the last directory where a wavfile was opened from.
