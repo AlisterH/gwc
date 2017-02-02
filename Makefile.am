@@ -1,3 +1,15 @@
+# Alister: there are issues with the way this is all set up.
+# 1. It is too complicated - we aren't letting autotools do enough for us.
+# 2. Make does not recognise if header files have changed and rebuild the necessary objects.
+# 3. We haven't properly integrated meschach.  Make here doesn't recognise if any of meschach's header or source files have changed, and autoconf or autoreconf here doesn't touch it. (also see note in meschach/configure - neither autoconf nor building in meschach actually works in our version).
+# 4. `make dist` needs to be told to include all of the header and source files, as we haven't specified them as gwc_SOURCES.
+# 5. `make clean` errors trying to clean the meschach directory if `make` has not been run :)
+
+# Note if we contemplate updating meschach or using an external meschach library we need to check what Jeff did to our version:
+# - Jeff said he fixed a bad memory leak (I *think* this is also fixed in the debian version).
+# - Jeff made a change to err.c, which I have commented
+# - Anything else?
+
 prefix = @prefix@
 exec_prefix = @exec_prefix@
 
@@ -31,6 +43,17 @@ LIBS= meschach.a @GTK_LIBS@ @SNDFILE_LIBS@ @ALSALIB@ @PALIB@ @FFTWLIB@ @OGGLIB@ 
 
 SRC = tap_reverb_file_io.c tap_reverb.c reverb.c dialog.c gwc.c audio_device.c audio_edit.c audio_util.c gtkled.c gtkledbar.c preferences.c drawing.c amplify.c denoise.c undo.c declick.c sample_block.c decrackle.c stat.c dethunk.c i0.c i1.c chbevl.c markers.c encode.c soundfile.c pinknoise.c biquad.c
 OBJS = $(SRC:.c=.o)
+# Alister: We should be able to avoid most of this - see item 3 and 4 in the comment at the top
+# Alister: leave out meschach/configure.in, as it makes a broken configure, and someone may try to use it!
+EXTRA_DIST = $(SRC) gwc-logo.png icons Changelog doc ar.c audio_osx.c audio_pa.c audio_oss.c audio_alsa.c \
+ar.h audio_device.h audio_edit.h biquad.h encoding.h fmtheaders.h gtkled.h gtkledbar.h gwc.h mconf.h mp3.h mp3-duration.h reverb_settings.h soundfile.h stat.h tap_reverb.h tap_reverb_common.h tap_reverb_file_io.h \
+meschach/DOC meschach/MACHINES meschach/arnoldi.c meschach/bdfactor.c meschach/bkpfacto.c meschach/chfactor.c meschach/config.cache meschach/configure meschach/conjgrad.c meschach/copy.c meschach/copyright meschach/dmacheps.c meschach/err.c meschach/err.h \
+meschach/extras.c meschach/fft.c meschach/FILELIST meschach/fmacheps.c meschach/givens.c meschach/hessen.c meschach/hsehldr.c meschach/init.c meschach/iotort.c meschach/iter.h meschach/iter0.c meschach/iternsym.c meschach/itersym.c meschach/itertort.c meschach/ivecop.c meschach/lanczos.c \
+meschach/ls.dat meschach/lufactor.c meschach/machine.c meschach/machine.h.in meschach/makefile.in meschach/matlab.c meschach/matlab.h meschach/matop.c meschach/matrix.h meschach/matrix2.h meschach/matrixio.c meschach/maxint.c meschach/meminfo.c meschach/meminfo.h meschach/memory.c meschach/memstat.c \
+meschach/memtort.c meschach/mfunc.c meschach/mfuntort.c meschach/norm.c meschach/oldnames.h meschach/otherio.c meschach/pxop.c meschach/qrfactor.c meschach/README meschach/rk4.dat meschach/schur.c meschach/solve.c meschach/sparse.c meschach/sparse.h meschach/sparse2.h meschach/sparseio.c \
+meschach/spbkp.c meschach/spchfctr.c meschach/splufctr.c meschach/sprow.c meschach/spswap.c meschach/sptort.c meschach/submat.c meschach/svd.c meschach/symmeig.c meschach/tags meschach/torture.c meschach/tutadv.c meschach/tutorial.c meschach/update.c meschach/vecop.c meschach/version.c \
+meschach/zcopy.c meschach/zfunc.c meschach/zgivens.c meschach/zhessen.c meschach/zhsehldr.c meschach/zlufctr.c meschach/zmachine.c meschach/zmatio.c meschach/zmatlab.c meschach/zmatop.c meschach/zmatrix.h meschach/zmatrix2.h meschach/zmemory.c meschach/znorm.c meschach/zqrfctr.c meschach/zschur.c \
+meschach/zsolve.c meschach/ztorture.c meschach/zvecop.c
 
 BINFILES = gwc
 dist_bin_SCRIPTS = gwcbatch.pl
