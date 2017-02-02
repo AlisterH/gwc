@@ -1942,7 +1942,7 @@ void open_wave_filename(void)
     
     l = strlen(wave_filename);
 
-    // Should also really reject wav files that we can't work with (e.g. mono recordings), or fix it so they do work! 
+    // Should also really reject wav files that we can't work with, or fix it so they do work! 
     if (is_valid_audio_file(wave_filename)) {
 	tmp_prefs = open_wavefile((char *) wave_filename, &audio_view);
 	if (tmp_prefs.successful_open) {
