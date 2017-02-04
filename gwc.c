@@ -2571,19 +2571,28 @@ void update_progress_bar(gfloat percentage, gfloat min_delta,
 }
 
 // Show "tooltips" in the statusbar for menu items
-static void on_menu_item_selected(GtkItem *proxy)
+static void on_menu_item_selected(GtkItem *item)
 {
     guint id = gtk_statusbar_get_context_id(status_bar, "MenuItemHints");
     gchar *hint;
-    g_object_get(gtk_widget_get_action(GTK_WIDGET(proxy)), "tooltip", &hint, NULL);
-    gtk_statusbar_push(status_bar, id, hint);
-    g_free(hint);
+    g_object_get(gtk_widget_get_action(GTK_WIDGET(item)), "tooltip", &hint, NULL);
+
+    if (hint) {
+        gtk_statusbar_push(status_bar, id, hint);
+        g_free(hint);
+    }
 }
 
 static void on_menu_item_deselected(GtkItem *item)
 {
     guint id = gtk_statusbar_get_context_id(status_bar, "MenuItemHints");
-    gtk_statusbar_pop(status_bar, id);
+    gchar *hint;
+    g_object_get(gtk_widget_get_action(GTK_WIDGET(item)), "tooltip", &hint, NULL);
+
+    if (hint) {
+		gtk_statusbar_pop(status_bar, id);
+        g_free(hint);
+    }
 }
 
 // Also show "labels" in statusbar for toolbar items
