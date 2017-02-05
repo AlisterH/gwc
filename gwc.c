@@ -118,7 +118,7 @@ gint encoding_type = GWC_OGG;
 extern double spectral_amp;
 
 #ifdef HAVE_ALSA
-char audio_device[256]="hw:0,0";
+char audio_device[256]="default";
 #else
 char audio_device[256]="/dev/dsp";
 #endif
