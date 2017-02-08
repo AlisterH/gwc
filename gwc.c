@@ -2113,9 +2113,59 @@ void open_file_selection(GtkWidget * widget, gpointer data)
 				      pathname);
 
 	ff = gtk_file_filter_new();
-	gtk_file_filter_set_name(ff,"Wave files");
+	gtk_file_filter_set_name(ff,"Known extensions");
+	// I think we could borrow code from mhwaveedit which gets the list of formats from libsndfile, 
+	// but I don't think it would tell us all the extensions, and we'd need to make it only tell us
+	// formats which support rdwr
+	//
+	// We could also borrow the dialog from mhwaveedit which allows you to open a raw audio file,
+	// And it would also be good to be able to load raw audio specifying its format from the command line
 	gtk_file_filter_add_pattern(ff,"*.wav");
+	gtk_file_filter_add_pattern(ff,"*.aiff");
+	gtk_file_filter_add_pattern(ff,"*.aif");
+	// when I try to create this format it actually seems the same as aiff, so not sure if we really do support it.
+	gtk_file_filter_add_pattern(ff,"*.aifc");
+	gtk_file_filter_add_pattern(ff,"*.au");
+	gtk_file_filter_add_pattern(ff,"*.snd");
+	gtk_file_filter_add_pattern(ff,"*.avr");
+	gtk_file_filter_add_pattern(ff,"*.caf");
+	gtk_file_filter_add_pattern(ff,"*.htk");
+	gtk_file_filter_add_pattern(ff,"*.iff");
+	gtk_file_filter_add_pattern(ff,"*.mat");
+	gtk_file_filter_add_pattern(ff,"*.mpc");
+	gtk_file_filter_add_pattern(ff,"*.paf");
+	gtk_file_filter_add_pattern(ff,"*.pvf");
+	gtk_file_filter_add_pattern(ff,"*.rf64");
+	gtk_file_filter_add_pattern(ff,"*.sd2");
+	gtk_file_filter_add_pattern(ff,"*.sds");
+	gtk_file_filter_add_pattern(ff,"*.sf");
+	gtk_file_filter_add_pattern(ff,"*.voc");
+	gtk_file_filter_add_pattern(ff,"*.w64");
+	gtk_file_filter_add_pattern(ff,"*.wve");
 	gtk_file_filter_add_pattern(ff,"*.WAV");
+	gtk_file_filter_add_pattern(ff,"*.AIFF");
+	gtk_file_filter_add_pattern(ff,"*.AIF");
+	gtk_file_filter_add_pattern(ff,"*.AIFC");
+	gtk_file_filter_add_pattern(ff,"*.AU");
+	gtk_file_filter_add_pattern(ff,"*.SND");
+	gtk_file_filter_add_pattern(ff,"*.AVR");
+	gtk_file_filter_add_pattern(ff,"*.CAF");
+	gtk_file_filter_add_pattern(ff,"*.HTK");
+	gtk_file_filter_add_pattern(ff,"*.IFF");
+	gtk_file_filter_add_pattern(ff,"*.MAT");
+	gtk_file_filter_add_pattern(ff,"*.MPC");
+	// note that this format seems to be broken when written by ffmpeg, but mhwaveedit is OK
+	gtk_file_filter_add_pattern(ff,"*.PAF");
+	gtk_file_filter_add_pattern(ff,"*.PVF");
+	gtk_file_filter_add_pattern(ff,"*.RF64");
+	gtk_file_filter_add_pattern(ff,"*.SD2");
+	gtk_file_filter_add_pattern(ff,"*.SDS");
+	gtk_file_filter_add_pattern(ff,"*.SF");
+	// note that this format seems to be broken when written by ffmpeg, but mhwaveedit is OK
+	gtk_file_filter_add_pattern(ff,"*.VOC");
+	gtk_file_filter_add_pattern(ff,"*.W64");
+	// note that this format seems to be broken when written by mhwaveedit, but sox is OK
+	gtk_file_filter_add_pattern(ff,"*.WVE");
 	gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(file_selector),ff);
   
 	ffa = gtk_file_filter_new();
