@@ -40,25 +40,22 @@ while (@ARGV)
 	@keep = map {&time2sec($_)} @keep;
 	@noise = map {&time2sec($_)} @noise;
 	
+	# back up the file first.
+	print `cp $file $archive`;
+	
+	# Now declick and remove noise
+	print `gwc $file batch declick $sens $keep[0] $keep[1]`;
+	# Add extra declicking runs if you want them
+	#print `gwc $file batch declick $sens $keep[0] $keep[1]`;
+	print `gwc $file batch denoise $noise[0] $noise[1] $keep[0] $keep[1]`;
+
+	# truncate after cleaning in case the noise sample is from the region to truncate
 	# for some reason, it *sometimes* hangs when truncating
 	# both front and back, so do back first, then front
 	print `gwc $file batch truncate 0 $keep[1]`;
 	print `gwc $file batch truncate $keep[0] $keep[1]`;
 	
-	# back up the file after truncating, but before
-	# doing irreversible operations.
-	print `cp $file $archive`;
-	
-	# now have to shift noise sample and endpoint by $keep[0]
-	# since we shifted everything over
-	$keep[1] = &time2sec($keep[1]) - &time2sec($keep[0]);
-	$noise[0] = &time2sec($noise[0]) - &time2sec($keep[0]);
-	$noise[1] = &time2sec($noise[1]) - &time2sec($keep[0]);
-	
-	# Now declick and remove noise
-	print `gwc $file batch declick $sens 0 $keep[1]`;
-	print `gwc $file batch declick $sens 0 $keep[1]`;
-	print `gwc $file batch denoise $noise[0] $noise[1] 0 $keep[1]`;
+	# normalize last so it isn't affected by anything we are discarding
 	print `gwc $file batch normalize`;
 }
 
@@ -156,11 +153,7 @@ This script will do the following:
 
 =item *
 
-truncate the wav file, keeping only musicStart - musicEnd
-
-=item *
-
-copy the truncated file for archival purposes
+copy the file for archival purposes
 
 =item *
 
@@ -169,11 +162,13 @@ declick using declickSens for the sensitivity
 =item *
 
 denoise using the noise sample specified in noiseStart- noiseEnd
-B<NOTE:> noiseStart & noiseEnd are relative to the untruncated wav.
-gwcbatch.pl shifts these values by musicStart so that they refer to
-the same sample area after the truncation
 
 =item *
+
+truncate the wav file, keeping only musicStart - musicEnd
+
+=item *
+
 normalize the audio; amplify as much as possible without
 clipping.
 
