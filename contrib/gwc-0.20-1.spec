@@ -1,8 +1,7 @@
 #
 # SPEC file for Gnome Wave Cleaner
 #
-%define gwc_version 0.19
-%define gwc_subversion 9
+%define gwc_version 0.22
 
 Name: gwc
 Summary: Gnome Wave Cleaner -- audio restoration application
@@ -28,7 +27,7 @@ and declicking algorithms.
 
 %prep
 rm -rf $RPM_BUILD_ROOT
-%setup -n %{name}-%{gwc_version}-%{gwc_subversion}
+%setup -n %{name}-%{gwc_version}
 
 %build
 ./configure --prefix=%{_prefix} --bindir=%{_bindir} --datadir=%{_datadir}
