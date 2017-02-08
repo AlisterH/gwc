@@ -48,8 +48,8 @@
 #endif
 
 #define GWC_VERSION_MAJOR 0
-#define GWC_VERSION_MINOR 21
-#define VERSION "0.21-19"
+#define GWC_VERSION_MINOR 22
+#define VERSION "0.22"
 #define GWC_POINT_HANDLE 0x01
 #define SBW  128	/* Sample Block Width, the number of audio samples summarized in one block  */
 #define PROGRESS_UPDATE_INTERVAL 0.5	/* update status bar every 1/2  second on long edit operations */
