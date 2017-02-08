@@ -15,7 +15,7 @@ CODE: follow more standards for where we install files.
 CODE: various fixes to the build system, including actually installing to --prefix.
 CODE: general cleanup including removing duplicated or unnecessary files, fixing typos etc.
 DOC: remove the old help manual in favour of the quickstart guide.
-KNOWN ISSUE: GWC fails to open wav files with metadata, such as those created by recent versions of ffmpeg. GWC will produce an error like this: "Failed to open /root/whistle.wav, 'Error : Cannot open file in read/write mode due to string data in header.'".  Libsndfile does not support RDWR mode for these files - one workaround is to open and save the file in mhwaveedit.
+KNOWN ISSUE: GWC fails to open wav files with metadata, such as those created by recent versions of ffmpeg. GWC will produce an error like this: "Failed to open /root/whistle.wav, 'Error : Cannot open file in read/write mode due to string data in header.'".  Libsndfile does not support RDWR mode for these files - one workaround is to open and save the file in mhwaveedit. Or if you are creating the files using ffmpeg try adding "-flags bitexact" into your command line (although this will reduce ffmpeg's performance), or writing to a different libsndfile supported format such as au or aiff. 
 NOTE: the location of the config file has changed - typically it was ~/.gnome2/gnome_wave_cleaner and is now ~/.config/gnome-wave-cleaner/gwc.conf
 The format has not changed so users are able to move an old file to the new location.
 
