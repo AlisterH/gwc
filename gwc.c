@@ -1844,16 +1844,18 @@ gint delete_event(GtkWidget * widget, GdkEvent * event, gpointer data)
 		warning("Can't quit while in batch mode. (Will automatically close.)");
 		return TRUE;
 	}
-	if(cleanup_and_close(&audio_view, &prefs))
-		gtk_main_quit();
-		return FALSE;
+	if(!cleanup_and_close(&audio_view, &prefs)) 
+		return TRUE;
+	gtk_main_quit();
+	return FALSE;
 		
 }
 
-/* need to fix this - it sometimes crashes if you click outside the about dialog:
+/* need to fix this - it sometimes (still?) crashes if you click outside the about dialog:
 Floating point exception
 
 Also don't know why it won't open the website link!
+EDIT - it does, at least on some systems
 */
 void about(GtkWidget *window)
 {
