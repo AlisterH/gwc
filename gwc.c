@@ -172,8 +172,9 @@ void usage(char *prog)
 %s <file> <batch[s] declick-hpf sensitivity start_position stop_position>\n\
 %s <file> <batch[s] amplify amount start_position stop_position>\n\
 %s <file> <batch[s] denoise sample_start sample_end denoise_start denoise_end>\n\
+%s <file> <batch[s] normalize>\n\
 %s <file> <batch[s] dsp start_position stop_position>\n\
-%s <file> <batch[s] dsp start_position stop_position>\n\
+%s <file> <batch[s] reverb start_position stop_position>\n\
 %s <file> <batch[s] truncate keep_start keep_end>\n\
 Position are in hh:mm:ss for batch or in samples for batchs. Stop_position can \
 also be end to denote the stop_position being the end of file.\n",
