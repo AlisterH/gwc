@@ -1882,6 +1882,7 @@ void about(GtkWidget *window)
 				    "comments", "An application to aid in denoising (hiss & clicks) of audio files",
 				    "authors", authors,
 				    NULL);
+	// Note I think we'd have to refactor a bit to make this dialog modal in GTK2
 }
 
 void main_redraw(int cursor_flag, int redraw_data)
@@ -2166,8 +2167,14 @@ void open_file_selection(GtkWidget * widget, gpointer data)
 	gtk_file_filter_add_pattern(ff,"*.W64");
 	// note that this format seems to be broken when written by mhwaveedit, but sox is OK
 	gtk_file_filter_add_pattern(ff,"*.WVE");
+	// note libsndfile also supports reading and writing FLAC, but does not support rdwr
+	// and it supports reading and writing OGG, but I wasn't able to generate an OGG that it supported!
 	gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(file_selector),ff);
   
+	// Not sure why, but after switching to show all files, when next opened the dialog doesn't
+	// show which filter is selected ???
+	// But if we put this code first it is ALWAYS selected
+	// ???
 	ffa = gtk_file_filter_new();
 	gtk_file_filter_set_name(ffa,"All files");
 	gtk_file_filter_add_pattern(ffa,"*");
