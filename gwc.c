@@ -1426,6 +1426,9 @@ void zoom_select(GtkWidget * widget, gpointer data)
 
 	if(audio_view.selected_first_sample < 0) audio_view.selected_first_sample = 0 ;
 	if(audio_view.selected_last_sample > prefs.n_samples-1) audio_view.selected_last_sample = prefs.n_samples-1 ;
+	// If we don't do this and just left or right channel was selected only it will be cleaned
+	// But that is unexpected since it is no longer visibly selected; even more so if we zoom in or out or pan again
+	audio_view.channel_selection_mask = 3 ;
 
 	audio_view.selection_region = FALSE;
 	set_scroll_bar(prefs.n_samples - 1, audio_view.first_sample,
@@ -1595,6 +1598,10 @@ void view_all(GtkWidget * widget, gpointer data)
 	audio_view.first_sample = 0;
 	audio_view.last_sample = prefs.n_samples - 1;
 	audio_view.selection_region = FALSE;
+	// If we don't do this and just left or right channel was selected only it will be cleaned
+	// But that is unexpected since it is no longer visibly selected
+	// We need to remove it if we implement showing the selection after clicking "View all"
+	audio_view.channel_selection_mask = 3 ;
 	set_scroll_bar(prefs.n_samples - 1, audio_view.first_sample,
 		       audio_view.last_sample);
 	/* set_scroll_bar redraws */
@@ -1974,6 +1981,9 @@ void open_wave_filename(void)
 			MAX(0, audio_view.last_sample);
 		}
 		audio_view.selection_region = FALSE;
+	    // If we don't do this and we had another file open with just left or right channel selected, only that channel will be cleaned
+	    // But that is very unexpected!
+	    audio_view.channel_selection_mask = 3 ;
 		file_is_open = TRUE;
 		fill_sample_buffer(&prefs);
 
