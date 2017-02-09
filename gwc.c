@@ -383,16 +383,10 @@ void load_preferences(void)
     if (g_key_file_has_group(key_file, "config") == TRUE) {
         strcpy(pathname, g_key_file_get_string(key_file, "config", "pathname", NULL));
         strcpy(last_filename, g_key_file_get_string(key_file, "config", "last_filename", NULL));
-        prefs.rate = g_key_file_get_integer(key_file, "config", "rate", NULL);
-        prefs.bits = g_key_file_get_integer(key_file, "config", "bits", NULL);
-        prefs.stereo = g_key_file_get_integer(key_file, "config", "stereo", NULL);
-    audio_view.first_sample =
-    	g_key_file_get_integer(key_file, "config", "first_sample_viewed", NULL);
+        audio_view.first_sample = g_key_file_get_integer(key_file, "config", "first_sample_viewed", NULL);
         audio_view.last_sample = g_key_file_get_integer(key_file, "config", "last_sample_viewed", NULL);
         // What's going on here with num_song_markers?
     num_song_markers = 0;
-    audio_view.channel_selection_mask =
-    	g_key_file_get_integer(key_file, "config", "channel_selection_mask", NULL);
         weak_declick_sensitivity = g_key_file_get_double(key_file, "config", "weak_declick_sensitivity", NULL);
         strong_declick_sensitivity = g_key_file_get_double(key_file, "config", "strong_declick_sensitivity", NULL);
         declick_iterate_flag = g_key_file_get_integer(key_file, "config", "declick_iterate", NULL);
@@ -402,10 +396,8 @@ void load_preferences(void)
         decrackle_level = g_key_file_get_double(key_file, "config", "decrackle_level", NULL);
         decrackle_window = g_key_file_get_integer(key_file, "config", "decrackle_window", NULL);
         decrackle_average = g_key_file_get_integer(key_file, "config", "decrackle_average", NULL);
-    stop_key_highlight_interval =
-    	g_key_file_get_double(key_file, "config", "stop_key_highlight_interval", NULL);
-    song_key_highlight_interval =
-    	g_key_file_get_double(key_file, "config", "song_key_highlight_interval", NULL);
+        stop_key_highlight_interval = g_key_file_get_double(key_file, "config", "stop_key_highlight_interval", NULL);
+        song_key_highlight_interval = g_key_file_get_double(key_file, "config", "song_key_highlight_interval", NULL);
         song_mark_silence = g_key_file_get_double(key_file, "config", "song_mark_silence", NULL);
         sonogram_log = g_key_file_get_double(key_file, "config", "sonogram_log", NULL);
 /*      audio_view.truncate_tail = g_key_file_get_integer(key_file, "config", "truncate_tail", NULL) ;  */
@@ -428,13 +420,8 @@ void save_preferences(void)
 
     g_key_file_set_string(key_file, "config", "pathname", pathname);
     g_key_file_set_string(key_file, "config", "last_filename", last_filename);
-    g_key_file_set_integer(key_file, "config", "rate", prefs.rate);
-    g_key_file_set_integer(key_file, "config", "bits", prefs.bits);
-    g_key_file_set_integer(key_file, "config", "stereo", prefs.stereo);
     g_key_file_set_integer(key_file, "config", "first_sample_viewed", audio_view.first_sample);
     g_key_file_set_integer(key_file, "config", "last_sample_viewed", audio_view.last_sample);
-    g_key_file_set_integer(key_file, "config", "channel_selection_mask",
-			 audio_view.channel_selection_mask);
     g_key_file_set_double(key_file, "config", "weak_declick_sensitivity", weak_declick_sensitivity);
     g_key_file_set_double(key_file, "config", "strong_declick_sensitivity", strong_declick_sensitivity);
     g_key_file_set_integer(key_file, "config", "declick_iterate", declick_iterate_flag);
@@ -444,10 +431,8 @@ void save_preferences(void)
     g_key_file_set_double(key_file, "config", "decrackle_level", decrackle_level);
     g_key_file_set_integer(key_file, "config", "decrackle_window", decrackle_window);
     g_key_file_set_integer(key_file, "config", "decrackle_average", decrackle_average);
-    g_key_file_set_double(key_file, "config", "stop_key_highlight_interval",
-			   stop_key_highlight_interval);
-    g_key_file_set_double(key_file, "config", "song_key_highlight_interval",
-			   song_key_highlight_interval);
+    g_key_file_set_double(key_file, "config", "stop_key_highlight_interval", stop_key_highlight_interval);
+    g_key_file_set_double(key_file, "config", "song_key_highlight_interval", song_key_highlight_interval);
     g_key_file_set_double(key_file, "config", "song_mark_silence", song_mark_silence);
     g_key_file_set_integer(key_file, "config", "sonogram_log", sonogram_log);
     g_key_file_set_string(key_file, "config", "audio_device", audio_device);
