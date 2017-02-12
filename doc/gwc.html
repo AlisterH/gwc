@@ -12,7 +12,7 @@
 <h2> An <i>important</i>  note on GWC editing </h2>
 GWC commits all changes to the original
 file instantly, and saves the deltas needed for undo to get back to the original,
-so on exit all your changes are already saved.  As of version 0.21-06, when you exit (or open a new file) GWC will
+so on exit all your changes are already saved.  When you exit (or open a new file) GWC will
 notify you that changes have been made, and give you the chance to undo them all.
 
 <h1>Creating your wavfiles</h1>
@@ -57,7 +57,7 @@ background noise level for noise elimination.</li>
 
 <ul>
 <li>
-If you try to open a wav file created by software such as a recent ffmpeg, GWC will produce an error like this: "Failed to open /root/whistle.wav, 'Error : Cannot open file in read/write mode due to string data in header.'".  Libsndfile does not support RDWR mode for these files - one workaround is to open and save the file in mhwaveedit.
+If you try to open a wav file created by software such as a recent ffmpeg, GWC will produce an error like this: "Failed to open /root/whistle.wav, 'Error : Cannot open file in read/write mode due to string data in header.'".  Libsndfile does not support RDWR mode for these files - one workaround is to open and save the file in mhwaveedit. Or if you are creating the files using ffmpeg try adding "-flags bitexact" into your command line (although this will reduce ffmpeg's performance), or writing to a different libsndfile supported format such as au or aiff.
 </li>
 </ul>
 
@@ -66,6 +66,7 @@ If you try to open a wav file created by software such as a recent ffmpeg, GWC w
 <li>To select sections of audio for GWC to operate on you click and drag in the displayed audio waveform. </li>
 <p><li>Start dragging anywhere between the centers of the left and right channels to select both channels, or start dragging
 above or below this region to select just one channel.</li>
+<li>If you do not make a selection GWC will operate on all the audio in the current view, but note that <b>if you have clicked in the top or bottom quarter of the waveform it will only operate on the left or right channel</b>.</li>
 <p><li>Use <b>edit markers</b> to help you navigate and select sections of audio.  There are 200 markers available.  
 You set them by using the "B" and "E" keys, and clear them using the "Markers>Clear markers" menu item.
 "B" toggles the first marker at the <em>start</em> of the currently selected region.  "E" toggles the second
@@ -76,6 +77,12 @@ portion, set another marker, and then zoom back out and select the region betwee
 a fine level of control on the precision of the selected region.</li>
 <p><li> You may also press the 'm' key, to automatically select the region between edit markers.  A button and icon are
 in the works...</li>
+</ul>
+</ul>
+
+<h1>Unselecting audio</h1>
+<ul>
+<li>To clear the selection click in the displayed audio waveform without dragging.  Any subsequent cleaning operations will be applied to all the audio in the current view, but note that <b>if you click anywhere between the centers of the left and right channels any subsequent cleaning operations will be applied to both channels; if you click above or below this area they will be applied to only the left or right channel.</b> 
 </ul>
 </ul>
 
