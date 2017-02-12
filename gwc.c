@@ -3280,20 +3280,20 @@ int main(int argc, char *argv[])
 	audio_drawing_area = gtk_drawing_area_new();
 
 	gtk_signal_connect(GTK_OBJECT(audio_drawing_area), "expose_event",
-			   (GtkSignalFunc) audio_expose_event, NULL);
+			   (GCallback) audio_expose_event, NULL);
 	gtk_signal_connect(GTK_OBJECT(audio_drawing_area),
 			   "configure_event",
-			   (GtkSignalFunc) audio_area_configure_event,
+			   (GCallback) audio_area_configure_event,
 			   NULL);
 
 	gtk_signal_connect(GTK_OBJECT(audio_drawing_area),
 			   "button_press_event",
-			   (GtkSignalFunc) audio_area_button_event, NULL);
+			   (GCallback) audio_area_button_event, NULL);
 	gtk_signal_connect(GTK_OBJECT(audio_drawing_area),
 			   "motion_notify_event",
-			   (GtkSignalFunc) audio_area_motion_event, NULL);
+			   (GCallback) audio_area_motion_event, NULL);
     /*          gtk_signal_connect (GTK_OBJECT(audio_drawing_area),"event",  */
-    /*                             (GtkSignalFunc) audio_area_event, NULL);  */
+    /*                             (GCallback) audio_area_event, NULL);  */
 
 	gtk_widget_set_events(audio_drawing_area, GDK_EXPOSURE_MASK
 			      | GDK_LEAVE_NOTIFY_MASK
@@ -3313,10 +3313,10 @@ int main(int argc, char *argv[])
     hscrollbar = gtk_hscrollbar_new(GTK_ADJUSTMENT(scroll_pos));
 
     gtk_signal_connect(GTK_OBJECT(GTK_ADJUSTMENT(scroll_pos)), "changed",
-		       (GtkSignalFunc) scroll_bar_changed, NULL);
+		       (GCallback) scroll_bar_changed, NULL);
 
     gtk_signal_connect(GTK_OBJECT(GTK_ADJUSTMENT(scroll_pos)),
-		       "value_changed", (GtkSignalFunc) scroll_bar_changed,
+		       "value_changed", (GCallback) scroll_bar_changed,
 		       NULL);
 
     gtk_box_pack_start(GTK_BOX(main_vbox), hscrollbar, FALSE, TRUE, 0);
