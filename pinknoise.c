@@ -17,7 +17,7 @@
 *   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 *******************************************************************************/
 
-/* amplify.c */
+/* pinknoise.c */
 #include <stdlib.h>
 #include "gtkledbar.h"
 #include "gwc.h"
@@ -234,7 +234,7 @@ void pinknoise(struct sound_prefs *p, long first, long last, int channel_mask)
 	    if(last - current < 10) loops++ ;
 
 	    if(loops > 5) {
-		warning("infinite loop in amplify_audio, programming error\n") ;
+		warning("infinite loop in pinknoise, programming error\n") ;
 	    }
 	}
 
