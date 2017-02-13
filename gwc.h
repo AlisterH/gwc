@@ -199,6 +199,8 @@ void amplify_audio(struct sound_prefs *p, long first, long last, int channel_mas
 int  amplify_dialog(struct sound_prefs current, struct view *) ;
 int  audio_area_button_event(GtkWidget *c, GdkEventButton *event, gpointer data) ;
 int  audio_area_motion_event(GtkWidget *c, GdkEventMotion *event) ;
+int  _audio_area_button_event(GtkWidget *c, GdkEventButton *event) ;
+int  _audio_area_motion_event(GtkWidget *c, GdkEventMotion *event) ;
 double blackman(int k, int N) ;
 double blackman_hybrid(int k, int n_flat, int N) ;
 int close_undo(void) ;

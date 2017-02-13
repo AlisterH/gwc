@@ -2775,6 +2775,26 @@ static gint audio_area_configure_event(GtkWidget * widget, GdkEventConfigure * e
     return TRUE;
 }
 
+int audio_area_button_event(GtkWidget *c, GdkEventButton *event, gpointer data)
+{
+    if ((file_processing == FALSE) && (file_is_open == TRUE)
+	&& (audio_playback == FALSE) && (cursor_playback == FALSE))
+	{
+		return _audio_area_button_event(c, event);
+	}
+	return FALSE;
+}
+
+int audio_area_motion_event(GtkWidget *c, GdkEventMotion *event)
+{
+    if ((file_processing == FALSE) && (file_is_open == TRUE)
+		&& (audio_playback == FALSE) && (cursor_playback == FALSE))
+    	{
+		return _audio_area_motion_event(c, event);
+	}
+	return FALSE;
+}
+
 /* Redraw the screen from the backing pixmap */
 gint audio_expose_event(GtkWidget * widget, GdkEventExpose * event)
 {

@@ -269,7 +269,7 @@ void draw_compressed_audio_image(struct view *v, struct sound_prefs *p, GtkWidge
 
 extern struct view audio_view ;
 
-int audio_area_button_event(GtkWidget *c, GdkEventButton *event, gpointer data)
+int _audio_area_button_event(GtkWidget *c, GdkEventButton *event)
 {
     /* we ignore all events except for BUTTON_PRESS */
 
@@ -310,7 +310,7 @@ int audio_area_button_event(GtkWidget *c, GdkEventButton *event, gpointer data)
     return FALSE ;
 }
 
-int audio_area_motion_event(GtkWidget *c, GdkEventMotion *event)
+int _audio_area_motion_event(GtkWidget *c, GdkEventMotion *event)
 {
     int x, y ;
     GdkModifierType state ;
