@@ -53,6 +53,7 @@ int start_save_undo(char *undo_msg, struct view *v)
 
     undo_level++ ;
 
+	// we should really save our working files somewhere other than the working directory (which isn't even necessarily the location of the file we are working on), because it may not be writeable.
     sprintf(filename, "gwc_undo_%d.dat", undo_level) ;
 
     if( (undo_fd = open(filename, O_CREAT|O_TRUNC|O_RDWR, S_IRUSR|S_IWUSR)) == -1) {
@@ -97,17 +98,21 @@ int save_undo_data(long first_sample, long last_sample, struct sound_prefs *p, i
 #ifndef TRUNCATE_OLD
     if (undo_type != UNDO_INSERT) {
 #endif
+	//The check seems to be far too low - maybe we should try 100MB?
+	//Note that the same amount of space is needed whether we are operating on both channels or only one.
     if(n_sample*FRAMESIZE > 10000000) {
-	GtkWidget *dialog ;
+	GtkWidget *dialog, *text ;
 	char buf[200] ;
 	int ret ;
 
 	sprintf(buf, "Undo will need %7.2f Mbytes of disk space (skipping undo commits changes to your original audio file)", n_sample*FRAMESIZE/1000000.0) ;
 
-	dialog = gtk_dialog_new_with_buttons(buf, GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT,
+	dialog = gtk_dialog_new_with_buttons("Warning", GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT,
 	   "Cancel edit action", 1, "Save undo data", 2, "Skip undo", 0, NULL) ;
 	gtk_dialog_set_default_response (GTK_DIALOG(dialog), 1);
-
+	text = gtk_label_new(buf);
+    gtk_widget_show(text);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), text, TRUE, TRUE, 0);
 	ret = gtk_dialog_run(GTK_DIALOG(dialog));
 	gtk_widget_destroy(dialog) ;
 
