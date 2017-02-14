@@ -1421,15 +1421,17 @@ void zoom_select(GtkWidget * widget, gpointer data)
 
 void select_all(GtkWidget * widget, gpointer data)
 {
-    if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
-	file_processing = TRUE;
 	audio_view.selected_first_sample = audio_view.first_sample;
 	audio_view.selected_last_sample = audio_view.last_sample;
 	audio_view.selection_region = TRUE;
 	main_redraw(FALSE, TRUE);
-	file_processing = FALSE;
-    }
+}
+
+void select_none(GtkWidget * widget, gpointer data)
+{
+	audio_view.selection_region = FALSE;
+	audio_view.channel_selection_mask = 3 ;
+	main_redraw(FALSE, TRUE);
 }
 
 void select_markers(GtkWidget * widget, gpointer data)
@@ -1755,9 +1757,6 @@ gboolean  key_press_cb(GtkWidget * widget, GdkEventKey * event, gpointer data)
 	case GDK_k:
 	    spectral_amp /= 1.7;
 	    main_redraw(FALSE, TRUE);
-	    break;
-	case GDK_m:
-	    select_markers(widget, data);
 	    break;
 	case GDK_r:
 	    scale_reset_callback(widget, data);
@@ -2439,7 +2438,8 @@ static const GtkActionEntry entries[] = {
   { "ZoomIn", "zoom_in_icon", "Zoom in", NULL, "Zoom in", G_CALLBACK(zoom_in) },
   { "ZoomOut", "zoom_out_icon", "Zoom out", NULL, "Zoom out", G_CALLBACK(zoom_out) },
   { "ViewAll", "view_all_icon", "View all", NULL, "View entire audio file", G_CALLBACK(view_all) },
-  { "SelectAll", "select_all_icon", "Select current view", NULL, "Select everything visible in the window", G_CALLBACK(select_all) },
+  { "SelectAll", "select_all_icon", "Select current view", "<control>A", "Select everything visible in the window", G_CALLBACK(select_all) },
+  { "SelectNone", NULL, "Select none", "Escape", "Clear the selection", G_CALLBACK(select_none) },
   { "Spectral", "spectral_icon", "Spectral view", NULL, "Toggle between waveform view and spectrogram", G_CALLBACK(display_sonogram) },
   { "MarkersMenu", NULL, "_Markers" },
   { "ToggleBegin", NULL, "Toggle beginning marker", "B", "Add or remove an edit marker at the beginning of the highlighted selection (or current view)", G_CALLBACK(toggle_start_marker) },
@@ -2507,6 +2507,7 @@ static const char *ui_description =
 "      <menuitem action='ZoomOut'/>"
 "      <menuitem action='ViewAll'/>"
 "      <menuitem action='SelectAll'/>"
+"      <menuitem action='SelectNone'/>"
 "      <menuitem action='Spectral'/>"
 "    </menu>"
 "    <menu action='MarkersMenu'>"
