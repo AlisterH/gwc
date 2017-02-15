@@ -48,16 +48,23 @@ int get_undo_levels(void)
 
 int start_save_undo(char *undo_msg, struct view *v)
 {
-    char filename[1024] ;
+	// Alister: should really tidy this up
+    char _filename[1024];
     short l ;
 
     undo_level++ ;
 
-	// we should really save our working files somewhere other than the working directory (which isn't even necessarily the location of the file we are working on), because it may not be writeable.
-    sprintf(filename, "gwc_undo_%d.dat", undo_level) ;
+	sprintf(_filename, "gwc_undo_%d.dat", undo_level) ;
+    // Alister: we need to save our working files somewhere other than the working directory (which isn't even necessarily the location of the file we are working on), 
+	// because it may not be writeable, and we need to allow for multiple instances of gwc to run from the same working directory without interfering with each other.
+	gchar *filename = _filename ;
+	if (g_file_test (tmpdir, G_FILE_TEST_IS_DIR)) //tmpdir exists
+		filename = g_build_filename (tmpdir, _filename, NULL);
+    //printf("filename: %s\n", *) ;
 
-    if( (undo_fd = open(filename, O_CREAT|O_TRUNC|O_RDWR, S_IRUSR|S_IWUSR)) == -1) {
-	warning("Can't save undo information") ;
+    
+
+    if( (undo_fd = open(filename, O_CREAT|O_TRUNC|O_RDWR, S_IRUSR|S_IWUSR)) == -1) {	warning("Can't save undo information") ;
 	return -1 ;
     }
 
@@ -98,7 +105,7 @@ int save_undo_data(long first_sample, long last_sample, struct sound_prefs *p, i
 #ifndef TRUNCATE_OLD
     if (undo_type != UNDO_INSERT) {
 #endif
-	//The check seems to be far too low - maybe we should try 100MB?
+	//Alister: the check seems to be far too low - maybe we should try 100MB?
 	//Note that the same amount of space is needed whether we are operating on both channels or only one.
     if(n_sample*FRAMESIZE > 10000000) {
 	GtkWidget *dialog, *text ;
@@ -155,6 +162,7 @@ int save_undo_data(long first_sample, long last_sample, struct sound_prefs *p, i
            end = last_sample;
 	read_raw_wavefile_data(buf, curr, end) ;
 	if (write(undo_fd, buf, FRAMESIZE * (end - curr + 1)) != FRAMESIZE * (end - curr + 1) ) {
+			// Alister: surely we shouldn't just exit.  Could we cancel?
             warning("Error saving undo data (out of disk space?), program will exit");
             exit(1);
         }
@@ -204,7 +212,7 @@ int undo(struct view *v, struct sound_prefs *p)
     int n_sections ;
 #define N_ALLOC_INC 1000
     int n_sections_max = N_ALLOC_INC ;
-    char filename[1024] ;
+    char _filename[1024] ;
     const int BLOCK_SIZE = 1024 ;
     char buf[BLOCK_SIZE * FRAMESIZE] ;
     long blocks ;
@@ -218,7 +226,10 @@ int undo(struct view *v, struct sound_prefs *p)
 	return undo_level ;
     }
 
-    sprintf(filename, "gwc_undo_%d.dat", undo_level) ;
+	sprintf(_filename, "gwc_undo_%d.dat", undo_level) ;
+	gchar *filename = _filename ;
+	if (g_file_test (tmpdir, G_FILE_TEST_IS_DIR)) //tmpdir exists
+		filename = g_build_filename (tmpdir, _filename, NULL);
 
     if( (undo_fd = open(filename, O_RDONLY)) == -1) {
 	warning("Can't undo, undo save data has been deleted from hard drive!") ;
@@ -339,10 +350,13 @@ int undo(struct view *v, struct sound_prefs *p)
 
 void undo_purge(void)
 {
-    char filename[1024] ;
+    char _filename[1024] ;
 
     while(undo_level>0) {
-	sprintf(filename, "gwc_undo_%d.dat", undo_level) ;
+	sprintf(_filename, "gwc_undo_%d.dat", undo_level) ;
+	gchar *filename = _filename ;
+	if (g_file_test (tmpdir, G_FILE_TEST_IS_DIR)) //tmpdir exists
+		filename = g_build_filename (tmpdir, _filename, NULL);
 	unlink(filename) ;
 	undo_level-- ;
     }

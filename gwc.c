@@ -1828,6 +1828,7 @@ gint delete_event(GtkWidget * widget, GdkEvent * event, gpointer data)
 	}
 	if(!cleanup_and_close(&audio_view, &prefs)) 
 		return TRUE;
+	g_remove(tmpdir);
 	gtk_main_quit();
 	return FALSE;
 		
@@ -3154,6 +3155,12 @@ int main(int argc, char *argv[])
 
     #define PREFIX "."
     #define SYSCONFDIR "."
+
+    gchar *newdir = g_build_filename (g_get_user_cache_dir (), "gwcXXXXXX", NULL) ;
+    if (!g_mkdtemp (newdir))
+      g_warning ("Creation of temp dir failed\nFalling back to current working directory.");
+	else
+	tmpdir = newdir;
 
     load_preferences();
     

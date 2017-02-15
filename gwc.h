@@ -185,6 +185,7 @@ typedef struct {
     int ready ;
 } DENOISE_DATA ;
 
+gchar *tmpdir;
 
 void print_denoise(char *header, struct denoise_prefs *pDnprefs) ;
 
