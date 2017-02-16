@@ -1791,7 +1791,14 @@ int cleanup_and_close(struct view *v, struct sound_prefs *p)
 
 	if(r == 1) {
 	    fprintf(stderr, "Undoing all changes\n") ;
-	    while(undo(v, p) > 0) ;
+	    int _p = get_undo_levels() ;
+	    while(undo(v, p) > 0) 
+	    {
+		if ( get_undo_levels() == _p )
+		return 0 ;
+		_p -- ;
+		}
+		;
 	}
     }
 
