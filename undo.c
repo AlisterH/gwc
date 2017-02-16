@@ -162,9 +162,15 @@ int save_undo_data(long first_sample, long last_sample, struct sound_prefs *p, i
            end = last_sample;
 	read_raw_wavefile_data(buf, curr, end) ;
 	if (write(undo_fd, buf, FRAMESIZE * (end - curr + 1)) != FRAMESIZE * (end - curr + 1) ) {
-			// Alister: surely we shouldn't just exit.  Could we cancel?
-            warning("Error saving undo data (out of disk space?), program will exit");
-            exit(1);
+			// Alister: we shouldn't just exit, in case the user has made previous edits successfully, but has now run out of space.
+            //warning("Error saving undo data (out of disk space?), program will exit");
+            //exit(1);
+            
+            // Alister: I *think* doing it this way has no ill effects.
+            // Ideally I guess we could ask if they want to continue without undo data...
+            warning("Error saving undo data (out of disk space?), cancelling edit");
+            undo_level-- ;
+            return 1 ;
         }
     }
 #ifndef TRUNCATE_OLD
