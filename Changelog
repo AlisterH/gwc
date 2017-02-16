@@ -18,6 +18,7 @@ DOC: remove the old help manual in favour of the quickstart guide.
 KNOWN ISSUE: GWC fails to open wav files with metadata, such as those created by recent versions of ffmpeg. GWC will produce an error like this: "Failed to open /root/whistle.wav, 'Error : Cannot open file in read/write mode due to string data in header.'".  Libsndfile does not support RDWR mode for these files - one workaround is to open and save the file in mhwaveedit. Or if you are creating the files using ffmpeg try adding "-flags bitexact" into your command line (although this will reduce ffmpeg's performance), or writing to a different libsndfile supported format such as au or aiff. 
 CHANGED CONFIG FILE: the location has changed - typically it was ~/.gnome2/gnome_wave_cleaner and is now ~/.config/gnome-wave-cleaner/gwc.conf
 The format has not changed so it is possible for you to move an old file to the new location.
+CHANGED BEHAVIOUR: Undo files and clipboard data are now saved in $XDG_CACHE_HOME if possible (rather than the current working directory).  Undo files are saved in unique subdirectories so multiple instances of gwc won't interfere with each other.  The clipboard is shared between all gwc instances unless you override $XDG_CACHE_HOME (or it does not exist).
 
 0.21-19
 Feb 2,2013
