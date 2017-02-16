@@ -3156,11 +3156,22 @@ int main(int argc, char *argv[])
     #define PREFIX "."
     #define SYSCONFDIR "."
 
-    gchar *newdir = g_build_filename (g_get_user_cache_dir (), "gwcXXXXXX", NULL) ;
+    gchar *newdir = g_build_filename (g_get_user_cache_dir (), "gwcXXXXXX", NULL) ; 
+	gchar *_CLIPBOARD_FILE = "gwc_intclip.dat" ;
     if (!g_mkdtemp (newdir))
       g_warning ("Creation of temp dir failed\nFalling back to current working directory.");
+      // note: assume if we can't create a folder for our undo files we probably can't create a clipboard file there either
 	else
-	tmpdir = newdir;
+	{
+	  tmpdir = newdir;
+	  // don't put the clipboard in tmpdir - this way we can share it between multiple instances of gwc
+	  // note there are problems if we try to paste incompatible audio e.g. mono vs stereo
+	  // and should we have some sort of locking so multiple instances don't try to write it at the same time?
+	  // also note there is a problem with undo (perhaps only with mono?)
+	  _CLIPBOARD_FILE = g_build_filename (g_get_user_cache_dir (), "gwc_intclip.dat", NULL) ;
+	}
+	CLIPBOARD_FILE = _CLIPBOARD_FILE ;
+	//printf("CLIPBOARD_FILE: %s\n", CLIPBOARD_FILE) ;
 
     load_preferences();
     

@@ -186,6 +186,7 @@ typedef struct {
 } DENOISE_DATA ;
 
 gchar *tmpdir;
+gchar *CLIPBOARD_FILE ;
 
 void print_denoise(char *header, struct denoise_prefs *pDnprefs) ;
 

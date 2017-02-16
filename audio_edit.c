@@ -28,8 +28,6 @@
 
 extern struct sound_prefs prefs;
 
-#define CLIPBOARD_FILE "gwc_intclip.dat"
-
 static void adjust_view(struct view *v)
 {
     prefs.n_samples = soundfile_count_samples();
