@@ -3015,7 +3015,7 @@ void batch(int argc, char **argv)
 	    pop_status_text() ;
 	}
     }
-    else if(!strcasecmp(argv[3], "normalize")) {
+    else if(!strcasecmp(argv[3], "normalize") || !strcasecmp(argv[3], "normalise")) {
 	g_print("Normalize audiofile\n");
 	batch_normalize(&prefs,0,prefs.n_samples-1,prefs.n_channels > 1 ? 0x03 : 0x01);
     }
@@ -3104,6 +3104,9 @@ void batch(int argc, char **argv)
     #endif
 	}
     }
+    else
+	usage(argv[0]);
+
 
     cleanup_and_close(&audio_view, &prefs);
 
