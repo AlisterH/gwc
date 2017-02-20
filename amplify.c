@@ -282,13 +282,13 @@ int amplify_dialog(struct sound_prefs current, struct view *v)
     return 0 ;
 }
 
-/* bj 9/6/03 stub for batch processing; must put amplification amounts into static vars */
 void batch_normalize(struct sound_prefs *p, long first, long last, int channel_mask)
 {
-    amount_first[0] = (double)1.0/(double)p->max_value;
-    amount_first[1] = amount_first[0];
-    amount_last[0] = amount_first[0];
-    amount_last[1] = amount_first[0];
+	amount_first_l[0] = (double)1.0/(double)p->max_value;
+	amount_last_l[0] = amount_first_l[0] ;
+	amount_first_r[1] = amount_first_l[0] ;
+	amount_last_r[1] = amount_first_l[0] ;
     feather_width = 2000;
+    //fprintf(stderr, "Maximum amplification without clipping is %f \n", amount_first_l[0]) ;
     amplify_audio(p,first,last,channel_mask);
 }
