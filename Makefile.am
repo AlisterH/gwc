@@ -77,6 +77,9 @@ gwc : meschach.a $(OBJS)
 
 audio_device.o : audio_device.c audio_alsa.c audio_oss.c audio_osx.c audio_pa.c Makefile
 	$(COMPILE) -c audio_device.c
+	
+audio_util.o : audio_util.c Makefile
+	$(COMPILE) -c audio_util.c
 
 .c.o :
 	$(COMPILE) -c $<
