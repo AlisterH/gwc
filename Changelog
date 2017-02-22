@@ -91,8 +91,6 @@ Dec 19, 2008
 CODE: undo needed to use off_t in lseek calls (Thanks Dave Hill, from Feb 2007)
 BUGFIX: alsa playback would at times crash, fixed
 
-
-
 0.21-08
 Feb 23, 2007
 CODE:   Add info for setting device in settings->miscellaneous
@@ -118,7 +116,6 @@ CODE:   When exiting, or closing audio file, user can committed changes, undo ch
 CODE:   shortcut "a" now appends to cdrdao toc file only the selected region, not everything between all markers.
 NEW:    Incorporated tap_reverb algorithm, uses internally stored settings if external ~/.reverbed is not found
 NEW:	Added many functions to batch capability
-
 
 0.21-05
 Jan 20, 2006
@@ -162,12 +159,6 @@ BUGFIX: Fixed left,right variable references in declick.c when using the old FFT
 April 13, 2005
 BUGFIX: Fixed p variable in declick.c when using the old FFTW libs(lines 470, 490)
 BUGFIX: Biquad.c needed a prototype
-
-0.20-10
-Feb 1, 2005
-CODE: IIR high/low/band/notch filtering, with known public domain source code
-CODE: FFT click detection
-CODE: Can limit frequency range applied in denoising (experimental)
 
 0.20-10
 Feb 1, 2005
@@ -254,15 +245,10 @@ CODE: Added progress meter in the encoding process
 0.19-4
 -----
 Added interface (frontend) to lame/oggenc for MP3 and Ogg encodings of selected waveform portions.
-
 Fixed issue with warnings if closing pop up windows via X in corner.
-
 Fixed issues with performing tasks with no file opened causing segfault.
-
 Fixed issue of trying to play when sonogram is being built.
-
 Fixed issue of trying to display sonogram(or do anything) while file is being played.
-
 Added some fixes to improve speed of display/amplify and some other functions.
 (do not cast if not needed and when you must cast do it wisely. See http://www.mega-nerd.com/FPcast/
 by Eric De Castro Lopo Author of libsndfile API).
@@ -395,7 +381,6 @@ KNOWN PROBLEM: Still a memory leak somewhere in the delicking algorithm, it may 
 NEW: Declick sensitivity setting available from Settings drop-down menu
 NEW: Iterate in declick -- will iterate in delick until no more repairs are made in a delick window
 CODE: Some dialog widget functions are now in dialog.c, 
-
 
 0.09
 ----
