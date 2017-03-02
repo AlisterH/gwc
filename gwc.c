@@ -3169,8 +3169,21 @@ int main(int argc, char *argv[])
     gchar *newdir = g_build_filename (g_get_user_cache_dir (), "gwcXXXXXX", NULL) ; 
 	gchar *_CLIPBOARD_FILE = "gwc_intclip.dat" ;
     if (!g_mkdtemp (newdir))
+    {
       g_warning ("Creation of temp dir failed\nFalling back to current working directory.");
-      // note: assume if we can't create a folder for our undo files we probably can't create a clipboard file there either
+      // note: assume if we can't create a folder for our undo files we probably can't create a clipboard file there either.
+      // It would be best to move this to the file open routine and if we can't use $XDG_CACHE_HOME to save the temp files 
+      // in the same location as the file we are working on. https://github.com/AlisterH/gwc/issues/9 
+	  //*newdir = g_build_filename (g_path_get_dirname ( TODO  filename), "gwcXXXXXX", NULL) ; 
+	  // should be able to avoid this nonsense - need to study pointers again I think
+	  newdir = g_build_filename (g_get_current_dir(), "gwcXXXXXX", NULL) ; 
+	  // might not need to test this - is it actually possible for it to fail but us still be able to write to the audio file we are working on itself?
+      if (!g_mkdtemp (newdir))
+      g_warning ("Creation of temp dir failed\nUndo files will conflict if you run more than one instance of gwc in this directory.");
+      g_warning ("Is the current working directory read-only?  If so we can't do any work because we can't save undo files!");
+      else
+        tmpdir = newdir;
+	}
 	else
 	{
 	  tmpdir = newdir;
