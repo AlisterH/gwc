@@ -3179,8 +3179,8 @@ int main(int argc, char *argv[])
 	  newdir = g_build_filename (g_get_current_dir(), "gwcXXXXXX", NULL) ; 
 	  // might not need to test this - is it actually possible for it to fail but us still be able to write to the audio file we are working on itself?
       if (!g_mkdtemp (newdir))
-      g_warning ("Creation of temp dir failed\nUndo files will conflict if you run more than one instance of gwc in this directory.");
-      g_warning ("Is the current working directory read-only?  If so we can't do any work because we can't save undo files!");
+      g_warning ("Creation of temp dir failed\nUndo files will conflict if you run more than one instance of gwc in this directory.\n"
+                 "Is the current working directory read-only?  If so we can't do any work because we can't save undo files!");
       else
         tmpdir = newdir;
 	}
