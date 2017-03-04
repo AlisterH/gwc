@@ -1197,7 +1197,7 @@ gint update_cursor(gpointer data)
 	    stop_all_playback_functions(NULL, NULL);
 	    stop_playback_force = 1 ;
 	    prev_cursor_millisec = -1;
-/*          this will redraw the hole sonogram view at the
+/*          this will redraw the whole sonogram view at the
             end of a "full view" playback  ...frank 31.08.03 */
 /* 	    main_redraw(FALSE, TRUE); */
 	}
