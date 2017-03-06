@@ -2415,8 +2415,11 @@ register_stock_icons (void)
 
 /* Normal items */
 static const GtkActionEntry entries[] = {
+	// named icons are not as reliable yet, because some distros use themes without edit-undo and help-browser
+	// also there is nothing to use for yes, no and cancel buttons in dialogs
+	// https://docs.google.com/spreadsheets/d/1HavJQRPpMuq-N0GoN1wJR-9KEGXpKy3-NEPpZZkUGJY/pub?output=html 
   { "FileMenu", NULL, "_File" },
-  { "Open", GTK_STOCK_OPEN, "_Open...", "<control>O", "Open a file", G_CALLBACK(open_file_selection) },
+  { "Open", "document-open", "_Open...", "<control>O", "Open a file", G_CALLBACK(open_file_selection) },
   { "SaveSelection", NULL, "Save selection as...", "<control>S", "Save the current selection to a new wavfile", G_CALLBACK(save_as_selection) },
   { "SaveSimple", NULL, "Simple encode selection as MP3...", NULL, "Save the current selection to an MP3 encoded file, simple options", G_CALLBACK(save_as_mp3_simple_selection) },
   { "SaveMP3", NULL, "Encode selection as MP3...", NULL, "Save the current selection to an MP3 encoded file", G_CALLBACK(save_as_mp3_selection) },
@@ -2424,9 +2427,9 @@ static const GtkActionEntry entries[] = {
   { "SaveCDRDAO", NULL, "Create cdrdao TOC file...", NULL, "Create a cdrdao table of contents file for marked songs", G_CALLBACK(save_cdrdao_tocs) },
   { "SaveMarkers", NULL, "Create cdrdao TOC file, using marker pairs...", NULL, "Create a cdrtao table of contents file for marked songs, using pairs of song markers", G_CALLBACK(save_cdrdao_tocp) },
   { "SaveSplit", NULL, "Split audio on song markers", NULL, "Create individual track files", G_CALLBACK(split_audio_on_markers) },
-  { "Quit", GTK_STOCK_QUIT, "Q_uit", "<control>Q", "Close GWC", G_CALLBACK(delete_event) },
+  { "Quit", "application-exit", "Q_uit", "<control>Q", "Close GWC", G_CALLBACK(delete_event) },
   { "EditMenu", NULL, "_Edit" },
-  { "Undo", GTK_STOCK_UNDO, "Undo", "<control>Z", "Undo the last edit", G_CALLBACK(undo_callback) },
+  { "Undo", "edit-undo", "Undo", "<control>Z", "Undo the last edit", G_CALLBACK(undo_callback) },
   { "Filter", "filter_icon", "Apply DSP Frequency Filters", NULL, "lowpass, highpass, notch or bandpass biquad filtering", G_CALLBACK(filter_cb) },
   { "PinkNoise", "pinknoise_icon", "Generate Pink Noise", NULL, "Replace current view or selection with pink noise", G_CALLBACK(pinknoise_cb) },
   { "Amplify", "amplify_icon", "Amplify", NULL, "Amplify or attenuate the current view or selection", G_CALLBACK(amplify) },
@@ -2439,10 +2442,10 @@ static const GtkActionEntry entries[] = {
   { "Denoise", "remove_noise_icon", "Denoise", NULL, "Remove noise from current view or selection", G_CALLBACK(remove_noise) },
   { "Silence", "silence_icon", "Silence", NULL, "Insert silence with size of current selection", G_CALLBACK(silence_callback) },
   { "Reverb", NULL, "Reverb", NULL, "Apply reverberation to the current view or selection", G_CALLBACK(reverb) },
-  { "Cut", GTK_STOCK_CUT, "Cut", NULL, "Cut current selection to internal clipboard", G_CALLBACK(cut_callback) },
-  { "Copy", GTK_STOCK_COPY, "Copy", NULL, "Copy current selection to internal clipboard", G_CALLBACK(copy_callback) },
-  { "Paste", GTK_STOCK_PASTE, "Paste", NULL, "Insert internal clipboard before current selection", G_CALLBACK(paste_callback) },
-  { "Delete", GTK_STOCK_DELETE, "Delete", NULL, "Delete current selection from audio data", G_CALLBACK(delete_callback) },
+  { "Cut", "edit-cut", "Cut", NULL, "Cut current selection to internal clipboard", G_CALLBACK(cut_callback) },
+  { "Copy", "edit-copy", "Copy", NULL, "Copy current selection to internal clipboard", G_CALLBACK(copy_callback) },
+  { "Paste", "edit-paste", "Paste", NULL, "Insert internal clipboard before current selection", G_CALLBACK(paste_callback) },
+  { "Delete", "edit-delete", "Delete", NULL, "Delete current selection from audio data", G_CALLBACK(delete_callback) },
   { "ViewMenu", NULL, "_View" },
   { "ZoomSelect", "zoom_sel_icon", "Zoom to selection", NULL, "Zoom in on selected portion", G_CALLBACK(zoom_select) },
   { "ZoomIn", "zoom_in_icon", "Zoom in", NULL, "Zoom in", G_CALLBACK(zoom_in) },
@@ -2471,8 +2474,8 @@ static const GtkActionEntry entries[] = {
   { "OggPrefs", NULL, "Ogg encoding", NULL, "Set Ogg Encoding parameters", G_CALLBACK(set_ogg_encoding_preferences) },
   { "MiscPrefs", NULL, "Miscellaneous", NULL, "Miscellaneous parameters", G_CALLBACK(set_misc_preferences) },
   { "HelpMenu", NULL, "_Help" },
-  { "Help", GTK_STOCK_HELP, "User Guide", NULL, "Instructions for using gwc", G_CALLBACK(help) },
-  { "About", GTK_STOCK_ABOUT, "About", NULL, "Info about this program", G_CALLBACK(about) },
+  { "Help", "help-browser", "User Guide", NULL, "Instructions for using gwc", G_CALLBACK(help) },
+  { "About", "help-about", "About", NULL, "Info about this program", G_CALLBACK(about) },
   { "PlayAudio", "start_icon", "Start audio playback", NULL, "Playback the selected or current view of audio", G_CALLBACK(start_gwc_playback) },
   { "StopAudio", "stop_icon", "Stop", NULL, "Stop audio playback", G_CALLBACK(stop_all_playback_functions) }
 };
