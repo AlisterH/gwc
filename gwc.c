@@ -353,7 +353,9 @@ GKeyFile* read_config(void)
     key_file = g_key_file_new ();
     if (! g_key_file_load_from_file (key_file, config_file, G_KEY_FILE_KEEP_COMMENTS, &error)) {
 	if (error->code != G_IO_ERROR_NOT_FOUND)
-            g_warning ("Could not load options file: %s\n", error->message);
+			// this is expected when running for the first time
+			// therefore don't use g_warning, which will error if G_DEBUG environment variable is set to "fatal-warnings"
+            g_message ("Could not load options file: %s\n", error->message);
         g_clear_error (&error);
     }
     g_free (config_file);
@@ -3172,7 +3174,9 @@ int main(int argc, char *argv[])
 	gchar *_CLIPBOARD_FILE = "gwc_intclip.dat" ;
     if (!g_mkdtemp (newdir))
     {
-      g_warning ("Creation of temp dir failed\nFalling back to current working directory.");
+	  // this is expected if $XDG_CACHE_HOME is not set
+	  // therefore don't use g_warning, which will error if G_DEBUG environment variable is set to "fatal-warnings"
+      g_message ("Creation of temp dir failed\nFalling back to current working directory.");
       // note: assume if we can't create a folder for our undo files we probably can't create a clipboard file there either.
       // It would be best to move this to the file open routine and if we can't use $XDG_CACHE_HOME to save the temp files 
       // in the same location as the file we are working on. https://github.com/AlisterH/gwc/issues/9 
