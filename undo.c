@@ -64,8 +64,10 @@ int start_save_undo(char *undo_msg, struct view *v)
 
     
 
-    if( (undo_fd = open(filename, O_CREAT|O_TRUNC|O_RDWR, S_IRUSR|S_IWUSR)) == -1) {	warning("Can't save undo information") ;
-	return -1 ;
+    if( (undo_fd = open(filename, O_CREAT|O_TRUNC|O_RDWR, S_IRUSR|S_IWUSR)) == -1) {	
+		warning("Can't save undo information") ;
+		undo_level-- ;
+		return -1 ;
     }
 
     if(undo_level == 1)
