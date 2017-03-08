@@ -28,8 +28,10 @@ LIBDIR = @libdir@
 SYSCONFDIR = @sysconfdir@
 APPNAME = gnome-wave-cleaner
 
+desktopdir = $(DATADIR)/applications
 pixmapdir = $(DATADIR)/pixmaps
-DOCDIR = $(DATADIR)/doc/gnome-wave-cleaner
+DOCDIR = $(DATADIR)/doc
+# Alister: if you set HELPDIR different to DOCDIR, you will need to add it to the uninstall routine below
 HELPDIR = $(DOCDIR)
 
 # use these entries for SuSE and maybe other distros
@@ -57,10 +59,10 @@ meschach/zsolve.c meschach/ztorture.c meschach/zvecop.c
 
 BINFILES = $(APPNAME)
 dist_bin_SCRIPTS = gwcbatch.pl
-# Alister: we don't need to 
-pixmap_DATA = icons/gnome-wave-cleaner.xpm
+pixmap_DATA = icons/$(APPNAME).xpm
+desktop_DATA = $(APPNAME).desktop
 DOCFILES = README INSTALL TODO COPYING Changelog
-HELPFILES = gwc.html
+HELPFILES = $(APPNAME).html
 HELPFILESSRCD = doc
 
 ###
@@ -87,21 +89,24 @@ audio_util.o : audio_util.c Makefile
 
 install : gwc
 	install -d $(BINDIR)
-	install -d $(DOCDIR)
+	install -d $(DOCDIR)/$(APPNAME)
+	install -d $(HELPDIR)/$(APPNAME)
 	install -d $(pixmapdir)
 	install -p -s $(BINFILES) $(BINDIR)
-	install -p -m 0644 $(DOCFILES) $(DOCDIR)
-	for hf in $(HELPFILES) ; do install -p -m 0644 $(HELPFILESSRCD)/$$hf $(HELPDIR) ; done
+	install -p -m 0644 $(DOCFILES) $(DOCDIR)/$(APPNAME)
+	for hf in $(HELPFILES) ; do install -p -m 0644 $(HELPFILESSRCD)/$$hf $(HELPDIR)/$(APPNAME) ; done
 	install -p -m 0644 $(pixmap_DATA) $(pixmapdir)
+	install -p -m 0644 $(desktop_DATA) $(desktopdir)
 
 uninstall :
 	( cd $(BINDIR) && rm -f $(BINFILES) )
-	( cd $(DOCDIR) && rm -f $(DOCFILES) )
-	( cd $(HELPDIRC) && rm -f $(HELPFILES) )
+	( cd $(DOCDIR)/$(APPNAME) && rm -f $(DOCFILES) )
+	( cd $(HELPDIR)/$(APPNAME) && rm -f $(HELPFILES) )
 	( cd $(pixmapdir) && rm -f $(pixmap_DATA) )
-	( rmdir --ignore-fail-on-non-empty $(DOCDIR) $(pixmapdir) )
-# gives an error message because we have DOCDIR=HELPDIR
-#	( rmdir --ignore-fail-on-non-empty $(DOCDIR) $(HELPDIR) $(pixmapdir) )
+	( cd $(desktopdir) && rm -f $(desktop_DATA) )
+	( rmdir --ignore-fail-on-non-empty $(DOCDIR)/$(APPNAME) $(DOCDIR) $(pixmapdir) $(desktopdir))
+# Alister: why does this test not work?
+#	( if [$(DOCDIR) != $(HELPDIR)]; then rmdir --ignore-fail-on-non-empty $(HELPDIR)/$(APPNAME) $(HELPDIR); fi)
 
 meschach.a : meschach/meschach.a
 	cp meschach/meschach.a .

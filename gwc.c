@@ -656,7 +656,7 @@ void help(GtkWidget * widget, gpointer data)
   // We prefer to show the help in a browser than yelp.
   // We should probably modify this so that it works if running GWC from the build directory without installing, and/or
   // so that it shows a warning message if the help file does not exist.  But should figure out test for gvfs first.
-  char *uri = g_strconcat ("file://", HELPDIR, "/", "gwc.html", NULL);
+  char *uri = g_strconcat ("file://", HELPDIR, "/", "gnome-wave-cleaner.html", NULL);
   // This is silly - better check if gvfs is installed, or try the gtk_show_uri and see if it fails
 # if GTK_CHECK_VERSION(2,14,0)
   // not sure if this does what I want
