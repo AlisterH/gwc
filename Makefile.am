@@ -26,10 +26,10 @@ DATADIR = @datadir@
 DATAROOTDIR = @datarootdir@
 LIBDIR = @libdir@
 SYSCONFDIR = @sysconfdir@
-APPNAME = gnome_wave_cleaner
+APPNAME = gnome-wave-cleaner
 
 pixmapdir = $(DATADIR)/pixmaps
-DOCDIR = $(DATADIR)/doc/gwc
+DOCDIR = $(DATADIR)/doc/gnome-wave-cleaner
 HELPDIR = $(DOCDIR)
 
 # use these entries for SuSE and maybe other distros
@@ -45,7 +45,7 @@ SRC = tap_reverb_file_io.c tap_reverb.c reverb.c dialog.c gwc.c audio_device.c a
 OBJS = $(SRC:.c=.o)
 # Alister: We should be able to avoid most of this - see item 3 and 4 in the comment at the top
 # Alister: leave out meschach/configure.in, as it makes a broken configure, and someone may try to use it!
-EXTRA_DIST = $(SRC) gwc-logo.png icons Changelog doc ar.c audio_osx.c audio_pa.c audio_oss.c audio_alsa.c \
+EXTRA_DIST = $(SRC) icons Changelog doc ar.c audio_osx.c audio_pa.c audio_oss.c audio_alsa.c \
 ar.h audio_device.h audio_edit.h biquad.h encoding.h fmtheaders.h gtkled.h gtkledbar.h gwc.h mconf.h mp3.h mp3-duration.h reverb_settings.h soundfile.h stat.h tap_reverb.h tap_reverb_common.h tap_reverb_file_io.h \
 meschach/DOC meschach/MACHINES meschach/arnoldi.c meschach/bdfactor.c meschach/bkpfacto.c meschach/chfactor.c meschach/config.cache meschach/configure meschach/conjgrad.c meschach/copy.c meschach/copyright meschach/dmacheps.c meschach/err.c meschach/err.h \
 meschach/extras.c meschach/fft.c meschach/FILELIST meschach/fmacheps.c meschach/givens.c meschach/hessen.c meschach/hsehldr.c meschach/init.c meschach/iotort.c meschach/iter.h meschach/iter0.c meschach/iternsym.c meschach/itersym.c meschach/itertort.c meschach/ivecop.c meschach/lanczos.c \
@@ -57,7 +57,8 @@ meschach/zsolve.c meschach/ztorture.c meschach/zvecop.c
 
 BINFILES = gwc
 dist_bin_SCRIPTS = gwcbatch.pl
-pixmap_DATA = gwc-logo.png
+# Alister: we don't need to 
+pixmap_DATA = icons/gnome-wave-cleaner.xpm
 DOCFILES = README INSTALL TODO COPYING Changelog
 HELPFILES = gwc.html
 HELPFILESSRCD = doc

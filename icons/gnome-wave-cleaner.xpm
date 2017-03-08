@@ -1,5 +1,5 @@
 /* XPM */
-static const char * declick_xpm[] = {
+static const char * gnome_wave_cleaner_xpm[] = {
 "50 49 181 2",
 "  	c None",
 ". 	c #000000",

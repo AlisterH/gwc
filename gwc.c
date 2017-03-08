@@ -45,7 +45,7 @@
 #include "icons/amplify.xpm"
 #include "icons/pinknoise.xpm"
 #include "icons/declick.xpm"
-#include "icons/declick4.xpm"
+#include "icons/gnome-wave-cleaner.xpm"
 #include "icons/declick_w.xpm"
 #include "icons/declick_m.xpm"
 #include "icons/decrackle.xpm"
@@ -2371,7 +2371,7 @@ static struct {
 	{"pinknoise_icon", pinknoise_xpm },
 	{"amplify_icon", amplify_xpm },
 	{"declick_icon", declick_xpm },
-	{"declick_4_icon", declick4_xpm },
+	{"gwc_icon", gnome_wave_cleaner_xpm },
 	{"declick_w_icon", declick_w_xpm },
 	{"declick_m_icon", declick_m_xpm },
 	{"decrackle_icon", decrackle_xpm },
@@ -3218,7 +3218,7 @@ int main(int argc, char *argv[])
     register_stock_icons ();
 
     main_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    GdkPixbuf *icon =  gtk_widget_render_icon(main_window, "declick_4_icon", 6, NULL);
+    GdkPixbuf *icon =  gtk_widget_render_icon(main_window, "gwc_icon", 6, NULL);
     gtk_window_set_default_icon(icon);
     //if we did use this method we should really check if the file exists first:
     //but it doesn't actually make any sense to use this file
