@@ -55,7 +55,7 @@ meschach/spbkp.c meschach/spchfctr.c meschach/splufctr.c meschach/sprow.c mescha
 meschach/zcopy.c meschach/zfunc.c meschach/zgivens.c meschach/zhessen.c meschach/zhsehldr.c meschach/zlufctr.c meschach/zmachine.c meschach/zmatio.c meschach/zmatlab.c meschach/zmatop.c meschach/zmatrix.h meschach/zmatrix2.h meschach/zmemory.c meschach/znorm.c meschach/zqrfctr.c meschach/zschur.c \
 meschach/zsolve.c meschach/ztorture.c meschach/zvecop.c
 
-BINFILES = gwc
+BINFILES = $(APPNAME)
 dist_bin_SCRIPTS = gwcbatch.pl
 # Alister: we don't need to 
 pixmap_DATA = icons/gnome-wave-cleaner.xpm
@@ -74,7 +74,7 @@ EFENCE =
 all : gwc
 
 gwc : meschach.a $(OBJS)
-	$(CC) $(OBJS) $(EFENCE) $(LDFLAGS) $(LIBS) -o gwc
+	$(CC) $(OBJS) $(EFENCE) $(LDFLAGS) $(LIBS) -o $(APPNAME)
 
 audio_device.o : audio_device.c audio_alsa.c audio_oss.c audio_osx.c audio_pa.c Makefile
 	$(COMPILE) -c audio_device.c
