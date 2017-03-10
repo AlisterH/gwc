@@ -11,9 +11,8 @@ The source code and all associated files are freely available under the GNU Publ
 
 Installation
 ------------
-Untar the source tarball (tar -xvzf <...>)
+If you are using a release source tarball, extract it (tar -xvzf <...>).
 Enter the directory created.
-
 Run "./configure"
 Run "make".
 Run "make install".
