@@ -2227,6 +2227,16 @@ void store_selected_filename_as_encoded(gpointer user_data)
     }
 }
 
+void remove_extension(char* s) {
+  char* dot = 0;
+  while (*s) {
+    if (*s == '.') dot = s;  // last dot
+    else if (*s == '/' || *s == '\\') dot = 0;  // ignore dots before path separators
+    s++;
+  }
+  if (dot) *dot = '\0';
+}
+
 void save_as_encoded()
 {
     GtkFileFilter * ff, * ffa;
@@ -2254,13 +2264,19 @@ void save_as_encoded()
 
 	    if (encoding_type == GWC_OGG) {
 		/* make it a .ogg extension */
-		bcopy(".ogg", strrchr(tmppath, '.'), 4);
+		//The corner case where this code might produce unexpected results is if you are working on hidden files without extensions e.g. "~/.recording1"
+		//But since we are choosing a name in the dialog that is ok.
+		remove_extension(tmppath) ;
+		strcat(tmppath, ".ogg");
 		gtk_file_filter_set_name(ff,"OGG files");
 		gtk_file_filter_add_pattern(ff,"*.ogg");
 		gtk_file_filter_add_pattern(ff,"*.OGG");
 	    } else {
 		/* make it a .mp3 extension */
-		bcopy(".mp3", strrchr(tmppath, '.'), 4);
+		//The corner case where this code might produce unexpected results is if you are working on hidden files without extensions e.g. "~/.recording1"
+		//But since we are choosing a name in the dialog that is ok.
+		remove_extension(tmppath) ;
+		strcat(tmppath, ".mp3");
 		gtk_file_filter_set_name(ff,"MP3 files");
 		gtk_file_filter_add_pattern(ff,"*.mp3");
 		gtk_file_filter_add_pattern(ff,"*.MP3");
