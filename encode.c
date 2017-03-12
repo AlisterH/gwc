@@ -741,7 +741,10 @@ int start_encode_old(int mode, char *newfilename, long start, long length, char 
 
 	/* read in blocks of size  buffer and  send out converted to new sound format */
 	for (ctr = 0; ctr < length; ctr += samples_read) {
-	    if(stop_encoding == TRUE) break ;
+	    if(stop_encoding == TRUE) {
+			stop_encoding = FALSE ;
+			break ;
+		}
 	    samples_read = sf_readf_double(in_fd, framebuf, numframes);
 	    sf_writef_double(out_fd, framebuf, samples_read);
 	    encode_progress ((double)ctr/(double)length) ;
@@ -890,7 +893,10 @@ int start_encode(int mode, char *newfilename, long start, long length, char *ori
 
 	/* read in blocks of size  buffer and  send out converted to new sound format */
 	for (ctr = 0; ctr < length; ctr += samples_read) {
-	    if(stop_encoding == TRUE) break ;
+	    if(stop_encoding == TRUE) {
+			stop_encoding = FALSE ;
+			break ;
+		}
 	    samples_read = sf_readf_double(in_fd, framebuf, numframes);
 	    sf_writef_double(out_fd, framebuf, samples_read);
 	    encode_progress ((double)ctr/(double)length) ;
