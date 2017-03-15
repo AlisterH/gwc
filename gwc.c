@@ -139,6 +139,7 @@ gint debug = 0;
 gchar save_selection_filename[PATH_MAX+1];
 gchar wave_filename[PATH_MAX+1];
 gchar last_filename[PATH_MAX+1];
+gchar *file_extension;
 
 long markers[MAX_MARKERS];
 long n_markers = 0;
@@ -1524,11 +1525,28 @@ void split_audio_on_markers(GtkWidget * widget, gpointer data)
 
 	    char filename[100] ;
 
-	    if(trackno < 10) {
-		snprintf(filename,99,"track0%d.cdda.wav",trackno) ;
-	    } else {
-		snprintf(filename,99,"track%d.cdda.wav",trackno) ;
-	    }
+		// Alister: I'm sure this could be much tidier
+		// Not that the first case is really needed
+	    if (file_extension=="") {
+			if(trackno < 10) {
+			//Alister: don't just output as xxx.cdda.wav
+			//we aren't necessarily working with a .wav file
+			//and why would we need the .cdda?
+			snprintf(filename,99,"track0%d",trackno) ;
+			} else {
+			snprintf(filename,99,"track%d",trackno) ;
+			}
+		}
+		else {
+			if(trackno < 10) {
+			//Alister: don't just output as xxx.cdda.wav
+			//we aren't necessarily working with a .wav file
+			//and why would we need the .cdda?
+			snprintf(filename,99,"track0%d.%s",trackno,file_extension) ;
+			} else {
+			snprintf(filename,99,"track%d.%s",trackno,file_extension) ;
+			}
+		}
 
 	    if(last_sample-first_sample >= 10000) {
 		save_as_wavfile(filename, first_sample, last_sample) ;
@@ -1984,6 +2002,21 @@ void open_wave_filename(void)
 			       audio_view.first_sample,
 			       audio_view.last_sample);
 		main_redraw(FALSE, TRUE);
+		
+		// get the file extension, so we know what to call files we export
+		// note that for a hidden file with no extension e.g. ~/.name
+		// name will be used as the extension.
+		// this is obviously wrong, but actually kind of cool as it allows you to 
+		// split more than one file into tracks without overwriting outputs or restarting gwc from a different working directory.
+		// i.e. track01.name1, track02.name1, then track01.name2, track02.name2
+		gchar *name = basename(wave_filename) ;
+		file_extension = "";
+		while (*name)
+		{
+		  if (*name++ == '.')
+		  file_extension = name;
+		}
+		
 	    } else {
 		file_is_open = FALSE;
 		warning("failed to open audio file");
@@ -2163,7 +2196,7 @@ void open_file_selection(GtkWidget * widget, gpointer data)
 	gtk_file_filter_add_pattern(ff,"*.W64");
 	// note that this format seems to be broken when written by mhwaveedit, but sox is OK
 	gtk_file_filter_add_pattern(ff,"*.WVE");
-	// note libsndfile also supports reading and writing FLAC, but does not support rdwr
+	// note libsndfile also supports reading and writing FLAC & ALAC, but does not support opening them in RDWR mode
 	// and it supports reading and writing OGG, but I wasn't able to generate an OGG that it supported!
 	gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(file_selector),ff);
   
