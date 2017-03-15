@@ -2364,7 +2364,8 @@ void save_as_mp3_simple_selection(GtkWidget * widget, gpointer data)
 
 void save_as_selection(GtkWidget * widget, gpointer data)
 {
-    GtkFileFilter * ff, * ffa;
+ 	/* Alister - disable, because we aren't necessarily saving a wav file
+ 	   GtkFileFilter * ff, * ffa;*/
 
     if ((file_processing == FALSE) && (file_is_open == TRUE)
 	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
@@ -2385,6 +2386,7 @@ void save_as_selection(GtkWidget * widget, gpointer data)
 	    gtk_file_chooser_set_do_overwrite_confirmation
             		                    (GTK_FILE_CHOOSER(file_selector), TRUE);
 
+	/* Alister - disable, because we aren't necessarily saving a wav file
 	ff = gtk_file_filter_new();
 	gtk_file_filter_set_name(ff,"Wave files");
 	gtk_file_filter_add_pattern(ff,"*.wav");
@@ -2394,7 +2396,7 @@ void save_as_selection(GtkWidget * widget, gpointer data)
 	ffa = gtk_file_filter_new();
 	gtk_file_filter_set_name(ffa,"All files");
 	gtk_file_filter_add_pattern(ffa,"*");
-	gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(file_selector),ffa);
+	gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(file_selector),ffa);*/
 
 	    if (gtk_dialog_run (GTK_DIALOG (file_selector)) == GTK_RESPONSE_ACCEPT)
             {
