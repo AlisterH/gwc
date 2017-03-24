@@ -2151,9 +2151,11 @@ void open_file_selection(GtkWidget * widget, gpointer data)
 	// We could also borrow the dialog from mhwaveedit which allows you to open a raw audio file,
 	// And it would also be good to be able to load raw audio specifying its format from the command line
 	gtk_file_filter_add_pattern(ff,"*.wav");
+	gtk_file_filter_add_pattern(ff,"*.wavpcm");
 	gtk_file_filter_add_pattern(ff,"*.aiff");
 	gtk_file_filter_add_pattern(ff,"*.aif");
 	// when I try to create this format it actually seems the same as aiff, so not sure if we really do support it.
+	gtk_file_filter_add_pattern(ff,"*.aiffc");
 	gtk_file_filter_add_pattern(ff,"*.aifc");
 	gtk_file_filter_add_pattern(ff,"*.au");
 	gtk_file_filter_add_pattern(ff,"*.snd");
@@ -2162,6 +2164,8 @@ void open_file_selection(GtkWidget * widget, gpointer data)
 	gtk_file_filter_add_pattern(ff,"*.htk");
 	gtk_file_filter_add_pattern(ff,"*.iff");
 	gtk_file_filter_add_pattern(ff,"*.mat");
+	gtk_file_filter_add_pattern(ff,"*.mat4");
+	gtk_file_filter_add_pattern(ff,"*.mat5");
 	gtk_file_filter_add_pattern(ff,"*.mpc");
 	gtk_file_filter_add_pattern(ff,"*.paf");
 	gtk_file_filter_add_pattern(ff,"*.pvf");
@@ -2173,8 +2177,10 @@ void open_file_selection(GtkWidget * widget, gpointer data)
 	gtk_file_filter_add_pattern(ff,"*.w64");
 	gtk_file_filter_add_pattern(ff,"*.wve");
 	gtk_file_filter_add_pattern(ff,"*.WAV");
+	gtk_file_filter_add_pattern(ff,"*.WAVPCM");
 	gtk_file_filter_add_pattern(ff,"*.AIFF");
 	gtk_file_filter_add_pattern(ff,"*.AIF");
+	gtk_file_filter_add_pattern(ff,"*.AIFFC");
 	gtk_file_filter_add_pattern(ff,"*.AIFC");
 	gtk_file_filter_add_pattern(ff,"*.AU");
 	gtk_file_filter_add_pattern(ff,"*.SND");
@@ -2183,6 +2189,8 @@ void open_file_selection(GtkWidget * widget, gpointer data)
 	gtk_file_filter_add_pattern(ff,"*.HTK");
 	gtk_file_filter_add_pattern(ff,"*.IFF");
 	gtk_file_filter_add_pattern(ff,"*.MAT");
+	gtk_file_filter_add_pattern(ff,"*.MAT4");
+	gtk_file_filter_add_pattern(ff,"*.MAT5");
 	gtk_file_filter_add_pattern(ff,"*.MPC");
 	// note that this format seems to be broken when written by ffmpeg, but mhwaveedit is OK
 	gtk_file_filter_add_pattern(ff,"*.PAF");
