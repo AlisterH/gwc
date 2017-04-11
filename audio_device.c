@@ -19,16 +19,5 @@
 
 /* gwc audio device interface impl.  ...frank 12.09.03 */
 
-#ifdef HAVE_ALSA
-# include "audio_alsa.c"
-#else
-# ifdef MAC_OS_X /* MacOSX */
-#  include "audio_osx.c"
-# else
-#  ifdef HAVE_PULSE_AUDIO /* MacOSX */
-#   include "audio_pa.c"
-#  else
-#   include "audio_oss.c"
-#  endif 
-# endif 
-#endif
+#include "audio_osx.c"
+

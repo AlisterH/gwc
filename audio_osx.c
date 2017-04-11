@@ -23,11 +23,11 @@
  *  Created by Rob Frohne on 11/8/04.
  *  Copyright 2004  *
  */
-#ifdef MAC_OS_X /* MacOSX */
+
 
 #include <sndfile.h>
 
-#include <Carbon.h>
+#include "/System/Library/Frameworks/Carbon.framework/Versions/A/Headers/Carbon.h"
 #include <CoreAudio/AudioHardware.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
@@ -321,7 +321,7 @@ int audio_device_nonblocking_write_buffer_size(int maxbufsize,    //Normally ret
 	return 1;  // This allows the process_audio to move the VU meters.
 }
 
-void audio_device_close(void)  //Reminder: check to make sure this works when no device has been opened.
+void audio_device_close(int drain)  //Reminder: check to make sure this works when no device has been opened.
 {
 	OSStatus	err ;
 	if(p_global_mem_alloced)
@@ -342,6 +342,4 @@ void audio_device_close(void)  //Reminder: check to make sure this works when no
 	} ;
 }
 
-
-#endif /* MacOSX */
 

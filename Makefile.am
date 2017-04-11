@@ -76,9 +76,9 @@ EFENCE =
 all : gwc
 
 gwc : meschach.a $(OBJS)
-	$(CC) $(OBJS) $(EFENCE) $(LDFLAGS) $(LIBS) -o $(APPNAME)
+	$(CC) -framework CoreAudio $(OBJS) $(EFENCE) $(LDFLAGS) $(LIBS) -o $(APPNAME)
 
-audio_device.o : audio_device.c audio_alsa.c audio_oss.c audio_osx.c audio_pa.c Makefile
+audio_device.o : audio_device.c audio_osx.c Makefile
 	$(COMPILE) -c audio_device.c
 	
 audio_util.o : audio_util.c Makefile

@@ -31,18 +31,7 @@
 #define DATALEN(bp)	((u_long)(bp.BlockLen[0]) | \
                          ((u_long)(bp.BlockLen[1]) << 8) | \
                          ((u_long)(bp.BlockLen[2]) << 16) )
-# ifndef MAC_OS_X
-# ifndef __u_char_defined
-typedef __u_char u_char;
-typedef __u_short u_short;
-typedef __u_int u_int;
-typedef __u_long u_long;
-typedef __quad_t quad_t;
-typedef __u_quad_t u_quad_t;
-typedef __fsid_t fsid_t;
-#  define __u_char_defined
-# endif
-# endif /* MAC_OS_X*/
+
 
 typedef struct vochead {
   u_char  Magic[20];	/* must be VOC_MAGIC */

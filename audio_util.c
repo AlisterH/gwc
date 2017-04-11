@@ -18,13 +18,13 @@
 *******************************************************************************/
 
 /* audio_util.c */
-
+#define MAC_OS_X
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <memory.h>
-#include <endian.h>
+#include <machine/endian.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <gtk/gtk.h>
