@@ -45,6 +45,7 @@ dnl setup macros variables to be replaced in Makefile.in
 AC_SUBST(FFTWLIB)
 AC_SUBST(FFTWHDR)
 AC_SUBST(FFTWPREC)
+AC_SUBST(OSXDEF)
 AC_SUBST(PALIB)
 AC_SUBST(PAHDR)
 AC_SUBST(ALSALIB)
@@ -172,5 +173,22 @@ AC_PROG_GCC_TRADITIONAL
 AC_TYPE_SIGNAL
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(gettimeofday)
+
+dnl check for osx platform
+AC_MSG_CHECKING([for Mac OS X platform])
+case `uname -s` in
+  Darwin)
+    platform_osx=yes
+    ;;
+  *)
+    platform_osx=no
+    ;;
+esac
+AC_MSG_RESULT([$platform_osx])
+AM_CONDITIONAL(PLATFORM_OSX, [test x$platform_osx = xyes])
+
+if [test x$platform_osx = xyes]; then
+  OSXDEF="-DMAC_OS_X"
+fi
 
 AC_OUTPUT(Makefile)

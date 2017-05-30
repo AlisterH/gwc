@@ -18,3 +18,35 @@ Problems with linking:
 	-- you will need to add /usr/local/lib/pkgconfig to your PKG_CONFIG_PATH environment variable, like so:
 
 	       export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+
+---
+Problems with autotools versions:
+
+e.g. building on OSX leopard I had problems like this:
+
+	configure.in:3: require Automake 1.12, but have 1.10
+
+I was using homebrew, so I had to install newer versions e.g. `brew install automake`, then do this to use these versions rather than the system ones:
+
+	export PATH="/usr/local/opt/automake/bin:/usr/local/opt/autoconf/bin:$PATH"
+
+---
+Problems with pkgconfig:
+
+e.g. building on OSX leopard I had problems like this:
+
+	checking for gtk+-2.0... no
+	configure: error: Package requirements (gtk+-2.0) were not met:
+
+	Package 'libpng', required by 'cairo', not found
+
+	Consider adjusting the PKG_CONFIG_PATH environment variable if you
+	installed software in a non-standard prefix.
+
+	Alternatively, you may set the environment variables GTK_CFLAGS
+	and GTK_LIBS to avoid the need to call pkg-config.
+	See the pkg-config man page for more details.
+
+To solve it I had to do this:
+
+export PKG_CONFIG_PATH=$(find /usr/local/Cellar -name 'pkgconfig' -type d | grep lib/pkgconfig | tr '\n' ':' | sed s/.$//)

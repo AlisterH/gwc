@@ -21,6 +21,12 @@ AM_CFLAGS = -O2
 AM_CXXFLAGS = -O2
 endif
 
+if PLATFORM_OSX
+OSX_STUFF = -framework CoreAudio
+else
+OSX_STUFF = 
+endif
+
 BINDIR = @bindir@
 DATADIR = @datadir@
 DATAROOTDIR = @datarootdir@
@@ -76,9 +82,10 @@ EFENCE =
 all : gwc
 
 gwc : meschach.a $(OBJS)
-	$(CC) $(OBJS) $(EFENCE) $(LDFLAGS) $(LIBS) -o $(APPNAME)
+	$(CC) $(OSX_STUFF) $(OBJS) $(EFENCE) $(LDFLAGS) $(LIBS) -o $(APPNAME)
 
-audio_device.o : audio_device.c audio_alsa.c audio_oss.c audio_osx.c audio_pa.c Makefile
+#audio_device.o : audio_device.c audio_alsa.c audio_oss.c audio_osx.c audio_pa.c Makefile
+audio_device.o : audio_device.c audio_osx.c Makefile
 	$(COMPILE) -c audio_device.c
 	
 audio_util.o : audio_util.c Makefile

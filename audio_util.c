@@ -24,7 +24,13 @@
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <memory.h>
+
+#ifdef MAC_OS_X
+#include <machine/endian.h>
+#else
 #include <endian.h>
+#endif
+
 #include <fcntl.h>
 #include <unistd.h>
 #include <gtk/gtk.h>
