@@ -22,10 +22,23 @@ AM_CXXFLAGS = -O2
 endif
 
 if PLATFORM_OSX
-OSX_STUFF = -framework CoreAudio
-else
-OSX_STUFF = 
+#note this isn't enough to pull in libgtkmacintegration-gtk2
+#but it isn't building properly on my system anyway, so I have to link to the object files
+OSX_LIBS = -framework CoreAudio -framework Cocoa -Lgtkmacintegration-gtk2
+#looks like I don't need -lobjc
+OSX_CFLAGS = -xobjective-c
+# note linking to the object files for gtk-mac-integration-gtk2, as the shared lib wasn't building with them on my system.
+# need to fix this so other users don't need to edit the path!
+OSX_OBJS = /Users/alister/gtk-mac-integration-2.0.8/src/.libs/*.o
 endif
+
+#might need somthing like this
+#if test "`echo ${GCC_VERSION} | cut -d. -f1`" -eq 4; then
+#   if test "`echo ${GCC_VERSION} | cut -d. -f2`" -ge 8; then
+#  	   # This is gcc >= 4.8.x
+#      OSX_CFLAGS="${OSX_CFLAGS} -fobjc-exceptions"
+#   fi
+#fi
 
 BINDIR = @bindir@
 DATADIR = @datadir@
@@ -73,7 +86,7 @@ HELPFILESSRCD = doc
 
 ###
 CC = @CC@
-COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)
+COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) $(OSX_CFLAGS)
 
 ### handy to have around for checking buffer overruns
 #EFENCE = -lefence
@@ -81,8 +94,8 @@ EFENCE =
 
 all : gwc
 
-gwc : meschach.a $(OBJS)
-	$(CC) $(OSX_STUFF) $(OBJS) $(EFENCE) $(LDFLAGS) $(LIBS) -o $(APPNAME)
+gwc : meschach.a $(OBJS) 
+	$(CC) $(OSX_LIBS) $(OBJS) $(OSX_OBJS) $(EFENCE) $(LDFLAGS) $(LIBS) -o $(APPNAME)
 
 #audio_device.o : audio_device.c audio_alsa.c audio_oss.c audio_osx.c audio_pa.c Makefile
 audio_device.o : audio_device.c audio_osx.c Makefile

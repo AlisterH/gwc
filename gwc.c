@@ -65,6 +65,13 @@
 #include "icons/silence.xpm"
 #endif
 
+
+#ifdef MAC_OS_X
+// Note that we only tested if we are building on OSX, and are just assuming we are building with the GDK QUARZ backend.
+// We should really check that, as we could be building with the X11 backend.
+#include <gtkmacintegration/gtkosxapplication.h>
+#endif
+
 char pathname[PATH_MAX+1] = "./";
 GtkWidget *dial[2];
 GtkWidget *audio_canvas_w;
@@ -3273,7 +3280,19 @@ int main(int argc, char *argv[])
     /* This is called in all GTK applications. Arguments are parsed
      * from the command line and are returned to the application. */
     gtk_init(&argc, &argv);
+	
+	#ifdef MAC_OS_X
+	// Note that we only tested if we are building on OSX, and are assuming we are building with the GDK QUARZ backend.
+	// We should really check that, as we could be building with the X11 backend.
 
+	// Supposedly just doing this first line makes closing from the dock work, etc.
+	GtkosxApplication *theApp = g_object_new(GTKOSX_TYPE_APPLICATION, NULL);
+	//We actually need this otherwise it just quits without asking about saving!
+	g_signal_connect (theApp, "NSApplicationBlockTermination", G_CALLBACK (delete_event), NULL );
+	//We actually need this, otherwise nothing happens at all
+	gtkosx_application_ready (theApp);
+	#endif
+	
     register_stock_icons ();
 
     main_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
