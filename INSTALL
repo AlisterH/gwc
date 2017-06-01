@@ -22,7 +22,7 @@ Problems with linking:
 ---
 Problems with autotools versions:
 
-e.g. building on OSX leopard I had problems like this:
+e.g. building on OSX "Snow Leopard" (10.6) I had problems like this:
 
 	configure.in:3: require Automake 1.12, but have 1.10
 
