@@ -3281,18 +3281,6 @@ int main(int argc, char *argv[])
      * from the command line and are returned to the application. */
     gtk_init(&argc, &argv);
 	
-	#ifdef MAC_OS_X
-	// Note that we only tested if we are building on OSX, and are assuming we are building with the GDK QUARZ backend.
-	// We should really check that, as we could be building with the X11 backend.
-
-	// Supposedly just doing this first line makes closing from the dock work, etc.
-	GtkosxApplication *theApp = g_object_new(GTKOSX_TYPE_APPLICATION, NULL);
-	//We actually need this otherwise it just quits without asking about saving!
-	g_signal_connect (theApp, "NSApplicationBlockTermination", G_CALLBACK (delete_event), NULL );
-	//We actually need this, otherwise nothing happens at all
-	gtkosx_application_ready (theApp);
-	#endif
-	
     register_stock_icons ();
 
     main_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -3512,10 +3500,33 @@ int main(int argc, char *argv[])
 			   FALSE, 0);
     }
 
-
-
     /* and the window */
     gtk_widget_show_all(main_window);
+
+	#ifdef MAC_OS_X
+	// Note that we only tested if we are building on OSX, and are assuming we are building with the GDK QUARZ backend.
+	// We should really check that, as we could be building with the X11 backend.
+
+	// Supposedly just doing this first line makes closing from the dock work, etc.
+	GtkosxApplication *theApp = g_object_new(GTKOSX_TYPE_APPLICATION, NULL);
+	//We actually need this otherwise it just quits without asking about saving!
+	g_signal_connect (theApp, "NSApplicationBlockTermination", G_CALLBACK (delete_event), NULL );
+	//We actually need this, otherwise nothing happens at all
+	gtk_widget_hide (menubar);
+	//if we really want o be mac friendly we need to do something like this and also move the about menu entry and the settings menu to the gwc menu:
+	//not working with my faulty gtkmacintegration build
+	/*
+	GtkosxApplicationMenuGroup *group;
+	GtkMenuItem *about_item, *preferences_item, *close_item;
+	about_item = gtk_ui_manager_get_widget(ui_manager, "/menubar/Help/About");
+	group = gtkosx_application_add_app_menu_group (theApp);
+	gtkosx_application_add_app_menu_item (theApp, group, GTK_MENU_ITEM (about_item));
+	//todo: preferences & close
+	gtk_widget_hide (close_item); 
+	*/
+	gtkosx_application_set_menu_bar(theApp, GTK_MENU_SHELL(menubar));
+	gtkosx_application_ready (theApp);
+	#endif
 
     /* and the idle function */
     /*      gtk_idle_add(idle_func, NULL);  */
