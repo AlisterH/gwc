@@ -25,7 +25,7 @@ if PLATFORM_OSX
 #note on my test system I initially couldn't use -lgtkmacintegration as it wasn't building properly, so I had to link to the object files.
 #OSX_OBJS = /Users/alister/gtk-mac-integration-2.0.8/src/.libs/*.o
 #note depending on your build environment you might need -lgtkmacintegration.2 or something instead.
-OSX_LIBS = -framework CoreAudio -framework Cocoa -lgtkmacintegration-gtk2
+OSX_LIBS = -framework CoreAudio -lgtkmacintegration-gtk2
 #looks like I don't need -lobjc, or this:
 #OSX_CFLAGS = -xobjective-c
 
@@ -33,8 +33,9 @@ OSX_LIBS = -framework CoreAudio -framework Cocoa -lgtkmacintegration-gtk2
 #if test "`echo ${GCC_VERSION} | cut -d. -f1`" -eq 4; then
 #   if test "`echo ${GCC_VERSION} | cut -d. -f2`" -ge 8; then
 #  	   # This is gcc >= 4.8.x
-#      OSX_CFLAGS="${OSX_CFLAGS} -fobjc-exceptions"
+#      OSX_CFLAGS = -xobjective-c -fobjc-exceptions
 #   fi
+#	else OSX_CFLAGS = -xobjective-c
 #fi
 endif
 
@@ -122,6 +123,8 @@ uninstall :
 	( cd $(HELPDIR)/$(APPNAME) && rm -f $(HELPFILES) )
 	( cd $(pixmapdir) && rm -f $(pixmap_DATA) )
 	( cd $(desktopdir) && rm -f $(desktop_DATA) )
+# Alister: note osx errors on --ignore-fail-on-non-empty
+# But we wouldn't normally run `make install` on osx
 	( rmdir --ignore-fail-on-non-empty $(DOCDIR)/$(APPNAME) $(DOCDIR) $(pixmapdir) $(desktopdir))
 # Alister: why does this test not work?
 #	( if [$(DOCDIR) != $(HELPDIR)]; then rmdir --ignore-fail-on-non-empty $(HELPDIR)/$(APPNAME) $(HELPDIR); fi)

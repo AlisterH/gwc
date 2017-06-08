@@ -66,9 +66,10 @@
 #endif
 
 #ifdef MAC_OS_X
-// Note that we only tested if we are building on OSX, and are just assuming we are building with the GDK QUARZ backend.
+// Note that we only tested if we are building on OSX, and are just assuming we are building with the GDK QUARTZ backend.
 // We should really check that, as we could be building with the X11 backend.
 #include <gtkmacintegration/gtkosxapplication.h>
+//#import <Cocoa/Cocoa.h>
 #endif
 
 char pathname[PATH_MAX+1] = "./";
@@ -646,6 +647,7 @@ int prompt_user(char *msg, char *s, int maxlen)
 
 void help(GtkWidget * widget, gpointer data)
 {
+	
 /* This shows the help in yelp and requires /usr/share/gnome/help/gwc/C/gwc.html (or similar, if not using html documentation)
 #if GTK_CHECK_VERSION(2,14,0)
 //  GdkScreen *screen;
@@ -663,18 +665,43 @@ void help(GtkWidget * widget, gpointer data)
   // We prefer to show the help in a browser than yelp.
   // We should probably modify this so that it works if running GWC from the build directory without installing, and/or
   // so that it shows a warning message if the help file does not exist.  But should figure out test for gvfs first.
-  char *uri = g_strconcat ("file://", HELPDIR, "/", "gnome-wave-cleaner.html", NULL);
+
+  #ifdef MAC_OS_X
+		// todo: find the path of a local help file in an osx app.
+		// note the path in the else statement below works if we installed it with `make install`
+		char *uri = "https://rawgit.com/AlisterH/gwc/master/doc/gnome-wave-cleaner.html"; 
+	    char *command = g_strdup_printf("%s %s &", command ? command : "open", uri);
+	    system(command);
+	    g_free(command);
+	// I had compile problems trying to do it using this method!
+	/*	NSURL	*ns_url;
+		gboolean retval;
+
+		//neither work
+		//NSAutoreleasePool *pool [[NSAutoreleasePool alloc] init];
+		@autoreleasepool
+		{
+			ns_url = NSURL URLWithString: [NSString stringWithUTF8String: "file:///users/alister/gwc/doc/gnome-wave-cleaner.html"];
+			retval = [[NSWorkspace sharedWorkspace] openURL: ns_url];
+		}
+		return retval;
+	*/	
+		
   // This is silly - better check if gvfs is installed, or try the gtk_show_uri and see if it fails
-# if GTK_CHECK_VERSION(2,14,0)
-  // not sure if this does what I want
-  GdkScreen *screen = gtk_widget_get_screen (main_window);
-  gtk_show_uri(screen, uri, gtk_get_current_event_time (), NULL);
-# else
-  char *command = g_strdup_printf("%s %s &", command ? command : "xdg-open", uri);
-  system(command);
-  g_free(command);
-# endif
-  g_free(uri);
+  # else
+	char *uri = g_strconcat ("file://", HELPDIR, "/", APPNAME, "/", "gnome-wave-cleaner.html", NULL);
+	# if GTK_CHECK_VERSION(2,14,0)
+  	// not sure if this does what I want
+  		GdkScreen *screen = gtk_widget_get_screen (main_window);
+  		gtk_show_uri(screen, uri, gtk_get_current_event_time (), NULL);*/
+	# else
+  		char *command = g_strdup_printf("%s %s &", command ? command : "xdg-open", uri);
+  		system(command);
+  		g_free(command);
+	# endif
+	// not sure why, but it crashes on osx if we move this below the last #endif
+	g_free(uri);
+  #endif
 }
 
 void declick_with_sensitivity(double sensitivity)
@@ -3528,7 +3555,7 @@ int main(int argc, char *argv[])
 	gtk_widget_hide (close_item);
 	// only need to do this so that the "window" menu is positioned correctly!
 	help_menu = gtk_ui_manager_get_widget(ui_manager, "/MainMenu/HelpMenu");
-	gtkosx_application_set_help_menu (theApp, help_menu);
+	gtkosx_application_set_help_menu (theApp, GTK_WIDGET (help_menu));
 	// this adds a "window" menu, which doesn't really seem useful in my test environment
 	// except that it enables the ⌘M keyboard shortcut to minimise!
 	gtkosx_application_set_window_menu (theApp, NULL);
