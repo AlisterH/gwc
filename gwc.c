@@ -65,7 +65,6 @@
 #include "icons/silence.xpm"
 #endif
 
-
 #ifdef MAC_OS_X
 // Note that we only tested if we are building on OSX, and are just assuming we are building with the GDK QUARZ backend.
 // We should really check that, as we could be building with the X11 backend.
@@ -3507,25 +3506,43 @@ int main(int argc, char *argv[])
 	// Note that we only tested if we are building on OSX, and are assuming we are building with the GDK QUARZ backend.
 	// We should really check that, as we could be building with the X11 backend.
 
-	// Supposedly just doing this first line makes closing from the dock work, etc.
+	// Supposedly just doing this first line makes closing from the dock work, etc. (#1)
 	GtkosxApplication *theApp = g_object_new(GTKOSX_TYPE_APPLICATION, NULL);
 	//We actually need this otherwise it just quits without asking about saving!
 	g_signal_connect (theApp, "NSApplicationBlockTermination", G_CALLBACK (delete_event), NULL );
-	//We actually need this, otherwise nothing happens at all
+	
+	// integrate the menus into the osx menu bar
+	// N.B. osx adds a "special characters" entry to the edit menu, which is bizarre
+	// but I guess useful for inserting symbols into the mp3 and ogg export metadata dialogs
 	gtk_widget_hide (menubar);
-	//if we really want o be mac friendly we need to do something like this and also move the about menu entry and the settings menu to the gwc menu:
-	//not working with my faulty gtkmacintegration build
-	/*
-	GtkosxApplicationMenuGroup *group;
-	GtkMenuItem *about_item, *preferences_item, *close_item;
-	about_item = gtk_ui_manager_get_widget(ui_manager, "/menubar/Help/About");
-	group = gtkosx_application_add_app_menu_group (theApp);
-	gtkosx_application_add_app_menu_item (theApp, group, GTK_MENU_ITEM (about_item));
-	//todo: preferences & close
-	gtk_widget_hide (close_item); 
-	*/
 	gtkosx_application_set_menu_bar(theApp, GTK_MENU_SHELL(menubar));
+	GtkWidget *about_item, *preferences_menu, *close_item, *help_menu;
+	// move the about item to the main (program name) menu
+	about_item = gtk_ui_manager_get_widget(ui_manager, "/MainMenu/HelpMenu/About");
+	gtkosx_application_insert_app_menu_item (theApp, GTK_WIDGET (about_item), 0);
+	// move the preferences item to the main menu
+	preferences_menu = gtk_ui_manager_get_widget(ui_manager, "/MainMenu/SettingsMenu");
+	gtkosx_application_insert_app_menu_item (theApp, GTK_WIDGET (preferences_menu), 1);
+	//	hide the close item in the file menu
+	close_item = gtk_ui_manager_get_widget(ui_manager, "/MainMenu/FileMenu/Quit");
+	gtk_widget_hide (close_item);
+	// only need to do this so that the "window" menu is positioned correctly!
+	help_menu = gtk_ui_manager_get_widget(ui_manager, "/MainMenu/HelpMenu");
+	gtkosx_application_set_help_menu (theApp, help_menu);
+	// this adds a "window" menu, which doesn't really seem useful in my test environment
+	// except that it enables the ⌘M keyboard shortcut to minimise!
+	gtkosx_application_set_window_menu (theApp, NULL);
+	
+	// I'm guessing setting the icon like this is unnecessary once we have created a .app application bundle
+	// And we need to do that to get osx to use the icon when the application isn't running.
+	gtkosx_application_set_dock_icon_pixbuf(theApp, icon);
+	
+	// Re #1 above - we actually need this, otherwise nothing happens at all
 	gtkosx_application_ready (theApp);
+	
+	// Possible todos:
+	// Make help work
+	// implement native file dialogs using nativefiledialog library or tinyfiledialogs or something
 	#endif
 
     /* and the idle function */

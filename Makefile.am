@@ -22,23 +22,21 @@ AM_CXXFLAGS = -O2
 endif
 
 if PLATFORM_OSX
-#note this isn't enough to pull in libgtkmacintegration-gtk2
-#but it isn't building properly on my system anyway, so I have to link to the object files
-OSX_LIBS = -framework CoreAudio -framework Cocoa -Lgtkmacintegration-gtk2
-#looks like I don't need -lobjc
-OSX_CFLAGS = -xobjective-c
-# note linking to the object files for gtk-mac-integration-gtk2, as the shared lib wasn't building with them on my system.
-# need to fix this so other users don't need to edit the path!
-OSX_OBJS = /Users/alister/gtk-mac-integration-2.0.8/src/.libs/*.o
-endif
+#note on my test system I initially couldn't use -lgtkmacintegration as it wasn't building properly, so I had to link to the object files.
+#OSX_OBJS = /Users/alister/gtk-mac-integration-2.0.8/src/.libs/*.o
+#note depending on your build environment you might need -lgtkmacintegration.2 or something instead.
+OSX_LIBS = -framework CoreAudio -framework Cocoa -lgtkmacintegration-gtk2
+#looks like I don't need -lobjc, or this:
+#OSX_CFLAGS = -xobjective-c
 
-#might need somthing like this
+#might need something like this
 #if test "`echo ${GCC_VERSION} | cut -d. -f1`" -eq 4; then
 #   if test "`echo ${GCC_VERSION} | cut -d. -f2`" -ge 8; then
 #  	   # This is gcc >= 4.8.x
 #      OSX_CFLAGS="${OSX_CFLAGS} -fobjc-exceptions"
 #   fi
 #fi
+endif
 
 BINDIR = @bindir@
 DATADIR = @datadir@
