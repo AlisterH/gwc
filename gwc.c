@@ -693,7 +693,7 @@ void help(GtkWidget * widget, gpointer data)
 	# if GTK_CHECK_VERSION(2,14,0)
   	// not sure if this does what I want
   		GdkScreen *screen = gtk_widget_get_screen (main_window);
-  		gtk_show_uri(screen, uri, gtk_get_current_event_time (), NULL);*/
+  		gtk_show_uri(screen, uri, gtk_get_current_event_time (), NULL);
 	# else
   		char *command = g_strdup_printf("%s %s &", command ? command : "xdg-open", uri);
   		system(command);
