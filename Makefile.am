@@ -77,7 +77,8 @@ meschach/zsolve.c meschach/ztorture.c meschach/zvecop.c
 
 BINFILES = $(APPNAME)
 dist_bin_SCRIPTS = gwcbatch.pl
-pixmap_DATA = $(APPNAME).xpm
+#why does this upset it?!
+#pixmap_DATA = $(APPNAME).xpm
 desktop_DATA = $(APPNAME).desktop
 DOCFILES = README INSTALL TODO COPYING Changelog
 HELPFILES = $(APPNAME).html
@@ -114,14 +115,14 @@ install : gwc
 	install -p -s $(BINFILES) $(BINDIR)
 	install -p -m 0644 $(DOCFILES) $(DOCDIR)/$(APPNAME)
 	for hf in $(HELPFILES) ; do install -p -m 0644 $(HELPFILESSRCD)/$$hf $(HELPDIR)/$(APPNAME) ; done
-	install -p -m 0644 icons/$(pixmap_DATA) $(pixmapdir)
+	install -p -m 0644 icons/$(APPNAME).xpm $(pixmapdir)
 	install -p -m 0644 $(desktop_DATA) $(desktopdir)
 
 uninstall :
 	( cd $(BINDIR) && rm -f $(BINFILES) )
 	( cd $(DOCDIR)/$(APPNAME) && rm -f $(DOCFILES) )
 	( cd $(HELPDIR)/$(APPNAME) && rm -f $(HELPFILES) )
-	( cd $(pixmapdir) && rm -f $(pixmap_DATA) )
+	( cd $(pixmapdir) && rm -f $(APPNAME).xpm )
 	( cd $(desktopdir) && rm -f $(desktop_DATA) )
 # Alister: note osx errors on --ignore-fail-on-non-empty
 # But we wouldn't normally run `make install` on osx
