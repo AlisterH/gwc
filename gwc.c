@@ -1903,7 +1903,7 @@ EDIT - it does, at least on some systems
 */
 void about(GtkWidget *window)
 {
-    const gchar *authors[] = { "Jeffrey J. Welty", "James Tappin", "Ian Leonard", "Bill Jetzer", "Charles Morgon", "Frank Freudenberg", "Thiemo Gehrke", "Rob Frohne", NULL };
+    const gchar *authors[] = { "Jeffrey J. Welty", "James Tappin", "Ian Leonard", "Bill Jetzer", "Charles Morgon", "Frank Freudenberg", "Thiemo Gehrke", "Rob Frohne", "Alister Hood", NULL };
     const gchar* LICENSE="This program is free software; you can redistribute it and/or "
 			 "modify it under the terms of the GNU General Public License "
 			 "as published by the Free Software Foundation; either version 2 "
