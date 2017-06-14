@@ -1911,7 +1911,7 @@ void about(GtkWidget *window)
 			 "This program is distributed in the hope that it will be useful, "
 			 "but WITHOUT ANY WARRANTY; without even the implied warranty of "
 			 "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the "
-			 "GNU General Public License for more details.\n\n"
+			 "GNU General Public License for more details.\n"
 			 "You should have received a copy of the GNU General Public License "
 			 "along with this program; if not, write to the Free Software "
 			 "Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.";
@@ -1923,7 +1923,7 @@ void about(GtkWidget *window)
 				    "license", LICENSE,
 				    "wrap-license", TRUE,
 				    "website", "http://gwc.sourceforge.net/",
-				    "comments", "A gui application to remove noise (hiss, pops and clicks) from audio files in WAV and similar formats.",
+				    "comments", "Removes noise (hiss, pops and clicks) from audio files in WAV and similar formats.\n\ne.g recordings of scratchy vinyl records.",
 				    "authors", authors,
 				    NULL);
 	// Note I think we'd have to refactor a bit to make this dialog modal in GTK2
