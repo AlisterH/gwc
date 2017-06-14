@@ -77,7 +77,7 @@ meschach/zsolve.c meschach/ztorture.c meschach/zvecop.c
 
 BINFILES = $(APPNAME)
 dist_bin_SCRIPTS = gwcbatch.pl
-pixmap_DATA = icons/$(APPNAME).xpm
+pixmap_DATA = $(APPNAME).xpm
 desktop_DATA = $(APPNAME).desktop
 DOCFILES = README INSTALL TODO COPYING Changelog
 HELPFILES = $(APPNAME).html
@@ -114,7 +114,7 @@ install : gwc
 	install -p -s $(BINFILES) $(BINDIR)
 	install -p -m 0644 $(DOCFILES) $(DOCDIR)/$(APPNAME)
 	for hf in $(HELPFILES) ; do install -p -m 0644 $(HELPFILESSRCD)/$$hf $(HELPDIR)/$(APPNAME) ; done
-	install -p -m 0644 $(pixmap_DATA) $(pixmapdir)
+	install -p -m 0644 icons/$(pixmap_DATA) $(pixmapdir)
 	install -p -m 0644 $(desktop_DATA) $(desktopdir)
 
 uninstall :
