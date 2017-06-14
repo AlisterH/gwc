@@ -45,7 +45,7 @@
 #include "icons/amplify.xpm"
 #include "icons/pinknoise.xpm"
 #include "icons/declick.xpm"
-#include "icons/gnome-wave-cleaner.xpm"
+#include "icons/gtk-wave-cleaner.xpm"
 #include "icons/declick_w.xpm"
 #include "icons/declick_m.xpm"
 #include "icons/decrackle.xpm"
@@ -356,7 +356,7 @@ GKeyFile* read_config(void)
     GKeyFile  *key_file = NULL;
     GError    *error = NULL;
 
-    config_file = g_build_filename (g_get_user_config_dir (), "gnome-wave-cleaner", SETTINGS_FILE, NULL);
+    config_file = g_build_filename (g_get_user_config_dir (), APPNAME, SETTINGS_FILE, NULL);
     //fprintf(stderr, "%s \n", config_file);
     key_file = g_key_file_new ();
     if (! g_key_file_load_from_file (key_file, config_file, G_KEY_FILE_KEEP_COMMENTS, &error)) {
@@ -376,8 +376,8 @@ void write_config(GKeyFile *key_file)
     gchar     *config_file;
 
     file_data = g_key_file_to_data (key_file, NULL, NULL);
-    if (g_mkdir_with_parents (g_build_filename (g_get_user_config_dir (), "gnome-wave-cleaner", NULL), 0755) != -1) {
-        config_file = g_build_filename (g_get_user_config_dir (), "gnome-wave-cleaner", SETTINGS_FILE, NULL);
+    if (g_mkdir_with_parents (g_build_filename (g_get_user_config_dir (), APPNAME, NULL), 0755) != -1) {
+        config_file = g_build_filename (g_get_user_config_dir (), APPNAME, SETTINGS_FILE, NULL);
         g_file_set_contents (config_file, file_data, -1, NULL);
         g_free (config_file);
     }
@@ -669,7 +669,7 @@ void help(GtkWidget * widget, gpointer data)
   #ifdef MAC_OS_X
 		// todo: find the path of a local help file in an osx app.
 		// note the path in the else statement below works if we installed it with `make install`
-		char *uri = "https://rawgit.com/AlisterH/gwc/master/doc/gnome-wave-cleaner.html"; 
+		char *uri = "https://rawgit.com/AlisterH/gwc/master/doc/gtk-wave-cleaner.html"; 
 	    char *command = g_strdup_printf("%s %s &", command ? command : "open", uri);
 	    system(command);
 	    g_free(command);
@@ -681,7 +681,7 @@ void help(GtkWidget * widget, gpointer data)
 		//NSAutoreleasePool *pool [[NSAutoreleasePool alloc] init];
 		@autoreleasepool
 		{
-			ns_url = NSURL URLWithString: [NSString stringWithUTF8String: "file:///users/alister/gwc/doc/gnome-wave-cleaner.html"];
+			ns_url = NSURL URLWithString: [NSString stringWithUTF8String: "file:///users/alister/gwc/doc/gtk-wave-cleaner.html"];
 			retval = [[NSWorkspace sharedWorkspace] openURL: ns_url];
 		}
 		return retval;
@@ -689,7 +689,7 @@ void help(GtkWidget * widget, gpointer data)
 		
   // This is silly - better check if gvfs is installed, or try the gtk_show_uri and see if it fails
   # else
-	char *uri = g_strconcat ("file://", HELPDIR, "/", APPNAME, "/", "gnome-wave-cleaner.html", NULL);
+	char *uri = g_strconcat ("file://", HELPDIR, "/", APPNAME, "/", APPNAME, ".html", NULL);
 	# if GTK_CHECK_VERSION(2,14,0)
   	// not sure if this does what I want
   		GdkScreen *screen = gtk_widget_get_screen (main_window);
@@ -1867,7 +1867,7 @@ int cleanup_and_close(struct view *v, struct sound_prefs *p)
 		gtk_window_get_size(GTK_WINDOW(main_window), &window_width, &window_height);
 	}
 	save_preferences();
-	gtk_accel_map_save( g_build_filename (g_get_user_config_dir (), "gnome-wave-cleaner", ACCELERATORS_FILE, NULL) );
+	gtk_accel_map_save( g_build_filename (g_get_user_config_dir (), APPNAME, ACCELERATORS_FILE, NULL) );
 	undo_purge();
     }
 
@@ -1917,13 +1917,13 @@ void about(GtkWidget *window)
 			 "Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.";
 
     gtk_show_about_dialog(GTK_WINDOW( NULL ),
-				    "program-name", "Gnome Wave Cleaner",
+				    "program-name", "Gtk Wave Cleaner",
 				    "version", VERSION,
 				    "copyright", "Copyright 2001, 2002, 2003, 2004, 2005 Redhawk.org",
 				    "license", LICENSE,
 				    "wrap-license", TRUE,
 				    "website", "http://gwc.sourceforge.net/",
-				    "comments", "An application to aid in denoising (hiss & clicks) of audio files",
+				    "comments", "A gui application to remove noise (hiss, pops and clicks) from audio files in WAV and similar formats.",
 				    "authors", authors,
 				    NULL);
 	// Note I think we'd have to refactor a bit to make this dialog modal in GTK2
@@ -2463,7 +2463,7 @@ static struct {
 	{"pinknoise_icon", pinknoise_xpm },
 	{"amplify_icon", amplify_xpm },
 	{"declick_icon", declick_xpm },
-	{"gwc_icon", gnome_wave_cleaner_xpm },
+	{"gwc_icon", gtk_wave_cleaner_xpm },
 	{"declick_w_icon", declick_w_xpm },
 	{"declick_m_icon", declick_m_xpm },
 	{"decrackle_icon", decrackle_xpm },
@@ -2565,8 +2565,8 @@ static const GtkActionEntry entries[] = {
   { "OggPrefs", NULL, "Ogg encoding", NULL, "Set Ogg Encoding parameters", G_CALLBACK(set_ogg_encoding_preferences) },
   { "MiscPrefs", NULL, "Miscellaneous", NULL, "Miscellaneous parameters", G_CALLBACK(set_misc_preferences) },
   { "HelpMenu", NULL, "_Help" },
-  { "Help", GTK_STOCK_HELP, "User Guide", NULL, "Instructions for using gwc", G_CALLBACK(help) },
-  { "About", GTK_STOCK_ABOUT, "About", NULL, "Info about this program", G_CALLBACK(about) },
+  { "Help", GTK_STOCK_HELP, "User Guide", NULL, "Instructions for using GWC", G_CALLBACK(help) },
+  { "About", GTK_STOCK_ABOUT, "About", NULL, "About GWC", G_CALLBACK(about) },
   { "PlayAudio", "start_icon", "Start audio playback", NULL, "Playback the selected or current view of audio", G_CALLBACK(start_gwc_playback) },
   { "StopAudio", "stop_icon", "Stop", NULL, "Stop audio playback", G_CALLBACK(stop_all_playback_functions) }
 };
@@ -2920,7 +2920,7 @@ gint audio_expose_event(GtkWidget * widget, GdkEventExpose * event)
 void gwc_window_set_title(char *title)
 {
     char buf[255];
-    snprintf(buf, sizeof(buf), "%s - Gnome Wave Cleaner", title);
+    snprintf(buf, sizeof(buf), "%s - Gtk Wave Cleaner", title);
     gtk_window_set_title(GTK_WINDOW(main_window), buf);
 }
 
@@ -3277,7 +3277,7 @@ int main(int argc, char *argv[])
 	  newdir = g_build_filename (g_get_current_dir(), "gwcXXXXXX", NULL) ; 
 	  // might not need to test this - is it actually possible for it to fail but us still be able to write to the audio file we are working on itself?
       if (!g_mkdtemp (newdir))
-      g_warning ("Creation of temp dir failed\nUndo files will conflict if you run more than one instance of gwc in this directory.\n"
+      g_warning ("Creation of temp dir failed\nUndo files will conflict if you run more than one instance of GWC in this directory.\n"
                  "Is the current working directory read-only?  If so we can't do any work because we can't save undo files!");
       else
         tmpdir = newdir;
@@ -3317,7 +3317,7 @@ int main(int argc, char *argv[])
     //gtk_window_set_default_icon_from_file(pixmapdir "/gwc-logo.png", NULL);
     //if we move from using gtk stock icons to using named icons we can do this:
     //gtk_window_set_default_icon_name("some_icon");
-    gtk_window_set_title(GTK_WINDOW(main_window), "Gnome Wave Cleaner: Dehiss, declick audio files");
+    gtk_window_set_title(GTK_WINDOW(main_window), "Gtk Wave Cleaner: Dehiss, declick audio files");
 
     // Remember the window geometry from the last time GWC was used, but check for sanity
     // Looks like we don't actually need to get this information - see comments below.
@@ -3386,7 +3386,7 @@ int main(int argc, char *argv[])
 
     gtk_ui_manager_insert_action_group (ui_manager, action_group, 0);
 
-    gtk_accel_map_load( g_build_filename (g_get_user_config_dir (), "gnome-wave-cleaner", ACCELERATORS_FILE, NULL) );
+    gtk_accel_map_load( g_build_filename (g_get_user_config_dir (), APPNAME, ACCELERATORS_FILE, NULL) );
     gtk_window_add_accel_group (GTK_WINDOW (main_window), 
 				gtk_ui_manager_get_accel_group (ui_manager));
 

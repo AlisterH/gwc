@@ -1,12 +1,18 @@
-gwc 0.22
+GWC 0.22
 --------------
 
-This is the README for Gnome Wave Cleaner, a GTK application to remove noise (hiss, pops and clicks) from audio files in WAV format (must be 16 bit, stereo).
+This is the README for Gtk Wave Cleaner, a gui application to remove noise (hiss, pops and clicks) from audio files in WAV and similar formats.
 
-gwc REQUIRES libsndfile found at: http://www.zip.com.au/~erikd/libsndfile/
-gwc REQUIRES the OSS, ALSA or Pulse Audio sound drivers.
-gwc REQUIRES the fftw libs (www.fftw.org); there are packages available for common Linux distributions.
+Requirements
+------------
+- a *nix based operating system i.e. linux, bsd, osx etc.  GWC can be run on Windows either in a Linux virtual machine or in "windows subsystem for linux" on 64bit Windows 10 using  pulseaudio and X11 servers for windows.
+- gtk2 (www.gtk.org); included in common Linux distributions.
+- libsndfile (www.mega-nerd.com/libsndfile/); there are packages available for common Linux distributions.
+- either the OSS, ALSA or Pulse Audio sound drivers, or Mac OSX.
+- fftw libs (www.fftw.org); there are packages available for common Linux distributions.
 
+License
+------------
 The source code and all associated files are freely available under the GNU Public License (GPL) agreement.
 
 Installation
@@ -17,14 +23,14 @@ Run "./configure"
 Run "make".
 Run "make install".
 
-"gwc" is the program file.  All you have to do is run it.
+"gtk-wave-cleaner" is the program file.  All you have to do is run it, or click on the menu entry.
 
 In case you are building the source from git you will first need to run "autoreconf -i"
 
 Instructions for use:
 ---------------------
 
-Check out the help documentation included in this distribution and available from the help menu in gwc.
+Check out the help documentation included in this distribution and available from the help menu in GWC.
 
 Background:
 -----------

@@ -16,9 +16,11 @@ CODE: various fixes to the build system, including actually installing to --pref
 CODE: general cleanup including removing duplicated or unnecessary files, fixing typos etc.
 DOC: remove the old help manual in favour of the quickstart guide.
 KNOWN ISSUE: GWC fails to open wav files with metadata, such as those created by recent versions of ffmpeg. GWC will produce an error like this: "Failed to open /root/whistle.wav, 'Error : Cannot open file in read/write mode due to string data in header.'".  Libsndfile does not support RDWR mode for these files. If you are creating them  using ffmpeg try adding "-flags bitexact" into your command line (although this will reduce ffmpeg's performance), or writing to a different libsndfile supported format such as .au or .aiff. A workaround for existing files is to open and save the file in mhwaveedit, but since you should keep your original recording as a backup anyway, I suggest either converting to a different format using sndfile-convert or ffmpeg, or using `SimplifyWave` from waveutils or `shntool strip` to make a copy of the file with a clean header.
-CHANGED CONFIG FILE: the location has changed - typically it was ~/.gnome2/gnome_wave_cleaner and is now ~/.config/gnome-wave-cleaner/gwc.conf
+CHANGED CONFIG FILE: the location has changed - typically it was ~/.gnome2/gnome_wave_cleaner and is now ~/.config/gtk-wave-cleaner/gwc.conf
 The format has not changed so it is possible for you to move an old file to the new location.
 CHANGED BEHAVIOUR: Undo files and clipboard data are now saved in $XDG_CACHE_HOME if possible (rather than the current working directory).  Undo files are saved in unique subdirectories so multiple instances of gwc won't interfere with each other.  The clipboard is shared between all gwc instances unless you override $XDG_CACHE_HOME (or it does not exist).
+CHANGED NAME: GWC no longer depends on the deprecated GNOME libs, does it depend on GTK3, and is not very "Gnomish".  Including Gnome in the name is therefore misleading, so the full name has been changed to "Gtk Wave Cleaner".
+RENAMED EXECUTABLE: there is at least one other project named gwc, so to avoid packaging clashes the executable is renamed to gtk-wave-cleaner.  Symlink or alias it as gwc if the long name bothers you ;)
 
 0.21-19
 Feb 2,2013

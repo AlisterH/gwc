@@ -6,9 +6,9 @@ Issue the command:
 
 "make install"
 
-By default this installs the gwc binary in /usr/local/bin/gwc
+By default this installs the GWC binary in /usr/local/bin/gtk-wave-cleaner
 
-Document files are installed in /usr/share/doc/gwc
+Document files are installed in /usr/share/doc/gtk-wave-cleaner
 
 ---
 Problems with linking:

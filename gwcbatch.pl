@@ -44,19 +44,19 @@ while (@ARGV)
 	print `cp $file $archive`;
 	
 	# Now declick and remove noise
-	print `gnome-wave-cleaner $file batch declick $sens $keep[0] $keep[1]`;
+	print `gtk-wave-cleaner $file batch declick $sens $keep[0] $keep[1]`;
 	# Add extra declicking runs if you want them
-	#print `gnome-wave-cleaner $file batch declick $sens $keep[0] $keep[1]`;
-	print `gnome-wave-cleaner $file batch denoise $noise[0] $noise[1] $keep[0] $keep[1]`;
+	#print `gtk-wave-cleaner $file batch declick $sens $keep[0] $keep[1]`;
+	print `gtk-wave-cleaner $file batch denoise $noise[0] $noise[1] $keep[0] $keep[1]`;
 
 	# truncate after cleaning in case the noise sample is from the region to truncate
 	# for some reason, it *sometimes* hangs when truncating
 	# both front and back, so do back first, then front
-	print `gnome-wave-cleaner $file batch truncate 0 $keep[1]`;
-	print `gnome-wave-cleaner $file batch truncate $keep[0] $keep[1]`;
+	print `gtk-wave-cleaner $file batch truncate 0 $keep[1]`;
+	print `gtk-wave-cleaner $file batch truncate $keep[0] $keep[1]`;
 	
 	# normalize last so it isn't affected by anything we are discarding
-	print `gnome-wave-cleaner $file batch normalize`;
+	print `gtk-wave-cleaner $file batch normalize`;
 }
 
 1;

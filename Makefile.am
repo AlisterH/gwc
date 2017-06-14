@@ -44,7 +44,7 @@ DATADIR = @datadir@
 DATAROOTDIR = @datarootdir@
 LIBDIR = @libdir@
 SYSCONFDIR = @sysconfdir@
-APPNAME = gnome-wave-cleaner
+APPNAME = gtk-wave-cleaner
 
 desktopdir = $(DATADIR)/applications
 pixmapdir = $(DATADIR)/pixmaps
@@ -53,7 +53,7 @@ DOCDIR = $(DATADIR)/doc
 HELPDIR = $(DOCDIR)
 
 # use these entries for SuSE and maybe other distros
-#DOCDIR = /usr/share/doc/packages/gwc
+#DOCDIR = /usr/share/doc/packages/gtk-wave-cleaner
 #HELPDIR = $(DOCDIR)
 
 DEFS = -DDATADIR=\"$(DATADIR)\" -DHELPDIR=\"$(HELPDIR)\" -DLIBDIR=\"$(LIBDIR)\" -Dpixmapdir=\"$(pixmapdir)\" -DAPPNAME=\"$(APPNAME)\" @OSXDEF@ @ALSADEF@ @PAHDR@ @FFTWHDR@ @FFTWPREC@ @OGGHDR@ @MP3HDR@
@@ -139,5 +139,5 @@ meschach/meschach.a :
 	(cd meschach ; ./configure --with-sparse ; make part1 ; make part2 ; make part3 ; cp machine.h ..)
 
 clean :
-	rm -f gnome-wave-cleaner *.o core meschach.a meschach/meschach.a machine.h
+	rm -f $(APPNAME) *.o core meschach.a meschach/meschach.a machine.h
 	(cd meschach ; make realclean)

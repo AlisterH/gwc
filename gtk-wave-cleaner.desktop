@@ -2,10 +2,10 @@
 Version=1.0
 Type=Application
 Terminal=false
-Name=Gnome Wave Cleaner
+Name=Gtk Wave Cleaner
 Comment=Removes noise from audio recordings e.g. of scratchy vinyl records
 Keywords=audio;sound;noise;filter;
-TryExec=gnome-wave-cleaner
-Exec=gnome-wave-cleaner %f
-Icon=gnome-wave-cleaner
+TryExec=gtk-wave-cleaner
+Exec=gtk-wave-cleaner %f
+Icon=gtk-wave-cleaner
 Categories=GTK;AudioVideo;Audio;AudioVideoEditing;
