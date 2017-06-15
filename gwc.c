@@ -1925,6 +1925,7 @@ void about(GtkWidget *window)
 				    "website", "http://gwc.sourceforge.net/",
 				    "comments", "Removes noise (hiss, pops and clicks) from audio files in WAV and similar formats.\n\ne.g recordings of scratchy vinyl records.",
 				    "authors", authors,
+				    "logo-icon-name", APPNAME,
 				    NULL);
 	// Note I think we'd have to refactor a bit to make this dialog modal in GTK2
 }
@@ -3311,7 +3312,8 @@ int main(int argc, char *argv[])
 
     main_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     GdkPixbuf *icon =  gtk_widget_render_icon(main_window, "gwc_icon", 6, NULL);
-    gtk_window_set_default_icon(icon);
+    //gtk_window_set_default_icon(icon);
+    gtk_window_set_default_icon_name(APPNAME);
     //if we did use this method we should really check if the file exists first:
     //but it doesn't actually make any sense to use this file
     //gtk_window_set_default_icon_from_file(pixmapdir "/gwc-logo.png", NULL);
