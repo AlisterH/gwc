@@ -46,8 +46,6 @@ LIBDIR = @libdir@
 SYSCONFDIR = @sysconfdir@
 APPNAME = gtk-wave-cleaner
 
-desktopdir = $(DATADIR)/applications
-pixmapdir = $(DATADIR)/pixmaps
 DOCDIR = $(DATADIR)/doc
 # Alister: if you set HELPDIR different to DOCDIR, you will need to add it to the uninstall routine below
 HELPDIR = $(DOCDIR)
@@ -56,7 +54,7 @@ HELPDIR = $(DOCDIR)
 #DOCDIR = /usr/share/doc/packages/gtk-wave-cleaner
 #HELPDIR = $(DOCDIR)
 
-DEFS = -DDATADIR=\"$(DATADIR)\" -DHELPDIR=\"$(HELPDIR)\" -DLIBDIR=\"$(LIBDIR)\" -Dpixmapdir=\"$(pixmapdir)\" -DAPPNAME=\"$(APPNAME)\" @OSXDEF@ @ALSADEF@ @PAHDR@ @FFTWHDR@ @FFTWPREC@ @OGGHDR@ @MP3HDR@
+DEFS = -DDATADIR=\"$(DATADIR)\" -DHELPDIR=\"$(HELPDIR)\" -DLIBDIR=\"$(LIBDIR)\" -DAPPNAME=\"$(APPNAME)\" @OSXDEF@ @ALSADEF@ @PAHDR@ @FFTWHDR@ @FFTWPREC@ @OGGHDR@ @MP3HDR@
 CFLAGS = -D_FILE_OFFSET_BITS=64 -Wall @CFLAGS@ @GTK_CFLAGS@ @SNDFILE_CFLAGS@
 
 LIBS= meschach.a @GTK_LIBS@ @SNDFILE_LIBS@ @ALSALIB@ @PALIB@ @FFTWLIB@ @OGGLIB@ @MP3LIB@ -lm
@@ -65,7 +63,7 @@ SRC = tap_reverb_file_io.c tap_reverb.c reverb.c dialog.c gwc.c audio_device.c a
 OBJS = $(SRC:.c=.o)
 # Alister: We should be able to avoid most of this - see item 3 and 4 in the comment at the top
 # Alister: leave out meschach/configure.in, as it makes a broken configure, and someone may try to use it!
-EXTRA_DIST = $(SRC) icons Changelog doc ar.c audio_osx.c audio_pa.c audio_oss.c audio_alsa.c \
+EXTRA_DIST = $(SRC) data osx_packaging Changelog doc ar.c audio_osx.c audio_pa.c audio_oss.c audio_alsa.c \
 ar.h audio_device.h audio_edit.h biquad.h encoding.h fmtheaders.h gtkled.h gtkledbar.h gwc.h mconf.h mp3.h mp3-duration.h reverb_settings.h soundfile.h stat.h tap_reverb.h tap_reverb_common.h tap_reverb_file_io.h \
 meschach/DOC meschach/MACHINES meschach/arnoldi.c meschach/bdfactor.c meschach/bkpfacto.c meschach/chfactor.c meschach/config.cache meschach/configure meschach/conjgrad.c meschach/copy.c meschach/copyright meschach/dmacheps.c meschach/err.c meschach/err.h \
 meschach/extras.c meschach/fft.c meschach/FILELIST meschach/fmacheps.c meschach/givens.c meschach/hessen.c meschach/hsehldr.c meschach/init.c meschach/iotort.c meschach/iter.h meschach/iter0.c meschach/iternsym.c meschach/itersym.c meschach/itertort.c meschach/ivecop.c meschach/lanczos.c \
@@ -77,12 +75,20 @@ meschach/zsolve.c meschach/ztorture.c meschach/zvecop.c
 
 BINFILES = $(APPNAME)
 dist_bin_SCRIPTS = gwcbatch.pl
-#why does this upset it?!
-#pixmap_DATA = $(APPNAME).xpm
-desktop_DATA = $(APPNAME).desktop
 DOCFILES = README INSTALL TODO COPYING Changelog
 HELPFILES = $(APPNAME).html
 HELPFILESSRCD = doc
+
+DATADIRS = \
+    icons/hicolor/16x16/apps \
+    icons/hicolor/22x22/apps \
+    icons/hicolor/24x24/apps \
+    icons/hicolor/32x32/apps \
+    icons/hicolor/64x64/apps \
+    icons/hicolor/128x128/apps \
+    icons/hicolor/256x256/apps \
+    icons/hicolor/scalable/apps\
+    applications
 
 ###
 CC = @CC@
@@ -111,22 +117,20 @@ install : gwc
 	install -d $(BINDIR)
 	install -d $(DOCDIR)/$(APPNAME)
 	install -d $(HELPDIR)/$(APPNAME)
-	install -d $(pixmapdir)
 	install -p -s $(BINFILES) $(BINDIR)
 	install -p -m 0644 $(DOCFILES) $(DOCDIR)/$(APPNAME)
 	for hf in $(HELPFILES) ; do install -p -m 0644 $(HELPFILESSRCD)/$$hf $(HELPDIR)/$(APPNAME) ; done
-	install -p -m 0644 icons/$(APPNAME).xpm $(pixmapdir)
-	install -p -m 0644 $(desktop_DATA) $(desktopdir)
+	for hf in $(DATADIRS) ; do install -d $(DATADIR)/$$hf && install -p -m 0644 data/$$hf/$(APPNAME).* $(DATADIR)/$$hf ; done
+	gtk-update-icon-cache -f -t $(DATADIR)/icons/hicolor
 
 uninstall :
 	( cd $(BINDIR) && rm -f $(BINFILES) )
 	( cd $(DOCDIR)/$(APPNAME) && rm -f $(DOCFILES) )
 	( cd $(HELPDIR)/$(APPNAME) && rm -f $(HELPFILES) )
-	( cd $(pixmapdir) && rm -f $(APPNAME).xpm )
-	( cd $(desktopdir) && rm -f $(desktop_DATA) )
 # Alister: note osx errors on --ignore-fail-on-non-empty
 # But we wouldn't normally run `make install` on osx
-	( rmdir --ignore-fail-on-non-empty $(DOCDIR)/$(APPNAME) $(DOCDIR) $(pixmapdir) $(desktopdir))
+	( rmdir --ignore-fail-on-non-empty $(DOCDIR)/$(APPNAME) $(DOCDIR) )
+	( for hf in $(DATADIRS) ; do rm $(DATADIR)/$$hf/$(APPNAME).* && rmdir -p --ignore-fail-on-non-empty $(DATADIR)/$$hf; done )
 # Alister: why does this test not work?
 #	( if [$(DOCDIR) != $(HELPDIR)]; then rmdir --ignore-fail-on-non-empty $(HELPDIR)/$(APPNAME) $(HELPDIR); fi)
 
