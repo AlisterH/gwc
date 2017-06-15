@@ -1917,7 +1917,6 @@ void about(GtkWidget *window)
 			 "Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.";
 
     gtk_show_about_dialog(GTK_WINDOW( NULL ),
-				    "program-name", "Gtk Wave Cleaner",
 				    "version", VERSION,
 				    "copyright", "Copyright 2001, 2002, 2003, 2004, 2005 Redhawk.org",
 				    "license", LICENSE,
@@ -3307,6 +3306,7 @@ int main(int argc, char *argv[])
     /* This is called in all GTK applications. Arguments are parsed
      * from the command line and are returned to the application. */
     gtk_init(&argc, &argv);
+    g_set_application_name("Gtk Wave Cleaner");
 	
     register_stock_icons ();
 
