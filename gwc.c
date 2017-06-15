@@ -3311,9 +3311,14 @@ int main(int argc, char *argv[])
     register_stock_icons ();
 
     main_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    GdkPixbuf *icon =  gtk_widget_render_icon(main_window, "gwc_icon", 6, NULL);
-    //gtk_window_set_default_icon(icon);
-    gtk_window_set_default_icon_name(APPNAME);
+    if (gtk_icon_theme_has_icon(gtk_icon_theme_get_default(), APPNAME))
+		gtk_window_set_default_icon_name(APPNAME);
+	else
+	{
+		GdkPixbuf *icon =  gtk_widget_render_icon(main_window, "gwc_icon", 6, NULL);
+		gtk_window_set_default_icon(icon);
+    }
+	
     //if we did use this method we should really check if the file exists first:
     //but it doesn't actually make any sense to use this file
     //gtk_window_set_default_icon_from_file(pixmapdir "/gwc-logo.png", NULL);
