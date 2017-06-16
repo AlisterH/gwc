@@ -1922,7 +1922,7 @@ void about(GtkWidget *window)
 				    "license", LICENSE,
 				    "wrap-license", TRUE,
 				    "website", "http://gwc.sourceforge.net/",
-				    "comments", "Removes noise (hiss, pops and clicks) from audio files in WAV and similar formats.\n\ne.g recordings of scratchy vinyl records.",
+				    "comments", "Removes noise (hiss, pops and clicks) from audio files in WAV and similar formats.\ne.g recordings of scratchy vinyl records.",
 				    "authors", authors,
 				    "logo-icon-name", APPNAME,
 				    NULL);

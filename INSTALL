@@ -1,19 +1,12 @@
 ---
-The README now includes instructions to install.  Can we delete this file now?
----
-
-Issue the command:
-
-"make install"
-
-By default this installs the GWC binary in /usr/local/bin/gtk-wave-cleaner
-
-Document files are installed in /usr/share/doc/gtk-wave-cleaner
+Installation is via the classic `./configure; make; make install`.
+Refer to the README for further information.
+This file documents specific installation problems which may be encountered.
 
 ---
 Problems with linking:
 
-1) You don't have libsndfile in a standard place, like /usr/lib, but /usr/local/lib
+You don't have libsndfile in a standard place, like /usr/lib, but /usr/local/lib
 	-- make sure /usr/local/lib is in your /etc/ld.so.conf file, and reload the runtime loader (man ldconf)
 	-- you will need to add /usr/local/lib/pkgconfig to your PKG_CONFIG_PATH environment variable, like so:
 
@@ -50,3 +43,7 @@ e.g. building on OSX leopard I had problems like this:
 To solve it I had to do this:
 
 export PKG_CONFIG_PATH=$(find /usr/local/Cellar -name 'pkgconfig' -type d | grep lib/pkgconfig | tr '\n' ':' | sed s/.$//)
+
+---
+It was previously reported that `make install` did not work due to datadir not being defined.
+This was fixed by configuring with `--datadir=$pkgdir/usr/share`. $pkgdir related to the distribution's packaging system.
