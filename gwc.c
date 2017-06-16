@@ -3318,11 +3318,7 @@ int main(int argc, char *argv[])
     }
 	gtk_window_set_default_icon_name(APPNAME);
 	
-    //if we did use this method we should really check if the file exists first:
-    //but it doesn't actually make any sense to use this file
     //gtk_window_set_default_icon_from_file(pixmapdir "/gwc-logo.png", NULL);
-    //if we move from using gtk stock icons to using named icons we can do this:
-    //gtk_window_set_default_icon_name("some_icon");
     gtk_window_set_title(GTK_WINDOW(main_window), "Gtk Wave Cleaner: Dehiss, declick audio files");
 
     // Remember the window geometry from the last time GWC was used, but check for sanity
@@ -3566,10 +3562,15 @@ int main(int argc, char *argv[])
 	// except that it enables the ⌘M keyboard shortcut to minimise!
 	gtkosx_application_set_window_menu (theApp, NULL);
 	
-	// I'm guessing setting the icon like this is unnecessary once we have created a .app application bundle
+	// N.B. Setting the icon like this is unnecessary when running as a .app application bundle
 	// And we need to do that to get osx to use the icon when the application isn't running.
-	gtkosx_application_set_dock_icon_pixbuf(theApp, icon);
-	
+	// We need the test so we don't override it when we are in an application bundle!
+	if (gtkosx_application_get_bundle_id() == NULL)
+	{
+		GdkPixbuf *icon =  gtk_widget_render_icon(main_window, "gwc_icon", 6, NULL);
+		gtkosx_application_set_dock_icon_pixbuf(theApp, icon);
+    }
+    
 	// Re #1 above - we actually need this, otherwise nothing happens at all
 	gtkosx_application_ready (theApp);
 	
