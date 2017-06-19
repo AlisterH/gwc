@@ -54,4 +54,4 @@ if /bin/expr "x$1" : '^x-psn_' > /dev/null; then
 fi
 
 echo "Launching Gtk Wave Cleaner..."
-$EXEC "$bundle_contents/MacOS/gtk-wave-cleaner" "$@" $EXTRA_ARGS
+$EXEC "$bundle_contents/MacOS/gtk-wave-cleaner-bin" "$@" $EXTRA_ARGS
