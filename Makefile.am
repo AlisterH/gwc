@@ -140,7 +140,7 @@ uninstall :
 # Alister: note osx errors on --ignore-fail-on-non-empty
 # But we wouldn't normally run `make install` on osx
 	( rmdir --ignore-fail-on-non-empty "$(DESTDIR)"$(DOCDIR)/$(APPNAME) $(DOCDIR) )
-	( for hf in $(DATADIRS) ; do rm "$(DESTDIR)"$(DATADIR)/$$hf/$(APPNAME).* && rmdir -p -ignore-fail-on-non-empty "$(DESTDIR)"$(DATADIR)/$$hf; done )
+	( for hf in $(DATADIRS) ; do rm "$(DESTDIR)"$(DATADIR)/$$hf/$(APPNAME).* && rmdir -p --ignore-fail-on-non-empty "$(DESTDIR)"$(DATADIR)/$$hf; done )
 # Alister: why does this test not work?
 #	( if [$(DOCDIR) != $(HELPDIR)]; then rmdir --ignore-fail-on-non-empty "$(DESTDIR)"$(HELPDIR)/$(APPNAME) "$(DESTDIR)"$(HELPDIR); fi)
 
