@@ -9,7 +9,7 @@
 	<key>CFBundleIdentifier</key>
 	<string>com.alisterhood.gwc</string>
 	<key>CFBundleName</key>
-	<string>Gtk-Wave-Cleaner</string>
+	<string>Gtk Wave Cleaner</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleSignature</key>
