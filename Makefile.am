@@ -123,7 +123,7 @@ audio_util.o : audio_util.c Makefile
 # How do we get it to load the logo in the about dialog from either the icon files or the .icns?
 
 install : gwc
-	install -d ""$(DESTDIR)""$(BINDIR)
+	install -d "$(DESTDIR)"$(BINDIR)
 	install -d "$(DESTDIR)"$(DOCDIR)/$(APPNAME)
 	install -d "$(DESTDIR)"$(HELPDIR)/$(APPNAME)
 	install -p -s $(BINFILES) "$(DESTDIR)"$(BINDIR)
