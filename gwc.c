@@ -669,7 +669,7 @@ void help(GtkWidget * widget, gpointer data)
   char *uri = g_strconcat ("file://", HELPDIR, "/", APPNAME, "/", APPNAME, ".html", NULL);
   #ifdef MAC_OS_X
 	  if ( gtkosx_application_get_bundle_id() )
-	    uri = g_strconcat (gtkosx_application_get_resource_path(), HELPDIR, "/", APPNAME, "/", APPNAME, ".html", NULL);
+	    uri = g_strconcat ("file://", g_uri_escape_string(gtkosx_application_get_resource_path(), "/", TRUE), HELPDIR, "/", APPNAME, "/", APPNAME, ".html", NULL);
 	  //g_message("testing %s", uri);
 	  char *command = g_strdup_printf("%s %s &", command ? command : "open", uri);
 	  system(command);
@@ -3588,8 +3588,7 @@ int main(int argc, char *argv[])
 	// Re #1 above - we actually need this, otherwise nothing happens at all
 	gtkosx_application_ready (theApp);
 	
-	// Possible todos:
-	// Make help work
+	// Possible todo:
 	// implement native file dialogs using nativefiledialog library or tinyfiledialogs or something
 	#endif
 
