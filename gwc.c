@@ -666,13 +666,14 @@ void help(GtkWidget * widget, gpointer data)
   // We should probably modify this so that it works if running GWC from the build directory without installing, and/or
   // so that it shows a warning message if the help file does not exist.  But should figure out test for gvfs first.
 
+  char *uri = g_strconcat ("file://", HELPDIR, "/", APPNAME, "/", APPNAME, ".html", NULL);
   #ifdef MAC_OS_X
-		// todo: find the path of a local help file in an osx app.
-		// note the path in the else statement below works if we installed it with `make install`
-		char *uri = "https://rawgit.com/AlisterH/gwc/master/doc/gtk-wave-cleaner.html"; 
-	    char *command = g_strdup_printf("%s %s &", command ? command : "open", uri);
-	    system(command);
-	    g_free(command);
+	  if ( gtkosx_application_get_bundle_id() )
+	    uri = g_strconcat (gtkosx_application_get_resource_path(), HELPDIR, "/", APPNAME, "/", APPNAME, ".html", NULL);
+	  //g_message("testing %s", uri);
+	  char *command = g_strdup_printf("%s %s &", command ? command : "open", uri);
+	  system(command);
+	  g_free(command);
 	// I had compile problems trying to do it using this method!
 	/*	NSURL	*ns_url;
 		gboolean retval;
@@ -687,21 +688,34 @@ void help(GtkWidget * widget, gpointer data)
 		return retval;
 	*/	
 		
-  // This is silly - better check if gvfs is installed, or try the gtk_show_uri and see if it fails
   # else
-	char *uri = g_strconcat ("file://", HELPDIR, "/", APPNAME, "/", APPNAME, ".html", NULL);
-	# if GTK_CHECK_VERSION(2,14,0)
-  	// not sure if this does what I want
+  /*
+  // This is infuriating as it silently fails if gvfs is not installed, and it will freeze gwc
+  // if gvfs is installed but broken (e.g. because the dbus session isn't working correctly)!
+	if GTK_CHECK_VERSION(2,14,0)
+  	{
+		// not sure if this does what I want
   		GdkScreen *screen = gtk_widget_get_screen (main_window);
-  		gtk_show_uri(screen, uri, gtk_get_current_event_time (), NULL);
-	# else
+  		// First try gtk_show_uri(), which fails if gvfs is not installed
+  		// Then use xdg-open, which should work in almost all cases.
+  		// If we were keen we could copy pragha's src/utils.c, which then tries firefox, mozilla, opera...
+  		if ( !gtk_show_uri(screen, uri, gtk_get_current_event_time (), NULL) )
+  		{
+			char *command = g_strdup_printf("%s %s &", command ? command : "xdg-open", uri);
+			system(command);
+			g_free(command);
+		}
+	}
+	else
+  	{ */
+		// I used to think that xdg-open was inferior because it used a hard-coded list of browsers,
+		// but it actually uses the $BROWSER environment variable if set
   		char *command = g_strdup_printf("%s %s &", command ? command : "xdg-open", uri);
   		system(command);
   		g_free(command);
-	# endif
-	// not sure why, but it crashes on osx if we move this below the last #endif
-	g_free(uri);
+//	}
   #endif
+  g_free(uri);
 }
 
 void declick_with_sensitivity(double sensitivity)
