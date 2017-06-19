@@ -41,6 +41,7 @@ endif
 
 BINDIR = @bindir@
 DATADIR = @datadir@
+# is this one used for anything?:
 DATAROOTDIR = @datarootdir@
 LIBDIR = @libdir@
 SYSCONFDIR = @sysconfdir@
@@ -113,26 +114,35 @@ audio_util.o : audio_util.c Makefile
 .c.o :
 	$(COMPILE) -c $<
 
+# Alister: note that we can mostly install to the OSX appdir using something like this:
+# make DESTDIR=/tmp/gwc/osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources install
+# but the binary won't be in the ...Contents/MacOS directory
+# so do this:
+# mv /osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/bin/gtk-wave-cleaner /osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/MacOS/gtk-wave-cleaner.bin
+# but the icon files aren't used, anyway!
+# How do we get it to load the logo in the about dialog from either the icon files or the .icns?
+
 install : gwc
-	install -d $(BINDIR)
-	install -d $(DOCDIR)/$(APPNAME)
-	install -d $(HELPDIR)/$(APPNAME)
-	install -p -s $(BINFILES) $(BINDIR)
-	install -p -m 0644 $(DOCFILES) $(DOCDIR)/$(APPNAME)
-	for hf in $(HELPFILES) ; do install -p -m 0644 $(HELPFILESSRCD)/$$hf $(HELPDIR)/$(APPNAME) ; done
-	for hf in $(DATADIRS) ; do install -d $(DATADIR)/$$hf && install -p -m 0644 data/$$hf/$(APPNAME).* $(DATADIR)/$$hf ; done
-	gtk-update-icon-cache -f -t $(DATADIR)/icons/hicolor
+	install -d ""$(DESTDIR)""$(BINDIR)
+	install -d "$(DESTDIR)"$(DOCDIR)/$(APPNAME)
+	install -d "$(DESTDIR)"$(HELPDIR)/$(APPNAME)
+	install -p -s $(BINFILES) "$(DESTDIR)"$(BINDIR)
+	install -p -m 0644 $(DOCFILES) "$(DESTDIR)"$(DOCDIR)/$(APPNAME)
+	for hf in $(HELPFILES) ; do install -p -m 0644 $(HELPFILESSRCD)/$$hf "$(DESTDIR)"$(HELPDIR)/$(APPNAME) ; done
+	for hf in $(DATADIRS) ; do install -d "$(DESTDIR)"$(DATADIR)/$$hf && install -p -m 0644 data/$$hf/$(APPNAME).* "$(DESTDIR)"$(DATADIR)/$$hf ; done
+#	if we are using DESTDIR this is pointless, so should we skip it?:
+	gtk-update-icon-cache -f -t "$(DESTDIR)"$(DATADIR)/icons/hicolor
 
 uninstall :
-	( cd $(BINDIR) && rm -f $(BINFILES) )
-	( cd $(DOCDIR)/$(APPNAME) && rm -f $(DOCFILES) )
-	( cd $(HELPDIR)/$(APPNAME) && rm -f $(HELPFILES) )
+	( cd "$(DESTDIR)"$(BINDIR) && rm -f $(BINFILES) )
+	( cd "$(DESTDIR)"$(DOCDIR)/$(APPNAME) && rm -f $(DOCFILES) )
+	( cd "$(DESTDIR)"$(HELPDIR)/$(APPNAME) && rm -f $(HELPFILES) )
 # Alister: note osx errors on --ignore-fail-on-non-empty
 # But we wouldn't normally run `make install` on osx
-	( rmdir --ignore-fail-on-non-empty $(DOCDIR)/$(APPNAME) $(DOCDIR) )
-	( for hf in $(DATADIRS) ; do rm $(DATADIR)/$$hf/$(APPNAME).* && rmdir -p --ignore-fail-on-non-empty $(DATADIR)/$$hf; done )
+	( rmdir --ignore-fail-on-non-empty "$(DESTDIR)"$(DOCDIR)/$(APPNAME) $(DOCDIR) )
+	( for hf in $(DATADIRS) ; do rm "$(DESTDIR)"$(DATADIR)/$$hf/$(APPNAME).* && rmdir -p -ignore-fail-on-non-empty "$(DESTDIR)"$(DATADIR)/$$hf; done )
 # Alister: why does this test not work?
-#	( if [$(DOCDIR) != $(HELPDIR)]; then rmdir --ignore-fail-on-non-empty $(HELPDIR)/$(APPNAME) $(HELPDIR); fi)
+#	( if [$(DOCDIR) != $(HELPDIR)]; then rmdir --ignore-fail-on-non-empty "$(DESTDIR)"$(HELPDIR)/$(APPNAME) "$(DESTDIR)"$(HELPDIR); fi)
 
 meschach.a : meschach/meschach.a
 	cp meschach/meschach.a .
