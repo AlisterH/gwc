@@ -669,6 +669,9 @@ void help(GtkWidget * widget, gpointer data)
   char *uri = g_strconcat ("file://", HELPDIR, "/", APPNAME, "/", APPNAME, ".html", NULL);
   #ifdef MAC_OS_X
 	  if ( gtkosx_application_get_bundle_id() )
+	    // TODO:
+	    // problem: the application directory could have spaces in its path, in which case we need to replace them with %20
+	    // note that g_filename_to_uri() is too useless to do that.
 	    uri = g_strconcat (gtkosx_application_get_resource_path(), HELPDIR, "/", APPNAME, "/", APPNAME, ".html", NULL);
 	  //g_message("testing %s", uri);
 	  char *command = g_strdup_printf("%s %s &", command ? command : "open", uri);
