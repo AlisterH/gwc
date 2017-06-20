@@ -1,0 +1,23 @@
+# first extract the source as ~/gwc and run configure in that directory
+make DESTDIR=~/gwc/osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources install
+mv osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/bin/gtk-wave-cleaner osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/MacOS/gtk-wave-cleaner-bin
+rmdir osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/bin
+mkdir osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+cp /usr/local/lib/libgtkmacintegration-gtk2.2.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+cp /usr/local/opt/gtk+/lib/libgtk-quartz-2.0.0.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+cp /usr/local/opt/gtk+/lib/libgdk-quartz-2.0.0.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+cp /usr/local/opt/pango/lib/libpangocairo-1.0.0.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+cp /usr/local/opt/pango/lib/libpango-1.0.0.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+cp /usr/local/opt/atk/lib/libatk-1.0.0.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+cp /usr/local/opt/cairo/lib/libcairo.2.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+cp /usr/local/opt/gdk-pixbuf/lib/libgdk_pixbuf-2.0.0.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+cp /usr/local/opt/glib/lib/libgio-2.0.0.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+cp /usr/local/opt/glib/lib/libgobject-2.0.0.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+cp /usr/local/opt/glib/lib/libglib-2.0.0.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+cp /usr/local/opt/gettext/lib/libintl.8.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+cp /usr/local/opt/libsndfile/lib/libsndfile.1.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+cp /usr/local/opt/fftw/lib/libfftw3.3.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+
+strip osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/MacOS/gtk-wave-cleaner-bin
+for i in osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/*; do strip -x "$i"; done
+hdiutil create -fs "Case-sensitive HFS+" -volname "Gtk Wave Cleaner" -srcfolder osx_packaging/Gtk\ Wave\ Cleaner.app GWC-stripped.dmg
