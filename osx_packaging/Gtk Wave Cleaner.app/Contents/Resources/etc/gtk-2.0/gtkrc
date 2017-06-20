@@ -1,0 +1,7 @@
+#the included toolbar icons are 28x2
+#this would be useful for hidpi screens, but how do we make other gui elements like scrollbars bigger too? 
+# And do we need to do anything to make text bigger?:
+#gtk-icon-sizes = "panel-menu=56,56:panel=56,56:gtk-menu=56,56:gtk-large-toolbar=56,56:gtk-small-toolbar=56,56:gtk-button=56,56:gtk-dnd=56,56"
+
+# use the win32/osx sort indicators direction
+gtk-alternative-sort-arrows = 1
