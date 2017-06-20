@@ -2155,6 +2155,14 @@ void old_open_wave_filename(void)
     }
 }
 
+#ifdef MAC_OS_X
+static gboolean app_open_file_cb (GtkosxApplication *app, gchar *path, gpointer p)
+{
+    strcpy(wave_filename, path);
+    open_wave_filename();
+}
+#endif
+
 void store_selection_filename(gpointer user_data)
 {
     if (strcmp(save_selection_filename, wave_filename)) {
@@ -3553,6 +3561,7 @@ int main(int argc, char *argv[])
 	GtkosxApplication *theApp = g_object_new(GTKOSX_TYPE_APPLICATION, NULL);
 	//We actually need this otherwise it just quits without asking about saving!
 	g_signal_connect (theApp, "NSApplicationBlockTermination", G_CALLBACK (delete_event), NULL );
+	g_signal_connect (theApp, "NSApplicationOpenFile", G_CALLBACK(app_open_file_cb), NULL); 
 	
 	// integrate the menus into the osx menu bar
 	// N.B. osx adds a "special characters" entry to the edit menu, which is bizarre
