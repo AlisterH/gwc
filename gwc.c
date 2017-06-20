@@ -2156,7 +2156,7 @@ void old_open_wave_filename(void)
 }
 
 #ifdef MAC_OS_X
-static gboolean app_open_file_cb (GtkosxApplication *app, gchar *path, gpointer p)
+static gboolean app_open_file_cb (GtkosxApplication *theApp, gchar *path, gpointer p)
 {
     strcpy(wave_filename, path);
     open_wave_filename();
