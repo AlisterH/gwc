@@ -1,7 +1,7 @@
 ## HOW TO USE ##
 
 ## This file is distributed as an example of gtk settings which people might find useful.
-## To apply these settings for all programs they should typically be added to ~/.gtkrc-2.0 or ~/.gtkrc-2.0.mine
+## To apply these settings for all GTK2 programs they should typically be added to ~/.gtkrc-2.0 or ~/.gtkrc-2.0.mine
 ## Changes will take effect upon restarting the program.
 ## If a line is prefixed by a # that means it is commented out.
 
