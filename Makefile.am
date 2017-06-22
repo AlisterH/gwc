@@ -51,7 +51,7 @@ DOCDIR = $(DATADIR)/doc
 # Alister: if you set HELPDIR different to DOCDIR, you will need to add it to the uninstall routine below
 HELPDIR = $(DOCDIR)
 
-# use these entries for SuSE and maybe other distros
+# use this for SuSE and maybe other distros
 #DOCDIR = /usr/share/doc/packages/gtk-wave-cleaner
 #HELPDIR = $(DOCDIR)
 
@@ -76,8 +76,9 @@ meschach/zsolve.c meschach/ztorture.c meschach/zvecop.c
 
 BINFILES = $(APPNAME)
 dist_bin_SCRIPTS = gwcbatch.pl
+# Confusingly we don't have the DOCFILES in the doc directory, only the HELPFILES
 DOCFILES = README INSTALL TODO COPYING Changelog
-HELPFILES = $(APPNAME).html
+HELPFILES = $(APPNAME).html gtkrc-example.txt
 HELPFILESSRCD = doc
 
 DATADIRS = \
@@ -119,7 +120,7 @@ audio_util.o : audio_util.c Makefile
 # but the binary won't be in the ...Contents/MacOS directory
 # so do this:
 # mv /osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/bin/gtk-wave-cleaner /osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/MacOS/gtk-wave-cleaner.bin
-# but the icon files aren't used, anyway!
+# The .desktop and icon files aren't used, anyway, but at least it installs the docs!
 # How do we get it to load the logo in the about dialog from either the icon files or the .icns?
 
 install : gwc
@@ -138,7 +139,7 @@ uninstall :
 	( cd "$(DESTDIR)"$(DOCDIR)/$(APPNAME) && rm -f $(DOCFILES) )
 	( cd "$(DESTDIR)"$(HELPDIR)/$(APPNAME) && rm -f $(HELPFILES) )
 # Alister: note osx errors on --ignore-fail-on-non-empty
-# But we wouldn't normally run `make install` on osx
+# But we wouldn't normally run `make uninstall` on osx
 	( rmdir --ignore-fail-on-non-empty "$(DESTDIR)"$(DOCDIR)/$(APPNAME) $(DOCDIR) )
 	( for hf in $(DATADIRS) ; do rm "$(DESTDIR)"$(DATADIR)/$$hf/$(APPNAME).* && rmdir -p --ignore-fail-on-non-empty "$(DESTDIR)"$(DATADIR)/$$hf; done )
 # Alister: why does this test not work?
