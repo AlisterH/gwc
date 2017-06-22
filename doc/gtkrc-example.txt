@@ -1,17 +1,22 @@
 ## HOW TO USE ##
 
 ## This file is distributed as an example of gtk settings which people might find useful.
-## These settings should typically be added to ~/.gtkrc-2.0 or ~/.gtkrc-2.0.mine and changes will take effect upon restarting the program.
+## To apply these settings for all programs they should typically be added to ~/.gtkrc-2.0 or ~/.gtkrc-2.0.mine
+## Changes will take effect upon restarting the program.
 ## If a line is prefixed by a # that means it is commented out.
 
-## To use a special gtkrc just for gwc you can launch it like this:
+## To use a special gtkrc just for GWC save it along with the config file i.e. as ~/.config/gtk-wave-cleaner/gtkrc
+## For reference, if we had not implemented reading this file, you could have still done it by launching GWC like this:
 ## GTK2_RC_FILES=/usr/share/doc/gtk-wave-cleaner/gtkrc-example.txt gtk-wave-cleaner
-## If you are doing this you probably want to include your normal gtkrc first, which will bring in your theme, fonts etc.  e.g.:
-# include "/home/alister/.gtkrc-2.0"
-## It seems you need to specify the actual path of the included file i.e. don't use ~ or $HOME.
-## Settings in the special gtkrc must be below the include to override anything explicitly set in the included file.
+
+
 
 ## USEFUL SETTINGS AND EXPLANATION ##
+
+## If you are using a special gtkrc for GWC then you probably want to include your normal gtkrc first, which will bring in your theme, fonts etc.  e.g.:
+# include "/home/alister/.gtkrc-2.0"
+## It seems you need to specify the actual path of the included file i.e. don't use ~ or $HOME.
+## Settings in the special gtkrc must be below the include for them to override anything explicitly set in the included file.
 
 ## GWC's toolbar icons are 28x28 and by default gtk scales them down.
 ## This will instead display the icons at their native size, so they will be bigger and clearer.

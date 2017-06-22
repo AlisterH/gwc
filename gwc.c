@@ -3324,6 +3324,9 @@ int main(int argc, char *argv[])
     load_ogg_encoding_preferences();
     load_mp3_encoding_preferences();
     load_mp3_simple_encoding_preferences();
+    
+    /* load ~/.config/gtk-wave-cleaner/gtkrc if it exists */
+    gtk_rc_add_default_file ( g_build_filename (g_get_user_config_dir (), APPNAME, "gtkrc", NULL) );
 
     /* This is called in all GTK applications. Arguments are parsed
      * from the command line and are returned to the application. */
