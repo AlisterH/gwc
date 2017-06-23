@@ -671,7 +671,7 @@ void help(GtkWidget * widget, gpointer data)
 	  if ( gtkosx_application_get_bundle_id() )
 	    uri = g_strconcat ("file://", g_uri_escape_string(gtkosx_application_get_resource_path(), "/", TRUE), HELPDIR, "/", APPNAME, "/", APPNAME, ".html", NULL);
 	  //g_message("testing %s", uri);
-	  char *command = g_strdup_printf("%s %s &", command ? command : "open", uri);
+	  char *command = g_strdup_printf("%s %s &", "open", uri);
 	  system(command);
 	  g_free(command);
 	// I had compile problems trying to do it using this method!
@@ -710,7 +710,7 @@ void help(GtkWidget * widget, gpointer data)
   	{ */
 		// I used to think that xdg-open was inferior because it used a hard-coded list of browsers,
 		// but it actually uses the $BROWSER environment variable if set
-  		char *command = g_strdup_printf("%s %s &", command ? command : "xdg-open", uri);
+  		char *command = g_strdup_printf("%s %s &",  "xdg-open", uri);
   		system(command);
   		g_free(command);
 //	}
@@ -1903,7 +1903,7 @@ gint delete_event(GtkWidget * widget, GdkEvent * event, gpointer data)
 	}
 	if(!cleanup_and_close(&audio_view, &prefs)) 
 		return TRUE;
-	g_remove(tmpdir);
+	rmdir(tmpdir);
 	gtk_main_quit();
 	return FALSE;
 		
@@ -2156,7 +2156,7 @@ void old_open_wave_filename(void)
 }
 
 #ifdef MAC_OS_X
-static gboolean app_open_file_cb (GtkosxApplication *theApp, gchar *path, gpointer p)
+void app_open_file_cb (GtkosxApplication *theApp, gchar *path, gpointer p)
 {
     strcpy(wave_filename, path);
     open_wave_filename();
@@ -3583,7 +3583,7 @@ int main(int argc, char *argv[])
 	gtk_widget_hide (close_item);
 	// only need to do this so that the "window" menu is positioned correctly!
 	help_menu = gtk_ui_manager_get_widget(ui_manager, "/MainMenu/HelpMenu");
-	gtkosx_application_set_help_menu (theApp, GTK_WIDGET (help_menu));
+	gtkosx_application_set_help_menu (theApp, GTK_MENU_ITEM (help_menu));
 	// this adds a "window" menu, which doesn't really seem useful in my test environment
 	// except that it enables the ⌘M keyboard shortcut to minimise!
 	gtkosx_application_set_window_menu (theApp, NULL);
