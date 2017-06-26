@@ -10,6 +10,8 @@ Requirements
 - libsndfile (www.mega-nerd.com/libsndfile/); there are packages available for common Linux distributions.
 - either the OSS, ALSA or Pulse Audio sound drivers, or Mac OSX.
 - fftw libs (www.fftw.org); there are packages available for common Linux distributions.
+- [optional] perl to use gwcbatch helper script.  Not required for normal gui use.
+- [optional] perldoc to view gwcbatch usage instructions (or just open it in a text editor).
 
 License
 ------------

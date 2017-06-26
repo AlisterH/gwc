@@ -75,7 +75,7 @@ meschach/zcopy.c meschach/zfunc.c meschach/zgivens.c meschach/zhessen.c meschach
 meschach/zsolve.c meschach/ztorture.c meschach/zvecop.c
 
 BINFILES = $(APPNAME)
-dist_bin_SCRIPTS = gwcbatch.pl
+dist_bin_SCRIPTS = gwcbatch
 # Confusingly we don't have the DOCFILES in the doc directory, only the HELPFILES
 DOCFILES = README INSTALL TODO COPYING Changelog
 HELPFILES = $(APPNAME).html gtkrc-example.txt
