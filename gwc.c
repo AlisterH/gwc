@@ -1909,11 +1909,8 @@ gint delete_event(GtkWidget * widget, GdkEvent * event, gpointer data)
 		
 }
 
-/* need to fix this - it sometimes (still?) crashes if you click outside the about dialog:
-Floating point exception
-
-Also don't know why it won't open the website link!
-EDIT - it does, at least on some systems
+/* I believe I have fixed the crash when clicking outside the about dialog.
+I'm guessing opening the website link requires gvfs and a working dbus session.
 */
 void about(GtkWidget *window)
 {
