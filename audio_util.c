@@ -1388,7 +1388,7 @@ void stop_playback(int force)
     if(!force) {
 	/* Robert altered */
 	int new_playback = audio_device_processed_bytes();
-	int  old_playback;
+	int  old_playback, cycles = 0;
 
 	while(new_playback < playback_total_bytes) {
 	    /* Robert altered */
@@ -1398,9 +1398,16 @@ void stop_playback(int force)
 
 	    /* check if more samples have been processed, if not,quit */
 	    if (old_playback==new_playback){
+		force = 1;
 		fprintf(stderr,"Playback appears frozen\n Breaking\n");
 		break;
 	    }
+	    
+	    // force break anyway, if this takes too long
+	    if (++cycles > 300) {
+			force = 1;
+			break;
+		}
 	}
 
 	usleep(100) ;
