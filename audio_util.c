@@ -1283,7 +1283,7 @@ int process_audio(gfloat *pL, gfloat *pR)
     }
 
 #define FEATHER_WIDTH 30000
-    if(playback_samples_remaining - n_read < 1) {
+    if(playback_samples_remaining - n_read < 0) {
 	feather_out = 1 ;
 	feather_out_N = MIN(n_read, FEATHER_WIDTH) ;
 	fprintf(stderr, "Feather out n_read=%ld, playback_samples_remaining=%ld, N=%lf\n", n_read, playback_samples_remaining, feather_out_N) ;
