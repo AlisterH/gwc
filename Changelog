@@ -9,6 +9,7 @@ Patches or pull requests are of course encouraged!
 BUGFIX: apply Debian patch to prevent crash on x86_64.
 BUGFIX: apply Debian patch to build successfully if using clang.
 BUGFIX: solve various problems with ogg and mp3 encoding.
+BUGFIX: don't freeze when stopping alsa playback (please report if you do still experience and freezes).
 CODE: reimplemented the gui to use plain gtk2, removing the dependencies on obsolete Gnome libraries.  This also fixes a number of minor gui bugs and modernises things like file choosers.
 CODE: on Mac OSX integrate with the system "application menu", dock and basic keyboard shortcuts.
 CODE: various other gui bugfixes and improvements.

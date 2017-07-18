@@ -144,6 +144,8 @@ uninstall :
 	( for hf in $(DATADIRS) ; do rm "$(DESTDIR)"$(DATADIR)/$$hf/$(APPNAME).* && rmdir -p --ignore-fail-on-non-empty "$(DESTDIR)"$(DATADIR)/$$hf; done )
 # Alister: why does this test not work?
 #	( if [$(DOCDIR) != $(HELPDIR)]; then rmdir --ignore-fail-on-non-empty "$(DESTDIR)"$(HELPDIR)/$(APPNAME) "$(DESTDIR)"$(HELPDIR); fi)
+# should we be running this on uninstall?:
+#	gtk-update-icon-cache -f -t "$(DESTDIR)"$(DATADIR)/icons/hicolor
 
 meschach.a : meschach/meschach.a
 	cp meschach/meschach.a .

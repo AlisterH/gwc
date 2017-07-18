@@ -33,10 +33,8 @@ In case you are building the source from git you will first need to run "autorec
 Additional options
 ------------------
 Run "./configure --help" for additional compile options.
-By default the GWC binary is installed /usr/local/bin/ and document files are installed in 
-/usr/local/share/doc/gtk-wave-cleaner.  Override this with "./configure --prefix=/usr" or similar.
-If you have playback problems try disabling alsa (--disable-alsa) to use oss.  In an alsa environment 
-you can use it with aoss if necessary.
+By default the GWC binary is installed in /usr/local/bin/ and document files are installed in /usr/local/share/doc/gtk-wave-cleaner.  Override this with "./configure --prefix=/usr" or similar.
+If you have playback problems try disabling alsa (--disable-alsa) to use oss.  In an alsa environment you can use it with aoss if necessary.
 Distributions may want to enable pulseaudio (--enable-pa).
 Note that mp3 and ogg reading support are currently still broken, so ignore those options.
 
