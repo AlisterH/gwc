@@ -253,10 +253,10 @@ long start_playback(char *output_device, struct view *v, struct sound_prefs *p, 
     long playback_samples ;
     gfloat lv, rv ;
 
-    if(audio_type == SNDFILE_TYPE && sndfile == NULL) return 1 ;
 #ifdef HAVE_OGG
     if(audio_type == OGG_TYPE && fp_ogg == NULL) return 1 ;
 #endif
+    if(audio_type == SNDFILE_TYPE && sndfile == NULL) return 1 ;
 
     audio_device_close(1) ;
 
@@ -413,18 +413,20 @@ int close_wavefile(struct view *v)
 	    if(r == 0) truncate_wavfile(v) ;
 	}
 #endif /* TRUNCATE_OLD */
+#ifdef HAVE_OGG
+if(audio_type == OGG_TYPE) {
+	if(fp_ogg != NULL) {
+	    ov_clear(&oggfile) ;
+	}
+	fp_ogg = NULL ;
+    } else {
+#endif
 	if(sndfile != NULL) {
 	    sf_close(sndfile) ;
 	}
 	audio_device_close(0) ;
 	sndfile = NULL ;
-#ifdef HAVE_OGG
-    } else if(audio_type == OGG_TYPE) {
-	if(fp_ogg != NULL) {
-	    ov_clear(&oggfile) ;
-	}
-	fp_ogg = NULL ;
-#endif
+
 #ifdef HAVE_MP3
     } else if(audio_type == MP3_TYPE) {
 	if(fp_mp3 != NULL) {
@@ -433,6 +435,7 @@ int close_wavefile(struct view *v)
 	fp_mp3 = NULL ;
 #endif
     }
+}
 
     return 1 ;
 }
@@ -569,7 +572,7 @@ int is_valid_audio_file(char *filename)
             fp_ogg = NULL ;
         } else {
 	    ov_clear(&oggfile) ;
-            fclose(fp_ogg) ;
+//            fclose(fp_ogg) ;
 	    fp_ogg = NULL ;
 	    audio_type = OGG_TYPE ;
 	    return 1 ;
@@ -624,22 +627,6 @@ struct sound_prefs open_wavefile(char *filename, struct view *v)
     }
 
 
-    if(audio_type == SNDFILE_TYPE) {
-	if (! (sndfile = sf_open (filename, SFM_RDWR, &sfinfo))) {
-	    /* Open failed so print an error message. */
-
-	    char buf[80+PATH_MAX] ;
-	    snprintf(buf, sizeof(buf), "Failed to open  %s, no permissions or unknown audio format", filename) ;
-	    warning(buf) ;
-	    wfh.successful_open = FALSE ;
-	    return wfh ;
-
-	    /* Print the error message from libsndfile. */
-    /*          sf_perror (NULL) ;  */
-    /*          return  1 ;  */
-	} ;
-    }
-
 #ifdef HAVE_OGG
     if(audio_type == OGG_TYPE) {
         if((fp_ogg = fopen(filename, "r")) != NULL) {
@@ -659,6 +646,25 @@ struct sound_prefs open_wavefile(char *filename, struct view *v)
     }
 #endif
 
+
+
+    if(audio_type == SNDFILE_TYPE) {
+	if (! (sndfile = sf_open (filename, SFM_RDWR, &sfinfo))) {
+	    /* Open failed so print an error message. */
+
+	    char buf[80+PATH_MAX] ;
+	    snprintf(buf, sizeof(buf), "Failed to open  %s, no permissions or unknown audio format", filename) ;
+	    warning(buf) ;
+	    wfh.successful_open = FALSE ;
+	    return wfh ;
+
+	    /* Print the error message from libsndfile. */
+    /*          sf_perror (NULL) ;  */
+    /*          return  1 ;  */
+	} ;
+    }
+
+
 #ifdef HAVE_MP3
     if(audio_type == MP3_TYPE) {
 	if(gwc_mpg123_open(filename) != MPG123_OK) {
@@ -677,6 +683,25 @@ struct sound_prefs open_wavefile(char *filename, struct view *v)
 
 
     wfh.wavefile_fd = 1 ;
+
+
+#ifdef HAVE_OGG
+    if(audio_type == OGG_TYPE) {
+        vorbis_info *vi = ov_info(&oggfile,-1) ;
+        wfh.rate = vi->rate ;
+        wfh.n_channels = vi->channels ;
+        wfh.stereo = stereo = vi->channels-1 ;
+
+        wfh.n_samples = ov_pcm_total(&oggfile,-1) ;
+
+        BYTESPERSAMPLE=2 ;
+        MAXSAMPLEVALUE = 1 << 15 ;
+
+        current_ogg_or_mp3_pos = 0 ;
+	fprintf(stderr, "Oggfile: FRAMESIZE=%d\n", BYTESPERSAMPLE*wfh.n_channels) ;
+	wfh.successful_open = TRUE ;
+    }
+#endif
 
 
     if(audio_type == SNDFILE_TYPE) {
@@ -709,23 +734,6 @@ struct sound_prefs open_wavefile(char *filename, struct view *v)
 	}
     }
 
-#ifdef HAVE_OGG
-    if(audio_type == OGG_TYPE) {
-        vorbis_info *vi = ov_info(&oggfile,-1) ;
-        wfh.rate = vi->rate ;
-        wfh.n_channels = vi->channels ;
-        wfh.stereo = stereo = vi->channels-1 ;
-
-        wfh.n_samples = ov_pcm_total(&oggfile,-1) ;
-
-        BYTESPERSAMPLE=2 ;
-        MAXSAMPLEVALUE = 1 << 15 ;
-
-        current_ogg_or_mp3_pos = 0 ;
-	fprintf(stderr, "Oggfile: FRAMESIZE=%d\n", BYTESPERSAMPLE*wfh.n_channels) ;
-	wfh.successful_open = TRUE ;
-    }
-#endif
 
 #ifdef HAVE_MP3
     if(audio_type == MP3_TYPE) {
@@ -766,6 +774,14 @@ struct sound_prefs open_wavefile(char *filename, struct view *v)
 
 void position_wavefile_pointer(long sample_number)
 {
+#ifdef HAVE_OGG
+        if(current_ogg_or_mp3_pos != sample_number) {
+            fprintf(stderr, "pos_wv_ptr, was %ld, want %ld\n", current_ogg_or_mp3_pos, sample_number) ;
+            ov_pcm_seek(&oggfile, sample_number) ;
+            current_ogg_or_mp3_pos = sample_number ;
+        } else {
+#endif
+
     if(audio_type == SNDFILE_TYPE) {
 	sf_seek(sndfile, sample_number, SEEK_SET) ;
     } else if(audio_type == MP3_TYPE) {
@@ -803,15 +819,8 @@ void position_wavefile_pointer(long sample_number)
         }
 #endif
 
-    } else {
-#ifdef HAVE_OGG
-        if(current_ogg_or_mp3_pos != sample_number) {
-            fprintf(stderr, "pos_wv_ptr, was %ld, want %ld\n", current_ogg_or_mp3_pos, sample_number) ;
-            ov_pcm_seek(&oggfile, sample_number) ;
-            current_ogg_or_mp3_pos = sample_number ;
-        }
-#endif
     }
+}
 }
 
 int read_raw_wavefile_data(char buf[], long first, long last)
@@ -823,10 +832,6 @@ int read_raw_wavefile_data(char buf[], long first, long last)
 
     position_wavefile_pointer(first) ;
 
-    if(audio_type == SNDFILE_TYPE) {
-	n_bytes_read = sf_read_raw(sndfile, buf, n*FRAMESIZE) ;
-	return n_bytes_read/FRAMESIZE ;
-    }
 
 #ifdef HAVE_OGG
     if(audio_type == OGG_TYPE) {
@@ -844,6 +849,14 @@ int read_raw_wavefile_data(char buf[], long first, long last)
 	return n_read ;
     }
 #endif
+
+
+    if(audio_type == SNDFILE_TYPE) {
+	n_bytes_read = sf_read_raw(sndfile, buf, n*FRAMESIZE) ;
+	return n_bytes_read/FRAMESIZE ;
+    }
+
+
 
 #ifdef HAVE_MP3
     if(audio_type == MP3_TYPE) {
@@ -898,9 +911,7 @@ int read_wavefile_data(long left[], long right[], long first, long last)
 	n_read = read_raw_wavefile_data((char *)p_int, first, last) ;
 #else
 	long n_this = MIN((n-s_i)*(stereo+1), bufsize_long) ;
-	if(audio_type == SNDFILE_TYPE) {
-	    n_read = sf_read_int(sndfile, p_int, n_this) ;
-	}
+
 
 #ifdef HAVE_OGG
 	if(audio_type == OGG_TYPE) {
@@ -908,6 +919,12 @@ int read_wavefile_data(long left[], long right[], long first, long last)
 	    n_read /= FRAMESIZE ;
 	}
 #endif
+
+
+	if(audio_type == SNDFILE_TYPE) {
+	    n_read = sf_read_int(sndfile, p_int, n_this) ;
+	}
+
 
 #ifdef HAVE_MP3
 	if(audio_type == MP3_TYPE) {
