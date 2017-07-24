@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT([Gtk Wave Cleaner], [0.22], [http://gwc.sourceforge.net])
+AC_INIT([Gtk Wave Cleaner], [0.22-01], [http://gwc.sourceforge.net])
 AM_INIT_AUTOMAKE([1.12 foreign no-define])
 
 PKG_CHECK_MODULES(SNDFILE, sndfile >= 1.0.0,
@@ -60,7 +60,7 @@ dnl enable ogg/vorbis libs on user request and check installation
 OGGLIB=""
 OGGHDR=""
 
-AC_ARG_ENABLE(ogg, [  --enable-ogg           compile Ogg file reading support (default disabled)])
+AC_ARG_ENABLE(ogg, [  --enable-ogg           compile experimental Ogg file reading support (default disabled)])
 
 AC_MSG_CHECKING([for ogg])
 if test "$enable_ogg" = "yes"
@@ -75,7 +75,7 @@ dnl enable mp3 libs on user request and check installation
 MP3LIB=""
 MP3HDR=""
 
-AC_ARG_ENABLE(mp3, [  --enable-mp3           compile mp3 file reading support (default disabled)])
+AC_ARG_ENABLE(mp3, [  --enable-mp3           compile experimental mp3 file reading support (default disabled)])
 
 AC_MSG_CHECKING([for mp3])
 if test "$enable_mp3" = "yes"
