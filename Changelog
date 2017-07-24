@@ -1,6 +1,6 @@
 GWC Changelog
 0.22
-[unreleased]
+July 18, 2017
 This release is by Alister Hood.  Jeff Welty has advised via email that he has not used GWC for several years and does not have time currently to look at any issues with it.
 This release is a port from the old GNOME libraries to plain GTK2 and does not include major changes in functionality.  There is plenty of bugfixing and cleanup of how things work, but much of it will only be apparent in less typical "corner cases".
 A more detailed summary of the changes is below.  For full details refer to the git commit log at https://github.com/AlisterH/gwc
@@ -26,7 +26,7 @@ RENAMED EXECUTABLE: there is at least one other project named gwc, so to avoid p
 KNOWN ISSUE: GWC fails to open wav files with metadata, such as those created by recent versions of ffmpeg. GWC will produce an error like this: "Failed to open /root/whistle.wav, 'Error : Cannot open file in read/write mode due to string data in header.'".  Libsndfile does not support RDWR mode for these files. If you are creating them  using ffmpeg try adding "-flags bitexact" into your command line (although this will reduce ffmpeg's performance), or writing to a different libsndfile supported format such as .au or .aiff. A workaround for existing files is to open and save the file in mhwaveedit, but since you should keep your original recording as a backup anyway, I suggest either converting to a different format using sndfile-convert or ffmpeg, or using `SimplifyWave` from waveutils or `shntool strip` to make a copy of the file with a clean header.
 
 0.21-19
-Feb 2,2013
+Feb 2, 2013
 BUGFIX: warning on opening audio device incorrectly displayed pulse audio message when neither alsa or pulse audio was being used
 BUGFIX: Encoding to ogg or mp3 has always been broken, can only encode to once during GWC session.  Fixed by using named pipe
 NEW: A simple front end for encoding to MP3s.  Only a -V xx encoding option,
@@ -34,7 +34,7 @@ but can have default artist and album tags now, and enter trackname when
 encoding the selection.  Kind of klunky user interface, but it works.
 
 0.21-18
-Feb 1,2013
+Feb 1, 2013
 BUGFIX: pulse audio using pulse_simple_new was incorrectly checking error return
 Apr 10, 2012
 BUGFIX: length of tracks on cdrdao toc file was too short by 1 sample
