@@ -2756,6 +2756,7 @@ static void on_menu_item_deselected(GtkItem *item)
 {
     guint id = gtk_statusbar_get_context_id(status_bar, "MenuItemHints");
     gchar *hint;
+    // gtk_action_get_label requires at least GTK 2.16!  I guess we could use gtk_action_get_name for lower versions if we care...
     g_object_get(gtk_widget_get_action(GTK_WIDGET(item)), "tooltip", &hint, NULL);
 
     if (hint) {
@@ -2768,6 +2769,7 @@ static void on_menu_item_deselected(GtkItem *item)
 static gboolean on_tool_item_enter_event (GtkAction *action)
 {
     guint id = gtk_statusbar_get_context_id(status_bar, "ToolItemHints");
+    // gtk_action_get_label requires at least GTK 2.16!  I guess we could use gtk_action_get_name for lower versions if we care...
     const gchar *tooltip = gtk_action_get_label (action);
     gtk_statusbar_push (status_bar, id, tooltip);
     // don't prevent the normal gtk handlers from being invoked for the event.
@@ -3283,6 +3285,8 @@ int main(int argc, char *argv[])
 
     gchar *newdir = g_build_filename (g_get_user_cache_dir (), "gwcXXXXXX", NULL) ; 
 	gchar *_CLIPBOARD_FILE = "gwc_intclip.dat" ;
+    // note that g_mkdtemp rather than mkdtemp is required for portability e.g. to Solaris (not OpenSolaris)
+    // unfortunately it pushes the minimum GLIB required to 2.30, so is it really more or less portable...?
     if (!g_mkdtemp (newdir))
     {
 	  // this is expected if $XDG_CACHE_HOME is not set

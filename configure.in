@@ -166,7 +166,7 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_TYPE_SIZE_T
 
-dnl will comment in gwc.c where these versions are required:
+dnl refer to comments in gwc.c where these versions are required:
 PKG_CHECK_MODULES(GTK, [ gtk+-2.0 >= 2.16 glib-2.0 >= 2.30 ])
 
 dnl Checks for library functions.
