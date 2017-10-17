@@ -17,6 +17,12 @@ cp /usr/local/opt/glib/lib/libglib-2.0.0.dylib osx_packaging/Gtk\ Wave\ Cleaner.
 cp /usr/local/opt/gettext/lib/libintl.8.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
 cp /usr/local/opt/libsndfile/lib/libsndfile.1.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
 cp /usr/local/opt/fftw/lib/libfftw3.3.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+cp /usr/local/opt/libffi/3.2.1/lib/libffi.6.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+cp /usr/local/opt/fontconfig/2.12.1_2/lib/libfontconfig.1.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+cp /usr/local/opt/freetype/2.7.1/lib/libfreetype.6.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+cp /usr/local/opt/glib/2.52.0/lib/libgmodule-2.0.0.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+cp /usr/local/opt/pixman/0.34.0/lib/libpixman-1.0.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+cp /usr/local/opt/libpng/1.6.29/lib/libpng16.16.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
 
 strip osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/MacOS/gtk-wave-cleaner-bin
 for i in osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/*; do strip -x "$i"; done
