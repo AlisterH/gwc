@@ -1,0 +1,15 @@
+# GdkPixbuf Image Loader Modules file
+# Automatically generated file, do not edit
+# Created by gdk-pixbuf-query-loaders from gdk-pixbuf-2.36.6
+#
+# LoaderDir = /usr/local/lib/gdk-pixbuf-2.0/2.10.0/loaders
+#
+
+# alister: edited in spite of the above
+
+"@executable_path/../Resources/lib/gdk-pixbuf-2.0/loaders/libpixbufloader-xpm.so"
+"xpm" 4 "gdk-pixbuf" "XPM" "LGPL"
+"image/x-xpixmap" ""
+"xpm" ""
+"/* XPM */" "" 100
+

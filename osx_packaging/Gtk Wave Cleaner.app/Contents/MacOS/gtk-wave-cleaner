@@ -41,6 +41,9 @@ export PATH="$bundle_contents/MacOS:$PATH"
 
 # Set up generic configuration
 export GTK2_RC_FILES="$bundle_etc/gtk-2.0/gtkrc"
+export GDK_PIXBUF_MODULE_FILE="$bundle_lib/gdk-pixbuf-2.0/loaders.cache"
+# this one doesn't actually seem to do anything:
+#export GDK_PIXBUF_MODULEDIR="$bundle_lib/gdk-pixbuf-2.0/loaders"
 
 # Extra arguments can be added in environment.sh.
 EXTRA_ARGS=

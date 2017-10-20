@@ -23,6 +23,16 @@ cp /usr/local/opt/freetype/2.7.1/lib/libfreetype.6.dylib osx_packaging/Gtk\ Wave
 cp /usr/local/opt/glib/2.52.0/lib/libgmodule-2.0.0.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
 cp /usr/local/opt/pixman/0.34.0/lib/libpixman-1.0.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
 cp /usr/local/opt/libpng/1.6.29/lib/libpng16.16.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+cp /usr/local/opt/flac/lib/libFLAC.8.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+cp /usr/local/opt/glib/lib/libgthread-2.0.0.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+cp /usr/local/opt/harfbuzz/lib/libharfbuzz.0.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+cp /usr/local/opt/libogg/lib/libogg.0.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+cp /usr/local/opt/libpango/lib/libpangoft2-1.0.0.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+cp /usr/local/opt/pcre/lib/libpcre.1.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+cp /usr/local/opt/libvorbis/lib/libvorbis.0.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+cp /usr/local/opt/libvorbis/lib/libvorbisenc.2.dylib osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/
+mkdir osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/gdk-pixbuf-2.0/loaders
+cp /usr/local/opt/gdk-pixbuf/lib/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-xpm.so osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/gdk-pixbuf-2.0/loaders
 
 strip osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/MacOS/gtk-wave-cleaner-bin
 for i in osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/lib/*; do strip -x "$i"; done
