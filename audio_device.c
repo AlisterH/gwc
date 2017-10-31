@@ -25,7 +25,7 @@
 # ifdef MAC_OS_X /* MacOSX */
 #  include "audio_osx.c"
 # else
-#  ifdef HAVE_PULSE_AUDIO /* MacOSX */
+#  ifdef HAVE_PULSE_AUDIO
 #   include "audio_pa.c"
 #  else
 #   include "audio_oss.c"
