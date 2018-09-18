@@ -80,6 +80,11 @@ int audio_device_open(char *output_device)
 
 int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate)
 {
+    int err ;
+    // Alister: is there any reason we shouldn't combine audio_device_set_params and audio_device_open?
+    // Why do they need to be two separate steps?
+    //printf("First close the Pulse audio device in case we are playing a mono file, as we don't seem to be able to switch\n") ;
+    audio_device_close(0) ;
     ss.rate = *rate ;
     ss.channels = *channels ;
 
@@ -91,7 +96,17 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate)
 	default:
 	case GWC_S16_LE: ss.format = PA_SAMPLE_S16LE; framesize=2 ; break;
     }
+    //printf("Open the Pulse audio device again\n") ;
+    pa_device = pa_simple_new(NULL,"GWC",PA_STREAM_PLAYBACK,NULL,"GWC Playback", &ss, NULL, NULL, &err) ;
 
+    if (pa_device == NULL) {
+        pa_perr("audio_device_open: pa_simple_new", err);
+        return -1;
+    } 
+
+    written_frames = 0;
+    last_written_size = -1 ;
+    latency_flag = 1 ;
     framesize *= *channels ;
 
     frames_per_usec = (double)(*rate) / 1000000.0 ;
