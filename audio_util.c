@@ -1291,7 +1291,11 @@ int process_audio(gfloat *pL, gfloat *pR)
 
     for(frame = 0  ; frame < n_read ; frame++) {
 	int vl, vr ;
-	i = frame*2 ;
+	// I don't understand how all this code works, but if I remove the multiplication by two then the level meter actually works for mono files in ALSA, and for some reason there seem to be no side effects.
+	// However, note that the level meters work quite differently in different configurations, and arguably don't show anything helpful, anyway.
+	// Perhaps we should multiply by (stereo + 1) though?
+	// i = frame*2 ;
+	i = frame;
 
 	if(BYTESPERSAMPLE < 3) {
 	    if(feather_out == 1 && n_read-(frame+1) < FEATHER_WIDTH) {
