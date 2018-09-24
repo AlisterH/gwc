@@ -19,7 +19,6 @@
 
 /* pinknoise.c */
 #include <stdlib.h>
-#include "gtkledbar.h"
 #include "gwc.h"
 
 #define BUFSIZE 10000

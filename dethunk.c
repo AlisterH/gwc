@@ -20,7 +20,6 @@
 /* dethunk.c */
 
 #include <stdlib.h>
-#include "gtkledbar.h"
 #include "gwc.h"
 #include "stat.h"
 

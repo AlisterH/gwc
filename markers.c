@@ -32,7 +32,6 @@
 #include <string.h>
 #include <signal.h>
 
-#include "gtkledbar.h"
 #include "gwc.h"
 
 long cdtext_length;

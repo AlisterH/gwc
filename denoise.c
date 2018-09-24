@@ -20,7 +20,6 @@
 /* denoise.c */
 
 #include <stdlib.h>
-#include "gtkledbar.h"
 #include "gwc.h"
 #include <math.h>
 #include <float.h>

@@ -20,7 +20,6 @@
 /* biquad.c */
 #include <stdlib.h>
 #include <glib.h>
-#include "gtkledbar.h"
 #include "gwc.h"
 
 struct {

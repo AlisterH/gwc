@@ -21,7 +21,6 @@
 #include <stdlib.h>
 #include <glib.h>
 #include <string.h>
-#include "gtkledbar.h"
 #include "gwc.h"
 
 #include "tap_reverb_common.h"
