@@ -13,6 +13,7 @@ Requirements
 - [optional] perl to use gwcbatch helper script.  Not required for normal gui use.
 - [optional] perldoc to view gwcbatch usage instructions (or just open it in a text editor).
 - [optional] xdg-open from xdg-utils (https://www.freedesktop.org/wiki/Software/xdg-utils/) to open the manual file from the help menu. Not required on OSX.
+- [optional] vorbis-tools and lame for ogg and mp3 export.
 
 License
 ------------
