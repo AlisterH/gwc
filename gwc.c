@@ -187,7 +187,7 @@ void usage(char *prog)
 %s <file> <batch[s] truncate keep_start keep_end>\n\
 Position are in hh:mm:ss for batch or in samples for batchs. Stop_position can \
 also be end to denote the stop_position being the end of file.\n",
-prog, prog, prog, prog, prog, prog, prog, prog, prog);
+prog, prog, prog, prog, prog, prog, prog, prog, prog, prog);
 	exit(EXIT_FAILURE);
 }
 
