@@ -22,11 +22,11 @@
 #ifdef HAVE_ALSA
 # include "audio_alsa.c"
 #else
-# ifdef MAC_OS_X /* MacOSX */
-#  include "audio_osx.c"
+# ifdef HAVE_PULSE_AUDIO
+#  include "audio_pa.c"
 # else
-#  ifdef HAVE_PULSE_AUDIO
-#   include "audio_pa.c"
+#  ifdef MAC_OS_X /* MacOSX */
+#   include "audio_osx.c"
 #  else
 #   include "audio_oss.c"
 #  endif 

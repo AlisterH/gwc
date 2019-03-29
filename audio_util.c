@@ -26,7 +26,14 @@
 #include <memory.h>
 
 #ifdef MAC_OS_X
+
+/* this seems to give wrong results on intel macs :( */
 #include <machine/endian.h>
+
+/* doing this doesn't seem to fix it, and would presumablybreak us on */
+/* powerpc macs (but are we otherwise supported there?) */
+/*#define __BYTE_ORDER __LITTLE_ENDIAN */
+
 #else
 #include <endian.h>
 #endif
@@ -149,10 +156,15 @@ void config_audio_device(int rate_set, int bits_set, int stereo_set)
     /* play everything as 16 bit, signed integers */
     /* using the appropriate endianness */
 
-#if __BYTE_ORDER == __BIG_ENDIAN
-    format_set = GWC_S16_BE ;
-#else
+/* Alister: I have swapped this around as an intel mac seems to think */
+/* the first test is true regardless of whether you test for BE or LE */
+/* Presumably it might fail on a powerpc mac now?                     */
+/* Also, does it break other platforms (since LE is normal these days */
+/* it should really stay default                                      */
+#if __BYTE_ORDER == __LITTLE_ENDIAN
     format_set = GWC_S16_LE ;
+#else
+    format_set = GWC_S16_BE ;
 #endif
 
     rate = rate_set ;
@@ -1218,7 +1230,7 @@ void flush_wavefile_data(void)
 }
 
 /* process_audio for mac_os_x is found in the audio_osx.c */
-#ifndef MAC_OS_X
+#if !defined MAC_OS_X || defined HAVE_PULSE_AUDIO
 int process_audio(gfloat *pL, gfloat *pR)
 {
     int len = 0 ;
