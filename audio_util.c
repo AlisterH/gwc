@@ -30,7 +30,7 @@
 /* this seems to give wrong results on intel macs :( */
 #include <machine/endian.h>
 
-/* doing this doesn't seem to fix it, and would presumablybreak us on */
+/* doing this doesn't seem to fix it, and would presumably break it on */
 /* powerpc macs (but are we otherwise supported there?) */
 /*#define __BYTE_ORDER __LITTLE_ENDIAN */
 
@@ -163,8 +163,10 @@ void config_audio_device(int rate_set, int bits_set, int stereo_set)
 /* it should really stay default                                      */
 #if __BYTE_ORDER == __LITTLE_ENDIAN
     format_set = GWC_S16_LE ;
-#else
+#elif __BYTE_ORDER == __BIG_ENDIAN
     format_set = GWC_S16_BE ;
+#else
+    format_set = GWC_S16_LE ;
 #endif
 
     rate = rate_set ;
