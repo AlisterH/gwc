@@ -279,7 +279,7 @@ long audio_device_processed_bytes(void)
 		
 		if((err = AudioDeviceGetCurrentTime(audio_data.device, &this_time)) != noErr)
 		{
-			printf("Could not get the current time.  The error number is: %ld \n",err);
+			printf("Could not get the current time.  The error number is: %i \n", err);
 		}
 		else
 		{
