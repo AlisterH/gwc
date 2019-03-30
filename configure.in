@@ -55,6 +55,7 @@ AC_SUBST(OGGLIB)
 AC_SUBST(OGGHDR)
 AC_SUBST(MP3LIB)
 AC_SUBST(MP3HDR)
+AC_SUBST(OSXLIBS)
 
 dnl enable ogg/vorbis libs on user request and check installation
 OGGLIB=""
@@ -186,10 +187,22 @@ case `uname -s` in
     ;;
 esac
 AC_MSG_RESULT([$platform_osx])
-AM_CONDITIONAL(PLATFORM_OSX, [test x$platform_osx = xyes])
-
 if [test x$platform_osx = xyes]; then
   OSXDEF="-DMAC_OS_X"
+  if test "$enablepa" == "yes"; then
+    # pulseaudio is enabled (recommended until issues are fixed with coreaudio backend)
+    OSXLIBS="$LIBS -lgtkmacintegration-gtk2"
+  else
+    # pulseaudio is not enabled so we need to build CoreAudio backend instead
+    AC_MSG_NOTICE([
+**********************!!!!!!! Warning !!!!!!!**********************
+You are building on Apple OSX with the CoreAudio backend.
+This currently does not seem to work.
+Use --enable-pa to build with the pulseaudio backend instead.
+*******************************************************************
+])
+    OSXLIBS="$LIBS -framework CoreAudio -lgtkmacintegration-gtk2" 
+  fi
 fi
 
 AC_OUTPUT(Makefile)

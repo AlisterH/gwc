@@ -21,23 +21,15 @@ AM_CFLAGS = -O2
 AM_CXXFLAGS = -O2
 endif
 
-if PLATFORM_OSX
-#note on my test system I initially couldn't use -lgtkmacintegration as it wasn't building properly, so I had to link to the object files.
+# Alister: OSX potential issues
+# On an old test system I initially couldn't use -lgtkmacintegration as it wasn't building
+# properly, so I had to link to the object files.
 #OSX_OBJS = /Users/alister/gtk-mac-integration-2.0.8/src/.libs/*.o
-#note depending on your build environment you might need -lgtkmacintegration.2 or something instead.
-OSX_LIBS = -framework CoreAudio -lgtkmacintegration-gtk2
-#looks like I don't need -lobjc, or this:
-#OSX_CFLAGS = -xobjective-c
-
-#might need something like this
-#if test "`echo ${GCC_VERSION} | cut -d. -f1`" -eq 4; then
-#   if test "`echo ${GCC_VERSION} | cut -d. -f2`" -ge 8; then
-#  	   # This is gcc >= 4.8.x
-#      OSX_CFLAGS = -xobjective-c -fobjc-exceptions
-#   fi
-#	else OSX_CFLAGS = -xobjective-c
-#fi
-endif
+# Note depending on your build environment you might need something like -lgtkmacintegration.2
+# This is now taken care of by configure.in
+#OSX_LIBS = -framework CoreAudio -lgtkmacintegration-gtk2
+# Don't need coreaudio if using pulseaudio
+#OSX_LIBS = -lgtkmacintegration-gtk2
 
 BINDIR = @bindir@
 DATADIR = @datadir@
@@ -58,7 +50,7 @@ HELPDIR = $(DOCDIR)
 DEFS = -DDATADIR=\"$(DATADIR)\" -DHELPDIR=\"$(HELPDIR)\" -DLIBDIR=\"$(LIBDIR)\" -DAPPNAME=\"$(APPNAME)\" @OSXDEF@ @ALSADEF@ @PAHDR@ @FFTWHDR@ @FFTWPREC@ @OGGHDR@ @MP3HDR@
 CFLAGS = -D_FILE_OFFSET_BITS=64 -Wall @CFLAGS@ @GTK_CFLAGS@ @SNDFILE_CFLAGS@
 
-LIBS= meschach.a @GTK_LIBS@ @SNDFILE_LIBS@ @ALSALIB@ @PALIB@ @FFTWLIB@ @OGGLIB@ @MP3LIB@ -lm
+LIBS= meschach.a @GTK_LIBS@ @SNDFILE_LIBS@ @ALSALIB@ @PALIB@ @FFTWLIB@ @OGGLIB@ @MP3LIB@ @OSXLIBS@ -lm
 
 SRC = tap_reverb_file_io.c tap_reverb.c reverb.c dialog.c gwc.c audio_device.c audio_edit.c audio_util.c gtkled.c gtkledbar.c preferences.c drawing.c amplify.c denoise.c undo.c declick.c sample_block.c decrackle.c stat.c dethunk.c i0.c i1.c chbevl.c markers.c encode.c soundfile.c pinknoise.c biquad.c
 OBJS = $(SRC:.c=.o)
@@ -94,7 +86,9 @@ DATADIRS = \
 
 ###
 CC = @CC@
-COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) $(OSX_CFLAGS)
+COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)
+#Alister: I don't think we ever needed OSX_CFLAGS
+#COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) $(OSX_CFLAGS)
 
 ### handy to have around for checking buffer overruns
 #EFENCE = -lefence
@@ -102,11 +96,13 @@ EFENCE =
 
 all : gwc
 
-gwc : meschach.a $(OBJS) 
-	$(CC) $(OSX_LIBS) $(OBJS) $(OSX_OBJS) $(EFENCE) $(LDFLAGS) $(LIBS) -o $(APPNAME)
+gwc : meschach.a $(OBJS)
+	$(CC) $(OBJS) $(EFENCE) $(LDFLAGS) $(LIBS) -o $(APPNAME)
+        # Alister: If you have trouble building on a Mac
+        # set OSX_OBJS and OSX_LIBS above and use this:
+        #$(CC) $(OSX_LIBS) $(OBJS) $(OSX_OBJS) $(EFENCE) $(LDFLAGS) $(LIBS) -o $(APPNAME)
 
-#audio_device.o : audio_device.c audio_alsa.c audio_oss.c audio_osx.c audio_pa.c Makefile
-audio_device.o : audio_device.c audio_osx.c Makefile
+audio_device.o : audio_device.c audio_alsa.c audio_oss.c audio_osx.c audio_pa.c Makefile
 	$(COMPILE) -c audio_device.c
 	
 audio_util.o : audio_util.c Makefile
