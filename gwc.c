@@ -3301,7 +3301,9 @@ int main(int argc, char *argv[])
 	  // might not need to test this - is it actually possible for it to fail but us still be able to write to the audio file we are working on itself?
       if (!g_mkdtemp (newdir))
       g_warning ("Creation of temp dir failed\nUndo files will conflict if you run more than one instance of GWC in this directory.\n"
-                 "Is the current working directory read-only?  If so we can't do any work because we can't save undo files!");
+                 "Is the current working directory read-only?\n"
+                 "If so we can't do any work because we can't save undo files!\n"
+                 "Strongly recommend you exit and create ~/.cache/, or restart in a writable directory!");
       else
         tmpdir = newdir;
 	}
@@ -3316,10 +3318,8 @@ int main(int argc, char *argv[])
 	}
 	CLIPBOARD_FILE = _CLIPBOARD_FILE ;
 	//printf("CLIPBOARD_FILE: %s\n", CLIPBOARD_FILE) ;
-
     load_preferences();
     
-
     /* load all encoding preferences on start */
     // Why load these but not the filter and reverb preferences?
     load_ogg_encoding_preferences();
