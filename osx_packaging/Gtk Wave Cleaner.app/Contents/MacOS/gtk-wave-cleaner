@@ -36,14 +36,22 @@ export GTK_DATA_PREFIX="$bundle_res"
 export GTK_EXE_PREFIX="$bundle_res"
 export GTK_PATH="$bundle_res"
 
+#we need XDG_CACHE_HOME to prevent terrible behaviour when running from a .dmg, caused by
+#falling back to the current working directory, which is read-only in that case.
+export XDG_CACHE_HOME="$HOME/Library/Caches"
+#it is tidier if we use this (unless there are users on osx who like to have stuff in ~/.config?)
+export XDG_CONFIG_HOME="$HOME/Library/gtk-wave-cleaner/"
+#not sure if this is needed
+export XDG_DATA_HOME="$HOME/Library/gtk-wave-cleaner/"
+
 # Set up PATH variable
 export PATH="$bundle_contents/MacOS:$PATH"
 
 # Set up generic configuration
 export GTK2_RC_FILES="$bundle_etc/gtk-2.0/gtkrc"
 export GDK_PIXBUF_MODULE_FILE="$bundle_lib/gdk-pixbuf-2.0/loaders.cache"
-# this one doesn't actually seem to do anything:
-#export GDK_PIXBUF_MODULEDIR="$bundle_lib/gdk-pixbuf-2.0/loaders"
+# Alister: this doesn't actually seem to do anything:
+# export GDK_PIXBUF_MODULEDIR="$bundle_lib/gdk-pixbuf-2.0/loaders"
 
 # Extra arguments can be added in environment.sh.
 EXTRA_ARGS=
