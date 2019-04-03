@@ -3283,41 +3283,6 @@ int main(int argc, char *argv[])
     #define PREFIX "."
     #define SYSCONFDIR "."
 
-    gchar *newdir = g_build_filename (g_get_user_cache_dir (), "gwcXXXXXX", NULL) ; 
-	gchar *_CLIPBOARD_FILE = "gwc_intclip.dat" ;
-    // note that g_mkdtemp rather than mkdtemp is required for portability e.g. to Solaris (not OpenSolaris)
-    // unfortunately it pushes the minimum GLIB required to 2.30, so is it really more or less portable...?
-    if (!g_mkdtemp (newdir))
-    {
-	  // this is expected if $XDG_CACHE_HOME is not set
-	  // therefore don't use g_warning, which will error if G_DEBUG environment variable is set to "fatal-warnings"
-      g_message ("Creation of temp dir failed\nFalling back to current working directory.");
-      // note: assume if we can't create a folder for our undo files we probably can't create a clipboard file there either.
-      // It would be best to move this to the file open routine and if we can't use $XDG_CACHE_HOME to save the temp files 
-      // in the same location as the file we are working on. https://github.com/AlisterH/gwc/issues/9 
-	  //*newdir = g_build_filename (g_path_get_dirname ( TODO  filename), "gwcXXXXXX", NULL) ; 
-	  // should be able to avoid this nonsense - need to study pointers again I think
-	  newdir = g_build_filename (g_get_current_dir(), "gwcXXXXXX", NULL) ; 
-	  // might not need to test this - is it actually possible for it to fail but us still be able to write to the audio file we are working on itself?
-      if (!g_mkdtemp (newdir))
-      g_warning ("Creation of temp dir failed\nUndo files will conflict if you run more than one instance of GWC in this directory.\n"
-                 "Is the current working directory read-only?\n"
-                 "If so we can't do any work because we can't save undo files!\n"
-                 "Strongly recommend you exit and create ~/.cache/, or restart in a writable directory!");
-      else
-        tmpdir = newdir;
-	}
-	else
-	{
-	  tmpdir = newdir;
-	  // don't put the clipboard in tmpdir - this way we can share it between multiple instances of gwc
-	  // note there are problems if we try to paste incompatible audio e.g. mono vs stereo
-	  // and should we have some sort of locking so multiple instances don't try to write it at the same time?
-	  // also note there is a problem with undo (perhaps only with mono?)
-	  _CLIPBOARD_FILE = g_build_filename (g_get_user_cache_dir (), "gwc_intclip.dat", NULL) ;
-	}
-	CLIPBOARD_FILE = _CLIPBOARD_FILE ;
-	//printf("CLIPBOARD_FILE: %s\n", CLIPBOARD_FILE) ;
     load_preferences();
     
     /* load all encoding preferences on start */
@@ -3553,6 +3518,45 @@ int main(int argc, char *argv[])
 	gtk_box_pack_start(GTK_BOX(led_vbox), leave_click_marks_box, FALSE,
 			   FALSE, 0);
     }
+
+    gchar *newdir = g_build_filename (g_get_user_cache_dir (), "gwcXXXXXX", NULL) ; 
+	gchar *_CLIPBOARD_FILE = "gwc_intclip.dat" ;
+    // note that g_mkdtemp rather than mkdtemp is required for portability e.g. to Solaris (not OpenSolaris)
+    // unfortunately it pushes the minimum GLIB required to 2.30, so is it really more or less portable...?
+    if (!g_mkdtemp (newdir))
+    {
+	  // this is expected if $XDG_CACHE_HOME is not set
+	  // therefore don't use g_warning, which will error if G_DEBUG environment variable is set to "fatal-warnings"
+      warning ("Creation of temp dir in $XDG_CACHE_HOME failed\nFalling back to current working directory.");
+      // note: assume if we can't create a folder for our undo files we probably can't create a clipboard file there either.
+      // It would be best to move this to the file open routine and if we can't use $XDG_CACHE_HOME to save the temp files 
+      // in the same location as the file we are working on. https://github.com/AlisterH/gwc/issues/9 
+	  //*newdir = g_build_filename (g_path_get_dirname ( TODO  filename), "gwcXXXXXX", NULL) ; 
+	  // should be able to avoid this nonsense - need to study pointers again I think
+	  newdir = g_build_filename (g_get_current_dir(), "gwcXXXXXX", NULL) ; 
+	  // might not need to test this - is it actually possible for it to fail but us still be able to write to the audio file we are working on itself?
+      if (!g_mkdtemp (newdir))
+      {
+      	warning ("Creation of temp dir in current working directory failed\n"
+      	         "Undo files will conflict if you run more than one instance of GWC in this directory.\n");
+        warning ("Is the current working directory read-only?\n"
+               "If so we won't be able to save undo files!\n"
+               "Strongly recommend you exit and create ~/.cache/, or restart in a writable directory!");
+      }
+      else
+        tmpdir = newdir;
+	}
+	else
+	{
+	  tmpdir = newdir;
+	  // don't put the clipboard in tmpdir - this way we can share it between multiple instances of gwc
+	  // note there are problems if we try to paste incompatible audio e.g. mono vs stereo
+	  // and should we have some sort of locking so multiple instances don't try to write it at the same time?
+	  // also note there is a problem with undo (perhaps only with mono?)
+	  _CLIPBOARD_FILE = g_build_filename (g_get_user_cache_dir (), "gwc_intclip.dat", NULL) ;
+	}
+	CLIPBOARD_FILE = _CLIPBOARD_FILE ;
+	//printf("CLIPBOARD_FILE: %s\n", CLIPBOARD_FILE) ;
 
     /* and the window */
     gtk_widget_show_all(main_window);
