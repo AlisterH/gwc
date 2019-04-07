@@ -3527,7 +3527,7 @@ int main(int argc, char *argv[])
     {
 	  // this is expected if $XDG_CACHE_HOME is not set
 	  // therefore don't use g_warning, which will error if G_DEBUG environment variable is set to "fatal-warnings"
-      warning ("Creation of temp dir in $XDG_CACHE_HOME failed\nFalling back to current working directory.");
+      warning ("Could not create directory for temporary files in $XDG_CACHE_HOME\nFalling back to current working directory.");
       // note: assume if we can't create a folder for our undo files we probably can't create a clipboard file there either.
       // It would be best to move this to the file open routine and if we can't use $XDG_CACHE_HOME to save the temp files 
       // in the same location as the file we are working on. https://github.com/AlisterH/gwc/issues/9 
@@ -3537,8 +3537,8 @@ int main(int argc, char *argv[])
 	  // might not need to test this - is it actually possible for it to fail but us still be able to write to the audio file we are working on itself?
       if (!g_mkdtemp (newdir))
       {
-      	warning ("Creation of temp dir in current working directory failed\n"
-      	         "Undo files will conflict if you run more than one instance of GWC in this directory.\n");
+      	warning ("Could not create directory for temporary files in current working directory.\n"
+      	         "If you run more than one instance of GWC in this directory their undo files will conflict.\n");
         warning ("Is the current working directory read-only?\n"
                "If so we won't be able to save undo files!\n"
                "Strongly recommend you exit and create ~/.cache/, or restart in a writable directory!");
