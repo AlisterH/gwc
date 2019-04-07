@@ -136,6 +136,7 @@ uninstall :
 	( cd "$(DESTDIR)"$(HELPDIR)/$(APPNAME) && rm -f $(HELPFILES) )
 # Alister: note osx errors on --ignore-fail-on-non-empty
 # But we wouldn't normally run `make uninstall` on osx
+# If we need to we can install gnu coreutils and use its rmdir
 	( rmdir --ignore-fail-on-non-empty "$(DESTDIR)"$(DOCDIR)/$(APPNAME) $(DOCDIR) )
 	( for hf in $(DATADIRS) ; do rm "$(DESTDIR)"$(DATADIR)/$$hf/$(APPNAME).* && rmdir -p --ignore-fail-on-non-empty "$(DESTDIR)"$(DATADIR)/$$hf; done )
 # Alister: why does this test not work?
