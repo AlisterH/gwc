@@ -64,5 +64,8 @@ if /bin/expr "x$1" : '^x-psn_' > /dev/null; then
  shift 1
 fi
 
+# change to the user's home directory so that anything written to the current working directory ends up there.
+cd $HOME
+
 echo "Launching Gtk Wave Cleaner..."
 $EXEC "$bundle_contents/MacOS/gtk-wave-cleaner-bin" "$@" $EXTRA_ARGS
