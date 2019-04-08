@@ -3601,9 +3601,6 @@ int main(int argc, char *argv[])
 		GdkPixbuf *icon =  gtk_widget_render_icon(main_window, "gwc_icon", 6, NULL);
 		gtkosx_application_set_dock_icon_pixbuf(theApp, icon);
     }
-    
-	// Re #1 above - we actually need this, otherwise nothing happens at all
-	gtkosx_application_ready (theApp);
 	
 	// Possible todo:
 	// implement native file dialogs using nativefiledialog library or tinyfiledialogs or something
@@ -3657,6 +3654,14 @@ int main(int argc, char *argv[])
 	    }
 	}
     }
+
+    #ifdef MAC_OS_X    
+    // Re #1 above - we actually need this, otherwise nothing happens at all.
+    // It has has to be down here after e.g. open_wave_filename, otherwise running `gwc somefile` crashes on osx.
+    // But the rest of the gtkosx_application stuff needs to be before that otherwise it freezes when 
+    // clicking the icon after running `gwc somefile`
+    gtkosx_application_ready (theApp);
+    #endif
 
     gtk_main();
 
