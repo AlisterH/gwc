@@ -2,9 +2,10 @@
 # SPEC file for Gnome Wave Cleaner
 #
 %define gwc_version 0.22
+%define gwc_subversion 02
 
-Name: gwc
-Summary: Gnome Wave Cleaner -- audio restoration application
+Name: gtk-wave-cleaner
+Summary: Gtk Wave Cleaner -- audio restoration application
 Version: %{gwc_version}.%{gwc_subversion}
 Release: 1
 License: GPL
@@ -15,11 +16,11 @@ URL: http://gwc.sourceforge.net/
 Distribution: Redhat
 Vendor: Redhawk.org
 Packager: Redhawk.org
-PreReq: fftw libsndfile1 db1 gnome-libs
-BuildPreReq: fftw-devel libsndfile1-devel db1-devel gnome-libs-devel
+PreReq: fftw libsndfile1 gtk2-libs
+BuildPreReq: fftw-devel libsndfile1-devel gtk2-libs-devel
 
 %description
-GNOME Wave Cleaner (GWC) is a tool for cleaning up noisy audio files in
+Gtk (formerly GNOME) Wave Cleaner (GWC) is a tool for cleaning up noisy audio files in
 preparation for burning to CDs. The typical application is to record
 the audio from vinyl LPs, 45s, 78s, etc, to a hard disk as a 16-bit,
 stereo, 44.1khz wave formatted file and then use GWC to apply denoising
@@ -42,5 +43,5 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,0755)
 %doc README COPYING Changelog
-%doc gwc_help.html
+%doc gtk-wave-cleaner.html gtkrc-example.txt
 /usr/bin/gwc
