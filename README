@@ -8,7 +8,7 @@ Requirements
 - a *nix based operating system i.e. linux, bsd, osx etc.  GWC can be run on Windows either in a Linux virtual machine or in "windows subsystem for linux" on 64bit Windows 10 using  pulseaudio and X11 servers for windows.
 - gtk2 (www.gtk.org); included in common Linux distributions.
 - libsndfile (www.mega-nerd.com/libsndfile/); there are packages available for common Linux distributions.
-- either the OSS, ALSA or Pulse Audio sound drivers, or Mac OSX.
+- either the OSS, ALSA or Pulse Audio sound drivers (N.B. Mac OSX Core Audio backend is broken: use Pulse Audio).
 - fftw libs (www.fftw.org); there are packages available for common Linux distributions.
 - [optional] perl to use gwcbatch helper script.  Not required for normal gui use.
 - [optional] perldoc to view gwcbatch usage instructions (or just open it in a text editor).
