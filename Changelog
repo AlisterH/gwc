@@ -1,4 +1,20 @@
 GWC Changelog
+0.22-04
+April 16, 2019
+This release is mostly fixes and improvements for osx packaging.
+Note that the version number has jumped to -04 because I had several attempts at creating an osx package, using up some numbers, and I don't want to create confusion between them and newer releases.
+(I figured it was a good idea to use the same three numbers in CFBundleVersion, but actually it doesn't support 0 as the first number. So in future I should instead append something like "+build1".)
+
+BUGFIX: playback mono files at correct speed with pulseaudio backend.
+NEW: warn the user if the current working directory is not writable, as that causes big problems.
+CODE: allow building with pulseaudio backend on osx, as the coreaudio backend is broken (playback does not work in the previous OSX packages).
+CHANGED BEHAVIOUR: on osx write files to sensible locations.
+DOC: document optional dependencies (LAME and vorbis-tools).
+
+0.22-01
+August 04, 2017
+Minor build/packaging type fixes.
+
 0.22
 July 18, 2017
 This release is by Alister Hood.  Jeff Welty has advised via email that he has not used GWC for several years and does not have time currently to look at any issues with it.
