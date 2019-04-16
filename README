@@ -46,6 +46,10 @@ Instructions for use:
 
 Check out the help documentation included in this distribution and available from the help menu in GWC.
 
+Known Issues:
+-------------
+GWC fails to open wav files with metadata, such as those created by recent versions of ffmpeg. GWC will produce an error like this: "Failed to open /root/whistle.wav, 'Error : Cannot open file in read/write mode due to string data in header.'".  Libsndfile does not support RDWR mode for these files. If you are creating them  using ffmpeg try adding "-flags bitexact" into your command line (although this will reduce ffmpeg's performance), or writing to a different libsndfile supported format such as .au or .aiff. A workaround for existing files is to open and save the file in mhwaveedit, but since you should keep your original recording as a backup anyway, I suggest either converting to a different format using sndfile-convert or ffmpeg, or using `SimplifyWave` from waveutils or `shntool strip` to make a copy of the file with a clean header.
+
 Background:
 -----------
 
