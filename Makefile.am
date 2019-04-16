@@ -4,6 +4,8 @@
 # 3. We haven't properly integrated meschach.  Make here doesn't recognise if any of meschach's header or source files have changed, and autoconf or autoreconf here doesn't touch it. (also see note in meschach/configure - neither autoconf nor building in meschach actually works in our version).
 # 4. `make dist` needs to be told to include all of the header and source files, as we haven't specified them as gwc_SOURCES.
 # 5. `make clean` errors trying to clean the meschach directory if `make` has not been run :)
+# 6. `make install-strip` doesn't strip
+# etc
 
 # Note if we contemplate updating meschach or using an external meschach library we need to check what Jeff did to our version:
 # - Jeff said he fixed a bad memory leak (I *think* this is also fixed in the debian version).
@@ -67,6 +69,7 @@ meschach/zcopy.c meschach/zfunc.c meschach/zgivens.c meschach/zhessen.c meschach
 meschach/zsolve.c meschach/ztorture.c meschach/zvecop.c
 
 BINFILES = $(APPNAME)
+# Alister: normally this should automatically cause `make [un]install` to install/uninstall it, but in our case we are doing it manually below
 dist_bin_SCRIPTS = gwcbatch
 # Confusingly we don't have the DOCFILES in the doc directory, only the HELPFILES
 DOCFILES = README INSTALL TODO COPYING Changelog
@@ -123,7 +126,7 @@ install : gwc
 	install -d "$(DESTDIR)"$(BINDIR)
 	install -d "$(DESTDIR)"$(DOCDIR)/$(APPNAME)
 	install -d "$(DESTDIR)"$(HELPDIR)/$(APPNAME)
-	install -p -s $(BINFILES) "$(DESTDIR)"$(BINDIR)
+	install -p $(BINFILES) $(dist_bin_SCRIPTS) "$(DESTDIR)"$(BINDIR)
 	install -p -m 0644 $(DOCFILES) "$(DESTDIR)"$(DOCDIR)/$(APPNAME)
 	for hf in $(HELPFILES) ; do install -p -m 0644 $(HELPFILESSRCD)/$$hf "$(DESTDIR)"$(HELPDIR)/$(APPNAME) ; done
 	for hf in $(DATADIRS) ; do install -d "$(DESTDIR)"$(DATADIR)/$$hf && install -p -m 0644 data/$$hf/$(APPNAME).* "$(DESTDIR)"$(DATADIR)/$$hf ; done
@@ -131,7 +134,7 @@ install : gwc
 	gtk-update-icon-cache -f -t "$(DESTDIR)"$(DATADIR)/icons/hicolor
 
 uninstall :
-	( cd "$(DESTDIR)"$(BINDIR) && rm -f $(BINFILES) )
+	( cd "$(DESTDIR)"$(BINDIR) && rm -f $(BINFILES) $(dist_bin_SCRIPTS) )
 	( cd "$(DESTDIR)"$(DOCDIR)/$(APPNAME) && rm -f $(DOCFILES) )
 	( cd "$(DESTDIR)"$(HELPDIR)/$(APPNAME) && rm -f $(HELPFILES) )
 # Alister: note osx errors on --ignore-fail-on-non-empty
