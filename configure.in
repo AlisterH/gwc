@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT([Gtk Wave Cleaner], [0.22-04], [http://gwc.sourceforge.net])
-AM_INIT_AUTOMAKE([1.12 foreign no-define])
+AM_INIT_AUTOMAKE([1.12 foreign no-define tar-ustar])
 
 PKG_CHECK_MODULES(SNDFILE, sndfile >= 1.0.0,
                    HAVE_LIBSNDFILE1="yes", HAVE_LIBSNDFILE1="no")
