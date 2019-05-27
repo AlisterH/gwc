@@ -174,7 +174,7 @@ static int audio_debug = 0 ;
 
 void usage(char *prog)
 {
-	fprintf(stderr, "Usages:\n\
+	fprintf(stderr, "Usage:\n\
 %s\n\
 %s [file]\n\
 %s <file> <batch[s] declick sensitivity start_position stop_position>\n\
@@ -185,7 +185,7 @@ void usage(char *prog)
 %s <file> <batch[s] dsp start_position stop_position>\n\
 %s <file> <batch[s] reverb start_position stop_position>\n\
 %s <file> <batch[s] truncate keep_start keep_end>\n\
-Position are in hh:mm:ss for batch or in samples for batchs. Stop_position can \
+Positions are in hh:mm:ss for batch or in samples for batchs. Stop_position can \
 also be end to denote the stop_position being the end of file.\n",
 prog, prog, prog, prog, prog, prog, prog, prog, prog, prog);
 	exit(EXIT_FAILURE);
@@ -2070,7 +2070,8 @@ void open_wave_filename(void)
 	}
     } else {
 	file_is_open = FALSE;
-	warning("No file selected, or file format not recognized");
+	// I think we can do away with this extra warning now.
+	//warning("No file selected, or file format not recognized");
     }
 }
 
@@ -3027,7 +3028,7 @@ void batch(int argc, char **argv)
     }
     if(!strcasecmp(argv[3], "declick")) {
 	if(argc < 7) {
-	    fprintf(stderr, "Usage: gwc <wavfile> <batch[s] declick sensitivity start_position stop_position>\n") ;
+	    fprintf(stderr, "Usage: %s <wavfile> <batch[s] declick sensitivity start_position stop_position>\n", argv[0]) ;
 	} else {
 		declick_detector_type = FFT_DETECT;
 	    double sens = atof(argv[4]) ;
@@ -3051,7 +3052,7 @@ void batch(int argc, char **argv)
     }
     else if(!strcasecmp(argv[3], "declick-hpf")) {
 	if(argc < 7) {
-	    fprintf(stderr, "Usage: gwc <wavfile> <batch[s] declick sensitivity start_position stop_position>\n") ;
+	    fprintf(stderr, "Usage: %s <wavfile> <batch[s] declick sensitivity start_position stop_position>\n", argv[0]) ;
 	} else {
 		declick_detector_type = HPF_DETECT;
 	    double sens = atof(argv[4]) ;
@@ -3075,7 +3076,7 @@ void batch(int argc, char **argv)
     }
     else if(!strcasecmp(argv[3], "amplify")) {
 	if(argc < 7) {
-	    fprintf(stderr, "Usage: gwc <wavfile> <batch[s] amplify amount start_position stop_position>\n") ;
+	    fprintf(stderr, "Usage: %s <wavfile> <batch[s] amplify amount start_position stop_position>\n", argv[0]) ;
 	} else {
 	    double amount = atof(argv[4]) ;
 	    long first, last ;
@@ -3099,7 +3100,7 @@ void batch(int argc, char **argv)
     }
     else if(!strcasecmp(argv[3], "denoise")) {
 	if(argc < 8) {
-	    fprintf(stderr, "Usage: gwc <wavfile> <batch[s] denoise sample_start sample_end denoise_start denoise_end>\n") ;
+	    fprintf(stderr, "Usage: %s <wavfile> <batch[s] denoise sample_start sample_end denoise_start denoise_end>\n", argv[0]) ;
 	} else {
 	    if(type == BYTIME) {
 		denoise_data.noise_start = time_to_sample(argv[4],&prefs);
@@ -3138,7 +3139,7 @@ void batch(int argc, char **argv)
     }
     else if(!strcasecmp(argv[3], "dsp")) {
 	if(argc < 6) {
-	    fprintf(stderr, "Usage: gwc <wavfile> <batch[s] dsp start_position stop_position>\n") ;
+	    fprintf(stderr, "Usage: %s <wavfile> <batch[s] dsp start_position stop_position>\n", argv[0]) ;
 	} else {
 	    long first, last ;
 
@@ -3161,7 +3162,7 @@ void batch(int argc, char **argv)
     }
     else if(!strcasecmp(argv[3], "reverb")) {
 	if(argc < 6) {
-	    fprintf(stderr, "Usage: gwc <wavfile> <batch[s] reverb start_position stop_position>\n") ;
+	    fprintf(stderr, "Usage: %s <wavfile> <batch[s] reverb start_position stop_position>\n", argv[0]) ;
 	} else {
 	    long first, last ;
 
@@ -3183,7 +3184,7 @@ void batch(int argc, char **argv)
     }
     else if(!strcasecmp(argv[3], "truncate")) {
 	if(argc < 6) {
-	    fprintf(stderr, "Usage: gwc <wavfile> <batch[s] truncate keep_start keep_end>\n") ;
+	    fprintf(stderr, "Usage: %s <wavfile> <batch[s] truncate keep_start keep_end>\n", argv[0]) ;
 	} else {
 	    long first, last ;
     #ifdef TRUNCATE_OLD
@@ -3637,22 +3638,28 @@ int main(int argc, char *argv[])
 	sscanf(&buf[i], "%d.%d.%d", &v1, &v2, &v3);
 
 	printf("libsndfile Version: %s %d %d %d\n", buf, v1, v2, v3) ;
-
+	// Is this test right?  The logic seems odd.  In any case it is probably not necessary these days.
 	if (v1 < 1 || v2 < 0 || v3 < 0) {
 	    warning("libsndfile 1.0.0 or greater is required");
 	    exit(1);
 	}
     }
-
-    if (argc > 1) {
-	strcpy(wave_filename, argv[1]);
-	open_wave_filename();
-	if (argc > 2) {
-	    if ((!strcasecmp(argv[2], "batch")) || (!strcasecmp(argv[2], "batchs"))) {
-		batch(argc, argv);
-		return EXIT_SUCCESS;
-	    }
-	}
+    if ( argc > 1 ) {
+		if ( access (argv[1], F_OK) == 0 ) {
+			strcpy(wave_filename, argv[1]);
+			open_wave_filename();
+			if (argc > 2) {
+				if ((!strcasecmp(argv[2], "batch")) || (!strcasecmp(argv[2], "batchs"))) {
+					batch(argc, argv);
+					return EXIT_SUCCESS;
+				}
+			}
+		}
+		else if (strcmp(argv[1], "--help") == 0 || strcmp(argv[1], "-help") == 0  || strcmp(argv[1], "-h") == 0 ) {
+			usage( argv[0] );
+		}
+		else
+			warning(strcat(argv[1], ": File not found"));
     }
 
     #ifdef MAC_OS_X    
