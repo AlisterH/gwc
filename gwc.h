@@ -315,6 +315,7 @@ struct sound_prefs sound_pref_dialog(struct sound_prefs current) ;
 void stats(double x[], int n, double *pMean, double *pStderr, double *pVar, double *pCv, double *pStddev) ;
 void resample_audio_data(struct sound_prefs *p, long first, long last) ;
 int  start_recording(char *input_device, char *filename) ;
+void get_led_levels(gfloat *pL, gfloat *pR, gfloat *pL10, gfloat *pR10, long samples_played) ;
 long start_playback(char *output_device, struct view *v, struct sound_prefs *p, double seconds_per_block, double seconds_to_preload) ;
 int  start_monitor(char *input_device) ;
 void stop_playback(int force) ;

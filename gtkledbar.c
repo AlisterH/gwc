@@ -214,10 +214,10 @@ led_bar_unlight_segment (GtkWidget *bar, gint segment)
 }
 
 void
-led_bar_light_percent (GtkWidget *bar, gfloat percent)
+led_bar_light_percent (GtkWidget *bar, gfloat percent, gfloat percent_max)
 {
   LedBar     *led_bar;
-  gint       num, i;
+  gint       num, i_max, i;
 
   g_return_if_fail (bar != NULL);
   g_return_if_fail (IS_LEDBAR (bar));
@@ -225,6 +225,9 @@ led_bar_light_percent (GtkWidget *bar, gfloat percent)
   led_bar = LEDBAR (bar);
   num = percent * led_bar->num_segments;
   led_bar->lit_segments = num;
+
+  i_max = percent_max * led_bar->num_segments-1;
+
   for (i = 0; i < led_bar->num_segments; i++) 
     {
       if (num > 0 ) 
@@ -235,10 +238,17 @@ led_bar_light_percent (GtkWidget *bar, gfloat percent)
 			       TRUE);
 	  num--;
 	} else {
-	  if (GTK_LED (led_bar->segments[i])->is_on)
-	    gtk_led_set_state (GTK_LED (led_bar->segments[i]),
-			       GTK_STATE_SELECTED,
-			       FALSE);
+	  if(i == i_max) {
+	      if (! (GTK_LED (led_bar->segments[i])->is_on))
+		gtk_led_set_state (GTK_LED (led_bar->segments[i]),
+				   GTK_STATE_SELECTED,
+				   TRUE);
+	  } else {
+	      if (GTK_LED (led_bar->segments[i])->is_on)
+		gtk_led_set_state (GTK_LED (led_bar->segments[i]),
+				   GTK_STATE_SELECTED,
+				   FALSE);
+	  }
     }
   }
 }

@@ -1146,15 +1146,16 @@ void stop_all_playback_functions(GtkWidget * widget, gpointer data)
 	playback_timer = -1 ;
     }
 
-    if (cursor_playback == TRUE)
+    if(stop_playback_force && cursor_playback == TRUE) {
 	gtk_timeout_remove(cursor_timer);
+	cursor_playback = FALSE;
+	led_bar_light_percent(dial[0], 0.0, 0.0);
+	led_bar_light_percent(dial[1], 0.0, 0.0);
+    }
 
     stop_playback(stop_playback_force);
 
-    cursor_playback = FALSE;
     audio_playback = FALSE;
-    led_bar_light_percent(dial[0], 0.0);
-    led_bar_light_percent(dial[1], 0.0);
 }
 
 /* This is a callback function. The data arguments are ignored
@@ -1182,8 +1183,8 @@ gint play_a_block(gpointer data)
     if (audio_playback == TRUE) {
 
 	if (process_audio(&l, &r) == 0) {
-	    led_bar_light_percent(dial[0], l);
-	    led_bar_light_percent(dial[1], r);
+	    //led_bar_light_percent(dial[0], l);
+	    //led_bar_light_percent(dial[1], r);
 	} else {
 	    d_print("process_audio returns nonzero.\n");
 	}
@@ -1208,6 +1209,12 @@ gint update_cursor(gpointer data)
 {
     long cursor_samples_per_pixel;
     long cursor_millisec;
+    gfloat l, r;
+    gfloat l10, r10; // max led level in past 10 blocks
+    long last, first;
+
+    get_region_of_interest(&first, &last, &audio_view);
+
     audio_debug_print("update_cursor with audio_playback:%d\n", audio_playback) ;
 
     if (audio_playback == TRUE) {
@@ -1228,16 +1235,24 @@ gint update_cursor(gpointer data)
 	}
 
 	set_playback_cursor_position(&audio_view, prev_cursor_millisec);
+
+	audio_debug_print("update_cursor with audio_playback:%d\n", audio_playback) ;
+	get_led_levels(&l, &r, &l10, &r10, audio_view.cursor_position-first) ;
+	led_bar_light_percent(dial[0], l, l10);
+	led_bar_light_percent(dial[1], r, r10);
+
 	main_redraw(TRUE, TRUE);
 	audio_debug_print(".\n") ;
     } else {
-	long last, first;
-
-	get_region_of_interest(&first, &last, &audio_view);
-
 	if (audio_view.cursor_position < last) {
 	    set_playback_cursor_position(&audio_view,
 					 prev_cursor_millisec);
+
+	    audio_debug_print("update_cursor with audio_playback==FALSE, cursor:%ld, last:%ld \n", audio_view.cursor_position, last) ;
+	    get_led_levels(&l, &r, &l10, &r10, audio_view.cursor_position-first) ;
+	    led_bar_light_percent(dial[0], l, l10);
+	    led_bar_light_percent(dial[1], r, r10);
+
 	    main_redraw(TRUE, TRUE);
 	    audio_debug_print("?\n") ;
 	} else {
@@ -1248,6 +1263,8 @@ gint update_cursor(gpointer data)
 	    stop_all_playback_functions(NULL, NULL);
 	    stop_playback_force = 1 ;
 	    prev_cursor_millisec = -1;
+	    led_bar_light_percent(dial[0], 0.0, 0.0);
+	    led_bar_light_percent(dial[1], 0.0, 0.0);
 /*          this will redraw the whole sonogram view at the
             end of a "full view" playback  ...frank 31.08.03 */
 /* 	    main_redraw(FALSE, TRUE); */
@@ -1547,7 +1564,6 @@ void split_audio_on_markers(GtkWidget * widget, gpointer data)
     if ((file_processing == FALSE) && (file_is_open == TRUE)
 	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
 	int i = 0 ;
-	int first = -1 ;
 	int trackno = 1 ;
 
 	long first_sample = 0 ;
@@ -1574,7 +1590,7 @@ void split_audio_on_markers(GtkWidget * widget, gpointer data)
 
 		// Alister: I'm sure this could be much tidier
 		// Not that the first case is really needed
-	    if (file_extension=="") {
+	    if (strlen(file_extension)==0) {
 			if(trackno < 10) {
 			//Alister: don't just output as xxx.cdda.wav
 			//we aren't necessarily working with a .wav file
@@ -1597,7 +1613,7 @@ void split_audio_on_markers(GtkWidget * widget, gpointer data)
 
 	    if(last_sample-first_sample >= 10000) {
 		save_as_wavfile(filename, first_sample, last_sample) ;
-		printf("Save as wavfile %s %d->%d\n", filename, first_sample, last_sample) ;
+		printf("Save as wavfile %s %ld->%ld\n", filename, first_sample, last_sample) ;
 		trackno++ ;
 	    }
 
@@ -1967,9 +1983,6 @@ void display_sonogram(GtkWidget * widget, gpointer data)
 void open_wave_filename(void)
 {
     char tmp[PATH_MAX+1];
-
-
-    int l;
     struct sound_prefs tmp_prefs;
 
     gnome_flush();
@@ -1998,8 +2011,6 @@ void open_wave_filename(void)
     // But note that it still stores the file location even if it isn't able to be opened (e.g. because it isn't a wav file).  Is this intended?
     strcpy(pathname, tmp);
     
-    l = strlen(wave_filename);
-
     // Should also really reject wav files that we can't work with, or fix it so they do work! 
     if (is_valid_audio_file(wave_filename)) {
 	tmp_prefs = open_wavefile((char *) wave_filename, &audio_view);
@@ -2090,12 +2101,9 @@ void old_open_wave_filename(void)
     strcat(pathname, basename(tmp));
 
     {
-	int l;
 	struct sound_prefs tmp_prefs;
 
 	cleanup_and_close(&audio_view, &prefs);
-
-	l = strlen(wave_filename);
 
 	if (is_valid_audio_file(wave_filename)) {
 	    tmp_prefs = open_wavefile((char *) wave_filename, &audio_view);
@@ -2103,10 +2111,10 @@ void old_open_wave_filename(void)
 		prefs = tmp_prefs;
 		spectral_view_flag = FALSE;
 		if (prefs.wavefile_fd != -1) {
-    #ifdef TRUNCATE_OLD
+#ifdef TRUNCATE_OLD
 		    audio_view.truncate_head = 0;
 		    audio_view.truncate_tail = (prefs.n_samples - 1);
-    #endif /* TRUNCATE_OLD */
+#endif /* TRUNCATE_OLD */
 		    audio_view.n_samples = prefs.n_samples;
 		    if (audio_view.first_sample == -1) {
 			audio_view.first_sample = 0;
@@ -2164,12 +2172,7 @@ void app_open_file_cb (GtkosxApplication *theApp, gchar *path, gpointer p)
 void store_selection_filename(gpointer user_data)
 {
     if (strcmp(save_selection_filename, wave_filename)) {
-	int l;
-
-	l = strlen(save_selection_filename);
-
 	save_selection_as_wavfile(save_selection_filename, &audio_view);
-
     } else {
 	warning("Cannot save selection over the currently open file!");
     }
@@ -2301,8 +2304,7 @@ void save_selection_as_encoded(int fmt, char *filename, char *filename_new, stru
 
 void store_selected_filename_as_encoded(gpointer user_data)
 {
-    int enc_format = NULL ;
-    int l;
+    int enc_format = NULL_FMT ;
     char trackname[1024] = "" ;
 
     if (encoding_type == GWC_OGG) enc_format = OGG_FMT ;
@@ -2310,8 +2312,6 @@ void store_selected_filename_as_encoded(gpointer user_data)
     if (encoding_type == GWC_MP3_SIMPLE) enc_format = MP3_SIMPLE_FMT ;
 
     if(!prompt_user("Enter the trackname:", trackname, 1023)) {
-	l = strlen(save_selection_filename);
-
 	file_processing = TRUE;
 
 	save_selection_as_encoded(enc_format, wave_filename,
@@ -3486,8 +3486,8 @@ int main(int argc, char *argv[])
 	gtk_box_pack_start(GTK_BOX(led_vbox), dial[i], TRUE, TRUE, 0);
     }
 
-    led_bar_light_percent(dial[0], (0.0));
-    led_bar_light_percent(dial[1], (0.0));
+    led_bar_light_percent(dial[0], (0.0), 0.0);
+    led_bar_light_percent(dial[1], (0.0), 0.0);
 
     gtk_box_pack_start(GTK_BOX(bottom_hbox), led_vbox, TRUE, TRUE, 0);
     gtk_box_pack_start(GTK_BOX(bottom_hbox), track_times_vbox, TRUE, TRUE,

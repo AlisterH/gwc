@@ -174,13 +174,7 @@ void config_audio_device(int rate_set, int bits_set, int stereo_set)
     stereo = stereo_set ;
     format = format_set ;
 
-/*      if(ioctl(audio_fd, SNDCTL_DSP_SETFRAGMENT, &fragset) == -1) {  */
-/*  	warning("error setting buffer size on audio device") ;  */
-/*      }  */
-
     channels = stereo + 1 ;
-// Alister: Eh?  Isn't this set above?
-    rate = rate_set ;
 
     if (audio_device_set_params(&format_set, &channels, &rate) == -1) {
 	warning("unknown error setting device parameter") ;
@@ -211,6 +205,7 @@ void config_audio_device(int rate_set, int bits_set, int stereo_set)
     stereo_set = channels - 1 ;
 
 // Alister: eh? does this make sense if rate has been set from rate_set above?
+// Jeff - no -- audio_device_set_params() may choose to alter (rate,format or channels) based on limitations of the audio device
     if(ABS(rate_set-rate) > 10) {
 	char buf[80] ;
 	snprintf(buf, sizeof(buf), "Rate set to %d instead of %d\nYour sound card may not support the desired rate\n",
@@ -242,23 +237,63 @@ long first_playback_sample ;
 long set_playback_cursor_position(struct view *v, long millisec_per_visual_frame)
 {
     long first, last ;
+    get_region_of_interest(&first, &last, v) ;
 
-    if(audio_state == AUDIO_IS_PLAYBACK) {
+    if((audio_state&AUDIO_IS_PLAYING)) {
 	long bytes = audio_device_processed_bytes()-looped_count*playback_total_bytes ;
-	get_region_of_interest(&first, &last, v) ;
 
-	v->cursor_position = first_playback_sample+bytes/(PLAYBACK_FRAMESIZE) ;
-
-	return playback_total_bytes - bytes ;
+	if(bytes >= 0) {
+	    v->cursor_position = first_playback_sample+bytes/(PLAYBACK_FRAMESIZE) ;
+	    return playback_total_bytes - bytes ;
+	}
     }
 
     {
 	long inc = rate*millisec_per_visual_frame/1000 ;
 /*  	g_print("inc:%ld\n", inc) ;  */
 	v->cursor_position += inc ;
+
+	if(v->cursor_position > last)
+	    v->cursor_position = last ;
+
 	return 1 ;
     }
     
+}
+
+gfloat *led_levels_r = NULL ;
+gfloat *led_levels_l = NULL ;
+gint n_blocks_in_levels ;
+gint n_samples_in_levels ;
+gint totblocks_in_levels ;
+#define LED_LEVEL_SAMPLE_SIZE 4096
+
+void get_led_levels(gfloat *pL, gfloat *pR, gfloat *pLold, gfloat *pRold, long samples_played)
+{
+    int block = samples_played/LED_LEVEL_SAMPLE_SIZE ;
+
+    if(block > n_blocks_in_levels-1)
+	block = n_blocks_in_levels-1 ;
+
+    if(block < 0)
+	block = 0 ;
+
+    //fprintf(stderr, "GLL block=%d, samples_played=%ld\n", block, samples_played) ;
+
+    *pL = led_levels_l[block] ;
+    *pR = led_levels_r[block] ;
+    *pLold = led_levels_l[block] ;
+    *pRold = led_levels_r[block] ;
+
+    // show largest value in past 10 blocks
+    int firstblock = block-9 ;
+    if(firstblock < 0)
+	firstblock = 0 ;
+
+    for(int i=firstblock ; i <= block ; i++) {
+	if(*pLold < led_levels_l[i]) *pLold = led_levels_l[i] ;
+	if(*pRold < led_levels_r[i]) *pRold = led_levels_r[i] ;
+    }
 }
 
 long start_playback(char *output_device, struct view *v, struct sound_prefs *p, double seconds_per_block, double seconds_to_preload)
@@ -322,7 +357,7 @@ long start_playback(char *output_device, struct view *v, struct sound_prefs *p, 
     playback_samples_remaining = (last-first+1) ;
     playback_total_bytes = playback_samples_remaining*PLAYBACK_FRAMESIZE ;
 
-    audio_state = AUDIO_IS_PLAYBACK ;
+    audio_state = AUDIO_IS_PLAYING|AUDIO_IS_BUFFERING ;
 
     position_wavefile_pointer(playback_start_position) ;
 /*      g_print("playback_start_position is %ld\n", playback_start_position) ;  */
@@ -344,6 +379,30 @@ long start_playback(char *output_device, struct view *v, struct sound_prefs *p, 
 
     v->prev_cursor_position = -1 ;
     looped_count = 0 ;
+
+    // setup to get date to track max levels given a playback position
+
+    if(led_levels_r != NULL) {
+	fprintf(stderr, "Free-ing led_levels data\n") ;
+	free(led_levels_r) ;
+	free(led_levels_l) ;
+	led_levels_r = NULL ;
+	led_levels_l = NULL ;
+    }
+
+
+    n_blocks_in_levels=0 ;
+    n_samples_in_levels=0 ;
+    totblocks_in_levels = (last-first+1)/LED_LEVEL_SAMPLE_SIZE+1 ;
+    fprintf(stderr, "Initializing led_levels data, totblocks=%d\n", totblocks_in_levels) ;
+
+    led_levels_r = (gfloat *)calloc(totblocks_in_levels, sizeof(gfloat)) ;
+    led_levels_l = (gfloat *)calloc(totblocks_in_levels, sizeof(gfloat)) ;
+
+    for(int i=0 ; i < totblocks_in_levels ; i++) {
+	led_levels_r[i] = 0. ;
+	led_levels_l[i] = 0. ;
+    }
 
     return playback_samples ;
 }
@@ -524,11 +583,7 @@ void save_as_wavfile(char *filename_new, long first_sample, long last_sample)
 
 void save_selection_as_wavfile(char *filename_new, struct view *v)
 {
-    SNDFILE *sndfile_new ;
-    SF_INFO sfinfo_new ;
-
     long total_samples ;
-    long total_bytes ;
 
     total_samples =  v->selected_last_sample-v->selected_first_sample+1 ;
 
@@ -833,7 +888,6 @@ int read_raw_wavefile_data(char buf[], long first, long last)
     long n = last - first + 1 ;
     int n_read = 0 ;
     int n_bytes_read = 0 ;
-    int bufsize = n * FRAMESIZE ;
 
     position_wavefile_pointer(first) ;
 
@@ -1240,27 +1294,30 @@ int process_audio(gfloat *pL, gfloat *pR)
     short *p_short ;
     int *p_int ;
     unsigned char  *p_char ;
-    short maxl = 0, maxr = 0 ;
     extern int audio_playback ;
     long n_samples_to_read, n_read ;
-    double maxpossible ;
+    gfloat maxpossible ;
     double feather_out_N ;
     int feather_out = 0 ;
 
     *pL = 0.0 ;
     *pR = 0.0 ;
+
+    /* only continue if audio is buffering or recording */
+    if((audio_state&(AUDIO_IS_BUFFERING|AUDIO_IS_RECORDING)) == 0)
+	return 1 ;
 	
 
-    if(audio_state == AUDIO_IS_IDLE) {
+    if(audio_state&AUDIO_IS_IDLE) {
 	d_print("process_audio says NOTHING is going on.\n") ;
 	return 1 ;
     }
 
-    if(audio_state == AUDIO_IS_RECORDING) {
+    if(audio_state&AUDIO_IS_RECORDING) {
 	if((len = audio_device_read(audio_buffer, BUFSIZE)) == -1) {
 	    warning("Error on audio read...") ;
 	}
-    } else if(audio_state == AUDIO_IS_PLAYBACK) {
+    } else if(audio_state&AUDIO_IS_BUFFERING) {
         len = audio_device_nonblocking_write_buffer_size(
             MAXBUFSIZE, playback_samples_remaining*PLAYBACK_FRAMESIZE);
 
@@ -1305,11 +1362,18 @@ int process_audio(gfloat *pL, gfloat *pR)
 
     for(frame = 0  ; frame < n_read ; frame++) {
 	int vl, vr ;
+
 	// I don't understand how all this code works, but if I remove the multiplication by two then the level meter actually works for mono files in ALSA, and for some reason there seem to be no side effects.
 	// However, note that the level meters work quite differently in different configurations, and arguably don't show anything helpful, anyway.
-	// Perhaps we should multiply by (stereo + 1) though?
-	// i = frame*2 ;
-	i = frame;
+
+	// Perhaps we should multiply by (stereo + 1) though? -- JJW, Jan 18, 2021 - YES!!!!
+	//  a frame is a complete set of samples, which may be only 1 sample for mono, or two samples for stereo.
+	// p_short or p_int has the channels interleaved l,r,l,r or for mono just l,l,l,l
+	//  it is critical to get "i" right, because the audio is being feathered, or tapered down in volume for each
+	//  frame.  i is the index of the index of the first sample in a frame, and must increment by 2 for stereo, and increment by 1 for mono
+	i = frame*(stereo+1) ;
+
+
 
 	if(BYTESPERSAMPLE < 3) {
 	    if(feather_out == 1 && n_read-(frame+1) < FEATHER_WIDTH) {
@@ -1321,7 +1385,7 @@ int process_audio(gfloat *pL, gfloat *pR)
 		}
 
 		p_short[i] *= p ;
-		p_short[i+1] *= p ;
+		if(stereo) p_short[i+1] *= p ;
 
 		//if(i > n_read - 100) {
 		//    printf("%hd %hd\n", p_short[i], p_short[i+1]) ;
@@ -1331,40 +1395,50 @@ int process_audio(gfloat *pL, gfloat *pR)
 	    }
 
 	    vl = p_short[i] ;
-	    vr = p_short[i+1] ;
+	    if(stereo) vr = p_short[i+1] ;
 
 	} else {
 	    if(feather_out == 1 && n_read-(i+1) < 10000) {
 		double p = 1.0 - (double)(n_read-(i+1))/9999.0 ;
 		printf(".") ;
 		p_int[i] *= p ;
-		p_int[i+1] *= p ;
+		if(stereo) p_int[i+1] *= p ;
 	    }
 
 	    vl = p_int[i] ;
-	    vr = p_int[i+1] ;
+	    if(stereo) vr = p_int[i+1] ;
 	}
 
-	if(vl > maxl) maxl = vl ;
-	if(-vl > maxl) maxl = -vl ;
+	int current_level_block=(n_samples_in_levels-1)/LED_LEVEL_SAMPLE_SIZE ;
+	if(current_level_block > totblocks_in_levels-1) {
+	    fprintf(stderr, "Uh-oh, current_level_block:%d, max:%d\n", current_level_block, totblocks_in_levels-1) ;
+	    current_level_block = totblocks_in_levels-1 ;
+	}
+
+	if(vl < 0) vl = -vl ;
+
+	if(led_levels_l[current_level_block] < (gfloat)vl/maxpossible)
+	    led_levels_l[current_level_block] = (gfloat)vl/maxpossible ;
 
 	if(stereo) {
-	    if(vr > maxr) maxr = vr ;
-	    if(-vr > maxr) maxr = -vr ;
+	    if(vr < 0) vr = -vr ;
+	    if(led_levels_r[current_level_block] < (gfloat)vr/maxpossible)
+		led_levels_r[current_level_block] = (gfloat)vr/maxpossible ;
 	} else {
-	    maxr = maxl ;
+	    led_levels_r[current_level_block] = led_levels_l[current_level_block] ;
 	}
+
+	n_blocks_in_levels = current_level_block+1 ;
+	n_samples_in_levels++ ;
     }
+
 #undef BYTESPERSAMPLE
     if(feather_out == 1) printf("\n") ;
 
-    *pL = (gfloat) maxl / maxpossible ;
-    *pR = (gfloat) maxr / maxpossible ;
-
-    if(audio_state == AUDIO_IS_RECORDING) {
+    if(audio_state&AUDIO_IS_RECORDING) {
 	len = write(wavefile_fd, audio_buffer, len) ;
 	audio_bytes_written += len ;
-    } else if(audio_state == AUDIO_IS_PLAYBACK) {
+    } else if(audio_state&AUDIO_IS_BUFFERING) {
 	len = audio_device_write(p_char, len) ;
 	playback_position += n_read ;
 	playback_samples_remaining -= n_read ;
@@ -1376,7 +1450,7 @@ int process_audio(gfloat *pL, gfloat *pR)
 		unsigned char zeros[1024] ;
 		long zeros_needed ;
 		memset(zeros,0,sizeof(zeros)) ;
-		audio_state = AUDIO_IS_PLAYBACK ;
+		audio_state = AUDIO_IS_PLAYING ;
 		audio_playback = FALSE ;
 
 		zeros_needed = playback_bytes_per_block - (playback_total_bytes % playback_bytes_per_block) ;
@@ -1386,7 +1460,7 @@ int process_audio(gfloat *pL, gfloat *pR)
 		    zeros_needed -= len ;
 		} while (len >= 0 && zeros_needed > 0) ;
 
-		g_print("Stop playback with playback_samples_remaining:%ld\n", playback_samples_remaining) ;
+		g_print("Stop playback audio buffering with playback_samples_remaining:%ld\n", playback_samples_remaining) ;
 		return 1 ;
 	    } else {
 		playback_position = playback_start_position ;
@@ -1408,14 +1482,14 @@ void stop_playback(int force)
 	int new_playback = audio_device_processed_bytes();
 	int  old_playback;
 
-	while(new_playback < playback_total_bytes) {
+	while(new_playback > 0 && new_playback < playback_total_bytes) {
 	    /* Robert altered */
 	    usleep(100) ;
 	    old_playback = new_playback;
 	    new_playback=audio_device_processed_bytes();
 
 	    /* check if more samples have been processed, if not,quit */
-	    if (old_playback==new_playback){
+	    if (new_playback > 0 && old_playback==new_playback){
 		fprintf(stderr,"Playback appears frozen\n Breaking\n");
 		break;
 	    }

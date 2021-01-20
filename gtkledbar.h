@@ -69,7 +69,8 @@ void          led_bar_light_segment       (GtkWidget  *bar,
 void          led_bar_unlight_segment     (GtkWidget  *bar,
 					   gint       segment);
 void          led_bar_light_percent       (GtkWidget  *bar,
-					   gfloat     percent);
+					   gfloat     percent,
+					   gfloat     percent_max);
 void          led_bar_sequence_step       (GtkWidget  *bar);
 void          led_bar_clear               (GtkWidget  *bar);
 

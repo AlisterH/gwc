@@ -307,6 +307,16 @@ int _audio_area_button_event(GtkWidget *c, GdkEventButton *event)
 	return TRUE;
     }
 
+    if(event->type == GDK_2BUTTON_PRESS) {
+	audio_view.selected_first_sample = audio_view.first_sample ;
+	audio_view.selected_last_sample = audio_view.last_sample ;
+	audio_view.selection_region = TRUE ;
+	selecting_region = FALSE ;
+	display_times() ;
+	main_redraw(FALSE, FALSE) ;
+	return TRUE;
+    }
+
     return FALSE ;
 }
 
