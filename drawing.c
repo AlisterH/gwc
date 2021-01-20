@@ -308,6 +308,31 @@ int _audio_area_button_event(GtkWidget *c, GdkEventButton *event)
     }
 
     if(event->type == GDK_2BUTTON_PRESS) {
+	long click_sample = pixel_to_sample(&audio_view, (int)event->x) ;
+	long select_first = audio_view.first_sample ;
+	long select_last = audio_view.last_sample ;
+
+	for(int i = 0 ; i < num_song_markers ; i++) {
+	    if(song_markers[i] < 0) continue ;
+
+	    if(song_markers[i] > click_sample && song_markers[i] < select_last)
+		select_last = song_markers[i] ;
+
+	    if(song_markers[i] < click_sample && song_markers[i] > select_first)
+		select_first = song_markers[i] ;
+	}
+
+
+	audio_view.selected_first_sample = select_first ;
+	audio_view.selected_last_sample = select_last ;
+	audio_view.selection_region = TRUE ;
+	selecting_region = FALSE ;
+	display_times() ;
+	main_redraw(FALSE, FALSE) ;
+	return TRUE;
+    }
+
+    if(event->type == GDK_3BUTTON_PRESS) {
 	audio_view.selected_first_sample = audio_view.first_sample ;
 	audio_view.selected_last_sample = audio_view.last_sample ;
 	audio_view.selection_region = TRUE ;

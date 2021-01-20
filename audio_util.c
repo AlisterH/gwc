@@ -266,7 +266,7 @@ gfloat *led_levels_l = NULL ;
 gint n_blocks_in_levels ;
 gint n_samples_in_levels ;
 gint totblocks_in_levels ;
-#define LED_LEVEL_SAMPLE_SIZE 4096
+gint LED_LEVEL_SAMPLE_SIZE = 4410 ;
 
 void get_led_levels(gfloat *pL, gfloat *pR, gfloat *pLold, gfloat *pRold, long samples_played)
 {
@@ -381,6 +381,7 @@ long start_playback(char *output_device, struct view *v, struct sound_prefs *p, 
     looped_count = 0 ;
 
     // setup to get date to track max levels given a playback position
+    LED_LEVEL_SAMPLE_SIZE = p->rate/10 ;
 
     if(led_levels_r != NULL) {
 	fprintf(stderr, "Free-ing led_levels data\n") ;
