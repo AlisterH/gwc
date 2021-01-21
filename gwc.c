@@ -99,7 +99,7 @@ struct view audio_view;
 struct click_data click_data;
 int audio_playback = FALSE;
 int audio_is_looping = FALSE;
-int cursor_playback = FALSE;
+//int cursor_playback = FALSE;
 int batch_mode = 0 ;
 long cursor_samples_per_playback_block;
 gint playback_timer = -1 ;
@@ -763,7 +763,7 @@ void declick_with_sensitivity(double sensitivity)
 void declick(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 
 	file_processing = TRUE;
 
@@ -779,7 +779,7 @@ void declick(GtkWidget * widget, gpointer data)
 void declick_weak(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 
 	file_processing = TRUE;
 
@@ -795,7 +795,7 @@ void declick_weak(GtkWidget * widget, gpointer data)
 void estimate(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 	long first, last;
 	file_processing = TRUE;
 	get_region_of_interest(&first, &last, &audio_view);
@@ -809,7 +809,7 @@ void estimate(GtkWidget * widget, gpointer data)
 void manual_declick(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 	int doit = TRUE;
 	long first, last;
 	file_processing = TRUE;
@@ -872,7 +872,7 @@ void manual_declick(GtkWidget * widget, gpointer data)
 void decrackle(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 	int cancel;
 	long first, last;
 
@@ -907,7 +907,7 @@ void decrackle(GtkWidget * widget, gpointer data)
 void noise_sample(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 	file_processing = TRUE;
 	get_region_of_interest(&denoise_data.noise_start,
 			       &denoise_data.noise_end, &audio_view);
@@ -921,7 +921,7 @@ void noise_sample(GtkWidget * widget, gpointer data)
 void remove_noise(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 	file_processing = TRUE;
 	if (denoise_data.ready == FALSE) {
 	    warning("Please select the noise sample first");
@@ -978,7 +978,7 @@ void remove_noise(GtkWidget * widget, gpointer data)
 void undo_callback(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 	file_processing = TRUE;
 	undo(&audio_view, &prefs);
 	main_redraw(FALSE, TRUE);
@@ -996,7 +996,7 @@ void undo_callback(GtkWidget * widget, gpointer data)
 void scale_up_callback(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 	file_processing = TRUE;
 	view_scale *= 1.25;
 	main_redraw(FALSE, TRUE);
@@ -1007,7 +1007,7 @@ void scale_up_callback(GtkWidget * widget, gpointer data)
 void cut_callback(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 #ifdef TRUNCATE_OLD
 	long start, end;
 
@@ -1044,7 +1044,7 @@ void cut_callback(GtkWidget * widget, gpointer data)
 void copy_callback(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
         if (is_region_selected()) {
             file_processing = TRUE;
             audioedit_copy_selection(&audio_view);
@@ -1056,7 +1056,7 @@ void copy_callback(GtkWidget * widget, gpointer data)
 void paste_callback(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
         if (is_region_selected()) {
             if (audioedit_has_clipdata()) {
                 file_processing = TRUE;
@@ -1074,7 +1074,7 @@ void paste_callback(GtkWidget * widget, gpointer data)
 void delete_callback(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
         if (is_region_selected()) {
             long first, last;
             get_region_of_interest(&first, &last, &audio_view);
@@ -1095,7 +1095,7 @@ void delete_callback(GtkWidget * widget, gpointer data)
 void silence_callback(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
         if (is_region_selected()) {
 
 	    if(!yesno("Insert silence can take a long time, continue?")) {
@@ -1113,7 +1113,7 @@ void silence_callback(GtkWidget * widget, gpointer data)
 void scale_reset_callback(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 	file_processing = TRUE;
 	view_scale = 1.00;
 	spectral_amp = 1.00;
@@ -1125,7 +1125,7 @@ void scale_reset_callback(GtkWidget * widget, gpointer data)
 void scale_down_callback(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 	file_processing = TRUE;
 	view_scale /= 1.25;
 	main_redraw(FALSE, TRUE);
@@ -1146,16 +1146,17 @@ void stop_all_playback_functions(GtkWidget * widget, gpointer data)
 	playback_timer = -1 ;
     }
 
-    if(stop_playback_force && cursor_playback == TRUE) {
-	gtk_timeout_remove(cursor_timer);
-	cursor_playback = FALSE;
-	led_bar_light_percent(dial[0], 0.0, 0.0);
-	led_bar_light_percent(dial[1], 0.0, 0.0);
-    }
+/*      if(stop_playback_force && cursor_playback == TRUE) {  */
+/*  	gtk_timeout_remove(cursor_timer);  */
+/*  	cursor_playback = FALSE;  */
+/*      }  */
 
     stop_playback(stop_playback_force);
 
     audio_playback = FALSE;
+
+    led_bar_light_percent(dial[0], 0.0, 0.0);
+    led_bar_light_percent(dial[1], 0.0, 0.0);
 }
 
 /* This is a callback function. The data arguments are ignored
@@ -1171,41 +1172,16 @@ void gnome_flush(void)
 	gtk_main_iteration();
 }
 
-long playback_samples_per_block;
+/*  * When the timer goes off:  */
+/*      - Send data to the audio device, if there is more to send  */
+/*      - Determine the cursor position from the audio device # samples played  */
+/*      - if the cursor position is within 1/20 sec of last sample to play  */
+/*  	. stop the timer  */
+/*      	. close the audio device, with flag to drain (play) all remaining samples  */
+/*  	. set the cursor position at the last sample to play  */
+/*      - redraw the screen  */
 
-gint play_a_block(gpointer data)
-{
-    gfloat l, r;
-    long first, last, bytes_left;
-
-    get_region_of_interest(&first, &last, &audio_view);
-
-    if (audio_playback == TRUE) {
-
-	if (process_audio(&l, &r) == 0) {
-	    //led_bar_light_percent(dial[0], l);
-	    //led_bar_light_percent(dial[1], r);
-	} else {
-	    d_print("process_audio returns nonzero.\n");
-	}
-    }
-
-    bytes_left =
-	set_playback_cursor_position(&audio_view, prev_cursor_millisec);
-/*      fprintf(stderr, "bytes_left:%ld\n", bytes_left) ;  */
-
-    if (bytes_left < 10 && !audio_is_looping) {	/* the  "10" is to allow some error in the audio driver */
-	audio_debug_print("play_a_block is stopping the playback_timer.\n") ;
-	stop_playback_force = 0 ;
-	stop_all_playback_functions(NULL, NULL) ;
-	stop_playback_force = 1 ;
-    }
-
-
-    return (TRUE);
-}
-
-gint update_cursor(gpointer data)
+gint playback_timer_function(gpointer data)
 {
     long cursor_samples_per_pixel;
     long cursor_millisec;
@@ -1215,63 +1191,43 @@ gint update_cursor(gpointer data)
 
     get_region_of_interest(&first, &last, &audio_view);
 
-    audio_debug_print("update_cursor with audio_playback:%d\n", audio_playback) ;
+    audio_debug_print("enter update_cursor with audio_playback:%d\n", audio_playback) ;
 
     if (audio_playback == TRUE) {
-	cursor_samples_per_pixel =
-	    (audio_view.last_sample -
-	     audio_view.first_sample) / audio_view.canvas_width;
-	cursor_millisec = (cursor_samples_per_pixel * 1000) / prefs.rate;
-
-	/* lower limit of 1/20th second on screen redraws */
-	if (cursor_millisec < 50)
-	    cursor_millisec = 50;
-
-	if (cursor_millisec != prev_cursor_millisec) {
-	    gtk_timeout_remove(cursor_timer);
-	    cursor_timer =
-		gtk_timeout_add(cursor_millisec, update_cursor, NULL);
-	    prev_cursor_millisec = cursor_millisec;
-	}
+	process_audio(&l, &r) ;
 
 	set_playback_cursor_position(&audio_view, prev_cursor_millisec);
 
-	audio_debug_print("update_cursor with audio_playback:%d\n", audio_playback) ;
-	get_led_levels(&l, &r, &l10, &r10, audio_view.cursor_position-first) ;
-	led_bar_light_percent(dial[0], l, l10);
-	led_bar_light_percent(dial[1], r, r10);
+	float secs_remaining = (float)(last-audio_view.cursor_position)/(float)prefs.rate ;
 
-	main_redraw(TRUE, TRUE);
-	audio_debug_print(".\n") ;
-    } else {
-	if (audio_view.cursor_position < last) {
-	    set_playback_cursor_position(&audio_view,
-					 prev_cursor_millisec);
-
-	    audio_debug_print("update_cursor with audio_playback==FALSE, cursor:%ld, last:%ld \n", audio_view.cursor_position, last) ;
+	if(!audio_is_looping && secs_remaining < .01) {
+	    audio_debug_print("update_cursor is ending audio_playback CP:%ld, last:%ld diff:%ld\n", audio_view.cursor_position, last, last-audio_view.cursor_position) ;
+	    audio_debug_print("prefs.rate:%ld\n", prefs.rate) ;
+	    gtk_timeout_remove(playback_timer);
+	    stop_playback(0) ;
+	    audio_view.cursor_position=last ;
+	    audio_playback = FALSE ;
+	    led_bar_light_percent(dial[0], 0., 0.);
+	    led_bar_light_percent(dial[1], 0., 0.);
+	}  else {
+	    audio_debug_print("update_cursor with audio_playback:%ld, secs:%f\n", audio_view.cursor_position, secs_remaining) ;
 	    get_led_levels(&l, &r, &l10, &r10, audio_view.cursor_position-first) ;
 	    led_bar_light_percent(dial[0], l, l10);
 	    led_bar_light_percent(dial[1], r, r10);
-
-	    main_redraw(TRUE, TRUE);
-	    audio_debug_print("?\n") ;
-	} else {
-	    audio_debug_print("\nupdate_cursor is stopping cursor_timer\n") ;
-	    cursor_playback = FALSE;
-	    gtk_timeout_remove(cursor_timer);
-	    stop_playback_force = 0 ;
-	    stop_all_playback_functions(NULL, NULL);
-	    stop_playback_force = 1 ;
-	    prev_cursor_millisec = -1;
-	    led_bar_light_percent(dial[0], 0.0, 0.0);
-	    led_bar_light_percent(dial[1], 0.0, 0.0);
-/*          this will redraw the whole sonogram view at the
-            end of a "full view" playback  ...frank 31.08.03 */
-/* 	    main_redraw(FALSE, TRUE); */
 	}
+
+	main_redraw(TRUE, TRUE);
+	audio_debug_print(".\n") ;
     }
     return (TRUE);
 }
+
+/*  * To start playback:  */
+/*      - Open the audio device  */
+/*      - Start a timer (at 1/20th second)  */
+/*      - Send data to the audio device  */
+/*      - set the cursor position at the first sample to play  */
+/*      - redraw the screen  */
 
 /* This is a callback function. The data arguments are ignored
 * in this example. More on callbacks below. */
@@ -1281,43 +1237,21 @@ void start_gwc_playback(GtkWidget * widget, gpointer data)
 
     audio_debug_print("entering start_gwc_playback with audio_playback=%d\n", audio_playback) ;
 
-    if (file_is_open == TRUE && file_processing == FALSE
-	&& audio_playback == FALSE && cursor_playback == FALSE) {
+    if (file_is_open == TRUE && file_processing == FALSE && audio_playback == FALSE) {
 
-	playback_samples_per_block = start_playback(audio_device, &audio_view, &prefs, 0.10, 0.25);
+	audio_view.cursor_position = start_playback(audio_device, &audio_view, &prefs, 0.10, 0.25);
 
-	if(playback_samples_per_block < 1)
+	if(audio_view.cursor_position < 0)
 	    return ; // an error occurred
 
 	audio_playback = TRUE;
-	audio_debug_print("playback_samples_per_block=%ld\n", playback_samples_per_block) ;
+	audio_debug_print("audio cursor position=%ld\n", audio_view.cursor_position) ;
 
 	if (audio_playback == TRUE) {
-	    millisec_per_block =
-		playback_samples_per_block * 1000 / prefs.rate;
-	    cursor_samples_per_playback_block =
-		(millisec_per_block - 5) * prefs.rate / 1000;
-	    {
-		long margin = 50;
-
-		if (millisec_per_block < 100)
-		    margin = millisec_per_block / 2;
-
-		audio_debug_print("start_gwc_playback starting playback timers\n") ;
-
-		playback_timer =
-		    gtk_timeout_add(millisec_per_block - margin,
-				    play_a_block, NULL);
-		cursor_playback = TRUE;
-		prev_cursor_millisec = millisec_per_block - margin;
-		cursor_timer = gtk_timeout_add(50, update_cursor, NULL);
-	    }
-	    play_a_block(NULL);
-	} else {
-	    /* not enough samples played to get more than 1 block
-	       in the buffer, no point in drawing cursor now,
-	       the audio data is not available to dump to the audio
-	       device now! */
+	    gfloat l, r;
+	    audio_debug_print("start_gwc_playback starting playback timers\n") ;
+	    process_audio(&l, &r) ;
+	    playback_timer = gtk_timeout_add(50, playback_timer_function, NULL);
 	}
     }
 
@@ -1329,7 +1263,7 @@ void start_gwc_playback(GtkWidget * widget, gpointer data)
 void detect_only_func(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 	file_processing = TRUE;
 	repair_clicks =
 	    gtk_toggle_button_get_active((GtkToggleButton *) widget) ==
@@ -1344,7 +1278,7 @@ void detect_only_func(GtkWidget * widget, gpointer data)
 void amplify(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 	file_processing = TRUE;
 	if (amplify_dialog(prefs, &audio_view)) {
 	    long first, last;
@@ -1374,7 +1308,7 @@ void amplify(GtkWidget * widget, gpointer data)
 void reverb(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 	file_processing = TRUE;
 	if (reverb_dialog(prefs, &audio_view)) {
 	    long first, last;
@@ -1404,7 +1338,7 @@ void reverb(GtkWidget * widget, gpointer data)
 void pinknoise_cb(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 	file_processing = TRUE;
 
 	if (pinknoise_dialog(prefs, &audio_view)) {
@@ -1436,7 +1370,7 @@ void pinknoise_cb(GtkWidget * widget, gpointer data)
 void filter_cb(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 	file_processing = TRUE;
 
 	if (filter_dialog(prefs, &audio_view)) {
@@ -1466,7 +1400,7 @@ void filter_cb(GtkWidget * widget, gpointer data)
 void zoom_select(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 	file_processing = TRUE;
 
 	if(audio_view.selected_first_sample == audio_view.selected_last_sample) {
@@ -1532,7 +1466,7 @@ void select_markers(GtkWidget * widget, gpointer data)
 void toggle_marker_at(long sample)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 	int i;
 	int j;
 
@@ -1562,7 +1496,7 @@ void toggle_marker_at(long sample)
 void split_audio_on_markers(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 	int i = 0 ;
 	int trackno = 1 ;
 
@@ -1659,7 +1593,7 @@ void adjust_marker_positions(long pos, long delta)
 void view_all(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 	file_processing = TRUE;
 	audio_view.first_sample = 0;
 	audio_view.last_sample = prefs.n_samples - 1;
@@ -1676,7 +1610,7 @@ void view_all(GtkWidget * widget, gpointer data)
 void zoom_out(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 	long w = audio_view.last_sample - audio_view.first_sample;
 
 	file_processing = TRUE;
@@ -1702,7 +1636,7 @@ void zoom_out(GtkWidget * widget, gpointer data)
 void zoom_in(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 	long w = audio_view.last_sample - audio_view.first_sample;
 	file_processing = TRUE;
 
@@ -1725,7 +1659,7 @@ void zoom_in(GtkWidget * widget, gpointer data)
 void toggle_start_marker(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 	long first, last;
 	get_region_of_interest(&first, &last, &audio_view);
 	toggle_marker_at(first);
@@ -1736,7 +1670,7 @@ void toggle_start_marker(GtkWidget * widget, gpointer data)
 void toggle_end_marker(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 	long first, last;
 	get_region_of_interest(&first, &last, &audio_view);
 	toggle_marker_at(last);
@@ -1748,7 +1682,7 @@ void clear_markers_in_view(GtkWidget * widget, gpointer data)
 {
 
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 	long first, last;
 	int i;
 
@@ -1775,14 +1709,14 @@ gboolean  key_press_cb(GtkWidget * widget, GdkEventKey * event, gpointer data)
     /* GDK_b, GDK_c, GDK_e, GDK_n, GDK_z used through menus */
     switch (event->keyval) {
 	case GDK_space:
-	    if (cursor_playback == FALSE)
+	    if (audio_playback == FALSE)
 		start_gwc_playback(widget, data);
 	    else {
 		stop_all_playback_functions(widget, data);
 	    }
 	    break;
 	case GDK_l:
-	    if (cursor_playback == FALSE) {
+	    if (audio_playback == FALSE) {
 		start_gwc_playback(widget, data);
 		audio_is_looping = TRUE ;
 	    } else {
@@ -1972,7 +1906,7 @@ void main_redraw(int cursor_flag, int redraw_data)
 void display_sonogram(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 	file_processing = TRUE;
 	spectral_view_flag = !spectral_view_flag;
 	main_redraw(FALSE, TRUE);
@@ -2182,8 +2116,7 @@ void open_file_selection(GtkWidget * widget, gpointer data)
 {
     GtkFileFilter * ff, * ffa;
 
-    if ((file_processing == FALSE) && (audio_playback == FALSE)
-	&& (cursor_playback == FALSE))
+    if ((file_processing == FALSE) && (audio_playback == FALSE))
     {
 
 	/* Create the selector */
@@ -2336,7 +2269,7 @@ void save_as_encoded()
     GtkFileFilter * ff, * ffa;
 
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 
 	char tmppath[PATH_MAX+6];
 
@@ -2429,7 +2362,7 @@ void save_as_selection(GtkWidget * widget, gpointer data)
  	   GtkFileFilter * ff, * ffa;*/
 
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+	&& (audio_playback == FALSE)) {
 
 	if (audio_view.selection_region == TRUE) {
 
@@ -2905,7 +2838,7 @@ static gint audio_area_configure_event(GtkWidget * widget, GdkEventConfigure * e
 int audio_area_button_event(GtkWidget *c, GdkEventButton *event, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE) && (cursor_playback == FALSE))
+	&& (audio_playback == FALSE))
 	{
 		return _audio_area_button_event(c, event);
 	}
@@ -2915,7 +2848,7 @@ int audio_area_button_event(GtkWidget *c, GdkEventButton *event, gpointer data)
 int audio_area_motion_event(GtkWidget *c, GdkEventMotion *event)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
-		&& (audio_playback == FALSE) && (cursor_playback == FALSE))
+		&& (audio_playback == FALSE))
     	{
 		return _audio_area_motion_event(c, event);
 	}

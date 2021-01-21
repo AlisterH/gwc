@@ -226,7 +226,14 @@ int audio_device_write(unsigned char *data, int count)
 long query_processed_bytes(void)
 {
     if(handle != NULL) {
+
+	// both avail_update() and avail() seem to give same result in terms
+	// of puting the playback cursor on the screen.  Since the avail_update()
+	// version is lighter weight according to the documentation, stay with
+	// that.
 	snd_pcm_sframes_t avail_frames_in_buf = snd_pcm_avail_update(handle);
+	//snd_pcm_sframes_t avail_frames_in_buf = snd_pcm_avail(handle);
+
 	return snd_pcm_frames_to_bytes(handle, (written_frames - (buffer_total_frames - avail_frames_in_buf)));
     }
 

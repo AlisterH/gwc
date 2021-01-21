@@ -101,9 +101,10 @@ extern struct view audio_view ;
 extern struct sound_prefs prefs ;
 extern struct encoding_prefs encoding_prefs;
 
-int current_sample ;
+int looped_count = 0 ; // increments when frames *played* exceeds total frames to play
+int buffered_looped_count = 0 ; // increments when frames sent to output device exceeds total frames to play
 
-void position_wavefile_pointer(long sample_number) ;
+void position_wavefile_pointer(long frame_number) ;
 
 void audio_normalize(int flag)
 {
@@ -219,32 +220,42 @@ void config_audio_device(int rate_set, int bits_set, int stereo_set)
     stereo = stereo_set ;
 }
 
-long playback_samples_remaining = 0 ;
+long playback_frames_not_output = 0 ;
 long playback_total_bytes ;
+long playback_total_frames ;
 int playback_bytes_per_block ;
-int looped_count ;
 
 #define MAXBUFSIZE 32768
 int BUFSIZE ;
 unsigned char audio_buffer[MAXBUFSIZE] ;
 unsigned char audio_buffer2[MAXBUFSIZE] ;
 
-long playback_start_position ;
-long playback_end_position ;
-long playback_position ;
-long first_playback_sample ;
+long playback_start_frame ;
+long playback_end_frame ;
+long playback_read_frame_position ;
+long first_playback_frame ;
+extern int audio_is_looping ;
 
 long set_playback_cursor_position(struct view *v, long millisec_per_visual_frame)
 {
-    long first, last ;
-    get_region_of_interest(&first, &last, v) ;
+    long first_frame, last_frame ;
+    get_region_of_interest(&first_frame, &last_frame, v) ;
 
     if((audio_state&AUDIO_IS_PLAYING)) {
-	long bytes = audio_device_processed_bytes()-looped_count*playback_total_bytes ;
+	long frames_played = audio_device_processed_bytes()/PLAYBACK_FRAMESIZE - looped_count*playback_total_frames ;
 
-	if(bytes >= 0) {
-	    v->cursor_position = first_playback_sample+bytes/(PLAYBACK_FRAMESIZE) ;
-	    return playback_total_bytes - bytes ;
+	if(audio_is_looping && frames_played > playback_total_frames) {
+	    looped_count++ ;
+	    frames_played -= playback_total_frames ;
+	}
+
+	if(frames_played >= 0) {
+	    v->cursor_position = first_playback_frame+frames_played ;
+	    return frames_played ;
+	} else {
+	    v->cursor_position = last_frame ;
+	    fprintf(stderr, "!!!!!!!!!!!!  processed bytes < 0!\n") ;
+	    return last_frame-first_frame+1 ;
 	}
     }
 
@@ -253,27 +264,26 @@ long set_playback_cursor_position(struct view *v, long millisec_per_visual_frame
 /*  	g_print("inc:%ld\n", inc) ;  */
 	v->cursor_position += inc ;
 
-	if(v->cursor_position > last)
-	    v->cursor_position = last ;
+	if(v->cursor_position > last_frame)
+	    v->cursor_position = last_frame ;
 
-	return 1 ;
+	return -1 ;
     }
     
 }
 
 gfloat *led_levels_r = NULL ;
 gfloat *led_levels_l = NULL ;
-gint n_blocks_in_levels ;
-gint n_samples_in_levels ;
-gint totblocks_in_levels ;
-gint LED_LEVEL_SAMPLE_SIZE = 4410 ;
+gint n_frames_in_levels ;  // number of frames of data loaded into the led_levels_r[] and led_levels_l[] block arrays
+gint totblocks_in_levels ; // number of blocks (elements) alloc()'ed in the led_levels_r and led_levels_l arrays
+gint LED_LEVEL_FRAME_SIZE = 4410 ;  // number of frames examined for max values in a single led_level element, will be reset based on prefs.rate
 
-void get_led_levels(gfloat *pL, gfloat *pR, gfloat *pLold, gfloat *pRold, long samples_played)
+void get_led_levels(gfloat *pL, gfloat *pR, gfloat *pLold, gfloat *pRold, long frame_number)
 {
-    int block = samples_played/LED_LEVEL_SAMPLE_SIZE ;
+    int block = frame_number/LED_LEVEL_FRAME_SIZE ;
 
-    if(block > n_blocks_in_levels-1)
-	block = n_blocks_in_levels-1 ;
+    if(block > totblocks_in_levels-1)
+	block = totblocks_in_levels-1 ;
 
     if(block < 0)
 	block = 0 ;
@@ -328,11 +338,13 @@ long start_playback(char *output_device, struct view *v, struct sound_prefs *p, 
 /*      g_print("last is %ld\n", last) ;  */
 /*      g_print("rate is %ld\n", (long)p->rate) ;  */
 
-    first_playback_sample = first ;
+    first_playback_frame = first ;
 
-    playback_start_position =  first ;
-    playback_end_position = last+1;
-    playback_position = playback_start_position ;
+    playback_start_frame =  first ;
+    playback_end_frame = last+1;
+
+    playback_read_frame_position = playback_start_frame ;
+
     playback_samples = p->rate*seconds_per_block ;
     playback_bytes_per_block = playback_samples*PLAYBACK_FRAMESIZE ;
 
@@ -354,34 +366,21 @@ long start_playback(char *output_device, struct view *v, struct sound_prefs *p, 
 
     BUFSIZE = playback_bytes_per_block ;
 
-    playback_samples_remaining = (last-first+1) ;
-    playback_total_bytes = playback_samples_remaining*PLAYBACK_FRAMESIZE ;
+    playback_frames_not_output = (last-first+1) ;
+    playback_total_frames = (last-first+1) ;
+    playback_total_bytes = playback_frames_not_output*PLAYBACK_FRAMESIZE ;
 
     audio_state = AUDIO_IS_PLAYING|AUDIO_IS_BUFFERING ;
 
-    position_wavefile_pointer(playback_start_position) ;
-/*      g_print("playback_start_position is %ld\n", playback_start_position) ;  */
-
-    /* put some data in the buffer queues, to avoid underflows */
-    if(0) {
-	int n = (int)(seconds_to_preload / seconds_per_block+0.5) ;
-	int old_playback_bytes = playback_bytes_per_block ;
-
-	playback_bytes_per_block *= n ;
-	if(playback_bytes_per_block > MAXBUFSIZE) playback_bytes_per_block = MAXBUFSIZE ;
-	process_audio(&lv, &rv) ;
-	v->cursor_position = first+playback_bytes_per_block/(PLAYBACK_FRAMESIZE) ;
-	playback_bytes_per_block = old_playback_bytes ;
-    }
-
-/*      g_print("playback_samples is %ld\n", playback_samples) ;  */
-/*      g_print("BUFSIZE %ld (%lg fragments)\n", (long)BUFSIZE, (double)BUFSIZE/(double)oss_info.fragsize) ;  */
+    position_wavefile_pointer(playback_start_frame) ;
 
     v->prev_cursor_position = -1 ;
+
     looped_count = 0 ;
+    buffered_looped_count = 0 ;
 
     // setup to get date to track max levels given a playback position
-    LED_LEVEL_SAMPLE_SIZE = p->rate/10 ;
+    LED_LEVEL_FRAME_SIZE = p->rate/10 ;
 
     if(led_levels_r != NULL) {
 	fprintf(stderr, "Free-ing led_levels data\n") ;
@@ -392,9 +391,9 @@ long start_playback(char *output_device, struct view *v, struct sound_prefs *p, 
     }
 
 
-    n_blocks_in_levels=0 ;
-    n_samples_in_levels=0 ;
-    totblocks_in_levels = (last-first+1)/LED_LEVEL_SAMPLE_SIZE+1 ;
+    n_frames_in_levels=0 ;
+
+    totblocks_in_levels = (last-first+1)/LED_LEVEL_FRAME_SIZE+1 ;
     fprintf(stderr, "Initializing led_levels data, totblocks=%d\n", totblocks_in_levels) ;
 
     led_levels_r = (gfloat *)calloc(totblocks_in_levels, sizeof(gfloat)) ;
@@ -405,7 +404,7 @@ long start_playback(char *output_device, struct view *v, struct sound_prefs *p, 
 	led_levels_l[i] = 0. ;
     }
 
-    return playback_samples ;
+    return first ;
 }
 
 void *wavefile_data ;
@@ -511,25 +510,25 @@ int close_wavefile(struct view *v)
     return 1 ;
 }
 
-void save_as_wavfile(char *filename_new, long first_sample, long last_sample)
+void save_as_wavfile(char *filename_new, long first_frame, long last_frame)
 {
     SNDFILE *sndfile_new ;
     SF_INFO sfinfo_new ;
 
-    long total_samples ;
+    long total_frames ;
     long total_bytes ;
 
-    total_samples =  last_sample-first_sample+1 ;
+    total_frames =  last_frame-first_frame+1 ;
 
-    if(total_samples < 0) {
+    if(total_frames < 0) {
 	warning("Invalid selection") ;
 	return ;
     }
 
-    total_bytes = total_samples*FRAMESIZE ;
+    total_bytes = total_frames*FRAMESIZE ;
 
     sfinfo_new = sfinfo ;
-    sfinfo_new.frames = total_samples ;
+    sfinfo_new.frames = total_frames ;
 
     if (! (sndfile_new = sf_open (filename_new, SFM_WRITE, &sfinfo_new))) {
 	/* Open failed so print an error message. */
@@ -546,7 +545,7 @@ void save_as_wavfile(char *filename_new, long first_sample, long last_sample)
     /* something like this, gotta buffer this or the disk head will
        burn a hole in the platter */
 
-    position_wavefile_pointer(first_sample) ;
+    position_wavefile_pointer(first_frame) ;
 
     {
 	long n_copied  ;
@@ -584,11 +583,11 @@ void save_as_wavfile(char *filename_new, long first_sample, long last_sample)
 
 void save_selection_as_wavfile(char *filename_new, struct view *v)
 {
-    long total_samples ;
+    long total_frames ;
 
-    total_samples =  v->selected_last_sample-v->selected_first_sample+1 ;
+    total_frames =  v->selected_last_sample-v->selected_first_sample+1 ;
 
-    if(total_samples < 0 || total_samples > v->n_samples) {
+    if(total_frames < 0 || total_frames > v->n_samples) {
 	warning("Invalid selection") ;
 	return ;
     }
@@ -834,39 +833,39 @@ struct sound_prefs open_wavefile(char *filename, struct view *v)
     return wfh ;
 }
 
-void position_wavefile_pointer(long sample_number)
+void position_wavefile_pointer(long frame_number)
 {
     if(audio_type == SNDFILE_TYPE) {
-	sf_seek(sndfile, sample_number, SEEK_SET) ;
+	sf_seek(sndfile, frame_number, SEEK_SET) ;
     } else if(audio_type == MP3_TYPE) {
 #ifdef HAVE_MP3
-        if(current_ogg_or_mp3_pos != sample_number) {
+        if(current_ogg_or_mp3_pos != frame_number) {
 	    off_t new_pos ;
-            current_ogg_or_mp3_pos = sample_number ;
-	    if(sample_number != 0) {
+            current_ogg_or_mp3_pos = frame_number ;
+	    if(frame_number != 0) {
 		unsigned char buf[1152*4] ;
-		new_pos = mpg123_seek(fp_mp3,sample_number,SEEK_SET) ;
+		new_pos = mpg123_seek(fp_mp3,frame_number,SEEK_SET) ;
 		off_t curr_frame = mpg123_tellframe(fp_mp3) ;
 /*  		if(curr_frame > 0) curr_frame-- ;  */
 		mpg123_seek_frame(fp_mp3,curr_frame,SEEK_SET) ;
-		int presample_number = (int)mpg123_tell(fp_mp3) ;
-/*  		if(presample_number > 0) presample_number-- ;  */
-		int samples_to_read = sample_number - presample_number ;
-		new_pos = mpg123_seek(fp_mp3,presample_number,SEEK_SET) ;
+		int preframe_number = (int)mpg123_tell(fp_mp3) ;
+/*  		if(preframe_number > 0) preframe_number-- ;  */
+		int frames_to_read = frame_number - preframe_number ;
+		new_pos = mpg123_seek(fp_mp3,preframe_number,SEEK_SET) ;
 
 /*  		    fprintf(stderr, "position_wf_ptr, samples_to_read:%d > 1152!!\n", samples_to_read) ;  */
 /*  		    fprintf(stderr, "curr_frame:%d presample_number:%d\n", curr_frame,presample_number) ;  */
 /*  		    fprintf(stderr, "position_wf_ptr, want:%d got%d\n", (int)sample_number, (int)new_pos) ;  */
-		if(samples_to_read > 1152) {
+		if(frames_to_read > 1152) {
 		    exit(1) ;
 		}
 
 		unsigned int done ;
 		int err ;
 
-		err = mpg123_read(fp_mp3, buf, samples_to_read*FRAMESIZE, &done) ;
+		err = mpg123_read(fp_mp3, buf, frames_to_read*FRAMESIZE, &done) ;
 	    } else {
-		new_pos = mpg123_seek(fp_mp3,sample_number,SEEK_SET) ;
+		new_pos = mpg123_seek(fp_mp3,frame_number,SEEK_SET) ;
 		nonzero_seek = 0 ;
 	    }
 /*  	    fprintf(stderr, "position_wf_ptr, want:%d got%d\n", (int)sample_number, (int)new_pos) ;  */
@@ -875,22 +874,22 @@ void position_wavefile_pointer(long sample_number)
 
     } else {
 #ifdef HAVE_OGG
-        if(current_ogg_or_mp3_pos != sample_number) {
-            fprintf(stderr, "pos_wv_ptr, was %ld, want %ld\n", current_ogg_or_mp3_pos, sample_number) ;
-            ov_pcm_seek(&oggfile, sample_number) ;
-            current_ogg_or_mp3_pos = sample_number ;
+        if(current_ogg_or_mp3_pos != frame_number) {
+            fprintf(stderr, "pos_wv_ptr, was %ld, want %ld\n", current_ogg_or_mp3_pos, frame_number) ;
+            ov_pcm_seek(&oggfile, frame_number) ;
+            current_ogg_or_mp3_pos = frame_number ;
         }
 #endif
     }
 }
 
-int read_raw_wavefile_data(char buf[], long first, long last)
+int read_raw_wavefile_data(char buf[], long first_frame, long last_frame)
 {
-    long n = last - first + 1 ;
+    long n = last_frame - first_frame + 1 ;
     int n_read = 0 ;
     int n_bytes_read = 0 ;
 
-    position_wavefile_pointer(first) ;
+    position_wavefile_pointer(first_frame) ;
 
     if(audio_type == SNDFILE_TYPE) {
 	n_bytes_read = sf_read_raw(sndfile, buf, n*FRAMESIZE) ;
@@ -935,27 +934,27 @@ int read_raw_wavefile_data(char buf[], long first, long last)
     return n_read ;
 }
 
-int write_raw_wavefile_data(char buf[], long first, long last)
+int write_raw_wavefile_data(char buf[], long first_frame, long last_frame)
 {
-    long n = last - first + 1 ;
+    long n = last_frame - first_frame + 1 ;
     int n_read ;
 
-    position_wavefile_pointer(first) ;
+    position_wavefile_pointer(first_frame) ;
 
     n_read = sf_write_raw(sndfile, buf, n*FRAMESIZE) ;
 
     return n_read/FRAMESIZE ;
 }
 
-int read_wavefile_data(long left[], long right[], long first, long last)
+int read_wavefile_data(long left[], long right[], long first_frame, long last_frame)
 {
-    long n = last - first + 1 ;
+    long n = last_frame - first_frame + 1 ;
     long s_i = 0 ;
     long bufsize_long ;
     long j ;
     int *p_int ;
 
-    position_wavefile_pointer(first) ;
+    position_wavefile_pointer(first_frame) ;
     p_int = (int *)audio_buffer ;
     bufsize_long = sizeof(audio_buffer) / sizeof(long) ;
 
@@ -964,7 +963,7 @@ int read_wavefile_data(long left[], long right[], long first, long last)
 
 #define TRY_NEW_ABSTRACTION_NOT
 #ifdef TRY_NEW_ABSTRACTION
-	n_read = read_raw_wavefile_data((char *)p_int, first, last) ;
+	n_read = read_raw_wavefile_data((char *)p_int, first_frame, last_frame) ;
 #else
 	long n_this = MIN((n-s_i)*(stereo+1), bufsize_long) ;
 	if(audio_type == SNDFILE_TYPE) {
@@ -1007,7 +1006,7 @@ int read_wavefile_data(long left[], long right[], long first, long last)
 
 	if(n_read == 0) {
 	    char tmp[100] ;
-	    snprintf(tmp, sizeof(tmp), "Attempted to read past end of audio, first=%ld, last=%ld", first, last) ;
+	    snprintf(tmp, sizeof(tmp), "Attempted to read past end of audio, first=%ld, last=%ld", first_frame, last_frame) ;
 	    warning(tmp) ;
 	    exit(1) ;
 	}
@@ -1016,9 +1015,9 @@ int read_wavefile_data(long left[], long right[], long first, long last)
     return s_i ;
 }
 
-int read_fft_real_wavefile_data(fftw_real left[], fftw_real right[], long first, long last)
+int read_fft_real_wavefile_data(fftw_real left[], fftw_real right[], long first_frame, long last_frame)
 {
-    long n = last - first + 1 ;
+    long n = last_frame - first_frame + 1 ;
     long s_i = 0 ;
     long j ;
 
@@ -1026,10 +1025,10 @@ int read_fft_real_wavefile_data(fftw_real left[], fftw_real right[], long first,
 
     int bufsize_double = sizeof(audio_buffer) / sizeof(double) ;
 
-    position_wavefile_pointer(first) ;
+    position_wavefile_pointer(first_frame) ;
 
     if(audio_type != SNDFILE_TYPE) {
-	long pos = first ;
+	long pos = first_frame ;
 	short *buffer2 ;
 	int bufsize_short ;
 
@@ -1052,15 +1051,12 @@ int read_fft_real_wavefile_data(fftw_real left[], fftw_real right[], long first,
 		}
 		left[s_i] /= MAXSAMPLEVALUE ;
 		right[s_i] /= MAXSAMPLEVALUE ;
-		if(first == 0) {
-/*  		    fprintf(stderr, "%4d %d %d\n", (int)s_i, (int)left[s_i], (int)right[s_i]) ;  */
-		}
 		s_i++ ;
 	    }
 
 	    if(n_read == 0) {
 		char tmp[100] ;
-		snprintf(tmp, sizeof(tmp), "read_fft_real Attempted to read past end of audio, first=%ld, last=%ld", first, last) ;
+		snprintf(tmp, sizeof(tmp), "read_fft_real Attempted to read past end of audio, first=%ld, last=%ld", first_frame, last_frame) ;
 		warning(tmp) ;
 		//exit(1) ;
 	    }
@@ -1084,7 +1080,7 @@ int read_fft_real_wavefile_data(fftw_real left[], fftw_real right[], long first,
 
 	    if(n_read == 0) {
 		char tmp[100] ;
-		snprintf(tmp, sizeof(tmp), "Attempted to read past end of audio, first=%ld, last=%ld", first, last) ;
+		snprintf(tmp, sizeof(tmp), "Attempted to read past end of audio, first=%ld, last=%ld", first_frame, last_frame) ;
 		warning(tmp) ;
 		exit(1) ;
 	    }
@@ -1095,9 +1091,9 @@ int read_fft_real_wavefile_data(fftw_real left[], fftw_real right[], long first,
     return s_i ;
 }
 
-int read_float_wavefile_data(float left[], float right[], long first, long last)
+int read_float_wavefile_data(float left[], float right[], long first_frame, long last_frame)
 {
-    long n = last - first + 1 ;
+    long n = last_frame - first_frame + 1 ;
     long s_i = 0 ;
     long j ;
 
@@ -1105,7 +1101,7 @@ int read_float_wavefile_data(float left[], float right[], long first, long last)
 
     int bufsize_float = sizeof(audio_buffer) / sizeof(float) ;
 
-    position_wavefile_pointer(first) ;
+    position_wavefile_pointer(first_frame) ;
 
     while(s_i < n) {
 	long n_this = MIN((n-s_i)*(stereo+1), bufsize_float) ;
@@ -1124,7 +1120,7 @@ int read_float_wavefile_data(float left[], float right[], long first, long last)
 
 	if(n_read == 0) {
 	    char tmp[100] ;
-	    snprintf(tmp, sizeof(tmp), "Attempted to read past end of audio, first=%ld, last=%ld", first, last) ;
+	    snprintf(tmp, sizeof(tmp), "Attempted to read past end of audio, first=%ld, last=%ld", first_frame, last_frame) ;
 	    warning(tmp) ;
 	    exit(1) ;
 	}
@@ -1134,12 +1130,12 @@ int read_float_wavefile_data(float left[], float right[], long first, long last)
     return s_i ;
 }
 
-int sf_write_values(void *ptr, int n_samples)
+int sf_write_values(void *ptr, int n_frames)
 {
     int n = 0 ;
 
-    if(n_samples > 0) {
-	n = sf_write_int(sndfile, ptr, n_samples) ;
+    if(n_frames > 0) {
+	n = sf_write_int(sndfile, ptr, n_frames) ;
     }
 
     return n * BYTESPERSAMPLE ;
@@ -1171,9 +1167,9 @@ int WRITE_VALUE_TO_AUDIO_BUF(char *ivalue)
 
     
 
-int write_fft_real_wavefile_data(fftw_real left[], fftw_real right[], long first, long last)
+int write_fft_real_wavefile_data(fftw_real left[], fftw_real right[], long first_frame, long last_frame)
 {
-    long n = last - first + 1 ;
+    long n = last_frame - first_frame + 1 ;
     long j ;
     long n_written = 0 ;
 
@@ -1183,7 +1179,7 @@ int write_fft_real_wavefile_data(fftw_real left[], fftw_real right[], long first
 
     n_in_buf = 0 ;
 
-    position_wavefile_pointer(first) ;
+    position_wavefile_pointer(first_frame) ;
 
     for(j = 0  ; j < n ; j++) {
 	buf[n_in_buf] = left[j] ;
@@ -1208,9 +1204,9 @@ int write_fft_real_wavefile_data(fftw_real left[], fftw_real right[], long first
 #undef MAXBUF
 }
 
-int write_float_wavefile_data(float left[], float right[], long first, long last)
+int write_float_wavefile_data(float left[], float right[], long first_frame, long last_frame)
 {
-    long n = last - first + 1 ;
+    long n = last_frame - first_frame + 1 ;
     long j ;
     long n_written = 0 ;
 
@@ -1220,7 +1216,7 @@ int write_float_wavefile_data(float left[], float right[], long first, long last
 
     n_in_buf = 0 ;
 
-    position_wavefile_pointer(first) ;
+    position_wavefile_pointer(first_frame) ;
 
     for(j = 0  ; j < n ; j++) {
 	buf[n_in_buf] = left[j] ;
@@ -1245,9 +1241,9 @@ int write_float_wavefile_data(float left[], float right[], long first, long last
 #undef MAXBUF
 }
 
-int write_wavefile_data(long left[], long right[], long first, long last)
+int write_wavefile_data(long left[], long right[], long first_frame, long last_frame)
 {
-    long n = last - first + 1 ;
+    long n = last_frame - first_frame + 1 ;
     long j ;
     long n_written = 0 ;
 /* make SURE MAXBUF is a multiple of 2 */
@@ -1256,7 +1252,7 @@ int write_wavefile_data(long left[], long right[], long first, long last)
 
     n_in_buf = 0 ;
 
-    position_wavefile_pointer(first) ;
+    position_wavefile_pointer(first_frame) ;
 
     for(j = 0  ; j < n ; j++) {
 	buf[n_in_buf] = left[j] ;
@@ -1296,7 +1292,7 @@ int process_audio(gfloat *pL, gfloat *pR)
     int *p_int ;
     unsigned char  *p_char ;
     extern int audio_playback ;
-    long n_samples_to_read, n_read ;
+    long n_frames_to_read, n_read ;
     gfloat maxpossible ;
     double feather_out_N ;
     int feather_out = 0 ;
@@ -1320,21 +1316,22 @@ int process_audio(gfloat *pL, gfloat *pR)
 	}
     } else if(audio_state&AUDIO_IS_BUFFERING) {
         len = audio_device_nonblocking_write_buffer_size(
-            MAXBUFSIZE, playback_samples_remaining*PLAYBACK_FRAMESIZE);
+            MAXBUFSIZE, playback_frames_not_output*PLAYBACK_FRAMESIZE);
 
 	if (len <= 0) {
 	    return 0 ;
 	}
     }
 
-    n_samples_to_read = len/PLAYBACK_FRAMESIZE ;
+    n_frames_to_read = len/PLAYBACK_FRAMESIZE ;
 
-    if(n_samples_to_read*PLAYBACK_FRAMESIZE != len)
+    if(n_frames_to_read*PLAYBACK_FRAMESIZE != len)
 	g_print("ACK!!\n") ;
 
     p_char = (unsigned char *)audio_buffer ;
     p_short = (short *)audio_buffer ;
     p_int = (int *)audio_buffer ;
+
 
     /* for now force playback to 16 bit... */
 #define BYTESPERSAMPLE 2
@@ -1342,23 +1339,23 @@ int process_audio(gfloat *pL, gfloat *pR)
     if(audio_type == SNDFILE_TYPE) {
 	if(BYTESPERSAMPLE < 3) {
 	    maxpossible = 1 << 15 ;
-	    n_read = sf_readf_short(sndfile, p_short, n_samples_to_read) ;
+	    n_read = sf_readf_short(sndfile, p_short, n_frames_to_read) ;
 	} else {
 	    maxpossible = 1 << 23 ;
-	    n_read = sf_readf_int(sndfile, p_int, n_samples_to_read) ;
+	    n_read = sf_readf_int(sndfile, p_int, n_frames_to_read) ;
 	}
     } else {
 #if defined(HAVE_MP3) || defined(HAVE_OGG)
 	maxpossible = 1 << 15 ;
-	n_read = read_raw_wavefile_data((char *)p_char, current_ogg_or_mp3_pos, current_ogg_or_mp3_pos+n_samples_to_read-1) ;
+	n_read = read_raw_wavefile_data((char *)p_char, current_ogg_or_mp3_pos, current_ogg_or_mp3_pos+n_frames_to_read-1) ;
 #endif
     }
 
 #define FEATHER_WIDTH 30000
-    if(playback_samples_remaining - n_read < 0) {
+    if(playback_frames_not_output - n_read < 0) {
 	feather_out = 1 ;
 	feather_out_N = MIN(n_read, FEATHER_WIDTH) ;
-	fprintf(stderr, "Feather out n_read=%ld, playback_samples_remaining=%ld, N=%lf\n", n_read, playback_samples_remaining, feather_out_N) ;
+	fprintf(stderr, "Feather out n_read=%ld, playback_frames_not_output=%ld, N=%lf\n", n_read, playback_frames_not_output, feather_out_N) ;
     }
 
     for(frame = 0  ; frame < n_read ; frame++) {
@@ -1410,27 +1407,29 @@ int process_audio(gfloat *pL, gfloat *pR)
 	    if(stereo) vr = p_int[i+1] ;
 	}
 
-	int current_level_block=(n_samples_in_levels-1)/LED_LEVEL_SAMPLE_SIZE ;
-	if(current_level_block > totblocks_in_levels-1) {
-	    fprintf(stderr, "Uh-oh, current_level_block:%d, max:%d\n", current_level_block, totblocks_in_levels-1) ;
-	    current_level_block = totblocks_in_levels-1 ;
+	if(audio_is_looping == FALSE || buffered_looped_count == 0) {
+	    // if looping, only need to do this for first time through the loop
+	    int current_level_block=(n_frames_in_levels-1)/LED_LEVEL_FRAME_SIZE ;
+	    if(current_level_block > totblocks_in_levels-1) {
+		fprintf(stderr, "Uh-oh, current_level_block:%d, max:%d\n", current_level_block, totblocks_in_levels-1) ;
+		current_level_block = totblocks_in_levels-1 ;
+	    }
+
+	    if(vl < 0) vl = -vl ;
+
+	    if(led_levels_l[current_level_block] < (gfloat)vl/maxpossible)
+		led_levels_l[current_level_block] = (gfloat)vl/maxpossible ;
+
+	    if(stereo) {
+		if(vr < 0) vr = -vr ;
+		if(led_levels_r[current_level_block] < (gfloat)vr/maxpossible)
+		    led_levels_r[current_level_block] = (gfloat)vr/maxpossible ;
+	    } else {
+		led_levels_r[current_level_block] = led_levels_l[current_level_block] ;
+	    }
+
+	    n_frames_in_levels++ ;
 	}
-
-	if(vl < 0) vl = -vl ;
-
-	if(led_levels_l[current_level_block] < (gfloat)vl/maxpossible)
-	    led_levels_l[current_level_block] = (gfloat)vl/maxpossible ;
-
-	if(stereo) {
-	    if(vr < 0) vr = -vr ;
-	    if(led_levels_r[current_level_block] < (gfloat)vr/maxpossible)
-		led_levels_r[current_level_block] = (gfloat)vr/maxpossible ;
-	} else {
-	    led_levels_r[current_level_block] = led_levels_l[current_level_block] ;
-	}
-
-	n_blocks_in_levels = current_level_block+1 ;
-	n_samples_in_levels++ ;
     }
 
 #undef BYTESPERSAMPLE
@@ -1441,34 +1440,37 @@ int process_audio(gfloat *pL, gfloat *pR)
 	audio_bytes_written += len ;
     } else if(audio_state&AUDIO_IS_BUFFERING) {
 	len = audio_device_write(p_char, len) ;
-	playback_position += n_read ;
-	playback_samples_remaining -= n_read ;
+	playback_read_frame_position += n_read ;
+	playback_frames_not_output -= n_read ;
 
-	if(playback_samples_remaining < 1) {
-	    extern int audio_is_looping ;
+	if(playback_frames_not_output < 1) {
 
 	    if(audio_is_looping == FALSE) {
-		unsigned char zeros[1024] ;
-		long zeros_needed ;
-		memset(zeros,0,sizeof(zeros)) ;
 		audio_state = AUDIO_IS_PLAYING ;
-		audio_playback = FALSE ;
+		//audio_playback = FALSE ;
 
-		zeros_needed = playback_bytes_per_block - (playback_total_bytes % playback_bytes_per_block) ;
-		if(zeros_needed < PLAYBACK_FRAMESIZE) zeros_needed = PLAYBACK_FRAMESIZE ; 
-		do {
-		    len = audio_device_write(zeros, MIN(zeros_needed, sizeof(zeros))) ;
-		    zeros_needed -= len ;
-		} while (len >= 0 && zeros_needed > 0) ;
+		if(0) {
+		    unsigned char zeros[1024] ;
+		    long zeros_needed ;
+		    memset(zeros,0,sizeof(zeros)) ;
 
-		g_print("Stop playback audio buffering with playback_samples_remaining:%ld\n", playback_samples_remaining) ;
+		    zeros_needed = playback_bytes_per_block - (playback_total_bytes % playback_bytes_per_block) ;
+		    if(zeros_needed < PLAYBACK_FRAMESIZE) zeros_needed = PLAYBACK_FRAMESIZE ; 
+		    do {
+			len = audio_device_write(zeros, MIN(zeros_needed, sizeof(zeros))) ;
+			zeros_needed -= len ;
+		    } while (len >= 0 && zeros_needed > 0) ;
+		}
+
+		g_print("Stop playback audio buffering with playback_frames_not_output:%ld\n", playback_frames_not_output) ;
 		return 1 ;
 	    } else {
-		playback_position = playback_start_position ;
-		playback_samples_remaining = (playback_end_position-playback_start_position) ;
-		sf_seek(sndfile, playback_position, SEEK_SET) ;
-		g_print("Loop with playback_samples_remaining:%ld\n", playback_samples_remaining) ;
-		looped_count++ ;
+		audio_state = AUDIO_IS_PLAYING|AUDIO_IS_BUFFERING ;
+		playback_read_frame_position = playback_start_frame ;
+		playback_frames_not_output = (playback_end_frame-playback_start_frame) ;
+		sf_seek(sndfile, playback_read_frame_position, SEEK_SET) ;
+		g_print("Loop with playback_frames_not_output:%ld\n", playback_frames_not_output) ;
+		buffered_looped_count++ ;
 	    }
 	}
     }
