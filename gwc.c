@@ -247,19 +247,26 @@ static int is_region_selected(void)
 
 void append_cdrdao(struct view *v)
 {
-    FILE *fp = fopen("cdrdao.toc", "a");
-    long first, last ;
+    // without this check it will append to cdrdao.toc even if no file is open
+    if (file_is_open) {
+        FILE *fp = fopen("cdrdao.toc", "a");
+        long first, last ;
 
-    if (fp == NULL) {
-	fp = fopen("cdrdao.toc", "w");
+        if (fp == NULL) {
+            fp = fopen("cdrdao.toc", "w");
+        }
+
+        if (fp == NULL) {
+	        warning(g_strconcat("Cannot write to ", g_get_current_dir(), "/cdrdao.toc\n", NULL));  //this check prevents a segfault if we can't write to the file
+        }
+        else {
+            get_region_of_interest(&first, &last, v) ;
+            fprintf(fp, "TRACK AUDIO\n");
+            fprintf(fp, "FILE \"%s\" %ld %ld\n", wave_filename, first, last - first + 1);
+            fclose(fp);
+            set_status_text(g_strconcat("Selection appended to ", g_get_current_dir(), "/cdrdao.toc", NULL));  //we should really review the code looking for other actions that should set the status like this
+        }
     }
-
-    get_region_of_interest(&first, &last, v) ;
-
-    fprintf(fp, "TRACK AUDIO\n");
-    fprintf(fp, "FILE \"%s\" %ld %ld\n", wave_filename, first, last - first + 1);
-
-    fclose(fp);
 }
 
 
@@ -1032,7 +1039,7 @@ void cut_callback(GtkWidget * widget, gpointer data)
             } else {
                 file_processing = TRUE;
                 audioedit_cut_selection(&audio_view);
-		set_status_text("Cut done.");
+                set_status_text("Cut done.");
                 main_redraw(FALSE, TRUE);
                 file_processing = FALSE;
             }
@@ -1061,7 +1068,7 @@ void paste_callback(GtkWidget * widget, gpointer data)
             if (audioedit_has_clipdata()) {
                 file_processing = TRUE;
                 audioedit_paste_selection(&audio_view);
-		set_status_text("Paste done.");
+                set_status_text("Paste done.");
                 main_redraw(FALSE, TRUE);
                 file_processing = FALSE;
             } else {
@@ -1084,7 +1091,7 @@ void delete_callback(GtkWidget * widget, gpointer data)
             } else {
                 file_processing = TRUE;
                 audioedit_delete_selection(&audio_view);
-		set_status_text("Delete done.");
+                set_status_text("Delete done.");
                 main_redraw(FALSE, TRUE);
                 file_processing = FALSE;
             }
@@ -3542,7 +3549,7 @@ int main(int argc, char *argv[])
       	         "If you run more than one instance of GWC in this directory their undo files will conflict.\n");
         warning ("Is the current working directory read-only?\n"
                "If so we won't be able to save undo files!\n"
-               "Strongly recommend you exit and create ~/.cache/, or restart in a writable directory!");
+               "Strongly recommend you exit and create ~/.cache/, or restart in a writable directory!"); // we should really give them a button to exit gwc in this dialog and maybe others
       }
       else
         tmpdir = newdir;
