@@ -170,7 +170,7 @@ void d_print(char *fmt, ...)
     }
 }
 
-static int audio_debug = 0 ;
+static int audio_debug = 1 ;
 
 void usage(char *prog)
 {
@@ -1234,12 +1234,13 @@ gint playback_timer_function(gpointer data)
 void start_gwc_playback(GtkWidget * widget, gpointer data)
 {				/* Play audio */
     long millisec_per_block;
+    int device_framesize ;
 
     audio_debug_print("entering start_gwc_playback with audio_playback=%d\n", audio_playback) ;
 
     if (file_is_open == TRUE && file_processing == FALSE && audio_playback == FALSE) {
 
-	audio_view.cursor_position = start_playback(audio_device, &audio_view, &prefs, 0.10, 0.25);
+	audio_view.cursor_position = start_playback(audio_device, &audio_view, &prefs, 0.10, &device_framesize);
 
 	if(audio_view.cursor_position < 0)
 	    return ; // an error occurred
@@ -1251,7 +1252,23 @@ void start_gwc_playback(GtkWidget * widget, gpointer data)
 	    gfloat l, r;
 	    audio_debug_print("start_gwc_playback starting playback timers\n") ;
 	    process_audio(&l, &r) ;
+
+#ifdef HAVE_ALSA
 	    playback_timer = gtk_timeout_add(50, playback_timer_function, NULL);
+#else
+# ifdef HAVE_PULSE_AUDIO
+	    float msec_for_timer = (float)device_framesize/(float)prefs.rate*1000. ;
+	    int imsec = (int)(msec_for_timer)-4 ;
+	    audio_debug_print("PulseAudio, framesize:%d msec for playback timer is=%d\n", device_framesize, imsec) ;
+	    playback_timer = gtk_timeout_add(imsec, playback_timer_function, NULL);
+# else
+#  ifdef MAC_OS_X /* MacOSX */
+	    playback_timer = gtk_timeout_add(30, playback_timer_function, NULL);
+#  else
+	    playback_timer = gtk_timeout_add(30, playback_timer_function, NULL);
+#  endif 
+# endif 
+#endif
 	}
     }
 
@@ -1699,6 +1716,13 @@ void clear_markers_in_view(GtkWidget * widget, gpointer data)
     }
 }
 
+long msec_in_region_of_interest()
+{
+	long first, last;
+	get_region_of_interest(&first, &last, &audio_view);
+	return ((last-first)*1000)/prefs.rate ;
+}
+
 gboolean  key_press_cb(GtkWidget * widget, GdkEventKey * event, gpointer data)
 {
     extern double spectral_amp;
@@ -1717,8 +1741,12 @@ gboolean  key_press_cb(GtkWidget * widget, GdkEventKey * event, gpointer data)
 	    break;
 	case GDK_l:
 	    if (audio_playback == FALSE) {
-		start_gwc_playback(widget, data);
-		audio_is_looping = TRUE ;
+		if(msec_in_region_of_interest() < 250){
+		    warning("Must select > 0.25 seconds of audio to loop") ;
+		} else {
+		    start_gwc_playback(widget, data);
+		    audio_is_looping = TRUE ;
+		}
 	    } else {
 		audio_is_looping = FALSE ;
 		stop_all_playback_functions(widget, data);

@@ -300,17 +300,17 @@ void get_led_levels(gfloat *pL, gfloat *pR, gfloat *pLold, gfloat *pRold, long f
     if(firstblock < 0)
 	firstblock = 0 ;
 
-    for(int i=firstblock ; i <= block ; i++) {
+    int i ;
+    for(i=firstblock ; i <= block ; i++) {
 	if(*pLold < led_levels_l[i]) *pLold = led_levels_l[i] ;
 	if(*pRold < led_levels_r[i]) *pRold = led_levels_r[i] ;
     }
 }
 
-long start_playback(char *output_device, struct view *v, struct sound_prefs *p, double seconds_per_block, double seconds_to_preload)
+long start_playback(char *output_device, struct view *v, struct sound_prefs *p, double seconds_per_block, int *pBest_framesize)
 {
     long first, last ;
     long playback_samples ;
-    gfloat lv, rv ;
 
     if(audio_type == SNDFILE_TYPE && sndfile == NULL) return 1 ;
 #ifdef HAVE_OGG
@@ -321,16 +321,20 @@ long start_playback(char *output_device, struct view *v, struct sound_prefs *p, 
 
     if (audio_device_open(output_device) == -1) {
 	char buf[255] ;
-	snprintf(buf, sizeof(buf), "Failed to open OSS audio output device %s, check settings->miscellaneous for device information", output_device) ;
 #ifdef HAVE_ALSA
 	snprintf(buf, sizeof(buf), "Failed to open alsa output device %s, check settings->miscellaneous for device information", output_device) ;
+#else
+	snprintf(buf, sizeof(buf), "Failed to open OSS audio output device %s, check settings->miscellaneous for device information", output_device) ;
 #endif
 #ifdef HAVE_PULSE_AUDIO
 	snprintf(buf, sizeof(buf), "Failed to open Pulse audio output device, recommend internet search about pulse audio configuration for your OS") ;
 #endif
 	warning(buf) ;
-	return 0 ;
+	return -1 ;
     }
+
+    // this is only used for pulse audio
+    *pBest_framesize = audio_device_best_buffer_size(playback_bytes_per_block);
 
     get_region_of_interest(&first, &last, v) ;
 
@@ -399,7 +403,8 @@ long start_playback(char *output_device, struct view *v, struct sound_prefs *p, 
     led_levels_r = (gfloat *)calloc(totblocks_in_levels, sizeof(gfloat)) ;
     led_levels_l = (gfloat *)calloc(totblocks_in_levels, sizeof(gfloat)) ;
 
-    for(int i=0 ; i < totblocks_in_levels ; i++) {
+    int i ;
+    for(i=0 ; i < totblocks_in_levels ; i++) {
 	led_levels_r[i] = 0. ;
 	led_levels_l[i] = 0. ;
     }
@@ -1291,7 +1296,6 @@ int process_audio(gfloat *pL, gfloat *pR)
     short *p_short ;
     int *p_int ;
     unsigned char  *p_char ;
-    extern int audio_playback ;
     long n_frames_to_read, n_read ;
     gfloat maxpossible ;
     double feather_out_N ;
@@ -1324,6 +1328,8 @@ int process_audio(gfloat *pL, gfloat *pR)
     }
 
     n_frames_to_read = len/PLAYBACK_FRAMESIZE ;
+
+    fprintf(stderr, "process_audio: read %d bytes, %f msec of data\n", len, (float)n_frames_to_read/(float)prefs.rate*1000.) ;
 
     if(n_frames_to_read*PLAYBACK_FRAMESIZE != len)
 	g_print("ACK!!\n") ;

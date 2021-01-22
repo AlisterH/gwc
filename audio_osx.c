@@ -58,10 +58,10 @@ MacOSXAudioData 	audio_data ;
 extern SNDFILE *sndfile;
 extern SF_INFO sfinfo;
 extern int audio_state;
-extern long playback_end_position ;
-extern long playback_position ;
-extern long playback_start_position;
-extern long playback_samples_remaining;
+extern long playback_end_frame ;
+extern long playback_read_frame_position ;
+extern long playback_start_frame;
+extern long playback_frames_not_output;
 extern long playback_total_bytes ;
 extern int FRAMESIZE;
 int BUFFERSIZE = 1024; // The size of the buffers we will send.
@@ -138,12 +138,13 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
 
 int process_audio(gfloat *pL, gfloat *pR)  //This function must be called repeatedly from the gint play_a_block until the section is played. 
 {	//The pointers pL and pR passed in above return the levels for the VU meters.
+	fprintf(stderr, "Process Audio for OS X is now broken, need to fix it for led_level_\n") ;
 	if(audio_state == AUDIO_IS_IDLE) 
 	{
 		d_print("process_audio says AUDIO_IS_IDLE is going on.\n") ;
 		return 1 ;
-    }
-   	else if(audio_state == AUDIO_IS_PLAYBACK) 
+	}
+   	else if(audio_state&(AUDIO_IS_BUFFERING|AUDIO_IS_RECORDING))
 	{
 		*pL = pL_global[buff_num_play];
 		*pR = pR_global[buff_num_play];
@@ -225,7 +226,7 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate) //An
 	/*We want to set the buffer size so that we can get one point per buffer size to run the VU meters. */
 	buff_num = 0;
 	buff_num_play = 0;
-	num_buffers = (playback_end_position - playback_start_position)/BUFFERSIZE; 
+	num_buffers = (playback_end_frame - playback_start_frame)/BUFFERSIZE; 
 	if (!p_global_mem_alloced)
 	{
 		p_global_mem_alloced = TRUE;
@@ -283,19 +284,19 @@ long audio_device_processed_bytes(void)
 		}
 		else
 		{
-			playback_position = (long) (this_time.mSampleTime - start_sample_time);//*FRAMESIZE;
+			playback_read_frame_position = (long) (this_time.mSampleTime - start_sample_time);//*FRAMESIZE;
 																				   //led_bar_light_percent(dial[0], l);  
 																				   //led_bar_light_percent(dial[1], r);
 		}
 	}
-	if (playback_position >= playback_end_position)  //We are done playing.
+	if (playback_read_frame_position >= playback_end_frame)  //We are done playing.
 	{	
 		/* Tell the main application to terminate. */
 		audio_data.done_playing = SF_TRUE ;
 		audio_playback = FALSE;
 	}
 	
-	return playback_position*FRAMESIZE
+	return playback_read_frame_position*FRAMESIZE
 		;
 }  // This is used to set the cursor.  We need to make this return a number controlled by a timer.
 

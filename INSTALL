@@ -1,5 +1,5 @@
 ---
-Installation is via the classic `./configure; make; make install`.
+Installation is via the classic `autoreconf -i; ./configure; make; make install`.
 Refer to the README for further information.
 This file documents specific installation problems which may be encountered.
 

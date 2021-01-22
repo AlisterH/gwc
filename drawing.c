@@ -312,7 +312,8 @@ int _audio_area_button_event(GtkWidget *c, GdkEventButton *event)
 	long select_first = audio_view.first_sample ;
 	long select_last = audio_view.last_sample ;
 
-	for(int i = 0 ; i < num_song_markers ; i++) {
+	int i ;
+	for(i = 0 ; i < num_song_markers ; i++) {
 	    if(song_markers[i] < 0) continue ;
 
 	    if(song_markers[i] > click_sample && song_markers[i] < select_last)
