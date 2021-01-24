@@ -1191,12 +1191,13 @@ gint playback_timer_function(gpointer data)
 
     get_region_of_interest(&first, &last, &audio_view);
 
-    audio_debug_print("enter update_cursor with audio_playback:%d\n", audio_playback) ;
+    //audio_debug_print("enter update_cursor with audio_playback:%d\n", audio_playback) ;
 
     if (audio_playback == TRUE) {
 	process_audio(&l, &r) ;
 
-	set_playback_cursor_position(&audio_view, prev_cursor_millisec);
+	audio_view.expected_frames_played += audio_view.expected_frames_per_timer_update ;
+	set_playback_cursor_position(&audio_view, audio_view.timer_msec);
 
 	float secs_remaining = (float)(last-audio_view.cursor_position)/(float)prefs.rate ;
 
@@ -1210,14 +1211,14 @@ gint playback_timer_function(gpointer data)
 	    led_bar_light_percent(dial[0], 0., 0.);
 	    led_bar_light_percent(dial[1], 0., 0.);
 	}  else {
-	    audio_debug_print("update_cursor with audio_playback:%ld, secs:%f\n", audio_view.cursor_position, secs_remaining) ;
+	    //audio_debug_print("update_cursor with audio_playback:%ld, secs:%f\n", audio_view.cursor_position, secs_remaining) ;
 	    get_led_levels(&l, &r, &l10, &r10, audio_view.cursor_position-first) ;
 	    led_bar_light_percent(dial[0], l, l10);
 	    led_bar_light_percent(dial[1], r, r10);
 	}
 
 	main_redraw(TRUE, TRUE);
-	audio_debug_print(".\n") ;
+	//audio_debug_print(".\n") ;
     }
     return (TRUE);
 }
@@ -1240,35 +1241,43 @@ void start_gwc_playback(GtkWidget * widget, gpointer data)
 
     if (file_is_open == TRUE && file_processing == FALSE && audio_playback == FALSE) {
 
-	audio_view.cursor_position = start_playback(audio_device, &audio_view, &prefs, 0.10, &device_framesize);
+	audio_view.cursor_position = start_playback(audio_device, &audio_view, &prefs, 0.0, &device_framesize);
 
 	if(audio_view.cursor_position < 0)
 	    return ; // an error occurred
 
+	audio_view.playback_prev_cursor_position = audio_view.cursor_position ;
+
 	audio_playback = TRUE;
-	audio_debug_print("audio cursor position=%ld\n", audio_view.cursor_position) ;
+	audio_debug_print("START GWC PLAYBACK audio cursor position=%ld\n", audio_view.cursor_position) ;
 
 	if (audio_playback == TRUE) {
 	    gfloat l, r;
 	    audio_debug_print("start_gwc_playback starting playback timers\n") ;
 	    process_audio(&l, &r) ;
+	    long timer_msec = 25 ;  // this will cause 40 screen updates (and loading of audio buffers) per second
 
 #ifdef HAVE_ALSA
-	    playback_timer = gtk_timeout_add(50, playback_timer_function, NULL);
+	    timer_msec = 25 ;
 #else
 # ifdef HAVE_PULSE_AUDIO
 	    float msec_for_timer = (float)device_framesize/(float)prefs.rate*1000. ;
-	    int imsec = (int)(msec_for_timer)-4 ;
-	    audio_debug_print("PulseAudio, framesize:%d msec for playback timer is=%d\n", device_framesize, imsec) ;
-	    playback_timer = gtk_timeout_add(imsec, playback_timer_function, NULL);
+	    timer_msec = (long)(msec_for_timer)-4 ;
+	    if(timer_msec > 25) timer_msec = 25 ;
+	    audio_debug_print("PulseAudio, framesize:%d msec for playback timer is=%d\n", device_framesize, timer_msec) ;
 # else
 #  ifdef MAC_OS_X /* MacOSX */
-	    playback_timer = gtk_timeout_add(30, playback_timer_function, NULL);
+	    timer_msec = 25 ;
 #  else
-	    playback_timer = gtk_timeout_add(30, playback_timer_function, NULL);
+	    timer_msec = 25 ;
 #  endif 
 # endif 
 #endif
+
+	    audio_view.expected_frames_per_timer_update = (float)timer_msec/1000.f*(float)prefs.rate ;
+	    audio_view.expected_frames_played = 0.f ;
+	    audio_view.timer_msec = timer_msec ; // milliseconds the timer is set to repeat
+	    playback_timer = gtk_timeout_add(audio_view.timer_msec, playback_timer_function, NULL);
 	}
     }
 

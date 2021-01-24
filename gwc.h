@@ -147,7 +147,11 @@ struct view {
     long selected_first_sample ;
     long selected_last_sample ;
     long cursor_position ;
-    long prev_cursor_position ;
+    long prev_cursor_position ; // this is used for user selection, highlighting
+    long playback_prev_cursor_position ; // this is used *only* during playback
+    float expected_frames_per_timer_update ; // during playback, how many frames are expected to be played during one timer interval, can be fractional
+    float expected_frames_played ; // during playback, how many total frames are expected to be played, can be fractional
+    long timer_msec ; // milliseconds the timer is set to repeat
     int selection_region ;
     int channel_selection_mask ;
     long n_samples ;
