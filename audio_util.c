@@ -144,7 +144,9 @@ void write_wav_header(int thefd, int speed, long bcount, int bits, int stereo)
 
 	    memcpy(&(header.data_chunk), data, 4);
 	    header.data_length = bcount;
-	    write(thefd, &header, sizeof(header));
+
+	    if(write(thefd, &header, sizeof(header) != sizeof(header)))
+		warning("unable to write wavfile header") ;
 }
 
 void config_audio_device(int rate_set, int bits_set, int stereo_set)
@@ -302,7 +304,7 @@ long set_playback_cursor_position(struct view *v, long millisec_per_visual_frame
 
 	    // is the device reporting too many or two few delta frames? (can happen with alsa as buffers drop below or above certain thresholds)
 	    if((float)delta_dfp/(float)avg_dfp < 0.66 || (float)delta_dfp/(float)avg_dfp > 1.5) {
-		fprintf(stderr, "SPCP:override device_frames_played from %ld to %ld\n", delta_dfp, avg_dfp) ;
+		//fprintf(stderr, "SPCP:override device_frames_played from %ld to %ld\n", delta_dfp, avg_dfp) ;
 		device_frames_played = avg_dfp+prev_device_frames_played ;
 		if(device_frames_played > playback_total_frames)
 		    device_frames_played = playback_total_frames ;
@@ -320,35 +322,11 @@ long set_playback_cursor_position(struct view *v, long millisec_per_visual_frame
 
 	prev_device_frames_played = device_frames_played ;
 
-	if(1||audio_is_looping) {
-	    // trust that the audio device is correct
-	    frames_played = device_frames_played ;
-	    if(frames_played > playback_total_frames) {
-		looped_count++ ;
-		frames_played -= playback_total_frames ;
-	    }
-	} else {
-	    // normal playback.
-	    float msec = (float)(v->expected_frames_played - (float)device_frames_played)/(float)prefs.rate*1000. ;
-	    if(msec < 25.f) {
-		frames_played = device_frames_played ;
-		v->expected_frames_played = device_frames_played ;
-		if(prev_device_frames_played > -1) {
-		    audio_view.expected_frames_per_timer_update = device_frames_played - prev_device_frames_played ;
-		}
-		prev_device_frames_played = device_frames_played ;
-	    } else {
-		// something unexpected happened in audio device estimate, use expected values based on timer and prefs.rate
-		frames_played = (long) (v->expected_frames_played+0.5f) ;
-
-		if(frames_played > playback_total_frames)
-		    frames_played = playback_total_frames ;
-
-
-		if((frames_played - device_frames_played) > 100) {
-		    fprintf(stderr, "AUDIO DRIVER FELL BEHIND TIMER by %ld FRAMES (%f msec)!!!\n", frames_played-device_frames_played, msec) ;
-		}
-	    }
+	// trust that the audio device is correct
+	frames_played = device_frames_played ;
+	if(frames_played > playback_total_frames) {
+	    looped_count++ ;
+	    frames_played -= playback_total_frames ;
 	}
 
 	if(frames_played >= 0) {
@@ -369,6 +347,14 @@ gfloat *led_levels_l = NULL ;
 gint n_frames_in_led_levels ;  // number of frames of data loaded into the led_levels_r[] and led_levels_l[] block arrays
 gint totblocks_in_led_levels ; // number of blocks (elements) alloc()'ed in the led_levels_r and led_levels_l arrays
 gint LED_LEVEL_FRAME_SIZE = 4410 ;  // number of frames examined for max values in a single led_level element, will be reset based on prefs.rate
+
+			extern gint n_frames_in_led_levels ;
+			extern int audio_is_looping ;
+			extern gint totblocks_in_led_levels ;
+			extern int buffered_looped_count ;
+			extern gfoat *led_levels_l ;
+			extern gfoat *led_levels_r ;
+			extern gint LED_LEVEL_FRAME_SIZE ;
 
 void get_led_levels(gfloat *pL, gfloat *pR, gfloat *pLold, gfloat *pRold, long frame_number)
 {
@@ -1054,7 +1040,7 @@ int read_wavefile_data(long left[], long right[], long first_frame, long last_fr
     bufsize_long = sizeof(audio_buffer) / sizeof(long) ;
 
     while(s_i < n_frames_wanted) {
-	long n_frames_read ;
+	long n_frames_read = 0 ;
 
 #define TRY_NEW_ABSTRACTION_NOT
 #ifdef TRY_NEW_ABSTRACTION
@@ -1386,7 +1372,7 @@ int process_audio(gfloat *pL, gfloat *pR)
     short *p_short ;
     int *p_int ;
     unsigned char  *p_char ;
-    long n_frames_to_read, n_frames_read ;
+    long n_frames_to_read, n_frames_read=0 ;
     gfloat maxpossible ;
     double feather_out_N ;
     int feather_out = 0 ;
@@ -1455,7 +1441,7 @@ int process_audio(gfloat *pL, gfloat *pR)
     }
 
     for(frame = 0  ; frame < n_frames_read ; frame++) {
-	int vl, vr ;
+	int vl=0, vr=0 ;
 
 	// I don't understand how all this code works, but if I remove the multiplication by two then the level meter actually works for mono files in ALSA, and for some reason there seem to be no side effects.
 	// However, note that the level meters work quite differently in different configurations, and arguably don't show anything helpful, anyway.

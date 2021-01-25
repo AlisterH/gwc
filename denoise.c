@@ -313,6 +313,8 @@ void cdivide(double *a, double *b, double c, double d)
 
     anew = (*a*c + *b*d) / denom ;
     bnew = (*b*c - *a*d) / denom ;
+    *a = anew ;
+    *b = bnew ;
 }
 
 #define bin2freq(r,s,k) ((double)r / 2.0 /(double)(s/2)*(double)k)
@@ -333,15 +335,12 @@ void fft_remove_noise(fftw_real sample[], fftw_real noise_min2[], fftw_real nois
 {
     int k ;
     fftw_real noise2[DENOISE_MAX_FFT/2+1] ;
-    fftw_real noise[DENOISE_MAX_FFT/2+1] ;
     fftw_real Y2[DENOISE_MAX_FFT/2+1] ;
-    fftw_real Y[DENOISE_MAX_FFT/2+1] ;
     fftw_real masked[DENOISE_MAX_FFT/2+1] ;
     fftw_real gain_k[DENOISE_MAX_FFT] ;
     static fftw_real bsig_prev[2][DENOISE_MAX_FFT],bY2_prev[2][DENOISE_MAX_FFT/2+1],bgain_prev[2][DENOISE_MAX_FFT/2+1] ;
     fftw_real *sig_prev,*Y2_prev,*gain_prev ;
     static int debug_frame = 1 ;
-    double SFM, tonality_factor ;
 
     sig_prev = bsig_prev[ch] ;
     Y2_prev = bY2_prev[ch] ;
@@ -373,33 +372,24 @@ void fft_remove_noise(fftw_real sample[], fftw_real noise_min2[], fftw_real nois
     {
 	double sum_log_p = 0.0 ;
 	double sum_p = 0.0 ;
-	double kinv = 1./(double)(pPrefs->FFT_SIZE/2.0) ;
 
 	for (k = 1; k <= pPrefs->FFT_SIZE/2 ; ++k) {
 	    noise2[k] = noise_max2[k] ;
 	    noise2[k] = noise_min2[k] + 0.5*(noise_max2[k] - noise_min2[k]) ;
 	    noise2[k] = noise_avg2[k] ;
-	    noise[k] = sqrt(noise2[k]) ;
+
 	    if(k < pPrefs->FFT_SIZE/2) {
 		Y2[k] = out[k]*out[k] + out[pPrefs->FFT_SIZE-k]*out[pPrefs->FFT_SIZE-k] ;
-		Y[k] = sqrt(Y2[k]) ;
 	    } else {
 		Y2[k] = out[k]*out[k] ;
-		Y[k] = out[k] ;
 	    }
+
 	    sum_log_p += log10(Y2[k]) ;
 	    sum_p += Y2[k] ;
 	}
 
-
-	SFM = 10.0*( kinv*sum_log_p - log10(sum_p*kinv) ) ;
-	tonality_factor = MIN(SFM/-60.0, 1) ;
     }
 
-
-    if(pPrefs->noise_suppression_method == DENOISE_LORBER) tonality_factor = 0.0 ;
-
-/*      g_print("SFM:%f tonality:%lf\n", SFM, tonality_factor) ;  */
 
     if(pPrefs->noise_suppression_method == DENOISE_LORBER) {
 	for (k = 1; k <= pPrefs->FFT_SIZE/2 ; ++k) {
@@ -775,10 +765,6 @@ int denoise(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs, long noi
     rfftw_plan pFor, pBak ;
 #endif /* HAVE_FFTW3 */
     int framenum = 0 ;
-    double alpha ;
-    double s_amount ; /* amount, reduced to account for oversampling
-                         due to smoothness */
-                         
 
     start_timer() ;
     current = first_sample ;
@@ -804,9 +790,6 @@ int denoise(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs, long noi
     pBak = rfftw_create_plan(pDnprefs->FFT_SIZE, FFTW_COMPLEX_TO_REAL, FFTW_ESTIMATE);
 #endif /* HAVE_FFTW3 */
 
-    alpha = welty_alpha(0.5, 1.0/(double)pDnprefs->smoothness) ;
-    alpha = 1.0 ;
-
     for(k = 0 ; k < pDnprefs->FFT_SIZE ; k++) {
 	window_coef[k] = fft_window(k,pDnprefs->FFT_SIZE, pDnprefs->window_type) ;
 	d_print("k:%d wc:%lg\n", k, window_coef[k]) ;
@@ -831,11 +814,6 @@ int denoise(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs, long noi
 
     audio_normalize(denoise_normalize) ;
 
-
-/*      if(smoothness <= 4 || window_type == DENOISE_WINDOW_BLACKMAN_HYBRID)  */
-	s_amount = pDnprefs->amount ;
-/*      else  */
-/*  	s_amount = amount/(double)(smoothness-3) ;  */
 
     prev_sample[0] = 0 ;
     prev_sample[1] = 0 ;
@@ -1054,6 +1032,7 @@ void get_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs
 	    left_noise_avg[k] += p2 ;
 	}
 
+#ifdef EXPERIMENTAL_CODE
 	if(0 && pDnprefs->noise_suppression_method == DENOISE_EXPERIMENTAL) {
 	    for(k = 1 ; k <= pDnprefs->FFT_SIZE/2 ; k++) {
 		double p2 ;
@@ -1075,6 +1054,7 @@ void get_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs
 		}
 	    }
 	}
+#endif
 
 #ifdef HAVE_FFTW3
 	FFTW(execute)(pForRight);
@@ -1096,6 +1076,7 @@ void get_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs
 	    right_noise_avg[k] += p2 ;
 	}
 
+#ifdef EXPERIMENTAL_CODE
 	if(0 && pDnprefs->noise_suppression_method == DENOISE_EXPERIMENTAL) {
 	    for(k = 1 ; k <= pDnprefs->FFT_SIZE/2 ; k++) {
 		double p2 ;
@@ -1117,6 +1098,7 @@ void get_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs
 		}
 	    }
 	}
+#endif
 
     }
 

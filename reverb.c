@@ -151,7 +151,7 @@ void reverb_selection_made( GtkWidget      *clist,
 
 int reverb_dialog(struct sound_prefs current, struct view *v)
 {
-    GtkWidget *dlg, *maxtext, *dialog_table, *settings_frame ;
+    GtkWidget *dlg, *dialog_table ;
     GtkWidget *wet_entry ;
     GtkWidget *dry_entry ;
     GtkWidget *decay_entry ;
@@ -160,11 +160,8 @@ int reverb_dialog(struct sound_prefs current, struct view *v)
 
     gchar *reverb_method_window_titles[] = { "TAP Reverb Name" };
 
-    int dclose = 0 ;
     int row = 0 ;
     int dres ;
-    char buf[200] ;
-
 
     dialog_table = gtk_table_new(5,2,0) ;
 
@@ -235,12 +232,10 @@ int reverb_dialog(struct sound_prefs current, struct view *v)
     dres = gwc_dialog_run(GTK_DIALOG(dlg)) ;
 
     if(dres == 0) {
-	int i ;
 	wet_level = atoi(gtk_entry_get_text((GtkEntry *)wet_entry)) ;
 	dry_level = atoi(gtk_entry_get_text((GtkEntry *)dry_entry)) ;
 	decay = atoi(gtk_entry_get_text((GtkEntry *)decay_entry)) ;
 	save_reverb_preferences() ;
-	dclose = 1 ;
     }
 
     gtk_widget_destroy(dlg) ;

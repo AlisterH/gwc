@@ -51,6 +51,8 @@ int start_save_undo(char *undo_msg, struct view *v)
 	// Alister: should really tidy this up
     char _filename[1024];
     short l ;
+    int n_bytes_tot=0 ;
+    int n_bytes_written=0 ;
 
     undo_level++ ;
 
@@ -75,16 +77,19 @@ int start_save_undo(char *undo_msg, struct view *v)
 
     l = strlen(current_undo_msg) ;
 
-    write(undo_fd, (char *)&l, sizeof(l)) ;
-    write(undo_fd, current_undo_msg, l) ;
+    LL_WRITE(undo_fd, (char *)&l, sizeof(l), n_bytes_tot, n_bytes_written) ;
+    LL_WRITE(undo_fd, current_undo_msg, l, n_bytes_tot, n_bytes_written) ;
     {
 	long first, last ;
 	get_region_of_interest(&first, &last, v) ;
-	write(undo_fd, (char *)&first, sizeof(first)) ;
-	write(undo_fd, (char *)&last, sizeof(last)) ;
-	write(undo_fd, (char *)&v->channel_selection_mask, sizeof(v->channel_selection_mask)) ;
+	LL_WRITE(undo_fd, (char *)&first, sizeof(first), n_bytes_tot, n_bytes_written) ;
+	LL_WRITE(undo_fd, (char *)&last, sizeof(last), n_bytes_tot, n_bytes_written) ;
+	LL_WRITE(undo_fd, (char *)&v->channel_selection_mask, sizeof(v->channel_selection_mask), n_bytes_tot, n_bytes_written) ;
     }
     strcpy(current_undo_msg, undo_msg) ;
+
+    if(n_bytes_tot != n_bytes_written)
+	warning("Starting undo process had a problem") ;
 
     return undo_level ;
 }
@@ -101,7 +106,8 @@ int save_undo_data(long first_sample, long last_sample, struct sound_prefs *p, i
     const int BLOCK_SIZE = 1024 ;
     char buf[BLOCK_SIZE * FRAMESIZE] ;
     long curr ;
-    long blocks ;
+    int n_bytes_tot=0 ;
+    int n_bytes_written=0 ;
     gfloat n_sample = (last_sample-first_sample+1) ;
 
 #ifndef TRUNCATE_OLD
@@ -120,8 +126,8 @@ int save_undo_data(long first_sample, long last_sample, struct sound_prefs *p, i
 	   "Cancel edit action", 1, "Save undo data", 2, "Skip undo", 0, NULL) ;
 	gtk_dialog_set_default_response (GTK_DIALOG(dialog), 1);
 	text = gtk_label_new(buf);
-    gtk_widget_show(text);
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), text, TRUE, TRUE, 0);
+	gtk_widget_show(text);
+	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox), text, TRUE, TRUE, 0);
 	ret = gtk_dialog_run(GTK_DIALOG(dialog));
 	gtk_widget_destroy(dialog) ;
 
@@ -140,17 +146,15 @@ int save_undo_data(long first_sample, long last_sample, struct sound_prefs *p, i
     }
 #endif
 
-    write(undo_fd, (char *)&first_sample, sizeof(first_sample)) ;
-    write(undo_fd, (char *)&last_sample, sizeof(last_sample)) ;
+    LL_WRITE(undo_fd, (char *)&first_sample, sizeof(first_sample), n_bytes_tot, n_bytes_written) ;
+    LL_WRITE(undo_fd, (char *)&last_sample, sizeof(last_sample), n_bytes_tot, n_bytes_written) ;
 #ifndef TRUNCATE_OLD
-    write(undo_fd, (char *)&undo_type, sizeof(undo_type)) ;
+    LL_WRITE(undo_fd, (char *)&undo_type, sizeof(undo_type), n_bytes_tot, n_bytes_written) ;
 
     if (undo_type != UNDO_INSERT) {
 #endif        
     if(progress_update_flag)
 	update_progress_bar(0.0, PROGRESS_UPDATE_INTERVAL, TRUE) ;
-
-    blocks = (last_sample - first_sample + 1) / BLOCK_SIZE;
 
     for(curr = first_sample ; curr <= last_sample ; curr += BLOCK_SIZE) {
         long end;
@@ -180,6 +184,9 @@ int save_undo_data(long first_sample, long last_sample, struct sound_prefs *p, i
 #endif
     if(progress_update_flag)
 	update_progress_bar(0.0, PROGRESS_UPDATE_INTERVAL, TRUE) ;
+
+    if(n_bytes_tot != n_bytes_written)
+	warning("save_undo_data process had a problem") ;
 
     return 0 ;
 }
@@ -220,10 +227,11 @@ int undo(struct view *v, struct sound_prefs *p)
     int n_sections ;
 #define N_ALLOC_INC 1000
     int n_sections_max = N_ALLOC_INC ;
+    int n_bytes_read=0 ;
+    int n_bytes_tot=0 ;
     char _filename[1024] ;
     const int BLOCK_SIZE = 1024 ;
     char buf[BLOCK_SIZE * FRAMESIZE] ;
-    long blocks ;
     off_t *data_start_pos ;
     long total_sections;
 #ifndef TRUNCATE_OLD
@@ -247,14 +255,14 @@ int undo(struct view *v, struct sound_prefs *p)
     push_status_text("Performing Undo") ;
     update_progress_bar(0.0, PROGRESS_UPDATE_INTERVAL, TRUE) ;
 
-    read(undo_fd, (char *)&l, sizeof(l)) ;
+    LL_READ(undo_fd, (char *)&l, sizeof(l), n_bytes_tot, n_bytes_read) ;
 
-    read(undo_fd, current_undo_msg, l) ;
+    LL_READ(undo_fd, current_undo_msg, l, n_bytes_tot, n_bytes_read) ;
     current_undo_msg[l] = '\0' ;
 
-    read(undo_fd, (char *)&v->selected_first_sample, sizeof(v->selected_first_sample)) ;
-    read(undo_fd, (char *)&v->selected_last_sample, sizeof(v->selected_last_sample)) ;
-    read(undo_fd, (char *)&v->channel_selection_mask, sizeof(v->channel_selection_mask)) ;
+    LL_READ(undo_fd, (char *)&v->selected_first_sample, sizeof(v->selected_first_sample), n_bytes_tot, n_bytes_read) ;
+    LL_READ(undo_fd, (char *)&v->selected_last_sample, sizeof(v->selected_last_sample), n_bytes_tot, n_bytes_read) ;
+    LL_READ(undo_fd, (char *)&v->channel_selection_mask, sizeof(v->channel_selection_mask), n_bytes_tot, n_bytes_read) ;
     v->selection_region = TRUE ;
 
     n_sections = 0 ;
@@ -262,9 +270,9 @@ int undo(struct view *v, struct sound_prefs *p)
     data_start_pos[n_sections] = lseek(undo_fd, (off_t)0, SEEK_CUR) ;
 
     while(read(undo_fd, (char *)&first_sample, sizeof(first_sample)) == sizeof(first_sample) ) {
-	read(undo_fd, (char *)&last_sample, sizeof(last_sample)) ;
+	LL_READ(undo_fd, (char *)&last_sample, sizeof(last_sample), n_bytes_tot, n_bytes_read) ;
 #ifndef TRUNCATE_OLD
-	read(undo_fd, (char *)&undo_type, sizeof(undo_type)) ;
+	LL_READ(undo_fd, (char *)&undo_type, sizeof(undo_type), n_bytes_tot, n_bytes_read) ;
 #endif
 #if 0
 	for(curr = first_sample ; curr <= last_sample ; curr++) {
@@ -290,10 +298,10 @@ int undo(struct view *v, struct sound_prefs *p)
     for(n_sections-- ; n_sections >= 0 ; n_sections-- ) {
 	lseek(undo_fd, data_start_pos[n_sections], SEEK_SET) ;
 
-	read(undo_fd, (char *)&first_sample, sizeof(first_sample)) ;
-	read(undo_fd, (char *)&last_sample, sizeof(last_sample)) ;
+	LL_READ(undo_fd, (char *)&first_sample, sizeof(first_sample), n_bytes_tot, n_bytes_read) ;
+	LL_READ(undo_fd, (char *)&last_sample, sizeof(last_sample), n_bytes_tot, n_bytes_read) ;
 #ifndef TRUNCATE_OLD
-	read(undo_fd, (char *)&undo_type, sizeof(undo_type)) ;
+	LL_READ(undo_fd, (char *)&undo_type, sizeof(undo_type), n_bytes_tot, n_bytes_read) ;
 
         if (undo_type == UNDO_INSERT) {
             soundfile_remove_samples(first_sample,
@@ -305,7 +313,6 @@ int undo(struct view *v, struct sound_prefs *p)
 
         if (undo_type != UNDO_INSERT) {
 #endif
-        blocks = (last_sample - first_sample + 1) / BLOCK_SIZE;
         for(curr = first_sample ; curr <= last_sample ; curr += BLOCK_SIZE) {
               long end;
 	    gfloat p = (gfloat)(curr-first_sample)/(last_sample - first_sample) * (total_sections - n_sections) / total_sections ;
@@ -315,7 +322,7 @@ int undo(struct view *v, struct sound_prefs *p)
             end = curr + BLOCK_SIZE - 1;
             if (end > last_sample)
                end = last_sample;
-	    read(undo_fd, (char *)buf, FRAMESIZE * (end - curr + 1)) ;
+	    LL_READ(undo_fd, (char *)buf, FRAMESIZE * (end - curr + 1), n_bytes_tot, n_bytes_read) ;
 	    write_raw_wavefile_data(buf, curr, end) ;
 	}
 #ifdef TRUNCATE_OLD
@@ -348,6 +355,9 @@ int undo(struct view *v, struct sound_prefs *p)
 
     undo_fd = -1 ;
     undo_level-- ;
+
+    if(n_bytes_tot != n_bytes_read)
+	warning("undo did not read enought data") ;
 
     update_progress_bar(0.0, PROGRESS_UPDATE_INTERVAL, TRUE) ;
     pop_status_text();

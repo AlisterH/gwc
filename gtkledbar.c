@@ -53,10 +53,9 @@ led_bar_get_type ()
 static void
 led_bar_class_init (LedBarClass *class)
 {
-  GtkObjectClass   *object_class;
-
-  object_class = (GtkObjectClass *) class;
-
+  // apparently nothing happens in the init function anymore?  JJW Jan 25, 2021
+  //GtkObjectClass   *object_class;
+  //object_class = (GtkObjectClass *) class;
 }
 
 static void

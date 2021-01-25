@@ -69,10 +69,6 @@ long buff_num; // An index to allow us to create the array to run the VU meters.
 long num_buffers; // The number of buffers we will send.
 long buff_num_play;  // The index of the buffer we are playing.
 
-gfloat* pL_global;
-gfloat* pR_global;
-bool p_global_mem_alloced = FALSE; //Tells if we have reserved memory for the two above arrays.
-
 Float64 start_sample_time;
 struct timeval playback_start_time;
 bool playback_just_started = FALSE;
@@ -126,10 +122,41 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
 			} else {
 				maxr = maxl ;
 			}
+
+			extern gint n_frames_in_led_levels ;
+			extern int audio_is_looping ;
+			extern gint totblocks_in_led_levels ;
+			extern int buffered_looped_count ;
+			extern gfoat *led_levels_l ;
+			extern gfoat *led_levels_r ;
+			extern gint LED_LEVEL_FRAME_SIZE ;
+
+			if(audio_is_looping == FALSE || buffered_looped_count == 0) {
+			    // if looping, only need to do this for first time through the loop
+			    int current_level_block=(n_frames_in_led_levels-1)/LED_LEVEL_FRAME_SIZE ;
+			    if(current_level_block > totblocks_in_led_levels-1) {
+				fprintf(stderr, "Uh-oh, current_level_block:%d, max:%d\n", current_level_block, totblocks_in_led_levels-1) ;
+				current_level_block = totblocks_in_led_levels-1 ;
+			    }
+
+			    if(vl < 0) vl = -vl ;
+
+			    // note -- since the data was read using sf_read_float, the data is normalized to [-1,1], so
+			    // there is no division by (/maxpossible) as is done in audio_util.c
+			    if(led_levels_l[current_level_block] < (gfloat)vl)
+				led_levels_l[current_level_block] = (gfloat)vl ;
+
+			    if(stereo) {
+				if(vr < 0) vr = -vr ;
+				if(led_levels_r[current_level_block] < (gfloat)vr)
+				    led_levels_r[current_level_block] = (gfloat)vr ;
+			    } else {
+				led_levels_r[current_level_block] = led_levels_l[current_level_block] ;
+			    }
+
+			    n_frames_in_led_levels++ ;
+			}
 		}
-		pL_global[buff_num] = (gfloat) maxl;
-		pR_global[buff_num] = (gfloat) maxr;
-		buff_num++;
 		
 		return noErr ;
 	}
@@ -146,9 +173,6 @@ int process_audio(gfloat *pL, gfloat *pR)  //This function must be called repeat
 	}
    	else if(audio_state&(AUDIO_IS_BUFFERING|AUDIO_IS_RECORDING))
 	{
-		*pL = pL_global[buff_num_play];
-		*pR = pR_global[buff_num_play];
-		buff_num_play++;
 		return 0 ;
 	}
 	return 1 ;
@@ -227,12 +251,6 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate) //An
 	buff_num = 0;
 	buff_num_play = 0;
 	num_buffers = (playback_end_frame - playback_start_frame)/BUFFERSIZE; 
-	if (!p_global_mem_alloced)
-	{
-		p_global_mem_alloced = TRUE;
-		pL_global = (gfloat*) malloc(num_buffers*sizeof(gfloat)); // When do I need to free this?
-		pR_global = (gfloat*) malloc(num_buffers*sizeof(gfloat));
-	}
 	UInt32 bufferSize = BUFFERSIZE;
 	if((err = AudioDeviceSetProperty( audio_data.device,
 									  NULL, 0,
@@ -325,12 +343,7 @@ int audio_device_nonblocking_write_buffer_size(int maxbufsize,    //Normally ret
 void audio_device_close(int drain)  //Reminder: check to make sure this works when no device has been opened.
 {
 	OSStatus	err ;
-	if(p_global_mem_alloced)
-	{
-		free(pL_global);  
-		free(pR_global);
-		p_global_mem_alloced = FALSE;
-	}
+
 	if ((err = AudioDeviceStop (audio_data.device, macosx_audio_out_callback)) != noErr)
 	{	//printf ("AudioDeviceStop failed.\n") ;  //Need to comment out this line in deployment build.
 		return ;

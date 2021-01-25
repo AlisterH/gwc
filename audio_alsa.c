@@ -153,8 +153,6 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate)
         return -1;
     }
 
-    fprintf(stderr, "audio_device_handle %d\n",(int)handle);
-
     return 0;
 }
 
@@ -206,10 +204,10 @@ int audio_device_write(unsigned char *data, int count)
             snd_pcm_wait(handle, 1000);
         } else if (err < 0) {
 	    if(err == -EINVAL) {
-		fprintf(stderr, "snd_pcm_writei invalid argument: %d %d %d\n",(int)handle,(int)data,(int)count_frames);
+		fprintf(stderr, "snd_pcm_writei invalid argument: %p %d\n",(void *)data,(int)count_frames);
 		exit(1) ;
 	    } else if (recover_snd_handle(err) < 0) {
-		fprintf(stderr, "audio_device_write %d %d %d\n",(int)handle,(int)data,(int)count_frames);
+		fprintf(stderr, "audio_device_write %p %d\n",(void *)data,(int)count_frames);
                 snd_perr("ALSA audio_device_write: snd_pcm_writei", err);
 		exit(1) ;
                 return -1;
