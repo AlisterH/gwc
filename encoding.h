@@ -1,3 +1,4 @@
+#define NULL_FMT -1
 #define OGG_FMT 1000
 #define MP3_FMT 2000
 #define MP3_SIMPLE_FMT 3000

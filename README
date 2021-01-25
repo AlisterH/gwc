@@ -23,6 +23,7 @@ Installation
 ------------
 If you are using a release source tarball, extract it (tar -xvzf <...>).
 Enter the directory created.
+Run "autoreconf -i"
 Run "./configure".
 Run "make".
 Run "make install".

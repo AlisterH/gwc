@@ -25,6 +25,7 @@
 #include <unistd.h>
 
 #include <pulse/simple.h>
+#include <pulse/stream.h>
 #include <pulse/error.h>
 #include <pulse/gccmacro.h>
 
@@ -37,6 +38,8 @@ static pa_sample_spec ss = {
     .rate = 44100,
     .channels = 2
 };
+
+#define TOT_BUFSIZE 16384
 
 static pa_simple *pa_device = NULL;
 
@@ -59,6 +62,8 @@ int audio_device_open(char *output_device)
 {
     int err ;
 
+    // -- note, these are defaults, and will be changed
+    // with a subsequent call to audio_device_set_params
     ss.format = PA_SAMPLE_S16LE ;
     ss.rate = 44100 ;
     ss.channels = 2 ;
@@ -77,6 +82,8 @@ int audio_device_open(char *output_device)
 
     return 0;
 }
+
+pa_buffer_attr buffer_attributes ;
 
 int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate)
 {
@@ -97,6 +104,21 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate)
 	case GWC_S16_LE: ss.format = PA_SAMPLE_S16LE; framesize=2 ; break;
     }
     //printf("Open the Pulse audio device again\n") ;
+/*      buffer_attributes.fragsize=-1 ;  */
+/*      buffer_attributes.maxlength=-1 ;  */
+/*      buffer_attributes.minreq=-1 ;  */
+/*      buffer_attributes.prebuf=-1 ;  */
+/*      buffer_attributes.tlength=-1 ;  */
+
+/*      pa_device = pa_simple_new(NULL,"GWC",PA_STREAM_PLAYBACK,NULL,"GWC Playback", &ss, NULL, &buffer_attributes, &err) ;  */
+
+
+/*      fprintf(stderr, "PA:maxlength,minreq,prebuf,tlength = %d,%d,%d,%d\n",   */
+/*  	buffer_attributes.maxlength,  */
+/*  	buffer_attributes.minreq,  */
+/*  	buffer_attributes.prebuf,  */
+/*  	buffer_attributes.tlength) ;  */
+
     pa_device = pa_simple_new(NULL,"GWC",PA_STREAM_PLAYBACK,NULL,"GWC Playback", &ss, NULL, NULL, &err) ;
 
     if (pa_device == NULL) {
@@ -184,17 +206,20 @@ void audio_device_close(int drain)
     }
 }
 
-#define BEST_BUFSIZE 4096
-
 int audio_device_best_buffer_size(int playback_bytes_per_block)
 {
-    return BEST_BUFSIZE ;
+    return TOT_BUFSIZE ;
 }
+
+/*  pa_buffer_attr *pa_stream_get_buffer_attr(pa_stream *) ;  */
 
 int audio_device_nonblocking_write_buffer_size(int maxbufsize,
                                                int playback_bytes_remaining)
 {
-    int len = BEST_BUFSIZE ;
+    // try making the length of the buffer 10 frames longer than what best buffer size returned
+    // so the write may block for a few microseconds, but the buffer should
+    // stay full and the screen redraws be more or less done at the same rate.
+    int len = TOT_BUFSIZE+framesize*10 ;
 
     if (len > maxbufsize)
         len = maxbufsize;
@@ -203,6 +228,16 @@ int audio_device_nonblocking_write_buffer_size(int maxbufsize,
         len = playback_bytes_remaining;
 
     /*     printf("audio_device_nonblocking_write_buffer_size:%d\n", len); */
+
+
+/*      pa_buffer_attr *ptr ;  */
+/*      ptr = pa_stream_get_buffer_attr(pa_device) ;  */
+/*    */
+/*      fprintf(stderr, "PA:maxlength,minreq,prebuf,tlength = %d,%d,%d,%d\n",   */
+/*  	ptr->maxlength,  */
+/*  	ptr->minreq,  */
+/*  	ptr->prebuf,  */
+/*  	ptr->tlength) ;  */
 
     return len;
 }

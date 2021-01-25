@@ -25,7 +25,8 @@
 #define AUDIO_IS_IDLE 0x00
 #define AUDIO_IS_MONITOR 0x01
 #define AUDIO_IS_RECORDING  0x02
-#define AUDIO_IS_PLAYBACK  0x04
+#define AUDIO_IS_PLAYING  0x04
+#define AUDIO_IS_BUFFERING  0x08
 
 
 typedef enum {

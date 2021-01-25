@@ -147,7 +147,11 @@ struct view {
     long selected_first_sample ;
     long selected_last_sample ;
     long cursor_position ;
-    long prev_cursor_position ;
+    long prev_cursor_position ; // this is used for user selection, highlighting
+    long playback_prev_cursor_position ; // this is used *only* during playback
+    float expected_frames_per_timer_update ; // during playback, how many frames are expected to be played during one timer interval, can be fractional
+    float expected_frames_played ; // during playback, how many total frames are expected to be played, can be fractional
+    long timer_msec ; // milliseconds the timer is set to repeat
     int selection_region ;
     int channel_selection_mask ;
     long n_samples ;
@@ -315,7 +319,8 @@ struct sound_prefs sound_pref_dialog(struct sound_prefs current) ;
 void stats(double x[], int n, double *pMean, double *pStderr, double *pVar, double *pCv, double *pStddev) ;
 void resample_audio_data(struct sound_prefs *p, long first, long last) ;
 int  start_recording(char *input_device, char *filename) ;
-long start_playback(char *output_device, struct view *v, struct sound_prefs *p, double seconds_per_block, double seconds_to_preload) ;
+void get_led_levels(gfloat *pL, gfloat *pR, gfloat *pL10, gfloat *pR10, long samples_played) ;
+long start_playback(char *output_device, struct view *v, struct sound_prefs *p, double seconds_per_block, int *best_bufsize) ;
 int  start_monitor(char *input_device) ;
 void stop_playback(int force) ;
 void stop_recording(void) ;
