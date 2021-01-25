@@ -23,14 +23,12 @@ Installation
 ------------
 If you are using a release source tarball, extract it (tar -xvzf <...>).
 Enter the directory created.
-Run "autoreconf -i"
+Run "autoreconf -i" (shouldn't be necessary if you are using a release tarball)
 Run "./configure".
 Run "make".
 Run "make install".
 
 "gtk-wave-cleaner" is the program file.  All you have to do is run it, or click on the menu entry.
-
-In case you are building the source from git you will first need to run "autoreconf -i"
 
 Additional options
 ------------------
