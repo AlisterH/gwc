@@ -43,9 +43,15 @@ while (@ARGV)
 	@noise = map {&time2sec($_)} @noise;
 	
 	# back up the file first.
-	# we should really check if $archive exists first so we don't overwrite it if processing $file a second time
+	# check if $archive exists first and don't overwrite it (maybe we are processing $file a second time?)
+	# would be better to still save a new copy, appending _1 or something
+	# or skip the file completely?
+	if (-e $archive) {
+		print "$archive already exists\n";
+	} else {
 	print `cp "$file" "$archive"`;
-	
+	}
+
 	# Now declick and remove noise
 	print `gtk-wave-cleaner "$file" batch declick $sens $keep[0] $keep[1]`;
 	# Add extra declicking runs if you want them
