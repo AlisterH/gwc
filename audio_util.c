@@ -348,14 +348,6 @@ gint n_frames_in_led_levels ;  // number of frames of data loaded into the led_l
 gint totblocks_in_led_levels ; // number of blocks (elements) alloc()'ed in the led_levels_r and led_levels_l arrays
 gint LED_LEVEL_FRAME_SIZE = 4410 ;  // number of frames examined for max values in a single led_level element, will be reset based on prefs.rate
 
-			extern gint n_frames_in_led_levels ;
-			extern int audio_is_looping ;
-			extern gint totblocks_in_led_levels ;
-			extern int buffered_looped_count ;
-			extern gfoat *led_levels_l ;
-			extern gfoat *led_levels_r ;
-			extern gint LED_LEVEL_FRAME_SIZE ;
-
 void get_led_levels(gfloat *pL, gfloat *pR, gfloat *pLold, gfloat *pRold, long frame_number)
 {
     int block = frame_number/LED_LEVEL_FRAME_SIZE ;

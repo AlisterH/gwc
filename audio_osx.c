@@ -127,8 +127,8 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
 			extern int audio_is_looping ;
 			extern gint totblocks_in_led_levels ;
 			extern int buffered_looped_count ;
-			extern gfoat *led_levels_l ;
-			extern gfoat *led_levels_r ;
+			extern gfloat *led_levels_l ;
+			extern gfloat *led_levels_r ;
 			extern gint LED_LEVEL_FRAME_SIZE ;
 
 			if(audio_is_looping == FALSE || buffered_looped_count == 0) {
@@ -303,8 +303,6 @@ long audio_device_processed_bytes(void)
 		else
 		{
 			playback_read_frame_position = (long) (this_time.mSampleTime - start_sample_time);//*FRAMESIZE;
-																				   //led_bar_light_percent(dial[0], l);  
-																				   //led_bar_light_percent(dial[1], r);
 		}
 	}
 	if (playback_read_frame_position >= playback_end_frame)  //We are done playing.
