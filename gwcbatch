@@ -32,40 +32,51 @@ while (@ARGV)
 {
 	@keep = @noise = ();
 	$file = shift;
-	($filename,$dirs,$suffix) = fileparse($file, qr/\.[^.]*/);
-	($archive = $dirs . $filename . "_orig" . $suffix);
-	push @keep, (shift, shift);
-	$sens = shift;
-	push @noise, (shift,shift);
-	
-	#convert time to seconds
-	@keep = map {&time2sec($_)} @keep;
-	@noise = map {&time2sec($_)} @noise;
-	
-	# back up the file first.
-	# check if $archive exists first and don't overwrite it (maybe we are processing $file a second time?)
-	# would be better to still save a new copy, appending _1 or something
-	# or skip the file completely?
-	if (-e $archive) {
-		print "$archive already exists\n";
-	} else {
-	print `cp "$file" "$archive"`;
+	# test if the input is a writable file, to save the user clicking through multiple error dialogs 
+	# (but they'll still have to do that if it is a writable file that gwc can't handle)
+	# it might be nice to valid other inputs, or at least check there are the right number
+	# but since we're making a backup it doesn't matter as much
+	if (-w -f $file) {
+		($filename,$dirs,$suffix) = fileparse($file, qr/\.[^.]*/);
+		($archive = $dirs . $filename . "_orig" . $suffix);
+		push @keep, (shift, shift);
+		$sens = shift;
+		push @noise, (shift,shift);
+		
+		#convert time to seconds
+		@keep = map {&time2sec($_)} @keep;
+		@noise = map {&time2sec($_)} @noise;
+		
+		
+		# back up the file first.
+		# check if $archive exists first and don't overwrite it (maybe we are processing $file a second time?)
+		# would be better to still save a new copy, appending _1 or something
+		# or skip the file completely?
+		if (-e $archive) {
+			print "$archive already exists\n";
+		} else {
+			print `cp "$file" "$archive"`;
+		}
+
+		# Now declick and remove noise
+		print `gtk-wave-cleaner "$file" batch declick $sens $keep[0] $keep[1]`;
+		# Add extra declicking runs if you want them
+		#print `gtk-wave-cleaner $file batch declick $sens $keep[0] $keep[1]`;
+		print `gtk-wave-cleaner "$file" batch denoise $noise[0] $noise[1] $keep[0] $keep[1]`;
+
+		# truncate after cleaning in case the noise sample is from the region to truncate
+		# for some reason, it *sometimes* hangs when truncating
+		# both front and back, so do back first, then front
+		print `gtk-wave-cleaner "$file" batch truncate 0 $keep[1]`;
+		print `gtk-wave-cleaner "$file" batch truncate $keep[0] $keep[1]`;
+		
+		# normalize last so it isn't affected by anything we are discarding
+		print `gtk-wave-cleaner "$file" batch normalize`;
 	}
-
-	# Now declick and remove noise
-	print `gtk-wave-cleaner "$file" batch declick $sens $keep[0] $keep[1]`;
-	# Add extra declicking runs if you want them
-	#print `gtk-wave-cleaner $file batch declick $sens $keep[0] $keep[1]`;
-	print `gtk-wave-cleaner "$file" batch denoise $noise[0] $noise[1] $keep[0] $keep[1]`;
-
-	# truncate after cleaning in case the noise sample is from the region to truncate
-	# for some reason, it *sometimes* hangs when truncating
-	# both front and back, so do back first, then front
-	print `gtk-wave-cleaner "$file" batch truncate 0 $keep[1]`;
-	print `gtk-wave-cleaner "$file" batch truncate $keep[0] $keep[1]`;
-	
-	# normalize last so it isn't affected by anything we are discarding
-	print `gtk-wave-cleaner "$file" batch normalize`;
+	else {
+		print "$file does not seem to be a writable file\n";
+		shift,shift,shift,shift,shift;
+	}
 }
 
 1;
