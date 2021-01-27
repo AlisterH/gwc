@@ -163,9 +163,7 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
 	return noErr;
 } 
 
-int process_audio(gfloat *pL, gfloat *pR)  //This function must be called repeatedly from the gint play_a_block until the section is played. 
-{	//The pointers pL and pR passed in above return the levels for the VU meters.
-	fprintf(stderr, "Process Audio for OS X is now broken, need to fix it for led_level_\n") ;
+int process_audio(gfloat *pL, gfloat *pR)
 	if(audio_state == AUDIO_IS_IDLE) 
 	{
 		d_print("process_audio says AUDIO_IS_IDLE is going on.\n") ;
@@ -279,7 +277,8 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate) //An
 
 int audio_device_read(unsigned char *buffer, int buffersize){return 0;} // Leave this stub function because we don't want to read data.
 int audio_device_write(unsigned char *buffer, int buffersize){return 0;} // Not quite what the title says in OS X.
-long audio_device_processed_bytes(void)
+
+long audio_device_processed_frames(void)
 {
 	AudioTimeStamp this_time;
 	OSStatus err;
@@ -302,7 +301,8 @@ long audio_device_processed_bytes(void)
 		}
 		else
 		{
-			playback_read_frame_position = (long) (this_time.mSampleTime - start_sample_time);//*FRAMESIZE;
+			// it appears that mSampleTime really is the sampel frame number, it is not a time.   Just a poorly named variable in coreaudio
+			playback_read_frame_position = (long) (this_time.mSampleTime - start_sample_time);
 		}
 	}
 	if (playback_read_frame_position >= playback_end_frame)  //We are done playing.
@@ -312,7 +312,14 @@ long audio_device_processed_bytes(void)
 		audio_playback = FALSE;
 	}
 	
-	return playback_read_frame_position*FRAMESIZE
+	printf("DEBUG:============ OSX says current Frame # is %ld\n", playback_read_frame_position) ;
+	return playback_read_frame_position ;
+		;
+}  // This is used to set the cursor.  We need to make this return a number controlled by a timer.
+
+long audio_device_processed_bytes(void)
+{
+    return audio_device_processed_frames()*FRAMESIZE ;
 		;
 }  // This is used to set the cursor.  We need to make this return a number controlled by a timer.
 

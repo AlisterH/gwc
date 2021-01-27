@@ -296,7 +296,7 @@ long set_playback_cursor_position(struct view *v, long millisec_per_visual_frame
 {
     if((audio_state&AUDIO_IS_PLAYING)) {
 	// determine number of frames played thru the audio device (may have some error in it, but should be very close)
-	long device_frames_played = audio_device_processed_bytes()/PLAYBACK_FRAMESIZE - looped_count*playback_total_frames ;
+	long device_frames_played = audio_device_processed_frames() - looped_count*playback_total_frames ;
 	long delta_dfp = device_frames_played-prev_device_frames_played ;
 
 	if(!(audio_state&AUDIO_IS_BUFFERING)) {
@@ -895,7 +895,7 @@ struct sound_prefs open_wavefile(char *filename, struct view *v)
 #endif
 
     FRAMESIZE = BYTESPERSAMPLE*wfh.n_channels ;
-    PLAYBACK_FRAMESIZE = 2*wfh.n_channels ;
+    PLAYBACK_FRAMESIZE = BYTESPERSAMPLE*wfh.n_channels ;
 
     wfh.playback_bits = audio_bits = wfh.bits = BYTESPERSAMPLE*8 ;
 

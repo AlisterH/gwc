@@ -33,9 +33,7 @@
 
 static snd_pcm_t *handle = NULL;
 static snd_pcm_uframes_t written_frames = 0;
-static long drain_delta = 0 ;
-static long last_processed_bytes0 = -1 ;
-static long last_processed_bytes = -1 ;
+static int ALSA_FRAMESIZE=4 ;
 snd_pcm_uframes_t buffer_total_frames; /* number of frames in alsa device buffer */
 
 static void snd_perr(char *text, int err)
@@ -56,9 +54,6 @@ int audio_device_open(char *output_device)
     }
 
     written_frames = 0;
-    drain_delta=0 ;
-    last_processed_bytes0 = -1 ;
-    last_processed_bytes = -1 ;
     return 0;
 }
 
@@ -153,6 +148,8 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate)
         return -1;
     }
 
+    ALSA_FRAMESIZE = snd_pcm_frames_to_bytes(handle, 1);
+
     return 0;
 }
 
@@ -221,11 +218,11 @@ int audio_device_write(unsigned char *data, int count)
 
     written_frames += result_frames;
 
-    return snd_pcm_frames_to_bytes(handle, result_frames);
+    return result_frames * ALSA_FRAMESIZE ;
 }
 
-/* Number of bytes processed since opening the device. */
-long query_processed_bytes(void)
+/* Number of frames processed since opening the device. */
+long query_processed_frames(void)
 {
     if(handle != NULL) {
 	// both avail_update() and avail() seem to give same result in terms
@@ -239,34 +236,33 @@ long query_processed_bytes(void)
 	if (avail_frames_in_buf < 0) {
 	    // error occurred
 	    //snd_perr("ALSA snd_pcm_avail", avail_frames_in_buf);
-	    return snd_pcm_frames_to_bytes(handle,written_frames) ;
+	    return written_frames ;
 	}
 
-	//fprintf(stderr, "ALSA device written frames:%ld\n", (long)written_frames) ;
-	//fprintf(stderr, "ALSA device buffer  frames:%ld\n", (long)buffer_total_frames) ;
-	//fprintf(stderr, "ALSA device   avail frames:%ld\n", (long)avail_frames_in_buf) ;
-	//fprintf(stderr, "ALSA device buf-avl frames:%ld\n", (long)(buffer_total_frames-avail_frames_in_buf)) ;
-	//long playback_frame = written_frames - (buffer_total_frames - avail_frames_in_buf) ;
-	//fprintf(stderr, "ALSA device playback frame:%ld\n\n", playback_frame) ;
-
-	return snd_pcm_frames_to_bytes(handle, (written_frames - (buffer_total_frames - avail_frames_in_buf)));
+	return (written_frames - (buffer_total_frames - avail_frames_in_buf));
     }
 
     return 0 ;
 }
 
 
-long _audio_device_processed_bytes = 0 ;
+long _audio_device_processed_frames = 0 ;
+
+/* Number of bytes processed since opening the device. */
+long audio_device_processed_frames(void)
+{
+    if(handle != NULL)
+	_audio_device_processed_frames = query_processed_frames() ;
+    else
+	fprintf(stderr, "ALSA device handle is NULL\n") ;
+
+    return _audio_device_processed_frames ;
+}
 
 /* Number of bytes processed since opening the device. */
 long audio_device_processed_bytes(void)
 {
-    if(handle != NULL)
-	_audio_device_processed_bytes = query_processed_bytes() ;
-    else
-	fprintf(stderr, "ALSA device handle is NULL\n") ;
-
-    return _audio_device_processed_bytes ;
+    return audio_device_processed_frames() * ALSA_FRAMESIZE ;
 }
 
 void audio_device_close(int drain)
@@ -276,7 +272,7 @@ void audio_device_close(int drain)
 
 	printf("Closing the ALSA audio device\n") ;
 
-	_audio_device_processed_bytes = query_processed_bytes() ;
+	_audio_device_processed_frames = query_processed_frames() ;
 
 	if(drain)
 	    err = snd_pcm_drain(handle);
@@ -293,14 +289,13 @@ void audio_device_close(int drain)
 
         handle = NULL;
     }
-    drain_delta=0 ;
 }
 
 int audio_device_best_buffer_size(int playback_bytes_per_block)
 {
     int err;
     snd_pcm_status_t *status;
-    int frame_size ;
+    int buffer_total_bytes ;
 
     snd_pcm_status_alloca(&status);
 
@@ -312,21 +307,25 @@ int audio_device_best_buffer_size(int playback_bytes_per_block)
 
     buffer_total_frames = snd_pcm_status_get_avail(status);
 
-    frame_size = snd_pcm_frames_to_bytes(handle, buffer_total_frames);
+    buffer_total_bytes = (int)buffer_total_frames * ALSA_FRAMESIZE ;
+
+/*      printf("ALSA audio_device_adjusted_buffer framesize:%d\n", ALSA_FRAMESIZE) ;  */
+/*      printf("ALSA audio_device_adjusted_buffer total_frames:%d\n", (int)buffer_total_frames) ;  */
+/*      printf("ALSA audio_device_adjusted_buffer total_bytes:%d\n", (int)buffer_total_bytes) ;  */
 
 
-    if(frame_size < 4096 && frame_size > 0) {
-	int s = frame_size ;
-	while(frame_size < 4096) frame_size += s ;
-	printf("ALSA audio_device_adjusted_buffer_size:%d\n", frame_size) ;
+    if(buffer_total_bytes < 4096) {
+	int s = ALSA_FRAMESIZE ;
+	while(buffer_total_bytes < 4096) buffer_total_bytes += s ;
+	printf("ALSA audio_device_adjusted_buffer_size:%d\n", buffer_total_bytes) ;
     }
 
-    if(frame_size == 0) {
+    if(buffer_total_bytes == 0) {
 	warning("Your ALSA audio device driver gives invalid information for its buffer size, defaulting to 4K bytes, this may produce strange playback results") ;
-	frame_size = 4096 ;
+	buffer_total_bytes = 4096 ;
     }
 
-    return frame_size ;
+    return buffer_total_bytes ;
 }
 
 int audio_device_nonblocking_write_buffer_size(int maxbufsize,
@@ -345,7 +344,7 @@ int audio_device_nonblocking_write_buffer_size(int maxbufsize,
 	}
     }
 
-    len = snd_pcm_frames_to_bytes(handle, frames);
+    len = frames * ALSA_FRAMESIZE ;
 
     if (len > maxbufsize)
         len = maxbufsize;
