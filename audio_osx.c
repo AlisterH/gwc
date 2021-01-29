@@ -86,12 +86,6 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
 	float maxl = 0, maxr = 0;
 	float *p_float;
 	
-	if (playback_just_started)
-	{
-		playback_just_started = FALSE;
-		start_sample_time = time_out->mSampleTime;
-	}
-	
 	audio_data = (MacOSXAudioData*) client_data ;
 	
 	size = data_out->mBuffers[0].mDataByteSize ;  
@@ -164,6 +158,7 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
 } 
 
 int process_audio(gfloat *pL, gfloat *pR)
+{
 	if(audio_state == AUDIO_IS_IDLE) 
 	{
 		d_print("process_audio says AUDIO_IS_IDLE is going on.\n") ;
@@ -191,6 +186,39 @@ int audio_device_open(char *output_device)
 		return -1 ;  // return of -1 means it didn't open
 	}
 	return 0; //All went well.  
+}
+
+/* coreaudio apparently has a "frame" clock running, that does not necessarily start at 0 when the audio device itself starts (via audio_device_open())
+   this function retrieves that frame number
+*/
+Float64 coreaudio_running_clock_time(void)
+{
+	AudioTimeStamp this_time;
+	OSStatus err;
+	UInt32 num_processes;
+	UInt32		count;
+	extern int audio_playback ;
+	
+	count = sizeof(UInt32);
+	if ((err = AudioDeviceGetProperty (audio_data.device, 0, false, kAudioDevicePropertyDeviceIsRunning,
+									   &count, &num_processes)) != noErr)
+	{	printf ("AudioDeviceGetProperty (AudioDeviceGetProperty) failed.  The device probably isn't running.\n") ;
+		return -1;
+	} 
+	else
+	{
+		
+		if((err = AudioDeviceGetCurrentTime(audio_data.device, &this_time)) != noErr)
+		{
+			printf("Could not get the current time.  The error number is: %i \n", err);
+			return -1 ;
+		}
+		else
+		{
+			// it appears that mSampleTime really is the sample frame number, it is not a time.   Just a poorly named variable in coreaudio
+			return this_time.mSampleTime ;
+		}
+	}
 }
 
 
@@ -236,7 +264,7 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate) //An
 									   sizeof (AudioStreamBasicDescription), &(audio_data.format))) != noErr)
 	{	printf ("AudioDeviceSetProperty (kAudioDevicePropertyStreamFormat) failed.\n") ;
 		return -1;
-	} ;
+	}
 	
 	/*  we want linear pcm */
 	if (audio_data.format.mFormatID != kAudioFormatLinearPCM)
@@ -269,9 +297,14 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate) //An
 	
 	err = AudioDeviceStart (audio_data.device, macosx_audio_out_callback) ;
 	if	(err != noErr) return -1;
-	playback_just_started = TRUE;
+
 	audio_data.done_playing = SF_FALSE ;
 	audio_data.done_reading = FALSE;
+	
+	// ideally a few microseconds of latency would be added to this, let's
+	// see how it works -- JJW 01/28/2021
+	start_sample_time = coreaudio_running_clock_time() ;
+
 	return 0; //All went well.  
 }
 
@@ -280,31 +313,13 @@ int audio_device_write(unsigned char *buffer, int buffersize){return 0;} // Not 
 
 long audio_device_processed_frames(void)
 {
-	AudioTimeStamp this_time;
-	OSStatus err;
-	UInt32 num_processes;
-	UInt32		count;
-	extern int audio_playback ;
-	
-	count = sizeof(UInt32);
-	if ((err = AudioDeviceGetProperty (audio_data.device, 0, false, kAudioDevicePropertyDeviceIsRunning,
-									   &count, &num_processes)) != noErr)
-	{	printf ("AudioDeviceGetProperty (AudioDeviceGetProperty) failed.  The device probably isn't running.\n") ;
-		return -1;
-	} 
-	else
-	{
-		
-		if((err = AudioDeviceGetCurrentTime(audio_data.device, &this_time)) != noErr)
-		{
-			printf("Could not get the current time.  The error number is: %i \n", err);
-		}
-		else
-		{
-			// it appears that mSampleTime really is the sampel frame number, it is not a time.   Just a poorly named variable in coreaudio
-			playback_read_frame_position = (long) (this_time.mSampleTime - start_sample_time);
-		}
-	}
+	Float64 running_frame_number = coreaudio_running_clock_time() ;
+
+	if(running_frame_number < 0.)
+	    return (long)running_frame_number ;
+
+	playback_read_frame_position = (long)(running_frame_number - start_sample_time);
+
 	if (playback_read_frame_position >= playback_end_frame)  //We are done playing.
 	{	
 		/* Tell the main application to terminate. */
@@ -314,7 +329,6 @@ long audio_device_processed_frames(void)
 	
 	printf("DEBUG:============ OSX says current Frame # is %ld\n", playback_read_frame_position) ;
 	return playback_read_frame_position ;
-		;
 }  // This is used to set the cursor.  We need to make this return a number controlled by a timer.
 
 long audio_device_processed_bytes(void)
