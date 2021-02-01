@@ -48,7 +48,7 @@ void load_reverb_preferences(void)
         dry_level = g_key_file_get_double(key_file, "reverb_params", "dry_level", NULL);
         decay = g_key_file_get_double(key_file, "reverb_params", "decay", NULL);
     } else {
-        // Not sure why this is set here rather than declared above like the other three preferences...
+        // Not sure why this is set here rather than the default being declared above like the other three preferences...
 	strcpy(reverb_method_name, "Ambience (Thick) - HD") ;
     }
 

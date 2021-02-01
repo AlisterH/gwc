@@ -3155,6 +3155,7 @@ void batch(int argc, char **argv)
 	    audio_view.selection_region = TRUE;
 	    audio_view.channel_selection_mask = 0x03;
 	    get_region_of_interest(&first, &last, &audio_view);
+	    load_reverb_preferences() ;
 	    reverb_audio(&prefs, first, last, audio_view.channel_selection_mask);
 	    save_sample_block_data(&prefs);
 	}
