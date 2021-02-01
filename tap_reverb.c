@@ -144,7 +144,7 @@ biquad low_pass_IR;
 biquad high_pass_IR;
 unsigned long sample_rate;
 
-void reverb_setup(long rate, double decay_d, double wet_d, double dry_d, char *name)
+int reverb_setup(long rate, double decay_d, double wet_d, double dry_d, char *name)
 {
     tap_decay = decay_d ;
     wetlevel = wet_d ;
@@ -157,7 +157,12 @@ void reverb_setup(long rate, double decay_d, double wet_d, double dry_d, char *n
     }
 
     curr = get_revtype_by_name(reverb_root, name) ;
+    if (curr == NULL){
+		warning("Could not get reverb settings - perhaps reverb_method_name in gwc.conf is invalid") ;
+		return 1;
+	}
     reverb_init() ;
+    return 0;
 }
 
 

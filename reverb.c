@@ -43,7 +43,7 @@ void load_reverb_preferences(void)
 
     // We should probably have a separate test for each preference...
     if (g_key_file_has_group(key_file, "reverb_params") == TRUE) {
-	strcpy(reverb_method_name, g_key_file_get_string(key_file, "reverb_params", "reverb_method_name", NULL));
+        strcpy(reverb_method_name, g_key_file_get_string(key_file, "reverb_params", "reverb_method_name", NULL));
         wet_level = g_key_file_get_double(key_file, "reverb_params", "wet_level", NULL);
         dry_level = g_key_file_get_double(key_file, "reverb_params", "dry_level", NULL);
         decay = g_key_file_get_double(key_file, "reverb_params", "decay", NULL);
@@ -80,8 +80,10 @@ void reverb_audio(struct sound_prefs *p, long first, long last, int channel_mask
     push_status_text("TAP Reverb audio") ;
     update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
 
-    reverb_setup(p->rate, decay, wet_level, dry_level, reverb_method_name) ;
-
+    int rset = reverb_setup(p->rate, decay, wet_level, dry_level, reverb_method_name) ;
+    if (rset == 1) {
+        return 1 ;
+    }
 
     {
 

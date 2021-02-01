@@ -30,7 +30,7 @@ void comp_coeffs(void);
 void load_revtype_data(void);
 void reverb_init(void);
 int reverb_process(long nframes, reverb_audio_sample_t *output_L, reverb_audio_sample_t *input_L, reverb_audio_sample_t *output_R, reverb_audio_sample_t *input_R) ;
-void reverb_setup(long sample_rate, double decay_d, double wet_d, double dry_d, char *name) ;
+int reverb_setup(long sample_rate, double decay_d, double wet_d, double dry_d, char *name) ;
 void reverb_finish(void *arg);
 
 
