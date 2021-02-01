@@ -278,7 +278,7 @@ void read_sample_block(struct sample_block *sb, struct sound_prefs *p, long bloc
 int  read_wavefile_data(long left[], long right[], long first, long last) ;
 void redraw(struct view *v, struct sound_prefs *p, GtkWidget *canvas, int cursor_flag, int redraw_data, int sonogram_flag) ;
 void rescan_sample_buffer(struct sound_prefs *p) ;
-void reverb_audio(struct sound_prefs *p, long first, long last, int channel_mask) ;
+int reverb_audio(struct sound_prefs *p, long first, long last, int channel_mask) ;
 int  reverb_dialog(struct sound_prefs current, struct view *) ;
 int  sample_to_pixel(struct view *v, long sample) ;
 void save_cdrdao_tocs(GtkWidget * widget, gpointer data) ;
