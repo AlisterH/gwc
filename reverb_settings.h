@@ -1,6 +1,7 @@
 char reverb_default_settings[] = "\
 # DO NOT EDIT BY HAND!\n\
 # This file is created and used by TAP Reverb Editor.\n\
+# If ~/.reverbed exists then these built-in presets will not be available.\n\
 \n\
 REVTYPE\n\
 AfterBurn\n\
