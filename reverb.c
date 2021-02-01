@@ -68,13 +68,12 @@ void save_reverb_preferences(void)
 }
 
 
-void reverb_audio(struct sound_prefs *p, long first, long last, int channel_mask)
+int reverb_audio(struct sound_prefs *p, long first, long last, int channel_mask)
 {
     float left[BUFSIZE], right[BUFSIZE] ;
     reverb_audio_sample_t left_out[BUFSIZE], right_out[BUFSIZE] ;
     long current, i ;
     int loops = 0 ;
-
     current = first ;
 
     push_status_text("TAP Reverb audio") ;
@@ -127,6 +126,7 @@ void reverb_audio(struct sound_prefs *p, long first, long last, int channel_mask
     pop_status_text() ;
 
     main_redraw(FALSE, TRUE) ;
+    return 0 ;
 }
 
 /* If we come here, then the user has selected a row in the list. */
