@@ -255,6 +255,7 @@ void load_denoise_preferences(void) ;
 void load_mp3_encoding_preferences(void);
 void load_mp3_simple_encoding_preferences(void);
 void load_ogg_encoding_preferences(void);
+void load_reverb_preferences(void);
 int load_sample_block_data(struct sound_prefs *p) ;
 void main_redraw(int cursor_flag, int redraw_data) ;
 void mark_songs(GtkWidget * widget, gpointer data) ;

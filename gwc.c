@@ -2987,7 +2987,6 @@ long batch_time_to_sample(char *time, struct sound_prefs *p)
 		return time_to_sample(time, p);	
 }
 
-/* bj Sep 2003 re-write batch declick, add batch denoise, batch truncate */
 void batch(int argc, char **argv)
 {
 #define BYTIME 0
@@ -3098,7 +3097,7 @@ void batch(int argc, char **argv)
 	    load_denoise_preferences() ;
 	    print_denoise("batch remove_noise",&denoise_prefs) ;
 	    if(denoise_prefs.FFT_SIZE > (denoise_data.noise_end-denoise_data.noise_start+1)) {
-		fprintf(stderr, "FFT_SIZE must be <= # samples in noise sample!") ;
+		fprintf(stderr, "FFT_SIZE must be <= # samples in noise sample!\n") ;
 		return;
 	    }
 	    g_print("Denoise from %ld to %ld using noise sample from %ld to %ld\n", denoise_data.denoise_start, denoise_data.denoise_end, denoise_data.noise_start, denoise_data.noise_end) ;
