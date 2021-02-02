@@ -583,7 +583,7 @@ int encode(int mode, char *origfilename, char *newfilename, long start,
 
 
     if (in_fd == NULL) {
-	fprintf(stderr, "Failed to open  %s", origfilename);
+	fprintf(stderr, "Failed to open  %s\n", origfilename);
 	return (1);
     }
 

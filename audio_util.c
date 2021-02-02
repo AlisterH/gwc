@@ -1327,7 +1327,7 @@ int process_audio(gfloat *pL, gfloat *pR)
 		//    printf("%hd %hd\n", p_short[i], p_short[i+1]) ;
 		//}
 
-		if(frame == n_read-1) fprintf(stderr, "Feather out final %lf, n_read=%ld", p, n_read) ;
+		if(frame == n_read-1) fprintf(stderr, "Feather out final %lf, n_read=%ld\n", p, n_read) ;
 	    }
 
 	    vl = p_short[i] ;
