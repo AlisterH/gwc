@@ -231,7 +231,6 @@ void cdrdao_toc_info(char *filename)
 	   } else {
 	      new_cdtext = NULL;
 	   }
-
 	   for (j = 0; j < num_song_markers+(1-use_song_marker_pairs); j += 1+use_song_marker_pairs) {
 	      long end;
 	      int j1 = j+1 ;
@@ -245,7 +244,7 @@ void cdrdao_toc_info(char *filename)
 		      length = song_markers[j+1] - start + 1 ;
 		  } else {
 		      /* no last song marker in last pair, assume end of audio for end of last track */
-		      length = (prefs.n_samples-1) - start + 1 ;
+		      length = (prefs.n_samples-1) - start + 1 ; // the +1 and -1 cancel each other out, but this makes the logic clearer
 		  }
 	      } else {
 		  if (j == 0) {
@@ -253,7 +252,7 @@ void cdrdao_toc_info(char *filename)
 		    length = song_markers[j] - start + 1 ;
 		  } else if (j == num_song_markers) {
 		    start = song_markers[j-1] ;
-		    length = (prefs.n_samples-1) - start + 1 ;
+		    length = (prefs.n_samples-1) - start + 1 ; // the +1 and -1 cancel each other out, but this makes the logic clearer
 		  } else {
 		    start = song_markers[j-1] ;
 		    length = song_markers[j] - start + 1 ;
@@ -458,7 +457,7 @@ void adjust_song_marker_positions(long pos, long delta)
     while (i < num_song_markers) {
         if (song_markers[i] >= pos) {
             song_markers[i] += delta;
-            if (song_markers[i] <= pos || song_markers[i] >= prefs.n_samples) {
+            if (song_markers[i] <= pos || song_markers[i] >= prefs.n_samples) { //ajh: should it be prefs.n_samples - 1
                 for (j = i; j < num_song_markers - 1; j++) {
                     song_markers[j] = song_markers[j+1];
                 }

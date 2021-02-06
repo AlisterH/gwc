@@ -280,7 +280,7 @@ void display_times(void)
 #ifndef OLD
     gtk_label_set_text(GTK_LABEL(l_file_time),
 		       sample_to_time_text(prefs.n_samples, prefs.rate,
-					   "Total ", buf));
+					   "Total ", buf)); //ajh: should it be prefs.n_samples - 1
     gtk_label_set_text(GTK_LABEL(l_first_time),
 		       sample_to_time_text(first, prefs.rate, "First ",
 					   buf));
@@ -297,7 +297,7 @@ void display_times(void)
 #else
     gtk_label_set_text(GTK_LABEL(l_file_time),
 		       sample_to_time_text(prefs.n_samples, prefs.rate, "",
-					   buf));
+					   buf)); //ajh: should it be prefs.n_samples - 1
     gtk_label_set_text(GTK_LABEL(l_first_time),
 		       sample_to_time_text(first, prefs.rate, "", buf));
     gtk_label_set_text(GTK_LABEL(l_last_time),
@@ -1607,7 +1607,7 @@ void adjust_marker_positions(long pos, long delta)
     while (i < n_markers) {
         if (markers[i] >= pos) {
             markers[i] += delta;
-            if (markers[i] <= pos || markers[i] >= prefs.n_samples) {
+            if (markers[i] <= pos || markers[i] >= prefs.n_samples) { //ajh: should it be prefs.n_samples - 1
                 for (j = i; j < n_markers - 1; j++) {
                     markers[j] = markers[j+1];
                 }
@@ -3109,7 +3109,7 @@ void batch(int argc, char **argv)
 	    pop_status_text() ;
 	}
     }
-    else if(!strcasecmp(argv[3], "normalize") || !strcasecmp(argv[3], "normalise")) {
+    else if(!strcasecmp(argv[3], "normalize") || !strcasecmp(argv[3], "normalise")) { //this always operates on the full file; is that the right behaviour?
 	g_print("Normalize audiofile\n");
 	batch_normalize(&prefs,0,prefs.n_samples-1,prefs.n_channels > 1 ? 0x03 : 0x01);
     }
