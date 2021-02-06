@@ -2974,7 +2974,7 @@ long time_to_sample(char *time, struct sound_prefs *p)
 long batch_atol(char *time)
 {
 	if( strcmp(time,"end") == 0 )
-		return prefs.n_samples;
+		return prefs.n_samples-1;
 	else
 		return atol(time);
 }
@@ -2982,7 +2982,7 @@ long batch_atol(char *time)
 long batch_time_to_sample(char *time, struct sound_prefs *p)
 {
 	if( strcmp(time,"end") == 0 )
-		return p->n_samples;
+		return p->n_samples-1;
 	else
 		return time_to_sample(time, p);	
 }
