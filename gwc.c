@@ -2142,11 +2142,16 @@ void old_open_wave_filename(void)
 static void drag_data_received(GtkWidget *widget, GdkDragContext *d, gint32 i, gint32 j, GtkSelectionData *s, guint32 x, guint32 y)
 {
     gchar **uris = gtk_selection_data_get_uris(s) ;
-    gchar *filename = g_filename_from_uri(uris[0], NULL, NULL) ;
+    gchar *filename = g_filename_from_uri(uris[0], NULL, NULL) ; // use a separate variable so we don't overwrite wave_filename
+			    // e.g. if drag-n-dropping a broken symlink.  Consistent with opening from the command line.
+			    // Inconsistent with other failures e.g. a file format we don't understand.
+			    // Should review if this is a good idea or not
     if ( access (filename, F_OK) == 0 ) {
         strcpy(wave_filename, filename) ;
         open_wave_filename() ;
     }
+    else
+		warning(strcat(filename, ": File not found"));
     g_strfreev(uris) ;
     g_free(filename) ;
 }
@@ -2265,12 +2270,22 @@ void open_file_selection(GtkWidget * widget, gpointer data)
 	/* Display the dialog */
 	if (gtk_dialog_run (GTK_DIALOG (file_selector)) == GTK_RESPONSE_ACCEPT)
         {
-                strncpy(wave_filename,
+			    gchar filename[PATH_MAX+1]; // use a separate variable so we don't overwrite wave_filename
+			    // e.g. if opening a broken symlink.  Consistent with opening from the command line.
+			    // Inconsistent with other failures e.g. a file format we don't understand.
+			    // Should review if this is a good idea or not
+                strncpy(filename,
 	                gtk_file_chooser_get_filename(GTK_FILE_CHOOSER
 						      (file_selector)), PATH_MAX);
                 gtk_widget_destroy (GTK_WIDGET (file_selector));
-                open_wave_filename();
-        } else {
+        		if ( access (filename, F_OK) == 0 ) {
+		        	strcpy(wave_filename, filename);
+		        	open_wave_filename();
+		        }
+		        else
+		        	warning(strcat(filename, ": File not found"));
+        }
+    else {
         gtk_widget_destroy (GTK_WIDGET (file_selector));
 	}
     }
