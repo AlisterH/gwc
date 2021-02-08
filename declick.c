@@ -710,7 +710,7 @@ struct click_data *clicks, int iterate_flag, int leave_click_marks)
     int channel ;
     int done = 0 ;
 
-    if(last_sample > p->n_samples-20) last_sample = p->n_samples-20 ; //should it be 21 rather than 20?
+    if(last_sample > p->n_samples-21) last_sample = p->n_samples-21 ;
     if(first_sample < 20) first_sample = 20 ;
     if(first_sample >= last_sample) {
 	return "Region to small to declick." ;
@@ -889,7 +889,7 @@ struct click_data *clicks, int iterate_flag, int leave_click_marks)
 				    click_start -= 10 ;
 				    click_end += 10 ;
 				    click_start = MAX(0, click_start) ;
-				    click_end = MIN(p->n_samples, click_start) ; //ajh: should it be p->n_samples - 1
+				    click_end = MIN(p->n_samples-1, click_start) ;
 				    result = declick_a_click(p, click_start, click_end, channel+1) ;
 				}
 				    
@@ -974,7 +974,7 @@ struct click_data *clicks, int iterate_flag, int leave_click_marks)
     int window_step ;
     int channel ;
 
-    if(last_sample > p->n_samples-20) last_sample = p->n_samples-20 ; //should it be 21 rather than 20?
+    if(last_sample > p->n_samples-21) last_sample = p->n_samples-21 ;
     if(first_sample < 20) first_sample = 20 ;
     if(first_sample >= last_sample) {
 	return "Region to small to declick." ;
@@ -1079,7 +1079,7 @@ struct click_data *clicks, int iterate_flag, int leave_click_marks)
     /*  			click_start -= width ;  */
     /*  			click_end += width ;  */
 			    if(click_start < 0) click_start = 0 ;
-			    if(click_end > p->n_samples) click_end = p->n_samples ;//ajh: should it be p->n_samples - 1
+			    if(click_end > p->n_samples-1) click_end = p->n_samples-1 ;
 
 			    if(click_start >= first_sample && click_end <= last_sample) {
 				if(repair == TRUE) {
@@ -1092,7 +1092,7 @@ struct click_data *clicks, int iterate_flag, int leave_click_marks)
 					click_start -= 10 ;
 					click_end += 10 ;
 					click_start = MAX(0, click_start) ;
-					click_end = MIN(p->n_samples, click_start) ;//ajh: should it be prefs.n_samples - 1
+					click_end = MIN(p->n_samples-1, click_start) ;
 					result = declick_a_click(p, click_start, click_end, channel+1) ;
 				    }
 					
