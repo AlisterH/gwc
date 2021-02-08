@@ -2160,6 +2160,18 @@ void old_open_wave_filename(void)
     }
 }
 
+static void drag_data_received(GtkWidget *widget, GdkDragContext *d, gint32 i, gint32 j, GtkSelectionData *s, guint32 x, guint32 y)
+{
+    gchar **uris = gtk_selection_data_get_uris(s) ;
+    gchar *filename = g_filename_from_uri(uris[0], NULL, NULL) ;
+    if ( access (filename, F_OK) == 0 ) {
+        strcpy(wave_filename, filename) ;
+        open_wave_filename() ;
+    }
+    g_strfreev(uris) ;
+    g_free(filename) ;
+}
+
 #ifdef MAC_OS_X
 void app_open_file_cb (GtkosxApplication *theApp, gchar *path, gpointer p)
 {
@@ -3338,6 +3350,14 @@ int main(int argc, char *argv[])
     {
         gtk_window_maximize(GTK_WINDOW(main_window));
     }
+
+
+	g_signal_connect(main_window, "drag-data-received", G_CALLBACK(drag_data_received), NULL);
+
+	GtkTargetEntry targets[] = {
+		{"text/uri-list", GTK_TARGET_OTHER_APP, 0},
+	};
+	gtk_drag_dest_set(main_window, GTK_DEST_DEFAULT_ALL, targets, 1, GDK_ACTION_COPY);
 
     /* When the window is given the "delete_event" signal (this is given
      * by the window manager, usually by the "close" option, or on the
