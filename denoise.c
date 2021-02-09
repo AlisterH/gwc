@@ -948,6 +948,7 @@ int denoise(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs, long noi
 
 /* AJH: print_noise_sample is currently used by the DSP filter dialog's "show response" button; I suspect noise.dat is not an accurate name for the output */
 /* but I'm pretty sure we should be graphing the output instead, anyway */
+/* Also, there's currently no need for this function to return an int rather than void */
 int print_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs, long noise_start, long noise_end)
 {
     int k ;
@@ -967,17 +968,15 @@ int print_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnpref
         warning(g_strconcat("Cannot write to ", g_get_current_dir(), "/noise.dat\n", NULL));  //this check prevents a segfault if we can't write to the file
         return 1 ;
     }
-    else {
-        fprintf(stderr, "FFT_SIZE in print_noise_sample is %d\n", pDnprefs->FFT_SIZE) ;
+    fprintf(stderr, "FFT_SIZE in print_noise_sample is %d\n", pDnprefs->FFT_SIZE) ;
 
-        for(k = 1 ; k <= pDnprefs->FFT_SIZE/2 ; k++) {
-            double freq = (double)pPrefs->rate / 2.0 /(double)(pDnprefs->FFT_SIZE/2)*(double)k ;
-            double db_left = 20.0*log10(left_noise_avg[k]/(max/2.0)) ;
-            double db_right = 20.0*log10(right_noise_avg[k]/(max/2.0)) ;
-            fprintf(fp, "%10lgHz %12.1lfdB %12.1lfdB\n", freq, db_left, db_right) ;
-        }
-        set_status_text(g_strconcat("noise sample written to ", g_get_current_dir(), "/noise.dat", NULL));
+    for(k = 1 ; k <= pDnprefs->FFT_SIZE/2 ; k++) {
+        double freq = (double)pPrefs->rate / 2.0 /(double)(pDnprefs->FFT_SIZE/2)*(double)k ;
+        double db_left = 20.0*log10(left_noise_avg[k]/(max/2.0)) ;
+        double db_right = 20.0*log10(right_noise_avg[k]/(max/2.0)) ;
+        fprintf(fp, "%10lgHz %12.1lfdB %12.1lfdB\n", freq, db_left, db_right) ;
     }
+    set_status_text(g_strconcat("noise sample written to ", g_get_current_dir(), "/noise.dat", NULL));
 
     fclose(fp) ;
 
