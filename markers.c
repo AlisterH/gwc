@@ -312,7 +312,6 @@ void store_cdrdao_toc(gpointer user_data)
 	l = strlen(save_cdrdao_toc_filename) ;
 
 	d_print("Save cdrdao_toc to %s\n", save_cdrdao_toc_filename) ;
-
 	cdrdao_toc_info(save_cdrdao_toc_filename) ;
 
     } else {
@@ -323,7 +322,7 @@ void store_cdrdao_toc(gpointer user_data)
 
 void save_cdrdao_toc(GtkWidget * widget, gpointer data)
 {
-   char tmppath[PATH_MAX+6];
+   char tmppath[PATH_MAX+6]; //Why +6?
    GtkFileFilter * ff, * ffa;
 
    if (num_song_markers == 0) {
@@ -331,16 +330,17 @@ void save_cdrdao_toc(GtkWidget * widget, gpointer data)
    } else {
 	strcpy(tmppath, wave_filename);
 
-	/* Create the selector */
-	file_selector =
-	    gtk_file_chooser_dialog_new("Filename to save cdrdao toc to:",
+    /* Create the selector */
+    file_selector =
+        gtk_file_chooser_dialog_new("Filename to save cdrdao toc to:",
                                         GTK_WINDOW(main_window),
                                         GTK_FILE_CHOOSER_ACTION_SAVE,
                                         GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
                                         GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
                                         NULL);
 
-	bcopy(".toc", strrchr(tmppath, '.'), 4);
+    remove_extension(tmppath) ;
+    strcat(tmppath, ".toc");
 	gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER
 					  (file_selector), basename(tmppath));
 	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER
