@@ -1038,9 +1038,13 @@ void cut_callback(GtkWidget * widget, gpointer data)
                 info("Can't cut ALL audio data from file.");
             } else {
                 file_processing = TRUE;
-                audioedit_cut_selection(&audio_view);
-                set_status_text("Cut done.");
-                main_redraw(FALSE, TRUE);
+                int rc = audioedit_cut_selection(&audio_view);
+                    if (rc == 0) {
+                        set_status_text("Cut done.");
+                        main_redraw(FALSE, TRUE);
+                    }
+                    else
+                        warning(g_strconcat("Cut failed - could not write to ", CLIPBOARD_FILE, NULL));
                 file_processing = FALSE;
             }
         }
@@ -1054,7 +1058,9 @@ void copy_callback(GtkWidget * widget, gpointer data)
 	&& (audio_playback == FALSE)) {
         if (is_region_selected()) {
             file_processing = TRUE;
-            audioedit_copy_selection(&audio_view);
+                int rc = audioedit_copy_selection(&audio_view);
+                if (! rc == 0)
+                    warning(g_strconcat("Copy failed - could not write to ", CLIPBOARD_FILE, NULL));
             file_processing = FALSE;
         }
     }
