@@ -87,6 +87,8 @@ GtkWidget *leave_click_marks_widget;
 
 GtkWidget *l_file_time;
 GtkWidget *l_file_samples;
+GtkWidget *l_file_channels;
+GtkWidget *l_file_rate;
 GtkWidget *l_first_time;
 GtkWidget *l_selected_time;
 GtkWidget *l_last_time;
@@ -278,9 +280,15 @@ void display_times(void)
     get_region_of_interest(&first, &last, &audio_view);
 
 #ifndef OLD
+    sprintf(buf, "Audio Channels: %d", prefs.stereo+1);
+    gtk_label_set_text(GTK_LABEL(l_file_channels), buf);
+    sprintf(buf, "Samplerate: %d Hz", prefs.rate);
+    gtk_label_set_text(GTK_LABEL(l_file_rate), buf);
     gtk_label_set_text(GTK_LABEL(l_file_time),
 		       sample_to_time_text(prefs.n_samples, prefs.rate,
-					   "Total ", buf));
+					   "Track Length ", buf));
+    sprintf(buf, "Track samples: %ld", audio_view.n_samples);
+    gtk_label_set_text(GTK_LABEL(l_file_samples), buf);
     gtk_label_set_text(GTK_LABEL(l_first_time),
 		       sample_to_time_text(first, prefs.rate, "First ",
 					   buf));
@@ -292,8 +300,6 @@ void display_times(void)
 					   buf));
     sprintf(buf, "Samples: %ld", last - first + 1);
     gtk_label_set_text(GTK_LABEL(l_samples), buf);
-    sprintf(buf, "Track samples: %ld", audio_view.n_samples);
-    gtk_label_set_text(GTK_LABEL(l_file_samples), buf);
 #else
     gtk_label_set_text(GTK_LABEL(l_file_time),
 		       sample_to_time_text(prefs.n_samples, prefs.rate, "",
@@ -3521,12 +3527,16 @@ int main(int argc, char *argv[])
 
     gtk_box_pack_start(GTK_BOX(main_vbox), hscrollbar, FALSE, TRUE, 0);
 
+    l_file_channels =
+    mk_label_and_pack(GTK_BOX(track_times_vbox), "Audio Channels: 0");
+    l_file_rate =
+    mk_label_and_pack(GTK_BOX(track_times_vbox), "Samplerate: 0");
     l_file_time =
-	mk_label_and_pack(GTK_BOX(track_times_vbox), "Track 0:00:000");
+    mk_label_and_pack(GTK_BOX(track_times_vbox), "Track Length 0:00:000");
     l_file_samples =
-	mk_label_and_pack(GTK_BOX(track_times_vbox), "Track samples: 0");
+    mk_label_and_pack(GTK_BOX(track_times_vbox), "Track samples: 0");
     l_first_time =
-	mk_label_and_pack(GTK_BOX(times_vbox), "First 0:00:000");
+    mk_label_and_pack(GTK_BOX(times_vbox), "First 0:00:000");
     l_last_time = mk_label_and_pack(GTK_BOX(times_vbox), "Last 0:00:000");
     l_selected_time = mk_label_and_pack(GTK_BOX(times_vbox), "Selected 0:00:000");
     l_samples = mk_label_and_pack(GTK_BOX(times_vbox), "Samples: 0");
