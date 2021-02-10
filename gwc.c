@@ -537,8 +537,8 @@ int yesnocancel(char *msg)
 				    GTK_STOCK_YES,
 				    GTK_RESPONSE_YES,
 				    NULL);
-    // This is right for the save changes dialog, but not for the truncation dialog #ifdef TRUNCATE_OLD
-    // But it is probably time to remove that... I didn't cater to it when migrating from GnomeUIInfo to GtkUIManager and GtkAction
+    // This is right for the keep changes dialog, but not for the truncation dialog #ifdef TRUNCATE_OLD
+    // But it is probably time to remove that... I didn't cater to it when migrating from GnomeUIInfo to GtkUIManager and GtkAction // 20210210 need to check if this is still right
     gtk_dialog_set_default_response (GTK_DIALOG(dlg), GTK_RESPONSE_YES);
 
     text = gtk_label_new(msg);
@@ -1858,7 +1858,7 @@ int cleanup_and_close(struct view *v, struct sound_prefs *p)
     stop_playback(1);
 
     if(batch_mode == 0 && file_is_open && get_undo_levels() > 0) {
-	int r = yesnocancel("Save changes to the audio file?") ;
+	int r = yesnocancel("Keep changes to the audio file?") ;
 
 	if(r == 2)
 	    return 0 ;
