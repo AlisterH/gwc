@@ -259,7 +259,7 @@ void append_cdrdao(struct view *v)
         }
 
         if (fp == NULL) {
-            warning(g_strconcat("Cannot write to ", g_get_current_dir(), "/cdrdao.toc\n", NULL));  //this check prevents a segfault if we can't write to the file
+            warning(g_strconcat("Cannot write to ", g_get_current_dir(), "/cdrdao.toc: ", strerror(errno), NULL));  //this check prevents a segfault if we can't write to the file
         }
         else {
             get_region_of_interest(&first, &last, v) ;

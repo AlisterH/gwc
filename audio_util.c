@@ -19,6 +19,7 @@
 
 /* audio_util.c */
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -475,7 +476,7 @@ void save_as_wavfile(char *filename_new, long first_sample, long last_sample)
 	/* Open failed so print an error message. */
 
 	char buf[PATH_MAX] ;
-	snprintf(buf, sizeof(buf), "Failed to save selection %s", filename_new) ;
+	snprintf(buf, sizeof(buf), "Cannot write to %s: %s", filename_new, strerror(errno)) ;
 	warning(buf) ;
 	return ;
     } ;

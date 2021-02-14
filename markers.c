@@ -186,7 +186,7 @@ void cdrdao_toc_info(char *filename)
 	FILE *toc;
 	toc = fopen(filename,"w");
 	if (toc == NULL) {
-	   snprintf(buf, sizeof(buf), "Unable to open %s: %s", filename, strerror(errno));
+	   snprintf(buf, sizeof(buf), "Cannot write to %s: %s", filename, strerror(errno));
 	   warning(buf);
 	} else {
 	   int found_text = 0;
