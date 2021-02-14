@@ -19,6 +19,8 @@
 
 /* denoise.c */
 
+#include <errno.h>
+#include <string.h>
 #include <stdlib.h>
 #include "gwc.h"
 #include <math.h>
@@ -965,7 +967,7 @@ int print_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnpref
 
     fp = fopen("noise.dat", "w") ;
     if (fp == NULL) {
-        warning(g_strconcat("Cannot write to ", g_get_current_dir(), "/noise.dat\n", NULL));  //this check prevents a segfault if we can't write to the file
+        warning(g_strconcat("Cannot write to ", g_get_current_dir(), "/noise.dat: ", strerror(errno), NULL));  //this check prevents a segfault if we can't write to the file
         return 1 ;
     }
     fprintf(stderr, "FFT_SIZE in print_noise_sample is %d\n", pDnprefs->FFT_SIZE) ;
