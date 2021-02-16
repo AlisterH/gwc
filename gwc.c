@@ -3062,221 +3062,222 @@ void batch(int argc, char **argv)
 #define BYSAMPLE 1
 
     int type = BYTIME ; 
+    if (file_is_open == TRUE) {
+		batch_mode = 1 ;
 
-    batch_mode = 1 ;
+		if( argv[3] == NULL )
+			usage(argv[0]);
 
-	if( argv[3] == NULL )
+		if(!strcmp(argv[2], "batchs")) {
+		type = BYSAMPLE ;
+		}
+		if(!strcasecmp(argv[3], "declick")) {
+		if(argc < 7) {
+			fprintf(stderr, "Usage: %s <wavfile> <batch[s] declick sensitivity start_position stop_position>\n", argv[0]) ;
+		} else {
+			declick_detector_type = FFT_DETECT;
+			double sens = atof(argv[4]) ;
+
+			if(type == BYTIME) {
+			audio_view.selected_first_sample = time_to_sample(argv[5],&prefs) ;
+			audio_view.selected_last_sample = batch_time_to_sample(argv[6],&prefs) ;
+			} else {
+			audio_view.selected_first_sample = atol(argv[5]) ;
+			audio_view.selected_last_sample = batch_atol(argv[6]) ;
+			}
+
+			audio_view.selection_region = TRUE;
+			audio_view.channel_selection_mask = 0x03;
+			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(detect_only_widget), FALSE);
+			click_data.max_clicks = MAX_CLICKS ;
+			click_data.n_clicks = 0 ;
+			g_print("Declick from %ld to %ld\n", audio_view.selected_first_sample, audio_view.selected_last_sample) ;
+			declick_with_sensitivity(sens);
+		}
+		}
+		else if(!strcasecmp(argv[3], "declick-hpf")) {
+		if(argc < 7) {
+			fprintf(stderr, "Usage: %s <wavfile> <batch[s] declick sensitivity start_position stop_position>\n", argv[0]) ;
+		} else {
+			declick_detector_type = HPF_DETECT;
+			double sens = atof(argv[4]) ;
+
+			if(type == BYTIME) {
+			audio_view.selected_first_sample = time_to_sample(argv[5],&prefs) ;
+			audio_view.selected_last_sample = batch_time_to_sample(argv[6],&prefs) ;
+			} else {
+			audio_view.selected_first_sample = atol(argv[5]) ;
+			audio_view.selected_last_sample = batch_atol(argv[6]) ;
+			}
+
+			audio_view.selection_region = TRUE;
+			audio_view.channel_selection_mask = 0x03;
+			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(detect_only_widget), FALSE);
+			click_data.max_clicks = MAX_CLICKS ;
+			click_data.n_clicks = 0 ;
+			g_print("Declick from %ld to %ld\n", audio_view.selected_first_sample, audio_view.selected_last_sample) ;
+			declick_with_sensitivity(sens);
+		}
+		}
+		else if(!strcasecmp(argv[3], "amplify")) {
+		if(argc < 7) {
+			fprintf(stderr, "Usage: %s <wavfile> <batch[s] amplify amount start_position stop_position>\n", argv[0]) ;
+		} else {
+			double amount = atof(argv[4]) ;
+			long first, last ;
+
+			if(type == BYTIME) {
+			audio_view.selected_first_sample = time_to_sample(argv[5],&prefs) ;
+			audio_view.selected_last_sample = batch_time_to_sample(argv[6],&prefs) ;
+			} else {
+			audio_view.selected_first_sample = atol(argv[5]) ;
+			audio_view.selected_last_sample = batch_atol(argv[6]) ;
+			}
+			first = audio_view.selected_first_sample ;
+			last = audio_view.selected_last_sample ;
+
+			audio_view.selection_region = TRUE;
+			audio_view.channel_selection_mask = 0x03;
+
+			g_print("amplify from %ld to %ld\n", audio_view.selected_first_sample, audio_view.selected_last_sample) ;
+			simple_amplify_audio(&prefs, first, last, audio_view.channel_selection_mask, amount) ;
+		}
+		}
+		else if(!strcasecmp(argv[3], "denoise")) {
+		if(argc < 8) {
+			fprintf(stderr, "Usage: %s <wavfile> <batch[s] denoise sample_start sample_end denoise_start denoise_end>\n", argv[0]) ;
+		} else {
+			if(type == BYTIME) {
+			denoise_data.noise_start = time_to_sample(argv[4],&prefs);
+			denoise_data.noise_end = batch_time_to_sample(argv[5],&prefs);
+			audio_view.selected_first_sample = time_to_sample(argv[6],&prefs);
+			audio_view.selected_last_sample = batch_time_to_sample(argv[7],&prefs);
+			} else {
+			denoise_data.noise_start = atol(argv[4]);
+			denoise_data.noise_end = batch_atol(argv[5]);
+			audio_view.selected_first_sample = atol(argv[6]);
+			audio_view.selected_last_sample = batch_atol(argv[7]);
+			}
+
+			audio_view.selection_region = TRUE;
+			audio_view.channel_selection_mask = 0x03;
+			get_region_of_interest(&denoise_data.denoise_start, &denoise_data.denoise_end, &audio_view) ;
+			denoise_data.ready = TRUE ;
+			load_denoise_preferences() ;
+			print_denoise("batch remove_noise",&denoise_prefs) ;
+			if(denoise_prefs.FFT_SIZE > (denoise_data.noise_end-denoise_data.noise_start+1)) {
+			fprintf(stderr, "FFT_SIZE must be <= # samples in noise sample!\n") ;
+			return;
+			}
+			g_print("Denoise from %ld to %ld using noise sample from %ld to %ld\n", denoise_data.denoise_start, denoise_data.denoise_end, denoise_data.noise_start, denoise_data.noise_end) ;
+			push_status_text("Denoising selection") ;
+			denoise(&prefs, &denoise_prefs, denoise_data.noise_start, denoise_data.noise_end,
+				denoise_data.denoise_start, denoise_data.denoise_end, audio_view.channel_selection_mask) ;
+			resample_audio_data(&prefs, denoise_data.denoise_start, denoise_data.denoise_end) ;
+			save_sample_block_data(&prefs) ;
+			pop_status_text() ;
+		}
+		}
+		else if(!strcasecmp(argv[3], "normalize") || !strcasecmp(argv[3], "normalise")) {
+		g_print("Normalize audiofile\n");
+		batch_normalize(&prefs,0,prefs.n_samples-1,prefs.n_channels > 1 ? 0x03 : 0x01);
+		}
+		else if(!strcasecmp(argv[3], "dsp")) {
+		if(argc < 6) {
+			fprintf(stderr, "Usage: %s <wavfile> <batch[s] dsp start_position stop_position>\n", argv[0]) ;
+		} else {
+			long first, last ;
+
+			if(type == BYTIME) {
+			audio_view.selected_first_sample = time_to_sample(argv[4],&prefs) ;
+			audio_view.selected_last_sample = batch_time_to_sample(argv[5],&prefs) ;
+			} else {
+			audio_view.selected_first_sample = atol(argv[4]) ;
+			audio_view.selected_last_sample = batch_atol(argv[5]) ;
+			}
+			first = audio_view.selected_first_sample ;
+			last = audio_view.selected_last_sample ;
+
+			audio_view.selection_region = TRUE;
+			audio_view.channel_selection_mask = 0x03;
+			get_region_of_interest(&first, &last, &audio_view);
+			g_print("Applying DSP filter from %ld to %ld\n", first, last);
+			filter_audio(&prefs, first, last, audio_view.channel_selection_mask);
+			save_sample_block_data(&prefs);
+		}
+		}
+		else if(!strcasecmp(argv[3], "reverb")) {
+		if(argc < 6) {
+			fprintf(stderr, "Usage: %s <wavfile> <batch[s] reverb start_position stop_position>\n", argv[0]) ;
+		} else {
+			long first, last ;
+
+			if(type == BYTIME) {
+			audio_view.selected_first_sample = time_to_sample(argv[4],&prefs) ;
+			audio_view.selected_last_sample = batch_time_to_sample(argv[5],&prefs) ;
+			} else {
+			audio_view.selected_first_sample = atol(argv[4]) ;
+			audio_view.selected_last_sample = batch_atol(argv[5]) ;
+			}
+			first = audio_view.selected_first_sample ;
+			last = audio_view.selected_last_sample ;
+			audio_view.selection_region = TRUE;
+			audio_view.channel_selection_mask = 0x03;
+			get_region_of_interest(&first, &last, &audio_view);
+			g_print("Adding reverb from %ld to %ld\n", first, last);
+			load_reverb_preferences() ;
+			reverb_audio(&prefs, first, last, audio_view.channel_selection_mask);
+			save_sample_block_data(&prefs);
+		}
+		}
+		else if(!strcasecmp(argv[3], "truncate")) {
+		if(argc < 6) {
+			fprintf(stderr, "Usage: %s <wavfile> <batch[s] truncate keep_start keep_end>\n", argv[0]) ;
+		} else {
+			long first, last ;
+		#ifdef TRUNCATE_OLD
+			if(type == BYTIME) {
+			audio_view.truncate_head = time_to_sample(argv[4],&prefs) ;
+			audio_view.truncate_tail = batch_time_to_sample(argv[5],&prefs) ;
+			} else {
+			audio_view.truncate_head = atol(argv[4]) ;
+			audio_view.truncate_tail = batch_atol(argv[5]) ;
+			}
+
+			g_print("Truncating.  Keeping samples %ld to %ld\n", audio_view.truncate_head, audio_view.truncate_tail) ;
+			truncate_wavfile(&audio_view);
+			audio_view.truncate_head = 0;
+			audio_view.truncate_tail = audio_view.n_samples;
+		#else
+			if(type == BYTIME) {
+			audio_view.selected_first_sample = time_to_sample(argv[4],&prefs) ;
+			audio_view.selected_last_sample = batch_time_to_sample(argv[5],&prefs) ;
+			} else {
+			audio_view.selected_first_sample = atol(argv[4]) ;
+			audio_view.selected_last_sample = batch_atol(argv[5]) ;
+			}
+			audio_view.selection_region = TRUE;
+			first = audio_view.selected_first_sample ;
+			last = audio_view.selected_last_sample ;
+			g_print("Truncating.  Keeping samples %ld to %ld\n", first, last);
+
+			if(first == 0) {
+			long total_samples =  last-first+1 ;
+			sndfile_truncate(total_samples) ;
+			} else {
+			truncate_wavfile(&audio_view, 0); /* 0 == don't save undo data */
+			}
+		#endif
+		}
+		}
+		else
 		usage(argv[0]);
-
-    if(!strcmp(argv[2], "batchs")) {
-	type = BYSAMPLE ;
-    }
-    if(!strcasecmp(argv[3], "declick")) {
-	if(argc < 7) {
-	    fprintf(stderr, "Usage: %s <wavfile> <batch[s] declick sensitivity start_position stop_position>\n", argv[0]) ;
-	} else {
-		declick_detector_type = FFT_DETECT;
-	    double sens = atof(argv[4]) ;
-
-	    if(type == BYTIME) {
-		audio_view.selected_first_sample = time_to_sample(argv[5],&prefs) ;
-		audio_view.selected_last_sample = batch_time_to_sample(argv[6],&prefs) ;
-	    } else {
-		audio_view.selected_first_sample = atol(argv[5]) ;
-		audio_view.selected_last_sample = batch_atol(argv[6]) ;
-	    }
-
-	    audio_view.selection_region = TRUE;
-	    audio_view.channel_selection_mask = 0x03;
-	    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(detect_only_widget), FALSE);
-	    click_data.max_clicks = MAX_CLICKS ;
-	    click_data.n_clicks = 0 ;
-	    g_print("Declick from %ld to %ld\n", audio_view.selected_first_sample, audio_view.selected_last_sample) ;
-	    declick_with_sensitivity(sens);
 	}
-    }
-    else if(!strcasecmp(argv[3], "declick-hpf")) {
-	if(argc < 7) {
-	    fprintf(stderr, "Usage: %s <wavfile> <batch[s] declick sensitivity start_position stop_position>\n", argv[0]) ;
-	} else {
-		declick_detector_type = HPF_DETECT;
-	    double sens = atof(argv[4]) ;
-
-	    if(type == BYTIME) {
-		audio_view.selected_first_sample = time_to_sample(argv[5],&prefs) ;
-		audio_view.selected_last_sample = batch_time_to_sample(argv[6],&prefs) ;
-	    } else {
-		audio_view.selected_first_sample = atol(argv[5]) ;
-		audio_view.selected_last_sample = batch_atol(argv[6]) ;
-	    }
-
-	    audio_view.selection_region = TRUE;
-	    audio_view.channel_selection_mask = 0x03;
-	    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(detect_only_widget), FALSE);
-	    click_data.max_clicks = MAX_CLICKS ;
-	    click_data.n_clicks = 0 ;
-	    g_print("Declick from %ld to %ld\n", audio_view.selected_first_sample, audio_view.selected_last_sample) ;
-	    declick_with_sensitivity(sens);
-	}
-    }
-    else if(!strcasecmp(argv[3], "amplify")) {
-	if(argc < 7) {
-	    fprintf(stderr, "Usage: %s <wavfile> <batch[s] amplify amount start_position stop_position>\n", argv[0]) ;
-	} else {
-	    double amount = atof(argv[4]) ;
-	    long first, last ;
-
-	    if(type == BYTIME) {
-		audio_view.selected_first_sample = time_to_sample(argv[5],&prefs) ;
-		audio_view.selected_last_sample = batch_time_to_sample(argv[6],&prefs) ;
-	    } else {
-		audio_view.selected_first_sample = atol(argv[5]) ;
-		audio_view.selected_last_sample = batch_atol(argv[6]) ;
-	    }
-	    first = audio_view.selected_first_sample ;
-	    last = audio_view.selected_last_sample ;
-
-	    audio_view.selection_region = TRUE;
-	    audio_view.channel_selection_mask = 0x03;
-
-	    g_print("amplify from %ld to %ld\n", audio_view.selected_first_sample, audio_view.selected_last_sample) ;
-	    simple_amplify_audio(&prefs, first, last, audio_view.channel_selection_mask, amount) ;
-	}
-    }
-    else if(!strcasecmp(argv[3], "denoise")) {
-	if(argc < 8) {
-	    fprintf(stderr, "Usage: %s <wavfile> <batch[s] denoise sample_start sample_end denoise_start denoise_end>\n", argv[0]) ;
-	} else {
-	    if(type == BYTIME) {
-		denoise_data.noise_start = time_to_sample(argv[4],&prefs);
-		denoise_data.noise_end = batch_time_to_sample(argv[5],&prefs);
-		audio_view.selected_first_sample = time_to_sample(argv[6],&prefs);
-		audio_view.selected_last_sample = batch_time_to_sample(argv[7],&prefs);
-	    } else {
-		denoise_data.noise_start = atol(argv[4]);
-		denoise_data.noise_end = batch_atol(argv[5]);
-		audio_view.selected_first_sample = atol(argv[6]);
-		audio_view.selected_last_sample = batch_atol(argv[7]);
-	    }
-
-	    audio_view.selection_region = TRUE;
-	    audio_view.channel_selection_mask = 0x03;
-	    get_region_of_interest(&denoise_data.denoise_start, &denoise_data.denoise_end, &audio_view) ;
-	    denoise_data.ready = TRUE ;
-	    load_denoise_preferences() ;
-	    print_denoise("batch remove_noise",&denoise_prefs) ;
-	    if(denoise_prefs.FFT_SIZE > (denoise_data.noise_end-denoise_data.noise_start+1)) {
-		fprintf(stderr, "FFT_SIZE must be <= # samples in noise sample!\n") ;
-		return;
-	    }
-	    g_print("Denoise from %ld to %ld using noise sample from %ld to %ld\n", denoise_data.denoise_start, denoise_data.denoise_end, denoise_data.noise_start, denoise_data.noise_end) ;
-	    push_status_text("Denoising selection") ;
-	    denoise(&prefs, &denoise_prefs, denoise_data.noise_start, denoise_data.noise_end,
-			denoise_data.denoise_start, denoise_data.denoise_end, audio_view.channel_selection_mask) ;
-	    resample_audio_data(&prefs, denoise_data.denoise_start, denoise_data.denoise_end) ;
-	    save_sample_block_data(&prefs) ;
-	    pop_status_text() ;
-	}
-    }
-    else if(!strcasecmp(argv[3], "normalize") || !strcasecmp(argv[3], "normalise")) {
-	g_print("Normalize audiofile\n");
-	batch_normalize(&prefs,0,prefs.n_samples-1,prefs.n_channels > 1 ? 0x03 : 0x01);
-    }
-    else if(!strcasecmp(argv[3], "dsp")) {
-	if(argc < 6) {
-	    fprintf(stderr, "Usage: %s <wavfile> <batch[s] dsp start_position stop_position>\n", argv[0]) ;
-	} else {
-	    long first, last ;
-
-	    if(type == BYTIME) {
-		audio_view.selected_first_sample = time_to_sample(argv[4],&prefs) ;
-		audio_view.selected_last_sample = batch_time_to_sample(argv[5],&prefs) ;
-	    } else {
-		audio_view.selected_first_sample = atol(argv[4]) ;
-		audio_view.selected_last_sample = batch_atol(argv[5]) ;
-	    }
-	    first = audio_view.selected_first_sample ;
-	    last = audio_view.selected_last_sample ;
-
-	    audio_view.selection_region = TRUE;
-	    audio_view.channel_selection_mask = 0x03;
-	    get_region_of_interest(&first, &last, &audio_view);
-	    g_print("Applying DSP filter from %ld to %ld\n", first, last);
-	    filter_audio(&prefs, first, last, audio_view.channel_selection_mask);
-	    save_sample_block_data(&prefs);
-	}
-    }
-    else if(!strcasecmp(argv[3], "reverb")) {
-	if(argc < 6) {
-	    fprintf(stderr, "Usage: %s <wavfile> <batch[s] reverb start_position stop_position>\n", argv[0]) ;
-	} else {
-	    long first, last ;
-
-	    if(type == BYTIME) {
-		audio_view.selected_first_sample = time_to_sample(argv[4],&prefs) ;
-		audio_view.selected_last_sample = batch_time_to_sample(argv[5],&prefs) ;
-	    } else {
-		audio_view.selected_first_sample = atol(argv[4]) ;
-		audio_view.selected_last_sample = batch_atol(argv[5]) ;
-	    }
-	    first = audio_view.selected_first_sample ;
-	    last = audio_view.selected_last_sample ;
-	    audio_view.selection_region = TRUE;
-	    audio_view.channel_selection_mask = 0x03;
-	    get_region_of_interest(&first, &last, &audio_view);
-	    g_print("Adding reverb from %ld to %ld\n", first, last);
-	    load_reverb_preferences() ;
-	    reverb_audio(&prefs, first, last, audio_view.channel_selection_mask);
-	    save_sample_block_data(&prefs);
-	}
-    }
-    else if(!strcasecmp(argv[3], "truncate")) {
-	if(argc < 6) {
-	    fprintf(stderr, "Usage: %s <wavfile> <batch[s] truncate keep_start keep_end>\n", argv[0]) ;
-	} else {
-	    long first, last ;
-    #ifdef TRUNCATE_OLD
-	    if(type == BYTIME) {
-		audio_view.truncate_head = time_to_sample(argv[4],&prefs) ;
-		audio_view.truncate_tail = batch_time_to_sample(argv[5],&prefs) ;
-	    } else {
-		audio_view.truncate_head = atol(argv[4]) ;
-		audio_view.truncate_tail = batch_atol(argv[5]) ;
-	    }
-
-	    g_print("Truncating.  Keeping samples %ld to %ld\n", audio_view.truncate_head, audio_view.truncate_tail) ;
-	    truncate_wavfile(&audio_view);
-	    audio_view.truncate_head = 0;
-	    audio_view.truncate_tail = audio_view.n_samples;
-    #else
-	    if(type == BYTIME) {
-		audio_view.selected_first_sample = time_to_sample(argv[4],&prefs) ;
-		audio_view.selected_last_sample = batch_time_to_sample(argv[5],&prefs) ;
-	    } else {
-		audio_view.selected_first_sample = atol(argv[4]) ;
-		audio_view.selected_last_sample = batch_atol(argv[5]) ;
-	    }
-	    audio_view.selection_region = TRUE;
-	    first = audio_view.selected_first_sample ;
-	    last = audio_view.selected_last_sample ;
-	    g_print("Truncating.  Keeping samples %ld to %ld\n", first, last);
-
-	    if(first == 0) {
-		long total_samples =  last-first+1 ;
-		sndfile_truncate(total_samples) ;
-	    } else {
-		truncate_wavfile(&audio_view, 0); /* 0 == don't save undo data */
-	    }
-    #endif
-	}
-    }
-    else
-	usage(argv[0]);
-
 
     cleanup_and_close(&audio_view, &prefs);
 
-    batch_mode = 0 ;
+// ajh: don't think this is needed
+//    batch_mode = 0 ;
 
     return ;
 }
@@ -3621,7 +3622,6 @@ int main(int argc, char *argv[])
 
     /* and the window */
     gtk_widget_show_all(main_window);
-
 	#ifdef MAC_OS_X
 	// Note that we only tested if we are building on OSX, and are assuming we are building with the GDK QUARZ backend.
 	// We should really check that, as we could be building with the X11 backend.
@@ -3711,15 +3711,21 @@ int main(int argc, char *argv[])
 			if (argc > 2) {
 				if ((!strcasecmp(argv[2], "batch")) || (!strcasecmp(argv[2], "batchs"))) {
 					batch(argc, argv);
-					return EXIT_SUCCESS;
+					return EXIT_SUCCESS; //this closes the gui, but it isn't necessarily true that the batch processing was successful
 				}
 			}
 		}
 		else if (strcmp(argv[1], "--help") == 0 || strcmp(argv[1], "-help") == 0  || strcmp(argv[1], "-h") == 0 ) {
 			usage( argv[0] );
 		}
-		else
-			warning(strcat(argv[1], ": File not found"));
+		else {
+			//warning(strcat(argv[1], ": File not found")); //doing it like this prevents exit for some reason
+			warning(g_strconcat(argv[1], ": File not found", NULL));
+			if (argc > 2) { //alister: it seems very messy just duplicating this code in here, but it is easy and works 
+				if ((!strcasecmp(argv[2], "batch")) || (!strcasecmp(argv[2], "batchs"))) {
+					return EXIT_FAILURE; //this closes the gui, but in this case we know the batch processing wasn't successful
+				}}
+		}
     }
 
     #ifdef MAC_OS_X    
