@@ -2920,8 +2920,7 @@ static gint audio_area_configure_event(GtkWidget * widget, GdkEventConfigure * e
 
 int audio_area_button_event(GtkWidget *c, GdkEventButton *event, gpointer data)
 {
-    if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE))
+    if ((file_processing == FALSE) && (file_is_open == TRUE))
 	{
 		return _audio_area_button_event(c, event);
 	}
@@ -2930,8 +2929,7 @@ int audio_area_button_event(GtkWidget *c, GdkEventButton *event, gpointer data)
 
 int audio_area_motion_event(GtkWidget *c, GdkEventMotion *event)
 {
-    if ((file_processing == FALSE) && (file_is_open == TRUE)
-		&& (audio_playback == FALSE))
+    if ((file_processing == FALSE) && (file_is_open == TRUE))
     	{
 		return _audio_area_motion_event(c, event);
 	}
