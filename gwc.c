@@ -1444,26 +1444,26 @@ void filter_cb(GtkWidget * widget, gpointer data)
 
 void zoom_select(GtkWidget * widget, gpointer data)
 {
-    if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE)) {
-	file_processing = TRUE;
+	if ((file_processing == FALSE) && (file_is_open == TRUE)) {
+		stop_all_playback_functions(widget, data);
+		file_processing = TRUE;
 
-	if(audio_view.selected_first_sample == audio_view.selected_last_sample) {
-	    audio_view.first_sample = audio_view.selected_first_sample - prefs.rate+1 ;
-	    audio_view.last_sample = audio_view.selected_last_sample + prefs.rate ;
-	} else {
-	    audio_view.first_sample = audio_view.selected_first_sample;
-	    audio_view.last_sample = audio_view.selected_last_sample;
-	}
+		if(audio_view.selected_first_sample == audio_view.selected_last_sample) {
+			audio_view.first_sample = audio_view.selected_first_sample - prefs.rate+1 ;
+			audio_view.last_sample = audio_view.selected_last_sample + prefs.rate ;
+		} else {
+			audio_view.first_sample = audio_view.selected_first_sample;
+			audio_view.last_sample = audio_view.selected_last_sample;
+		}
 
-	if(audio_view.selected_first_sample < 0) audio_view.selected_first_sample = 0 ;
-	if(audio_view.selected_last_sample > prefs.n_samples-1) audio_view.selected_last_sample = prefs.n_samples-1 ;
-	set_scroll_bar(prefs.n_samples - 1, audio_view.first_sample,
-		       audio_view.last_sample);
-	/* set_scroll_bar redraws */
-	/*main_redraw(FALSE, TRUE) ; */
+		if(audio_view.selected_first_sample < 0) audio_view.selected_first_sample = 0 ;
+		if(audio_view.selected_last_sample > prefs.n_samples-1) audio_view.selected_last_sample = prefs.n_samples-1 ;
+		set_scroll_bar(prefs.n_samples - 1, audio_view.first_sample,
+				   audio_view.last_sample);
+		/* set_scroll_bar redraws */
+		/*main_redraw(FALSE, TRUE) ; */
 	file_processing = FALSE;
-    }
+	}
 }
 
 void select_all(GtkWidget * widget, gpointer data)
@@ -1637,68 +1637,68 @@ void adjust_marker_positions(long pos, long delta)
 * in this example. More on callbacks below. */
 void view_all(GtkWidget * widget, gpointer data)
 {
-    if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE)) {
-	file_processing = TRUE;
-	audio_view.first_sample = 0;
-	audio_view.last_sample = prefs.n_samples - 1;
-	set_scroll_bar(prefs.n_samples - 1, audio_view.first_sample,
-		       audio_view.last_sample);
-	/* set_scroll_bar redraws */
-	/*main_redraw(FALSE, TRUE) ; */
-	file_processing = FALSE;
-    }
+    if ((file_processing == FALSE) && (file_is_open == TRUE)) {
+		stop_all_playback_functions(widget, data);
+		file_processing = TRUE;
+		audio_view.first_sample = 0;
+		audio_view.last_sample = prefs.n_samples - 1;
+		set_scroll_bar(prefs.n_samples - 1, audio_view.first_sample,
+				   audio_view.last_sample);
+		/* set_scroll_bar redraws */
+		/*main_redraw(FALSE, TRUE) ; */
+		file_processing = FALSE;
+	}
 }
 
 /* This is a callback function. The data arguments are ignored
 * in this example. More on callbacks below. */
 void zoom_out(GtkWidget * widget, gpointer data)
 {
-    if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE)) {
-	long w = audio_view.last_sample - audio_view.first_sample;
+	if ((file_processing == FALSE) && (file_is_open == TRUE)) {
+		stop_all_playback_functions(widget, data);
+		long w = audio_view.last_sample - audio_view.first_sample;
 
-	file_processing = TRUE;
+		file_processing = TRUE;
 
-	w *= 2;
+		w *= 2;
 
-	audio_view.first_sample -= w / 4;
-	if (audio_view.first_sample < 0)
-	    audio_view.first_sample = 0;
-	audio_view.last_sample = audio_view.first_sample + w;
-	if (audio_view.last_sample > prefs.n_samples - 1)
-	    audio_view.last_sample = prefs.n_samples - 1;
-	set_scroll_bar(prefs.n_samples - 1, audio_view.first_sample,
-		       audio_view.last_sample);
-	/* set_scroll_bar redraws */
-	/*main_redraw(FALSE, TRUE) ; */
-	file_processing = FALSE;
-    }
+		audio_view.first_sample -= w / 4;
+		if (audio_view.first_sample < 0)
+			audio_view.first_sample = 0;
+		audio_view.last_sample = audio_view.first_sample + w;
+		if (audio_view.last_sample > prefs.n_samples - 1)
+			audio_view.last_sample = prefs.n_samples - 1;
+		set_scroll_bar(prefs.n_samples - 1, audio_view.first_sample,
+				   audio_view.last_sample);
+		/* set_scroll_bar redraws */
+		/*main_redraw(FALSE, TRUE) ; */
+		file_processing = FALSE;
+	}
 }
 
 /* This is a callback function. The data arguments are ignored
 * in this example. More on callbacks below. */
 void zoom_in(GtkWidget * widget, gpointer data)
 {
-    if ((file_processing == FALSE) && (file_is_open == TRUE)
-	&& (audio_playback == FALSE)) {
-	long w = audio_view.last_sample - audio_view.first_sample;
-	file_processing = TRUE;
+	if ((file_processing == FALSE) && (file_is_open == TRUE)) {
+		stop_all_playback_functions(widget, data);
+		long w = audio_view.last_sample - audio_view.first_sample;
+		file_processing = TRUE;
 
-	w /= 2;
+		w /= 2;
 
-	audio_view.first_sample += w / 2;
-	if (audio_view.first_sample < 0)
-	    audio_view.first_sample = 0;
-	audio_view.last_sample = audio_view.first_sample + w;
-	if (audio_view.last_sample > prefs.n_samples - 1)
-	    audio_view.last_sample = prefs.n_samples - 1;
-	set_scroll_bar(prefs.n_samples - 1, audio_view.first_sample,
-		       audio_view.last_sample);
-	/* set_scroll_bar redraws */
-	/*main_redraw(FALSE, TRUE) ; */
-	file_processing = FALSE;
-    }
+		audio_view.first_sample += w / 2;
+		if (audio_view.first_sample < 0)
+			audio_view.first_sample = 0;
+		audio_view.last_sample = audio_view.first_sample + w;
+		if (audio_view.last_sample > prefs.n_samples - 1)
+			audio_view.last_sample = prefs.n_samples - 1;
+		set_scroll_bar(prefs.n_samples - 1, audio_view.first_sample,
+				   audio_view.last_sample);
+		/* set_scroll_bar redraws */
+		/*main_redraw(FALSE, TRUE) ; */
+		file_processing = FALSE;
+	}
 }
 
 void toggle_start_marker(GtkWidget * widget, gpointer data)
