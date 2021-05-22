@@ -84,6 +84,7 @@ GtkObject *scroll_pos;
 GtkWidget *hscrollbar;
 GtkWidget *detect_only_widget;
 GtkWidget *leave_click_marks_widget;
+GtkWidget *main_window;
 
 GtkWidget *l_file_time;
 GtkWidget *l_file_samples;
@@ -149,6 +150,8 @@ gchar save_selection_filename[PATH_MAX+1];
 gchar wave_filename[PATH_MAX+1];
 gchar last_filename[PATH_MAX+1];
 gchar *file_extension;
+gchar *tmpdir;
+gchar *CLIPBOARD_FILE;
 
 long markers[MAX_MARKERS];
 long n_markers = 0;

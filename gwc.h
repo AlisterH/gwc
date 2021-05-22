@@ -185,12 +185,12 @@ typedef struct {
     int ready ;
 } DENOISE_DATA ;
 
-gchar *tmpdir;
-gchar *CLIPBOARD_FILE ;
+extern gchar *tmpdir;
+extern gchar *CLIPBOARD_FILE ;
 
 void print_denoise(char *header, struct denoise_prefs *pDnprefs) ;
 
-GtkWidget *main_window;
+extern GtkWidget *main_window;
 
 GtkWidget *add_number_entry_with_label(char *entry_text, char *label_text, GtkWidget *table, int row) ;
 GtkWidget *add_number_entry_with_label_int(int value, char *label_text, GtkWidget *table, int row) ;
