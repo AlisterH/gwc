@@ -2,6 +2,17 @@ GWC Changelog
 
 KNOWN ISSUE: GWC fails to open wav files with metadata; refer to the README for details.
 
+0.22-05
+May 28, 2021
+BUGFIX: fix various obscure bugs, crashes and failures, notably several related to batch mode.
+BUGFIX: fix various bugs, crashes and failures in gwcbatch, particularly for filenames including spaces, and file extensions other than .wav (which were previously overwritten without creating a backup)
+NEW: implement drag-and-drop to open a file
+NEW: allow to select audio during playback (this was possible in earlier versions but the ability was lost)
+NEW: allow zoom actions to stop playback
+CODE: minor ui and code improvements
+CODE: fix compile failure with gcc10
+DOC: minor doc improvements; implement --help
+
 0.22-04
 April 16, 2019
 This release is mostly fixes and improvements for osx packaging.
