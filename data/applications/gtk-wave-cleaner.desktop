@@ -4,6 +4,7 @@ Type=Application
 Terminal=false
 Name=Gtk Wave Cleaner
 Comment=Removes noise from audio recordings e.g. of scratchy vinyl records
+Comment[fr]=Supprime du bruit dans des fichiers audio, par exemple le scratch des vinyles
 Keywords=audio;sound;noise;filter;
 TryExec=gtk-wave-cleaner
 Exec=gtk-wave-cleaner %f
