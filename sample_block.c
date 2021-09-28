@@ -42,45 +42,65 @@ extern long num_song_markers, song_markers[] ;
 extern long cdtext_length;
 extern char *cdtext_data;
 
+void ll_read(int fd, void *p, int n, int *pN_tot, int *pN_read)
+{
+    *pN_tot += n ;
+    *pN_read += read(fd, p, n) ;
+}
+
+void ll_write(int fd, void *p, int n, int *pN_tot, int *pN_read)
+{
+    *pN_tot += n ;
+    *pN_read += write(fd, p, n) ;
+}
+
 void save_sample_block_data(struct sound_prefs *p)
 {
     char buf[1000] ;
     char l ;
     int fd ;
+    int n_bytes_tot = 0 ;
+    int n_bytes_written = 0 ;
     sprintf(buf, "%s.gwc", wave_filename) ;
     fd = open(buf, O_WRONLY | O_TRUNC | O_CREAT, S_IRUSR|S_IWUSR) ;
 
     sprintf(buf, "gwc %d %d", GWC_VERSION_MAJOR, GWC_VERSION_MINOR) ;
     l = (char)strlen(buf) ;
-    write(fd, (void *)&l, 1) ;
-    write(fd, (void *)buf, l) ;
+    LL_WRITE(fd, (void *)&l, 1, n_bytes_tot, n_bytes_written) ;
+    LL_WRITE(fd, (void *)buf, l, n_bytes_tot, n_bytes_written) ;
 
     sprintf(buf, "%d %ld %d", p->n_channels,p->n_samples,p->rate) ;
     l = (char)strlen(buf) ;
-    write(fd, (void *)&l, 1) ;
-    write(fd, (void *)buf, l) ;
+    LL_WRITE(fd, (void *)&l, 1, n_bytes_tot, n_bytes_written) ;
+    LL_WRITE(fd, (void *)buf, l, n_bytes_tot, n_bytes_written) ;
 
     n_blocks = p->n_samples / SBW ;
     n_blocks += (p->n_samples - n_blocks*SBW > 0 ? 1 : 0) ;
     sb_size = n_blocks*sizeof(struct sample_block) ;
 
-    write(fd, (void *)sample_buffer, sb_size) ;
+    n_bytes_tot += sb_size ;
+    n_bytes_written += write(fd, (void *)sample_buffer, sb_size) ;
 
-    write(fd, (void *)&n_markers, sizeof(long)) ;
-    write(fd, (void *)markers, sizeof(long)*n_markers) ;
+    LL_WRITE(fd, (void *)&n_markers, sizeof(long), n_bytes_tot, n_bytes_written) ;
+    LL_WRITE(fd, (void *)markers, sizeof(long)*n_markers, n_bytes_tot, n_bytes_written) ;
 
-    write(fd, (void *)&num_song_markers, sizeof(long)) ;
-    write(fd, (void *)song_markers, sizeof(long)*num_song_markers) ;
+    LL_WRITE(fd, (void *)&num_song_markers, sizeof(long), n_bytes_tot, n_bytes_written) ;
+    LL_WRITE(fd, (void *)song_markers, sizeof(long)*num_song_markers, n_bytes_tot, n_bytes_written) ;
 
-    write(fd, (void *)&cdtext_length, sizeof(long)) ;
-    write(fd, (void *)cdtext_data, cdtext_length) ;
+    LL_WRITE(fd, (void *)&cdtext_length, sizeof(long), n_bytes_tot, n_bytes_written) ;
+    LL_WRITE(fd, (void *)cdtext_data, cdtext_length, n_bytes_tot, n_bytes_written) ;
     close(fd) ;
+
+    if(n_bytes_tot != n_bytes_written)
+	warning("Writing sample blocks had a problem") ;
 }
 
 int load_sample_block_data(struct sound_prefs *p)
 {
     char buf[1000] ;
     int fd ;
+    int n_bytes_tot = 0 ;
+    int n_bytes_read = 0 ;
     char l ;
 
     sprintf(buf, "%s.gwc", wave_filename) ;
@@ -92,8 +112,8 @@ int load_sample_block_data(struct sound_prefs *p)
 	long n_samples ;
 	    int v_maj, v_min ;
 
-	read(fd, (void *)&l, 1) ;
-	read(fd, (void *)buf, l) ;
+	LL_READ(fd, (void *)&l, 1, n_bytes_tot, n_bytes_read) ;
+	LL_READ(fd, (void *)buf, l, n_bytes_tot, n_bytes_read) ;
 	buf[(int)l] = '\0' ;
 
 	if(buf[0] != 'g' || buf[1] != 'w' || buf[2] != 'c') {
@@ -110,8 +130,8 @@ int load_sample_block_data(struct sound_prefs *p)
 	    return 0 ;
 	}
 
-	read(fd, (void *)&l, 1) ;
-	read(fd, (void *)buf, l) ;
+	LL_READ(fd, (void *)&l, 1, n_bytes_tot, n_bytes_read) ;
+	LL_READ(fd, (void *)buf, l, n_bytes_tot, n_bytes_read) ;
 	buf[(int)l] = '\0' ;
 	sscanf(buf, "%d%ld%d", &n_channels,&n_samples,&rate) ;
 
@@ -128,25 +148,25 @@ int load_sample_block_data(struct sound_prefs *p)
 	n_blocks += (p->n_samples - n_blocks*SBW > 0 ? 1 : 0) ;
 	sb_size = n_blocks*sizeof(struct sample_block) ;
 
-	read(fd, (void *)sample_buffer, sb_size) ;
+	LL_READ(fd, (void *)sample_buffer, sb_size, n_bytes_tot, n_bytes_read) ;
 
 	if(v_maj >= 0 && v_min >= 18) {
 /*  	    int i ;  */
-	    read(fd, (void *)&n_markers, sizeof(long)) ;
-	    read(fd, (void *)markers, sizeof(long)*n_markers) ;
+	    LL_READ(fd, (void *)&n_markers, sizeof(long), n_bytes_tot, n_bytes_read) ;
+	    LL_READ(fd, (void *)markers, sizeof(long)*n_markers, n_bytes_tot, n_bytes_read) ;
 /*  	    for(i = 0 ; i < n_markers ; i++)  */
 /*  		g_print("marker:%ld\n", markers[i]) ;  */
 
-	    read(fd, (void *)&num_song_markers, sizeof(long)) ;
-	    read(fd, (void *)song_markers, sizeof(long)*num_song_markers) ;
+	    LL_READ(fd, (void *)&num_song_markers, sizeof(long), n_bytes_tot, n_bytes_read) ;
+	    LL_READ(fd, (void *)song_markers, sizeof(long)*num_song_markers, n_bytes_tot, n_bytes_read) ;
 
-	    read(fd, (void *)&cdtext_length, sizeof(long)) ;
+	    LL_READ(fd, (void *)&cdtext_length, sizeof(long), n_bytes_tot, n_bytes_read) ;
             if (cdtext_length > 0) {
                 if (cdtext_data != NULL) {
                     free(cdtext_data) ;
                 }
                 cdtext_data = calloc(cdtext_length, 1); 
-	        read(fd, (void *)cdtext_data, cdtext_length) ;
+	        LL_READ(fd, (void *)cdtext_data, cdtext_length, n_bytes_tot, n_bytes_read) ;
             } else {
                 cdtext_data = NULL;
             }
@@ -155,6 +175,9 @@ int load_sample_block_data(struct sound_prefs *p)
 	}
 
 	close(fd) ;
+
+	if(n_bytes_tot != n_bytes_read)
+	    warning("Reading sample blocks had a problem") ;
 	return 1 ;
     } else {
 	return 0 ;
@@ -273,7 +296,7 @@ void fill_sample_buffer(struct sound_prefs *p)
     sb_size = n_blocks*sizeof(struct sample_block) ;
 
     if(!load_sample_block_data(p)) {
-	g_print("Building display information, n_samples=%d, hang on...\n", p->n_samples) ;
+	g_print("Building display information, n_samples=%ld, hang on...\n", p->n_samples) ;
 	push_status_text("Loading audio information") ;
 
 	if(load_sample_block_data(p) == 0) {

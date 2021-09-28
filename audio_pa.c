@@ -48,6 +48,7 @@ static int framesize ;
 double frames_per_usec ;
 
 static int last_written_size ;
+static int last_written_n_frames ;
 static int latency_flag ;
 
 static void pa_perr(char *text, int err)
@@ -78,6 +79,7 @@ int audio_device_open(char *output_device)
 
     written_frames = 0;
     last_written_size = -1 ;
+    last_written_n_frames = -1 ;
     latency_flag = 1 ;
 
     return 0;
@@ -128,6 +130,7 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate)
 
     written_frames = 0;
     last_written_size = -1 ;
+    last_written_n_frames = -1 ;
     latency_flag = 1 ;
     framesize *= *channels ;
 
@@ -151,6 +154,43 @@ int audio_device_write(unsigned char *data, int count)
     written_frames += count/framesize ;
 
     return written_frames*framesize ;
+}
+
+/* Number of frames processed since opening the device. */
+long query_processed_frames(void)
+{
+
+    if(pa_device != NULL) {
+	int err ;
+	pa_usec_t latency = pa_simple_get_latency(pa_device, &err) ;
+
+	int frames_unprocessed = (latency*ss.rate)/1000000 ;
+
+	if( written_frames == last_written_n_frames) {
+	    latency_flag++ ;
+	    if(latency_flag > 4) {
+		frames_unprocessed = 0 ;
+	    } else {
+		frames_unprocessed /= latency_flag ;
+	    }
+	}
+
+	last_written_n_frames = (written_frames) ;
+	return written_frames - frames_unprocessed ;
+    }
+
+    return 0 ;
+}
+
+long _audio_device_processed_frames = 0 ;
+
+/* Number of frames processed since opening the device. */
+long audio_device_processed_frames(void)
+{
+    if(pa_device != NULL)
+	_audio_device_processed_frames = query_processed_frames() ;
+
+    return _audio_device_processed_frames ;
 }
 
 /* Number of bytes processed since opening the device. */

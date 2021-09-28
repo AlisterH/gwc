@@ -307,10 +307,6 @@ void cdrdao_toc_info(char *filename)
 void store_cdrdao_toc(gpointer user_data)
 {
     if(strcmp(save_cdrdao_toc_filename, wave_filename)) {
-	int l ;
-
-	l = strlen(save_cdrdao_toc_filename) ;
-
 	d_print("Save cdrdao_toc to %s\n", save_cdrdao_toc_filename) ;
 	cdrdao_toc_info(save_cdrdao_toc_filename) ;
 

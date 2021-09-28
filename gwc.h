@@ -55,6 +55,10 @@
 #define PROGRESS_UPDATE_INTERVAL 0.5	/* update status bar every 1/2  second on long edit operations */
 #define MAX_AUDIO_BUFSIZE 32768
 
+// a couple of macros to handle read(), and write() calls to track number of bytes input(output) 
+#define LL_READ(fd,p,n,n_tot,n_read) { n_tot += (n) ; n_read += read(fd,(p),n) ; }
+#define LL_WRITE(fd,p,n,n_tot,n_wrote) { n_tot += (n) ; n_wrote += write(fd,(p),n) ; }
+
 /* defs for declicking results */
 #define SINGULAR_MATRIX 0
 #define REPAIR_SUCCESS 1

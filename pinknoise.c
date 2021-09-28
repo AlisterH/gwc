@@ -253,7 +253,6 @@ int pinknoise_dialog(struct sound_prefs current, struct view *v)
     GtkWidget *amount_pink_entry ;
     GtkWidget *amount_white_entry ;
     GtkWidget *feather_width_entry ;
-    int dclose = 0 ;
     int row = 0 ;
     int dres ;
 
@@ -283,7 +282,6 @@ int pinknoise_dialog(struct sound_prefs current, struct view *v)
 	amount_white = atof(gtk_entry_get_text((GtkEntry *)amount_white_entry)) ;
 	feather_width = atoi(gtk_entry_get_text((GtkEntry *)feather_width_entry)) ;
 	n_pn_rows = atoi(gtk_entry_get_text((GtkEntry *)n_rows_entry)) ;
-	dclose = 1 ;
     }
 
     gtk_widget_destroy(dlg) ;

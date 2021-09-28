@@ -69,10 +69,6 @@ long buff_num; // An index to allow us to create the array to run the VU meters.
 long num_buffers; // The number of buffers we will send.
 long buff_num_play;  // The index of the buffer we are playing.
 
-gfloat* pL_global;
-gfloat* pR_global;
-bool p_global_mem_alloced = FALSE; //Tells if we have reserved memory for the two above arrays.
-
 Float64 start_sample_time;
 struct timeval playback_start_time;
 bool playback_just_started = FALSE;
@@ -89,12 +85,6 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
 	
 	float maxl = 0, maxr = 0;
 	float *p_float;
-	
-	if (playback_just_started)
-	{
-		playback_just_started = FALSE;
-		start_sample_time = time_out->mSampleTime;
-	}
 	
 	audio_data = (MacOSXAudioData*) client_data ;
 	
@@ -126,19 +116,49 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
 			} else {
 				maxr = maxl ;
 			}
+
+			extern gint n_frames_in_led_levels ;
+			extern int audio_is_looping ;
+			extern gint totblocks_in_led_levels ;
+			extern int buffered_looped_count ;
+			extern gfloat *led_levels_l ;
+			extern gfloat *led_levels_r ;
+			extern gint LED_LEVEL_FRAME_SIZE ;
+
+			if(audio_is_looping == FALSE || buffered_looped_count == 0) {
+			    // if looping, only need to do this for first time through the loop
+			    int current_level_block=(n_frames_in_led_levels-1)/LED_LEVEL_FRAME_SIZE ;
+			    if(current_level_block > totblocks_in_led_levels-1) {
+				fprintf(stderr, "Uh-oh, current_level_block:%d, max:%d\n", current_level_block, totblocks_in_led_levels-1) ;
+				current_level_block = totblocks_in_led_levels-1 ;
+			    }
+
+			    if(vl < 0) vl = -vl ;
+
+			    // note -- since the data was read using sf_read_float, the data is normalized to [-1,1], so
+			    // there is no division by (/maxpossible) as is done in audio_util.c
+			    if(led_levels_l[current_level_block] < (gfloat)vl)
+				led_levels_l[current_level_block] = (gfloat)vl ;
+
+			    if(stereo) {
+				if(vr < 0) vr = -vr ;
+				if(led_levels_r[current_level_block] < (gfloat)vr)
+				    led_levels_r[current_level_block] = (gfloat)vr ;
+			    } else {
+				led_levels_r[current_level_block] = led_levels_l[current_level_block] ;
+			    }
+
+			    n_frames_in_led_levels++ ;
+			}
 		}
-		pL_global[buff_num] = (gfloat) maxl;
-		pR_global[buff_num] = (gfloat) maxr;
-		buff_num++;
 		
 		return noErr ;
 	}
 	return noErr;
 } 
 
-int process_audio(gfloat *pL, gfloat *pR)  //This function must be called repeatedly from the gint play_a_block until the section is played. 
-{	//The pointers pL and pR passed in above return the levels for the VU meters.
-	fprintf(stderr, "Process Audio for OS X is now broken, need to fix it for led_level_\n") ;
+int process_audio(gfloat *pL, gfloat *pR)
+{
 	if(audio_state == AUDIO_IS_IDLE) 
 	{
 		d_print("process_audio says AUDIO_IS_IDLE is going on.\n") ;
@@ -146,9 +166,6 @@ int process_audio(gfloat *pL, gfloat *pR)  //This function must be called repeat
 	}
    	else if(audio_state&(AUDIO_IS_BUFFERING|AUDIO_IS_RECORDING))
 	{
-		*pL = pL_global[buff_num_play];
-		*pR = pR_global[buff_num_play];
-		buff_num_play++;
 		return 0 ;
 	}
 	return 1 ;
@@ -169,6 +186,39 @@ int audio_device_open(char *output_device)
 		return -1 ;  // return of -1 means it didn't open
 	}
 	return 0; //All went well.  
+}
+
+/* coreaudio apparently has a "frame" clock running, that does not necessarily start at 0 when the audio device itself starts (via audio_device_open())
+   this function retrieves that frame number
+*/
+Float64 coreaudio_running_clock_time(void)
+{
+	AudioTimeStamp this_time;
+	OSStatus err;
+	UInt32 num_processes;
+	UInt32		count;
+	extern int audio_playback ;
+	
+	count = sizeof(UInt32);
+	if ((err = AudioDeviceGetProperty (audio_data.device, 0, false, kAudioDevicePropertyDeviceIsRunning,
+									   &count, &num_processes)) != noErr)
+	{	printf ("AudioDeviceGetProperty (AudioDeviceGetProperty) failed.  The device probably isn't running.\n") ;
+		return -1;
+	} 
+	else
+	{
+		
+		if((err = AudioDeviceGetCurrentTime(audio_data.device, &this_time)) != noErr)
+		{
+			printf("Could not get the current time.  The error number is: %i \n", err);
+			return -1 ;
+		}
+		else
+		{
+			// it appears that mSampleTime really is the sample frame number, it is not a time.   Just a poorly named variable in coreaudio
+			return this_time.mSampleTime ;
+		}
+	}
 }
 
 
@@ -214,7 +264,7 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate) //An
 									   sizeof (AudioStreamBasicDescription), &(audio_data.format))) != noErr)
 	{	printf ("AudioDeviceSetProperty (kAudioDevicePropertyStreamFormat) failed.\n") ;
 		return -1;
-	} ;
+	}
 	
 	/*  we want linear pcm */
 	if (audio_data.format.mFormatID != kAudioFormatLinearPCM)
@@ -227,12 +277,6 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate) //An
 	buff_num = 0;
 	buff_num_play = 0;
 	num_buffers = (playback_end_frame - playback_start_frame)/BUFFERSIZE; 
-	if (!p_global_mem_alloced)
-	{
-		p_global_mem_alloced = TRUE;
-		pL_global = (gfloat*) malloc(num_buffers*sizeof(gfloat)); // When do I need to free this?
-		pR_global = (gfloat*) malloc(num_buffers*sizeof(gfloat));
-	}
 	UInt32 bufferSize = BUFFERSIZE;
 	if((err = AudioDeviceSetProperty( audio_data.device,
 									  NULL, 0,
@@ -253,42 +297,29 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate) //An
 	
 	err = AudioDeviceStart (audio_data.device, macosx_audio_out_callback) ;
 	if	(err != noErr) return -1;
-	playback_just_started = TRUE;
+
 	audio_data.done_playing = SF_FALSE ;
 	audio_data.done_reading = FALSE;
+	
+	// ideally a few microseconds of latency would be added to this, let's
+	// see how it works -- JJW 01/28/2021
+	start_sample_time = coreaudio_running_clock_time() ;
+
 	return 0; //All went well.  
 }
 
 int audio_device_read(unsigned char *buffer, int buffersize){return 0;} // Leave this stub function because we don't want to read data.
 int audio_device_write(unsigned char *buffer, int buffersize){return 0;} // Not quite what the title says in OS X.
-long audio_device_processed_bytes(void)
+
+long audio_device_processed_frames(void)
 {
-	AudioTimeStamp this_time;
-	OSStatus err;
-	UInt32 num_processes;
-	UInt32		count;
-	extern int audio_playback ;
-	
-	count = sizeof(UInt32);
-	if ((err = AudioDeviceGetProperty (audio_data.device, 0, false, kAudioDevicePropertyDeviceIsRunning,
-									   &count, &num_processes)) != noErr)
-	{	printf ("AudioDeviceGetProperty (AudioDeviceGetProperty) failed.  The device probably isn't running.\n") ;
-		return -1;
-	} 
-	else
-	{
-		
-		if((err = AudioDeviceGetCurrentTime(audio_data.device, &this_time)) != noErr)
-		{
-			printf("Could not get the current time.  The error number is: %i \n", err);
-		}
-		else
-		{
-			playback_read_frame_position = (long) (this_time.mSampleTime - start_sample_time);//*FRAMESIZE;
-																				   //led_bar_light_percent(dial[0], l);  
-																				   //led_bar_light_percent(dial[1], r);
-		}
-	}
+	Float64 running_frame_number = coreaudio_running_clock_time() ;
+
+	if(running_frame_number < 0.)
+	    return (long)running_frame_number ;
+
+	playback_read_frame_position = (long)(running_frame_number - start_sample_time);
+
 	if (playback_read_frame_position >= playback_end_frame)  //We are done playing.
 	{	
 		/* Tell the main application to terminate. */
@@ -296,7 +327,13 @@ long audio_device_processed_bytes(void)
 		audio_playback = FALSE;
 	}
 	
-	return playback_read_frame_position*FRAMESIZE
+	printf("DEBUG:============ OSX says current Frame # is %ld\n", playback_read_frame_position) ;
+	return playback_read_frame_position ;
+}  // This is used to set the cursor.  We need to make this return a number controlled by a timer.
+
+long audio_device_processed_bytes(void)
+{
+    return audio_device_processed_frames()*FRAMESIZE ;
 		;
 }  // This is used to set the cursor.  We need to make this return a number controlled by a timer.
 
@@ -325,12 +362,7 @@ int audio_device_nonblocking_write_buffer_size(int maxbufsize,    //Normally ret
 void audio_device_close(int drain)  //Reminder: check to make sure this works when no device has been opened.
 {
 	OSStatus	err ;
-	if(p_global_mem_alloced)
-	{
-		free(pL_global);  
-		free(pR_global);
-		p_global_mem_alloced = FALSE;
-	}
+
 	if ((err = AudioDeviceStop (audio_data.device, macosx_audio_out_callback)) != noErr)
 	{	//printf ("AudioDeviceStop failed.\n") ;  //Need to comment out this line in deployment build.
 		return ;

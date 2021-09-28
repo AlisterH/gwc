@@ -313,14 +313,15 @@ int _audio_area_button_event(GtkWidget *c, GdkEventButton *event)
 	long select_last = audio_view.last_sample ;
 
 	int i ;
-	for(i = 0 ; i < num_song_markers ; i++) {
-	    if(song_markers[i] < 0) continue ;
 
-	    if(song_markers[i] > click_sample && song_markers[i] < select_last)
-		select_last = song_markers[i] ;
+	for(i = 0 ; i < n_markers ; i++) {
+	    if(markers[i] < 0) continue ;
 
-	    if(song_markers[i] < click_sample && song_markers[i] > select_first)
-		select_first = song_markers[i] ;
+	    if(markers[i] > click_sample && markers[i] < select_last)
+		select_last = markers[i] ;
+
+	    if(markers[i] < click_sample && markers[i] > select_first)
+		select_first = markers[i] ;
 	}
 
 
@@ -491,12 +492,10 @@ void draw_sonogram(struct view *v, struct sound_prefs *pPrefs, GtkWidget *da, do
     int y ;
     int spec_start, spec_stop;
     int channel;
-    double spectrum_scale;
     int index_20Hz;
 
 #define MAXSW 2000
 #define MAXSH 400
-    unsigned char level[2][MAXSW][MAXSH] ;
 
     push_status_text("Building sonogram") ;
     update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
@@ -529,7 +528,6 @@ void draw_sonogram(struct view *v, struct sound_prefs *pPrefs, GtkWidget *da, do
 
        /* Normalize energy based on number of bins relative to maximum
           length FFT */
-    spectrum_scale = spectral_amp * sqrt((double) FFT_SIZE / FFT_MAX) * 4.0;
 #ifdef HAVE_FFTW3
     pLeft = FFTW(plan_r2r_1d)(FFT_SIZE, left, out, FFTW_R2HC, FFTW_ESTIMATE);
     pRight = FFTW(plan_r2r_1d)(FFT_SIZE, right, out, FFTW_R2HC, FFTW_ESTIMATE);
@@ -574,8 +572,6 @@ ly2_tbl[0] = 99999999;
     ly_offset[1] = AtoS(-(1-m-1),FFT_SIZE/4.0,1,v->canvas_height) - ly1_tbl[1];
 
     for(x = 0 ; x < v->canvas_width ; x++) {
-	long mid_sample ;
-
         update_progress_bar((double) x / v->canvas_width,PROGRESS_UPDATE_INTERVAL,FALSE) ;
 
 	sample = pixel_to_sample(&audio_view, x) ;
@@ -587,7 +583,6 @@ ly2_tbl[0] = 99999999;
 	if(max_sample > audio_view.n_samples-1)
 	    max_sample = audio_view.n_samples-1 ;
 
-	mid_sample = (max_sample-min_sample+1)/2 ;
 	read_fft_real_wavefile_data(left,  right, min_sample, max_sample) ;
 
 	for(k = 0 ; k < FFT_SIZE ; k++) {
@@ -686,10 +681,12 @@ ly2_tbl[0] = 99999999;
 
 	    for(k = 1 ; k <= FFT_SIZE/2 ; k++) {
 		int y ;
+
 		color = psk_to_color(power_spectrum[k]*spectral_amp, 1.0, 255) ;
+
 		if(color < 0) color=0 ; 
-		level[channel][x][k-1] = color ;
 		if(color > 255) color=255 ;
+
 		{ 
 		    for(y = ly2_tbl[k] ; y < ly1_tbl[k] ; y++) {
 			gdk_image_put_pixel(image, x, y + ly_offset[channel], sonogram_color[color].pixel);
@@ -1204,7 +1201,6 @@ void redraw(struct view *v, struct sound_prefs *p, GtkWidget *da, int cursor_fla
 	    double last_right_rmse = -1.0 ;
 	    double left_rmse = -1 ;
 	    double right_rmse = -1 ;
-	    double samp_width = 1./samples_per_pixel ;
 
 	    for(x = 0 ; x < v->canvas_width ; x++) {
 		int s_at_x = (double)x / (double)(v->canvas_width-1) * n_view_samples + v->first_sample ;

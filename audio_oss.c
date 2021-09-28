@@ -33,6 +33,7 @@
 #include "audio_device.h"
 
 static int audio_fd = -1 ;
+static int OSS_FRAMESIZE = 4 ;
 
 
 int audio_device_open(char *output_device)
@@ -46,6 +47,7 @@ int audio_device_open(char *output_device)
 int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate)
 {
     int oss_format;
+    int sample_size ;
 
     switch (*format)
     {
@@ -62,12 +64,14 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate)
 
     switch (oss_format)
     {
-    case AFMT_U8:     *format = GWC_U8; break;
-    case AFMT_S8:     *format = GWC_S8; break;
-    case AFMT_S16_BE: *format = GWC_S16_BE; break;
-    case AFMT_S16_LE: *format = GWC_S16_LE; break;
-    default:          *format = GWC_UNKNOWN; break;
+    case AFMT_U8:     *format = GWC_U8; sample_size = 1 ; break;
+    case AFMT_S8:     *format = GWC_S8; sample_size = 1 ; break;
+    case AFMT_S16_BE: *format = GWC_S16_BE; sample_size = 2 ; break;
+    case AFMT_S16_LE: *format = GWC_S16_LE; sample_size = 2 ; break;
+    default:          *format = GWC_UNKNOWN; sample_size = 2 ; break;
     }
+
+    OSS_FRAMESIZE=sample_size*(*channels) ;
 
     
     if (ioctl(audio_fd, SNDCTL_DSP_CHANNELS, channels) == -1) {
@@ -117,6 +121,12 @@ long audio_device_processed_bytes(void)
     }
 
     return 0;
+}
+
+/* Number of frames processed since opening the device. */
+long audio_device_processed_frames(void)
+{
+    return audio_device_processed_bytes() / OSS_FRAMESIZE ;
 }
 
 int audio_device_best_buffer_size(int playback_bytes_per_block)

@@ -1205,8 +1205,6 @@ void gnome_flush(void)
 
 gint playback_timer_function(gpointer data)
 {
-    long cursor_samples_per_pixel;
-    long cursor_millisec;
     gfloat l, r;
     gfloat l10, r10; // max led level in past 10 blocks
     long last, first;
@@ -1256,7 +1254,6 @@ gint playback_timer_function(gpointer data)
 * in this example. More on callbacks below. */
 void start_gwc_playback(GtkWidget * widget, gpointer data)
 {				/* Play audio */
-    long millisec_per_block;
     int device_framesize ;
 
     audio_debug_print("entering start_gwc_playback with audio_playback=%d\n", audio_playback) ;

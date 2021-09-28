@@ -45,6 +45,7 @@ int audio_device_read(unsigned char *buffer, int buffersize);
 int audio_device_write(unsigned char *buffer, int buffersize);
 void audio_device_close(int);
 long audio_device_processed_bytes(void);
+long audio_device_processed_frames(void);
 int audio_device_best_buffer_size(int playback_bytes_per_block);
 int audio_device_nonblocking_write_buffer_size(int maxbufsize,
                                                int playback_bytes_remaining);

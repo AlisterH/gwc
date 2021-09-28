@@ -596,7 +596,7 @@ int encode(int mode, char *origfilename, char *newfilename, long start,
     outsfinfo = insfinfo;
 
     /* skip to position in sound file */
-    if (!sf_seek(in_fd, start, SEEK_SET) == start) {
+    if (!(sf_seek(in_fd, start, SEEK_SET) == start)) {
 	warning("Failed to seek to position in sound file\n");
 	sf_close(in_fd);
 	return (1);
@@ -624,6 +624,7 @@ gint encode_progress (gfloat pvalue) ;
 void destroy_progress_window(void) ;
 gint stop_encoding = FALSE ;
 
+#ifdef ENCODE_OLD_CODE
 int start_encode_old(int mode, char *newfilename, long start, long length, char *origfilename)
 {
     long samples_read;
@@ -775,6 +776,7 @@ int start_encode_old(int mode, char *newfilename, long start, long length, char 
     return (0);
 
 }
+#endif
 
 // Alister: if using this, need to uncomment the line noted above so the pipe name is inserted for the "simple encode..." function
 int start_encode(int mode, char *newfilename, long start, long length, char *origfilename)
@@ -782,7 +784,7 @@ int start_encode(int mode, char *newfilename, long start, long length, char *ori
     long samples_read;
     long ctr;
     long numframes = 0;
-    int f_des[2], child_pid;
+    int child_pid;
     int i=0 ;
     int use_sox = 0 ;
     char cmd[2048] ;
@@ -808,7 +810,7 @@ int start_encode(int mode, char *newfilename, long start, long length, char *ori
     printf("\n") ;
 
     if(use_sox) {
-	sprintf(cmd, "sox %s -t raw - trim %ld\s %ld\s |", origfilename, start, length) ;
+	sprintf(cmd, "sox %s -t raw - trim %lds %lds |", origfilename, start, length) ;
 
 	for(i = 0 ; options[i] != (char *)NULL ; i++) {
 	    int j ;
@@ -832,7 +834,11 @@ int start_encode(int mode, char *newfilename, long start, long length, char *ori
 	}
 
 	printf("CMD:\n'%s\'\n", cmd) ;
-	system(cmd) ;
+
+	if(system(cmd) == -1) {
+	    printf("Could not execute system call for encoding!\n") ;
+	}
+
 	return 0 ;
     }
 
@@ -842,7 +848,7 @@ int start_encode(int mode, char *newfilename, long start, long length, char *ori
     /* Create a  pipe to send data through - must do first */
     /* now using a named pipe */
     if(mkfifo(pipe_name, S_IRWXU)) {
-	static char buf[254] ;
+	static char buf[256] ;
 	snprintf(buf,255,"Failed to open named pipe to transfer data to %s, cannot proceed", exec_loc) ;
 	warning(buf) ;
 	return 1 ;
@@ -860,7 +866,6 @@ int start_encode(int mode, char *newfilename, long start, long length, char *ori
 
     } else {
 	double *framebuf = NULL ;
-	FILE *fp ;
 	/* Parent */
 	fprintf(stderr, "encoding child pid is %d\n", child_pid) ;
 

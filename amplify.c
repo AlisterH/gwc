@@ -23,9 +23,6 @@
 
 #define BUFSIZE 10000
 
-static gfloat amount_first[2] = {1.0,1.0} ;
-static gfloat amount_last[2] = {1.0,1.0} ;
-
 static gfloat amount_first_l[2] = {1.0,0.0} ;
 static gfloat amount_last_l[2] = {1.0,0.0} ;
 static gfloat amount_first_r[2] = {0.0,1.0} ;
@@ -171,7 +168,6 @@ int amplify_dialog(struct sound_prefs current, struct view *v)
     GtkWidget *amount_first_entry_r[2] ;
     GtkWidget *amount_last_entry_r[2] ;
     GtkWidget *feather_width_entry ;
-    int dclose = 0 ;
     int row = 0 ;
     int dres ;
     char buf[200] ;
@@ -259,7 +255,6 @@ int amplify_dialog(struct sound_prefs current, struct view *v)
 	    amount_last_r[i] = atof(gtk_entry_get_text((GtkEntry *)amount_last_entry_r[i])) ;
 	}
 	feather_width = atoi(gtk_entry_get_text((GtkEntry *)feather_width_entry)) ;
-	dclose = 1 ;
     }
 
 /*      {  */
