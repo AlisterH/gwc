@@ -59,6 +59,9 @@ void print_spectral(char *str, fftw_real tmp_l[], long FFT_SIZE)
     }
 }
 
+//alister: in spite of the name I believe this is the oldest implementation
+//             I suspect it is also buggy because it edits audio past the ends of the selection
+//             it can edit right to the end of the file, but this can be odd - try doing it repeatedly!
 int dethunk_new(struct sound_prefs *pPrefs,
             long first_sample, long last_sample, int channel_mask) 
 {
@@ -328,6 +331,9 @@ int dethunk_new(struct sound_prefs *pPrefs,
     return 0 ;
 }
 
+//alister: in spite of the name this is the previous implementation
+//             I suspect it is also buggy because it edits audio past the ends of the selection
+//             it can edit right to the end of the file, but this can be odd - try doing it repeatedly!
 int dethunk_current(struct sound_prefs *pPrefs,
             long first_sample, long last_sample, int channel_mask)
 {
@@ -625,27 +631,38 @@ void estimate_region(fftw_real data[], int firstbad, int lastbad, int siglen)
     free(data_r) ;
 }
 
-
+//alister: note this implementation will not currently edit right to the end of the file
+//             so, leave some space a the beginning and end of your recordings if you are clipping them before bringing them into GWC!
 int dethunk(struct sound_prefs *pPrefs,
             long first_sample, long last_sample, int channel_mask)
 {
     long n_samples = last_sample - first_sample + 1 ;
     int cancel ;
     fftw_real *left, *right ;
-    int FFT_SIZE = MIN(ORDER*2,(last_sample-first_sample+1)*4) ;
-    int siglen = last_sample-first_sample+1+2*FFT_SIZE ;
+    int FFT_SIZE = MIN(ORDER*2,n_samples*4) ;
+    int siglen = n_samples+2*FFT_SIZE ;
     extern struct view audio_view ;
 
     left = calloc(siglen, sizeof(fftw_real)) ;
     right = calloc(siglen, sizeof(fftw_real)) ;
 
+    g_print("first_sample:%ld\n", first_sample) ;
+    g_print("last_sample:%ld\n", last_sample) ;
+	if(first_sample-FFT_SIZE < 0) {
+    info("Selection is too close to the beginning of the file");
+    return 0 ;
+    }
+	if(last_sample > pPrefs->n_samples-1-FFT_SIZE) { 
+	info("Selection is too close to the end of the file");
+	return 0 ;
+	}
+   
     push_status_text("Saving undo information") ;
     start_save_undo("Undo dethunk", &audio_view) ;
     cancel = save_undo_data( first_sample, last_sample, pPrefs, TRUE) ;
     close_undo() ;
     pop_status_text() ;
 	if (cancel != 1) {
-    n_samples = last_sample - first_sample + 1 ;
 
     push_status_text("Dethunking audio") ;
     update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
@@ -656,11 +673,11 @@ int dethunk(struct sound_prefs *pPrefs,
     read_fft_real_wavefile_data(left,  right, first_sample-FFT_SIZE, last_sample+FFT_SIZE) ;
 
     if(channel_mask & 0x01) {
-	estimate_region(left, FFT_SIZE, FFT_SIZE+n_samples-1, last_sample-first_sample+1+2*FFT_SIZE) ;
+	estimate_region(left, FFT_SIZE, FFT_SIZE+n_samples-1, n_samples+2*FFT_SIZE) ;
     }
 
     if(channel_mask & 0x02) {
-	estimate_region(right, FFT_SIZE, FFT_SIZE+n_samples-1, last_sample-first_sample+1+2*FFT_SIZE) ;
+	estimate_region(right, FFT_SIZE, FFT_SIZE+n_samples-1, n_samples+2*FFT_SIZE) ;
     }
 
     write_fft_real_wavefile_data(left,  right, first_sample-FFT_SIZE, last_sample+FFT_SIZE) ;
