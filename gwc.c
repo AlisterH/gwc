@@ -980,8 +980,8 @@ void remove_noise(GtkWidget * widget, gpointer data)
 					denoise_data.denoise_end);
 		    save_sample_block_data(&prefs);
 		    pop_status_text();
+		    set_status_text("Denoise done.");
 		}
-		set_status_text("Denoise done.");
 
 		main_redraw(FALSE, TRUE);
 	    }
