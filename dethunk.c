@@ -110,7 +110,7 @@ int dethunk_new(struct sound_prefs *pPrefs,
     cancel = save_undo_data( first_sample, last_sample, pPrefs, TRUE) ;
     close_undo() ;
     pop_status_text() ;
-
+	if (cancel != 1) {
     n_samples = last_sample - first_sample + 1 ;
 
     push_status_text("Dethunking audio") ;
@@ -322,7 +322,8 @@ int dethunk_new(struct sound_prefs *pPrefs,
 
     audio_normalize(1) ;
 
-    main_redraw(FALSE, TRUE) ;
+	set_status_text("Estimate done.");
+    }
 
     return 0 ;
 }
@@ -373,6 +374,7 @@ int dethunk_current(struct sound_prefs *pPrefs,
     close_undo() ;
     pop_status_text() ;
 
+	if (cancel != 1) {
     n_samples = last_sample - first_sample + 1 ;
 
     push_status_text("Dethunking audio") ;
@@ -525,8 +527,8 @@ int dethunk_current(struct sound_prefs *pPrefs,
     update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
 
     pop_status_text() ;
-
-    main_redraw(FALSE, TRUE) ;
+	set_status_text("Estimate done.");
+    }
 
     return 0 ;
 }
@@ -642,7 +644,7 @@ int dethunk(struct sound_prefs *pPrefs,
     cancel = save_undo_data( first_sample, last_sample, pPrefs, TRUE) ;
     close_undo() ;
     pop_status_text() ;
-
+	if (cancel != 1) {
     n_samples = last_sample - first_sample + 1 ;
 
     push_status_text("Dethunking audio") ;
@@ -669,8 +671,9 @@ int dethunk(struct sound_prefs *pPrefs,
     pop_status_text() ;
     free(left) ;
     free(right) ;
-
-    main_redraw(FALSE, TRUE) ;
+    
+	set_status_text("Estimate done.");
+    }
 
     return 0 ;
 }
