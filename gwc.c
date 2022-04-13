@@ -817,7 +817,6 @@ void estimate(GtkWidget * widget, gpointer data)
 	get_region_of_interest(&first, &last, &audio_view);
 	dethunk(&prefs, first, last, audio_view.channel_selection_mask);
 	main_redraw(FALSE, TRUE);
-	set_status_text("Estimate done.");
 	file_processing = FALSE;
     }
 }
