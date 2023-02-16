@@ -42,27 +42,46 @@
 #include "audio_edit.h"
 #include <sndfile.h>
 
+#include "icons/amplify_dark.xpm"
 #include "icons/amplify.xpm"
-#include "icons/pinknoise.xpm"
-#include "icons/declick.xpm"
-#include "icons/gtk-wave-cleaner.xpm"
-#include "icons/declick_w.xpm"
+#include "icons/declick_dark.xpm"
+#include "icons/declick_m_dark.xpm"
 #include "icons/declick_m.xpm"
+#include "icons/declick_w_dark.xpm"
+#include "icons/declick_w.xpm"
+#include "icons/declick.xpm"
+#include "icons/decrackle_dark.xpm"
 #include "icons/decrackle.xpm"
+#include "icons/estimate_dark.xpm"
 #include "icons/estimate.xpm"
+#include "icons/filter_dark.xpm"
 #include "icons/filter.xpm"
+#include "icons/gtk-wave-cleaner.xpm"
+#include "icons/noise_sample_dark.xpm"
 #include "icons/noise_sample.xpm"
+#include "icons/pinknoise_dark.xpm"
+#include "icons/pinknoise.xpm"
+#include "icons/remove_noise_dark.xpm"
 #include "icons/remove_noise.xpm"
-#include "icons/start.xpm"
-#include "icons/stop.xpm"
-#include "icons/zoom_sel.xpm"
-#include "icons/zoom_in.xpm"
-#include "icons/zoom_out.xpm"
-#include "icons/view_all.xpm"
+#include "icons/select_all_dark.xpm"
 #include "icons/select_all.xpm"
-#include "icons/spectral.xpm"
-#ifndef TRUNCATE_OLD
+#include "icons/silence_dark.xpm"
 #include "icons/silence.xpm"
+#include "icons/spectral_dark.xpm"
+#include "icons/spectral.xpm"
+#include "icons/start_dark.xpm"
+#include "icons/start.xpm"
+#include "icons/stop_dark.xpm"
+#include "icons/stop.xpm"
+#include "icons/view_all_dark.xpm"
+#include "icons/view_all.xpm"
+#include "icons/zoom_in_dark.xpm"
+#include "icons/zoom_in.xpm"
+#include "icons/zoom_out_dark.xpm"
+#include "icons/zoom_out.xpm"
+#include "icons/zoom_sel_dark.xpm"
+#include "icons/zoom_sel.xpm"
+#ifndef TRUNCATE_OLD
 #endif
 
 #ifdef MAC_OS_X
@@ -2496,33 +2515,34 @@ void save_as_selection(GtkWidget * widget, gpointer data)
 static struct {
 	gchar *stockid;
 	const char **icon_xpm;
+	const char **icon_dark_xpm;
 } stock_icons[] = {
-	{"filter_icon", filter_xpm },
-	{"pinknoise_icon", pinknoise_xpm },
-	{"amplify_icon", amplify_xpm },
-	{"declick_icon", declick_xpm },
-	{"gwc_icon", gtk_wave_cleaner_xpm },
-	{"declick_w_icon", declick_w_xpm },
-	{"declick_m_icon", declick_m_xpm },
-	{"decrackle_icon", decrackle_xpm },
-	{"estimate_icon", estimate_xpm },
-	{"noise_sample_icon", noise_sample_xpm },
-	{"remove_noise_icon", remove_noise_xpm },
-	{"silence_icon", silence_xpm },
-	{"zoom_sel_icon", zoom_sel_xpm },
-	{"zoom_in_icon", zoom_in_xpm },
-	{"zoom_out_icon", zoom_out_xpm },
-	{"view_all_icon", view_all_xpm },
-	{"select_all_icon", select_all_xpm },
-	{"spectral_icon", spectral_xpm },
-	{"start_icon", start_xpm },
-	{"stop_icon", stop_xpm }
+	{"amplify_icon", amplify_xpm, amplify_dark_xpm },
+	{"declick_icon", declick_xpm, declick_dark_xpm },
+	{"declick_m_icon", declick_m_xpm, declick_m_dark_xpm },
+	{"declick_w_icon", declick_w_xpm, declick_w_dark_xpm },
+	{"decrackle_icon", decrackle_xpm, decrackle_dark_xpm },
+	{"estimate_icon", estimate_xpm, estimate_dark_xpm },
+	{"filter_icon", filter_xpm, filter_dark_xpm },
+	{"gwc_icon", gtk_wave_cleaner_xpm, gtk_wave_cleaner_xpm },
+	{"noise_sample_icon", noise_sample_xpm, noise_sample_dark_xpm },
+	{"pinknoise_icon", pinknoise_xpm, pinknoise_dark_xpm },
+	{"remove_noise_icon", remove_noise_xpm, remove_noise_dark_xpm },
+	{"select_all_icon", select_all_xpm, select_all_dark_xpm },
+	{"silence_icon", silence_xpm, silence_dark_xpm },
+	{"spectral_icon", spectral_xpm, spectral_dark_xpm },
+	{"start_icon", start_xpm, start_dark_xpm },
+	{"stop_icon", stop_xpm, stop_dark_xpm },
+	{"view_all_icon", view_all_xpm, view_all_dark_xpm },
+	{"zoom_in_icon", zoom_in_xpm, zoom_in_dark_xpm },
+	{"zoom_out_icon", zoom_out_xpm, zoom_out_dark_xpm },
+	{"zoom_sel_icon", zoom_sel_xpm, zoom_sel_dark_xpm }
 };
 
 static gint n_stock_icons = G_N_ELEMENTS (stock_icons);
 
 static void
-register_stock_icons (void)
+register_stock_icons (int textAvg, int bgAvg)
 {
 	GtkIconFactory *icon_factory;
 	GtkIconSet *icon_set;
@@ -2533,7 +2553,14 @@ register_stock_icons (void)
 
 	for (i = 0; i < n_stock_icons; i++)
 	{
-		pixbuf = gdk_pixbuf_new_from_xpm_data(stock_icons[i].icon_xpm);
+		if (textAvg > bgAvg) {
+			pixbuf = gdk_pixbuf_new_from_xpm_data(stock_icons[i].icon_dark_xpm);
+		}
+		else {
+			pixbuf = gdk_pixbuf_new_from_xpm_data(stock_icons[i].icon_xpm);
+		}
+		
+		/*pixbuf = gdk_pixbuf_new_from_xpm_data(stock_icons[i].icon_xpm);*/
 		icon_set = gtk_icon_set_new_from_pixbuf (pixbuf);
 		g_object_unref(pixbuf);
 		gtk_icon_factory_add (icon_factory, stock_icons[i].stockid, icon_set);
@@ -3319,8 +3346,6 @@ int main(int argc, char *argv[])
     gtk_init(&argc, &argv);
     g_set_application_name("Gtk Wave Cleaner");
 	
-    register_stock_icons ();
-
     main_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     if (gtk_icon_theme_has_icon(gtk_icon_theme_get_default(), APPNAME) == FALSE)
 	{
@@ -3351,7 +3376,23 @@ int main(int argc, char *argv[])
 
 
 	g_signal_connect(main_window, "drag-data-received", G_CALLBACK(drag_data_received), NULL);
+	
+	/* Detecting a dark theme
+	 * Credit to Lars Windolf https://lzone.de/blog/Detecting-a-Dark-Theme-in-GTK */
+	gint textAvg, bgAvg;
+	gtk_widget_realize(main_window);
+	GtkStyle *style = gtk_widget_get_style (main_window);
 
+	textAvg = style->text[GTK_STATE_NORMAL].red / 256 +
+			style->text[GTK_STATE_NORMAL].green / 256 +
+			style->text[GTK_STATE_NORMAL].blue / 256;
+		
+	bgAvg = style->bg[GTK_STATE_NORMAL].red / 256 +
+			style->bg[GTK_STATE_NORMAL].green / 256 +
+			style->bg[GTK_STATE_NORMAL].blue / 256;
+
+	register_stock_icons(textAvg,bgAvg);
+	
 	GtkTargetEntry targets[] = {
 		{"text/uri-list", GTK_TARGET_OTHER_APP, 0},
 	};
