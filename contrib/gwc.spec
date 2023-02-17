@@ -2,7 +2,7 @@
 # SPEC file for Gnome Wave Cleaner
 #
 %define gwc_version 0.22
-%define gwc_subversion 05
+%define gwc_subversion 06
 
 Name: gtk-wave-cleaner
 Summary: Gtk Wave Cleaner -- audio restoration application
