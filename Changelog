@@ -3,7 +3,7 @@ GWC Changelog
 KNOWN ISSUE: GWC fails to open wav files with metadata; refer to the README for details.
 
 0.22-06
-Feb 17, 2022
+Feb 17, 2023
 BUGFIX: minor bugs and a crash
 NEW: icon variants used with dark GTK themes
 
