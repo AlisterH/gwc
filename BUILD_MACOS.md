@@ -42,30 +42,40 @@ brew install vorbis-tools lame
 
 ## Step 2: Audio Backend Configuration
 
-The original CoreAudio backend is broken. We use PulseAudio instead:
+GTK Wave Cleaner supports two audio backends on macOS:
+
+### Option 1: PulseAudio Backend (Recommended)
+The PulseAudio backend provides better cross-platform consistency:
 
 ```bash
 # Start PulseAudio daemon (required for audio playback)
 brew services start pulseaudio
 ```
 
-## Step 3: Build Process
+### Option 2: CoreAudio Backend (Native)
+The native CoreAudio backend requires no additional services but has some limitations noted by the original developers.
 
-### Current Status: ✅ Major compilation fixes completed
+For detailed comparison, see [MACOS_AUDIO_BACKENDS.md](MACOS_AUDIO_BACKENDS.md).
 
+## Step 3: Build Configuration
+
+Configure the build system with your preferred audio backend:
+
+### For PulseAudio Backend (Recommended)
 ```bash
-# Generate build files (modernized autotools)
-autoconf
-
-# Configure with PulseAudio and macOS-specific settings
 ./configure --enable-pa
-
-# Build
-make
-
-# Install (optional)
-make install
 ```
+
+### For CoreAudio Backend (Native)
+```bash
+./configure
+```
+
+The configure script will:
+- Detect and configure FFTW3 headers via pkg-config
+- Detect and configure PulseAudio headers (if using --enable-pa)
+- Set up proper compiler flags for macOS
+- Configure the Meschach mathematics library
 
 ## Progress Summary
 
