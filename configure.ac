@@ -159,9 +159,7 @@ fi
 
 
 dnl Checks for header files.
-AC_HEADER_STDC
-AC_CHECK_HEADERS(fcntl.h limits.h malloc.h sys/ioctl.h sys/time.h unistd.h sndfile.h)
-AC_HEADER_TIME
+AC_CHECK_HEADERS([fcntl.h limits.h malloc.h sys/ioctl.h sys/time.h unistd.h sndfile.h])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -171,8 +169,6 @@ dnl refer to comments in gwc.c where these versions are required:
 PKG_CHECK_MODULES(GTK, [ gtk+-2.0 >= 2.16 glib-2.0 >= 2.30 ])
 
 dnl Checks for library functions.
-AC_PROG_GCC_TRADITIONAL
-AC_TYPE_SIGNAL
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(gettimeofday)
 
@@ -205,4 +201,5 @@ Use --enable-pa to build with the pulseaudio backend instead.
   fi
 fi
 
-AC_OUTPUT(Makefile)
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT
