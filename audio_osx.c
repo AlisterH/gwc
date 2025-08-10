@@ -27,7 +27,7 @@
 
 #include <sndfile.h>
 
-#include </System/Library/Frameworks/Carbon.framework/Versions/A/Headers/Carbon.h>
+#include <Carbon/Carbon.h>
 #include <CoreAudio/AudioHardware.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
