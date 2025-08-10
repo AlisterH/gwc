@@ -1,6 +1,24 @@
 /*****************************************************************************
 *   Gnome Wave Cleaner Version 0.20.
-*   Copyright (C) 2003 Jeffrey J. Welty
+	if(audio_data->sndfile && buff_num < num_buffers)
+	{
+		// Get current file position for debugging
+		sf_count_t current_pos = sf_seek(audio_data->sndfile, 0, SEEK_CUR);
+		
+		// Force seek to beginning for first few callbacks to test
+		if (callback_count <= 3) {
+			sf_seek(audio_data->sndfile, 0, SEEK_SET);
+			current_pos = sf_seek(audio_data->sndfile, 0, SEEK_CUR);
+			printf("DEBUG: Force reset file position to %lld for callback #%d\n", 
+			       (long long)current_pos, callback_count);
+		}
+		
+		read_count = sf_read_float (audio_data->sndfile, p_float, sample_count) ;
+		if (callback_count <= 5) {
+			printf("DEBUG: sf_read_float returned %d samples (requested %d), file_pos=%lld\n", 
+			       read_count, sample_count, (long long)current_pos);
+			printf("DEBUG: Callback #%d - Writing %d samples to output buffer\n", callback_count, read_count);
+		}yright (C) 2003 Jeffrey J. Welty
 *   
 *   This program is free software; you can redistribute it and/or
 *   modify it under the terms of the GNU General Public License
@@ -76,6 +94,7 @@ bool p_global_mem_alloced = FALSE; //Tells if we have reserved memory for the tw
 Float64 start_sample_time;
 struct timeval playback_start_time;
 bool playback_just_started = FALSE;
+static bool coreaudio_device_started = FALSE;  // Track if device has been started
 
 
 static OSStatus
@@ -84,6 +103,12 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
 						   AudioBufferList*	data_out, const AudioTimeStamp* time_out,
 						   void* client_data)
 {	
+	static int callback_count = 0;
+	callback_count++;
+	if (callback_count <= 20) {  // Increase the limit to see more callbacks
+		printf("DEBUG: Audio callback called #%d\n", callback_count);
+	}
+	
 	MacOSXAudioData	*audio_data ;
 	int	size, sample_count, read_count, i ;
 	
@@ -94,9 +119,35 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
 	{
 		playback_just_started = FALSE;
 		start_sample_time = time_out->mSampleTime;
+		printf("DEBUG: Playback started, sample time: %f\n", start_sample_time);
 	}
 	
 	audio_data = (MacOSXAudioData*) client_data ;
+	
+	if (callback_count <= 5) {
+		printf("DEBUG: Callback - audio_data=%p, sndfile=%p\n", audio_data, audio_data ? audio_data->sndfile : NULL);
+		
+		// Get file position and info for debugging
+		if (audio_data && audio_data->sndfile) {
+			sf_count_t pos = sf_seek(audio_data->sndfile, 0, SEEK_CUR);
+			printf("DEBUG: Current file position: %ld\n", pos);
+			
+			// Check if file is valid
+			if (sf_error(audio_data->sndfile) != SF_ERR_NO_ERROR) {
+				printf("DEBUG: libsndfile error: %s\n", sf_strerror(audio_data->sndfile));
+			}
+			
+			// Get file info
+			SF_INFO info;
+			memset(&info, 0, sizeof(info));
+			if (sf_command(audio_data->sndfile, SFC_GET_CURRENT_SF_INFO, &info, sizeof(info)) == SF_TRUE) {
+				printf("DEBUG: File info - frames: %ld, channels: %d, samplerate: %d\n", 
+				       info.frames, info.channels, info.samplerate);
+			} else {
+				printf("DEBUG: Could not get file info\n");
+			}
+		}
+	}
 	
 	size = data_out->mBuffers[0].mDataByteSize ;  
 	sample_count = size / sizeof (float) ;  // The number of bytes to send.
@@ -105,10 +156,17 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
 	if((!(audio_data->done_reading))&&(buff_num < num_buffers))
 	{
 		read_count = sf_read_float (audio_data->sndfile, p_float, sample_count) ;
+		if (callback_count <= 5) {
+			printf("DEBUG: sf_read_float returned %d samples (requested %d)\n", read_count, sample_count);
+			printf("DEBUG: Callback #%d - Writing %d samples to output buffer\n", callback_count, read_count);
+		}
 		if(read_count < sample_count)
 		{
 			memset (&(p_float [read_count]), 0, (sample_count - read_count) * sizeof (float)) ; //set the rest of the buffer to 0.
 			audio_data->done_reading = SF_TRUE;
+			if (callback_count <= 5) {
+				printf("DEBUG: Reached end of audio data\n");
+			}
 		}
 		for(i = 0; i < read_count; i++) //Find the level for the VU meters
 		{  
@@ -132,12 +190,28 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
 		buff_num++;
 		
 		return noErr ;
+	} else {
+		if (callback_count <= 5) {
+			printf("DEBUG: Audio callback - no data to play (done_reading=%d, buff_num=%d, num_buffers=%d)\n",
+			       audio_data->done_reading, buff_num, num_buffers);
+		}
+		// Fill buffer with silence
+		memset(p_float, 0, size);
 	}
 	return noErr;
 } 
 
 int process_audio(gfloat *pL, gfloat *pR)  //This function must be called repeatedly from the gint play_a_block until the section is played. 
 {	//The pointers pL and pR passed in above return the levels for the VU meters.
+	static int process_audio_call_count = 0;
+	process_audio_call_count++;
+	
+	// Debug: show audio state for first few calls
+	if (process_audio_call_count <= 5) {
+		printf("DEBUG: process_audio() call #%d - audio_state=%d (IDLE=0, PLAYBACK=4)\n", 
+		       process_audio_call_count, audio_state);
+	}
+	
 	if(audio_state == AUDIO_IS_IDLE) 
 	{
 		d_print("process_audio says AUDIO_IS_IDLE is going on.\n") ;
@@ -145,6 +219,40 @@ int process_audio(gfloat *pL, gfloat *pR)  //This function must be called repeat
     }
    	else if(audio_state == AUDIO_IS_PLAYBACK) 
 	{
+		// Start CoreAudio device on first process_audio call if not already started
+		if (!coreaudio_device_started) {
+			OSStatus err;
+			printf("DEBUG: Starting CoreAudio device from process_audio()...\n");
+			err = AudioDeviceStart(audio_data.device, macosx_audio_out_callback);
+			if (err != noErr) {
+				printf("ERROR: AudioDeviceStart failed with error: %d (0x%x)\n", (int)err, (unsigned int)err);
+				return 1;
+			}
+			printf("DEBUG: CoreAudio device started successfully from process_audio()\n");
+			
+			// Verify the device is actually running
+			UInt32 isRunning = 0;
+			UInt32 size = sizeof(UInt32);
+			err = AudioDeviceGetProperty(audio_data.device, 0, false, kAudioDevicePropertyDeviceIsRunning, &size, &isRunning);
+			if (err == noErr) {
+				printf("DEBUG: Device running verification: %s\n", isRunning ? "YES" : "NO");
+			} else {
+				printf("DEBUG: Could not verify device running status, error: %d\n", (int)err);
+			}
+			
+			coreaudio_device_started = TRUE;
+			
+			// Give the device a moment to fully initialize
+			usleep(10000); // 10ms delay
+		}
+		
+		if (process_audio_call_count <= 5) {
+			printf("DEBUG: process_audio() call #%d - buff_num_play=%d\n", process_audio_call_count, buff_num_play);
+		}
+		
+		printf("DEBUG: In PLAYBACK mode, returning VU levels: pL=%f, pR=%f\n", 
+		       pL_global[buff_num_play], pR_global[buff_num_play]);
+		
 		*pL = pL_global[buff_num_play];
 		*pR = pR_global[buff_num_play];
 		buff_num_play++;
@@ -158,15 +266,17 @@ int audio_device_open(char *output_device)
 	OSStatus	err ;
 	UInt32		count ;
 	
+	printf("DEBUG: Opening CoreAudio device...\n");
 	audio_data.device = kAudioDeviceUnknown ;
 	
 	/*  get the default output device for the HAL */
 	count = sizeof (AudioDeviceID) ;
 	if ((err = AudioHardwareGetProperty (kAudioHardwarePropertyDefaultOutputDevice,
 										 &count, (void *) &(audio_data.device))) != noErr)
-	{	printf ("AudioHardwareGetProperty failed.\n") ;
+	{	printf ("AudioHardwareGetProperty failed with error: %d\n", (int)err) ;
 		return -1 ;  // return of -1 means it didn't open
 	}
+	printf("DEBUG: CoreAudio device ID: %u\n", (unsigned int)audio_data.device);
 	return 0; //All went well.  
 }
 
@@ -180,20 +290,25 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate) //An
 	OSStatus	err ;
 	UInt32		count;
 	
+	printf("DEBUG: Setting audio parameters...\n");
 	audio_data.sfinfo = sfinfo;
 	audio_data.sndfile = sndfile;
 	
+	printf("DEBUG: sfinfo channels: %d, samplerate: %d\n", sfinfo.channels, sfinfo.samplerate);
 	
 	/*  get a description of the data format used by the default device */
 	count = sizeof (AudioStreamBasicDescription) ;
 	if ((err = AudioDeviceGetProperty (audio_data.device, 0, false, kAudioDevicePropertyStreamFormat,
 									   &count, &(audio_data.format))) != noErr)
-	{	printf ("AudioDeviceGetProperty (kAudioDevicePropertyStreamFormat) failed.\n") ;
+	{	printf ("AudioDeviceGetProperty (kAudioDevicePropertyStreamFormat) failed with error: %d\n", (int)err) ;
 		return -1 ;
 	} 
 	
 	rate = (int *) &(audio_data.format.mSampleRate);
 	channels = (int *) &(audio_data.format.mChannelsPerFrame);
+	
+	printf("DEBUG: Device format - Sample rate: %f, Channels: %d\n", 
+	       audio_data.format.mSampleRate, (int)audio_data.format.mChannelsPerFrame);
 	
 	//Don't mess with the format.  OS X uses floats which don't match GWC_S16_LE which is what is called for.
 	
@@ -226,6 +341,15 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate) //An
 	buff_num = 0;
 	buff_num_play = 0;
 	num_buffers = (playback_end_position - playback_start_position)/BUFFERSIZE; 
+	
+	printf("DEBUG: Audio setup - start_pos=%ld, end_pos=%ld, buffersize=%d, num_buffers=%ld\n",
+	       playback_start_position, playback_end_position, BUFFERSIZE, num_buffers);
+	       
+	// CRITICAL FIX: Position file to playback start position
+	printf("DEBUG: Seeking file to playback start position: %ld\n", playback_start_position);
+	sf_count_t seek_result = sf_seek(audio_data.sndfile, playback_start_position, SEEK_SET);
+	printf("DEBUG: File seek result: %ld (should equal %ld)\n", seek_result, playback_start_position);
+	
 	if (!p_global_mem_alloced)
 	{
 		p_global_mem_alloced = TRUE;
@@ -246,12 +370,28 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate) //An
 	   /* Fire off the device. */
 	if ((err = AudioDeviceAddIOProc (audio_data.device, macosx_audio_out_callback,
 									 (void *) &audio_data)) != noErr)
-	{	printf ("AudioDeviceAddIOProc failed.\n") ;
+	{	printf ("AudioDeviceAddIOProc failed with error: %d\n", (int)err) ;
 		return -1;
 	} 
+	printf("DEBUG: AudioDeviceAddIOProc completed successfully\n");
 	
-	err = AudioDeviceStart (audio_data.device, macosx_audio_out_callback) ;
-	if	(err != noErr) return -1;
+	// Test: Try to immediately start the device to see if callback gets triggered
+	printf("DEBUG: Testing immediate device start...\n");
+	err = AudioDeviceStart(audio_data.device, macosx_audio_out_callback);
+	if (err != noErr) {
+		printf("DEBUG: Immediate AudioDeviceStart failed with error: %d\n", (int)err);
+	} else {
+		printf("DEBUG: Immediate AudioDeviceStart succeeded - KEEPING DEVICE STARTED\n");
+		// Give it a moment to see if callback gets called
+		usleep(100000); // 100ms
+		printf("DEBUG: After 100ms delay, checking if callback was called...\n");
+		// DON'T stop the device - keep it running!
+		coreaudio_device_started = TRUE; // Mark as started so process_audio won't try to start again
+	}
+	
+	printf("DEBUG: CoreAudio device configured but NOT started yet (will start on first process_audio call)\n");
+	// DON'T start the device here - let process_audio() start it when needed
+	// err = AudioDeviceStart (audio_data.device, macosx_audio_out_callback) ;
 	playback_just_started = TRUE;
 	audio_data.done_playing = SF_FALSE ;
 	audio_data.done_reading = FALSE;
@@ -276,10 +416,13 @@ long audio_device_processed_bytes(void)
 	} 
 	else
 	{
+		printf("DEBUG: Device is running check - num_processes=%u\n", (unsigned int)num_processes);
 		
 		if((err = AudioDeviceGetCurrentTime(audio_data.device, &this_time)) != noErr)
 		{
-			printf("Could not get the current time.  The error number is: %i \n", err);
+			printf("Could not get the current time.  The error number is: %i (device running: %u)\n", err, (unsigned int)num_processes);
+			// If we can't get time, just increment playback_position manually
+			playback_position += BUFFERSIZE; // Rough estimate
 		}
 		else
 		{

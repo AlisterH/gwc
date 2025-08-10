@@ -28,14 +28,17 @@ brew install autoconf automake libtool pkg-config
 # GTK2 and related libraries
 brew install gtk+
 
-# Audio libraries
-brew install libsndfile pulseaudio
+# Audio libraries (libsndfile for file I/O)
+brew install libsndfile
 
 # Math and signal processing libraries
 brew install fftw
 
 # Optional dependencies for additional formats
 brew install vorbis-tools lame
+
+# Optional: PulseAudio (only if you want PulseAudio backend instead of CoreAudio)
+# brew install pulseaudio
 ```
 
 **Note:** `gtk-mac-integration-gtk2` is not available in current Homebrew for GTK2. The build has been configured to work without it for now.
@@ -44,16 +47,20 @@ brew install vorbis-tools lame
 
 GTK Wave Cleaner supports two audio backends on macOS:
 
-### Option 1: PulseAudio Backend (Recommended)
-The PulseAudio backend provides better cross-platform consistency:
+### Option 1: CoreAudio Backend (Native - Default)
+The native CoreAudio backend requires no additional services and integrates directly with macOS:
+
+```bash
+# No additional setup required - CoreAudio is built into macOS
+```
+
+### Option 2: PulseAudio Backend (Optional)
+The PulseAudio backend provides cross-platform consistency but requires additional setup:
 
 ```bash
 # Start PulseAudio daemon (required for audio playback)
 brew services start pulseaudio
 ```
-
-### Option 2: CoreAudio Backend (Native)
-The native CoreAudio backend requires no additional services but has some limitations noted by the original developers.
 
 For detailed comparison, see [MACOS_AUDIO_BACKENDS.md](MACOS_AUDIO_BACKENDS.md).
 
@@ -61,19 +68,19 @@ For detailed comparison, see [MACOS_AUDIO_BACKENDS.md](MACOS_AUDIO_BACKENDS.md).
 
 Configure the build system with your preferred audio backend:
 
-### For PulseAudio Backend (Recommended)
-```bash
-./configure --enable-pa
-```
-
-### For CoreAudio Backend (Native)
+### For CoreAudio Backend (Default - Recommended)
 ```bash
 ./configure
 ```
 
+### For PulseAudio Backend (Optional)
+```bash
+./configure --enable-pa
+```
+
 The configure script will:
 - Detect and configure FFTW3 headers via pkg-config
-- Detect and configure PulseAudio headers (if using --enable-pa)
+- Set up CoreAudio backend (default) or PulseAudio headers (if using --enable-pa)
 - Set up proper compiler flags for macOS
 - Configure the Meschach mathematics library
 

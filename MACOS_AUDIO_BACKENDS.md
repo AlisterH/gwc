@@ -8,7 +8,22 @@ GTK Wave Cleaner now supports two audio backends on macOS:
 
 ## Configuration Options
 
-### PulseAudio Backend (Recommended)
+### CoreAudio Backend (Default - Recommended)
+```bash
+./configure
+```
+- **Pros:**
+  - Native macOS audio system
+  - No additional dependencies
+  - Direct system audio integration
+  - Better macOS integration and performance
+  - No service management required
+  
+- **Cons:**
+  - Original developers noted some historical limitations
+  - Platform-specific (not cross-platform)
+
+### PulseAudio Backend (Optional)
 ```bash
 ./configure --enable-pa
 ```
@@ -16,27 +31,12 @@ GTK Wave Cleaner now supports two audio backends on macOS:
   - Cross-platform consistency
   - Well-tested on Linux
   - Active audio processing without service issues
-  - More reliable for audio editing tasks
   
 - **Cons:**
   - Requires PulseAudio service to be running
   - Additional dependency via Homebrew
   - May conflict with other macOS audio applications
-
-### CoreAudio Backend (Native)
-```bash
-./configure
-# (CoreAudio is default on macOS when PulseAudio not explicitly enabled)
-```
-- **Pros:**
-  - Native macOS audio system
-  - No additional dependencies
-  - Direct system audio integration
-  
-- **Cons:**
-  - Original developers warned: "This currently does not seem to work"
-  - Less tested than PulseAudio version
-  - May have limitations with certain audio operations
+  - Unnecessary complexity on macOS
 
 ## Build Status
 
@@ -68,21 +68,21 @@ GLib-GIO-CRITICAL: g_loadable_icon_load: assertion 'G_IS_LOADABLE_ICON (icon)' f
 ## Recommendations
 
 ### For Regular Users
-Use **PulseAudio backend** with:
+Use **CoreAudio backend** (default):
+```bash
+./configure
+make
+```
+
+### For Cross-Platform Development
+Use **PulseAudio backend** if you need consistency across platforms:
 ```bash
 brew install pulseaudio
 ./configure --enable-pa
 make
 ```
 
-### For System Integration
-Use **CoreAudio backend** if you prefer no additional dependencies:
-```bash
-./configure
-make
-```
-
-### Audio Service Setup (PulseAudio)
+### Audio Service Setup (PulseAudio only)
 If using PulseAudio backend, ensure service is running:
 ```bash
 brew services start pulseaudio
