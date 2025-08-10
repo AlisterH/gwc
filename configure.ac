@@ -116,7 +116,7 @@ then
     if test "x$HAVE_PULSE_AUDIO" = xyes ; then
         pa="yes";
 	PALIB=$PULSEAUDIO_LIBS
-	PAHDR="-DHAVE_PULSE_AUDIO" ;
+	PAHDR="-DHAVE_PULSE_AUDIO $PULSEAUDIO_CFLAGS" ;
 	alsa="disabled";
 	ALSALIB="";
 	ALSADEF="";
@@ -138,23 +138,17 @@ fi
 dnl enable single precision FFTW3 if installed
 AC_ARG_ENABLE(single-fftw3,
             [  --enable-single-fftw3    compile single precision FFTW3 support (default double precision)],
-            FFTWLIB="-lfftw3f";FFTWHDR="-DHAVE_FFTW3";FFTWPREC="-DFFTWPREC=1")
+            [use_single_fftw=yes], [use_single_fftw=no])
 
-if test "$FFTWLIB" = ""
-then
-dnl Detect which version of fftw libs exist, if any
-FFTWPREC=""
-AC_CHECK_LIB(fftw3, fftw_plan_r2r_1d,FFTWLIB="-lfftw3";FFTWHDR="-DHAVE_FFTW3";FFTWPREC="-DFFTWPREC=2",
-    AC_CHECK_LIB(fftw3f, fftwf_plan_r2r_1d,FFTWLIB="-lfftw3f";FFTWHDR="-DHAVE_FFTW3";FFTWPREC="-DFFTWPREC=1",
-        AC_CHECK_LIB(fftw, fftw_create_plan, ,
-	    AC_CHECK_LIB(dfftw, fftw_create_plan))))
-
-if test "$FFTWLIB" = ""
-then
-AC_CHECK_LIB(rfftw, rfftw_one, FFTWLIB="-lrfftw -lfftw";FFTWHDR="-DHAVE_FFTW",
-    AC_CHECK_LIB(drfftw, rfftw_one, FFTWLIB="-ldrfftw -ldfftw";FFTWHDR="-DHAVE_DFFTW",
-	AC_MSG_ERROR("You need to install the fftw 3.x libraries from www.fftw.org")))
-fi
+dnl Use pkg-config to detect FFTW3
+if test "$use_single_fftw" = "yes"; then
+    PKG_CHECK_MODULES(FFTW3, fftw3f >= 3.0.0,
+                     [FFTWLIB="$FFTW3_LIBS";FFTWHDR="-DHAVE_FFTW3 $FFTW3_CFLAGS";FFTWPREC="-DFFTWPREC=1"],
+                     [AC_MSG_ERROR([FFTW3 single precision library not found])])
+else
+    PKG_CHECK_MODULES(FFTW3, fftw3 >= 3.0.0,
+                     [FFTWLIB="$FFTW3_LIBS";FFTWHDR="-DHAVE_FFTW3 $FFTW3_CFLAGS";FFTWPREC="-DFFTWPREC=2"],
+                     [AC_MSG_ERROR([FFTW3 library not found. Install fftw3 or use --enable-single-fftw3 for single precision.])])
 fi
 
 
@@ -187,7 +181,8 @@ if [test x$platform_osx = xyes]; then
   OSXDEF="-DMAC_OS_X"
   if test "$enablepa" == "yes"; then
     # pulseaudio is enabled (recommended until issues are fixed with coreaudio backend)
-    OSXLIBS="$LIBS -lgtkmacintegration-gtk2"
+    # Note: gtkmacintegration-gtk2 is not available in Homebrew, so we disable it for now
+    OSXLIBS="$LIBS"
   else
     # pulseaudio is not enabled so we need to build CoreAudio backend instead
     AC_MSG_NOTICE([
@@ -197,7 +192,7 @@ This currently does not seem to work.
 Use --enable-pa to build with the pulseaudio backend instead.
 *******************************************************************
 ])
-    OSXLIBS="$LIBS -framework CoreAudio -lgtkmacintegration-gtk2" 
+    OSXLIBS="$LIBS -framework CoreAudio" 
   fi
 fi
 

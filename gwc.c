@@ -87,7 +87,9 @@
 #ifdef MAC_OS_X
 // Note that we only tested if we are building on OSX, and are just assuming we are building with the GDK QUARTZ backend.
 // We should really check that, as we could be building with the X11 backend.
+#ifdef HAVE_GTK_MAC_INTEGRATION
 #include <gtkmacintegration/gtkosxapplication.h>
+#endif
 //#import <Cocoa/Cocoa.h>
 #endif
 
@@ -703,8 +705,10 @@ void help(GtkWidget * widget, gpointer data)
 
   char *uri = g_strconcat ("file://", HELPDIR, "/", APPNAME, "/", APPNAME, ".html", NULL);
   #ifdef MAC_OS_X
+#ifdef HAVE_GTK_MAC_INTEGRATION
 	  if ( gtkosx_application_get_bundle_id() )
 	    uri = g_strconcat ("file://", g_uri_escape_string(gtkosx_application_get_resource_path(), "/", TRUE), HELPDIR, "/", APPNAME, "/", APPNAME, ".html", NULL);
+#endif
 	  //g_message("testing %s", uri);
 	  char *command = g_strdup_printf("%s %s &", "open", uri);
 	  system(command);
@@ -2211,12 +2215,14 @@ static void drag_data_received(GtkWidget *widget, GdkDragContext *d, gint32 i, g
 }
 
 #ifdef MAC_OS_X
+#ifdef HAVE_GTK_MAC_INTEGRATION
 void app_open_file_cb (GtkosxApplication *theApp, gchar *path, gpointer p)
 {
     strcpy(wave_filename, path);
     open_wave_filename();
 }
-#endif
+#endif  // HAVE_GTK_MAC_INTEGRATION
+#endif  // MAC_OS_X
 
 void store_selection_filename(gpointer user_data)
 {
@@ -2368,7 +2374,7 @@ void save_selection_as_encoded(int fmt, char *filename, char *filename_new, stru
 
 void store_selected_filename_as_encoded(gpointer user_data)
 {
-    int enc_format = NULL ;
+    int enc_format = 0;
     int l;
     char trackname[1024] = "" ;
 
@@ -3664,6 +3670,7 @@ int main(int argc, char *argv[])
     /* and the window */
     gtk_widget_show_all(main_window);
 	#ifdef MAC_OS_X
+#ifdef HAVE_GTK_MAC_INTEGRATION
 	// Note that we only tested if we are building on OSX, and are assuming we are building with the GDK QUARZ backend.
 	// We should really check that, as we could be building with the X11 backend.
 
@@ -3706,6 +3713,7 @@ int main(int argc, char *argv[])
 	
 	// Possible todo:
 	// implement native file dialogs using nativefiledialog library or tinyfiledialogs or something
+#endif  // HAVE_GTK_MAC_INTEGRATION
 	#endif
 
     /* and the idle function */
@@ -3770,11 +3778,13 @@ int main(int argc, char *argv[])
     }
 
     #ifdef MAC_OS_X    
+#ifdef HAVE_GTK_MAC_INTEGRATION
     // Re #1 above - we actually need this, otherwise nothing happens at all.
     // It has has to be down here after e.g. open_wave_filename, otherwise running `gwc somefile` crashes on osx.
     // But the rest of the gtkosx_application stuff needs to be before that otherwise it freezes when 
     // clicking the icon after running `gwc somefile`
     gtkosx_application_ready (theApp);
+#endif
     #endif
 
     gtk_main();
