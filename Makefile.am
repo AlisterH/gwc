@@ -151,9 +151,14 @@ meschach.a : meschach/meschach.a
 	cp meschach/meschach.a .
 
 meschach/meschach.a :
-# Alister: a very old message on the mailing list seemed to imply that --with-sparse is necessary to build successfully,
-#          but this doesn't actually seem to be the case now
-	(cd meschach ; ./configure --with-sparse ; make part1 ; make part2 ; make part3 ; cp machine.h ..)
+# Build Meschach without sparse matrix support (part3) since GWC doesn't use it
+# and sparse.c has compilation issues with modern compilers
+	(cd meschach ; \
+	 ./configure ; \
+	 sed -i.bak 's|/\* #undef STDC_HEADERS \*/|#define STDC_HEADERS 1|' machine.h ; \
+	 sed -i.bak 's|/\* #undef HAVE_PROTOTYPES \*/|#define HAVE_PROTOTYPES 1|' machine.h ; \
+	 sed -i.bak 's|/\* #undef HAVE_PROTOTYPES_IN_STRUCT \*/|#define HAVE_PROTOTYPES_IN_STRUCT 1|' machine.h ; \
+	 make part1 ; make part2 ; cp machine.h ..)
 
 clean :
 	rm -f $(APPNAME) *.o core meschach.a meschach/meschach.a machine.h

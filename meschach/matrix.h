@@ -79,9 +79,9 @@ typedef struct	{
 
 
 #ifndef MALLOCDECL
-#ifndef ANSI_C
+#if !defined(ANSI_C) && !defined(__APPLE__)
 extern	char	*malloc(), *calloc(), *realloc();
-#else
+#elif !defined(__APPLE__)
 extern	void	*malloc(size_t),
 		*calloc(size_t,size_t),
 		*realloc(void *,size_t);
