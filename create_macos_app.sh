@@ -26,10 +26,26 @@ fi
 
 echo "📍 Using Homebrew prefix: ${BREW_PREFIX}"
 
-# Step 1: Clean and recreate app structure
+# Step 1: Clean and recreate app structure (preserve existing icon)
 echo "🧹 Cleaning old app bundle..."
+
+# Backup existing AppIcon.icns if it exists
+ICON_BACKUP=""
+if [[ -f "${APP_DIR}/Contents/Resources/AppIcon.icns" ]]; then
+    ICON_BACKUP=$(mktemp)
+    cp "${APP_DIR}/Contents/Resources/AppIcon.icns" "$ICON_BACKUP"
+    echo "💾 Backed up existing AppIcon.icns"
+fi
+
 rm -rf "${APP_DIR}"
 mkdir -p "${RESOURCES_DIR}" "${MACOS_DIR}" "${LIB_DIR}"
+
+# Restore the icon if we backed it up
+if [[ -n "$ICON_BACKUP" && -f "$ICON_BACKUP" ]]; then
+    cp "$ICON_BACKUP" "${RESOURCES_DIR}/AppIcon.icns"
+    rm "$ICON_BACKUP"
+    echo "🎨 Restored AppIcon.icns"
+fi
 
 # Step 2: Install GWC into the app bundle
 echo "📦 Installing GTK Wave Cleaner binary..."
@@ -100,7 +116,61 @@ if [[ -d "${RESOURCES_DIR}/usr/local/share" ]]; then
     mv "${RESOURCES_DIR}/usr/local/share" "${RESOURCES_DIR}/share"
 fi
 
-# Step 5: Create wrapper script for proper library loading
+# Step 5: Create Info.plist
+echo "📄 Creating Info.plist..."
+cat > "${APP_DIR}/Contents/Info.plist" << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleExecutable</key>
+    <string>gtk-wave-cleaner</string>
+    <key>CFBundleIdentifier</key>
+    <string>org.gwc.gtk-wave-cleaner</string>
+    <key>CFBundleName</key>
+    <string>GTK Wave Cleaner</string>
+    <key>CFBundleDisplayName</key>
+    <string>GTK Wave Cleaner</string>
+    <key>CFBundleShortVersionString</key>
+    <string>0.22</string>
+    <key>CFBundleVersion</key>
+    <string>0.22</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleSignature</key>
+    <string>????</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>10.14</string>
+    <key>CFBundleDocumentTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeName</key>
+            <string>Audio File</string>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>wav</string>
+                <string>aiff</string>
+                <string>au</string>
+                <string>snd</string>
+                <string>flac</string>
+                <string>ogg</string>
+                <string>mp3</string>
+            </array>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+        </dict>
+    </array>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+</dict>
+</plist>
+EOF
+
+echo "✅ Info.plist created"
+
+# Step 6: Create wrapper script for proper library loading
 echo "📝 Creating wrapper script..."
 cat > "${MACOS_DIR}/gtk-wave-cleaner-wrapper" << 'EOF'
 #!/bin/bash
@@ -127,7 +197,7 @@ sed -i '' 's/<string>gtk-wave-cleaner<\/string>/<string>gtk-wave-cleaner-wrapper
 
 echo "✅ Wrapper script created"
 
-# Step 6: Strip binaries to reduce size
+# Step 7: Strip binaries to reduce size
 echo "🔧 Stripping binaries..."
 strip "${MACOS_DIR}/gtk-wave-cleaner"
 for lib in "${LIB_DIR}"/*.dylib; do
@@ -138,7 +208,7 @@ done
 
 echo "✅ Binaries stripped"
 
-# Step 7: Create disk image
+# Step 8: Create disk image
 echo "💿 Creating disk image..."
 if [[ -f "GWC-$(date +%Y%m%d).dmg" ]]; then
     rm "GWC-$(date +%Y%m%d).dmg"

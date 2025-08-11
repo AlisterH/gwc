@@ -7,5 +7,9 @@ APP_RESOURCES="$(dirname "$SCRIPT_DIR")/Resources"
 # Set library path to use bundled libraries
 export DYLD_LIBRARY_PATH="${APP_RESOURCES}/lib:${DYLD_LIBRARY_PATH}"
 
+# Set up GTK/GLib paths
+export GTK_PATH="${APP_RESOURCES}"
+export GDK_PIXBUF_MODULEDIR="${APP_RESOURCES}/lib/gdk-pixbuf-2.0/loaders"
+
 # Execute the actual binary
 exec "${SCRIPT_DIR}/gtk-wave-cleaner" "$@"
