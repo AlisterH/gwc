@@ -8,7 +8,7 @@ Requirements
 - a *nix based operating system i.e. linux, bsd, osx etc.  GWC can be run on Windows either in a Linux virtual machine or in "windows subsystem for linux" on 64bit Windows 10 using  pulseaudio and X11 servers for windows.
 - gtk2 (www.gtk.org); included in common Linux distributions.
 - libsndfile (www.mega-nerd.com/libsndfile/); there are packages available for common Linux distributions.
-- either the OSS, ALSA or Pulse Audio sound drivers (N.B. Mac OSX Core Audio backend is broken: use Pulse Audio).
+- either the OSS, ALSA, Pulse Audio or Core Audio sound drivers (N.B. on macOS, Core Audio is now working and recommended).
 - fftw libs (www.fftw.org); there are packages available for common Linux distributions.
 - [optional] perl to use gwcbatch helper script.  Not required for normal gui use.
 - [optional] perldoc to view gwcbatch usage instructions (or just open it in a text editor).
@@ -21,12 +21,24 @@ The source code and all associated files are freely available under the GNU Gene
 
 Installation
 ------------
+## Linux/Unix:
 If you are using a release source tarball, extract it (tar -xvzf <...>).
 Enter the directory created.
 Run "autoreconf -i" (shouldn't be necessary if you are using a release tarball)
 Run "./configure".
 Run "make".
 Run "make install".
+
+## macOS (Homebrew - Recommended):
+For automated installation on macOS with Homebrew:
+Run "./brew-setup-complete.sh" (installs dependencies, builds, and creates app bundle)
+
+Or step by step:
+Run "./brew-install-deps.sh" (install Homebrew dependencies)
+Run "./brew-build.sh" (configure and build)
+Run "./create_macos_app.sh" (create distributable app bundle)
+
+See BUILD_MACOS.md and BREW_BUILD.md for detailed macOS build instructions.
 
 "gtk-wave-cleaner" is the program file.  All you have to do is run it, or click on the menu entry.
 
@@ -36,7 +48,11 @@ Run "./configure --help" for additional compile options.
 By default the GWC binary is installed in /usr/local/bin/ and document files are installed in /usr/local/share/doc/gtk-wave-cleaner.  Override this with "./configure --prefix=/usr" or similar.
 If you have playback problems try disabling alsa (--disable-alsa) to use oss.  In an alsa environment you can use it with aoss if necessary.
 Distributions may want to enable pulseaudio (--enable-pa).
+On macOS, Core Audio is enabled by default and works reliably.
 Note that mp3 and ogg reading support are currently still broken, so ignore those options.
+
+For detailed macOS build instructions and troubleshooting, see BUILD_MACOS.md.
+For automated Homebrew builds, see BREW_BUILD.md.
 
 If you have problems installing check whether they are documented in the INSTALL file.
 

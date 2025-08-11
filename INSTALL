@@ -4,6 +4,21 @@ Refer to the README for further information.
 This file documents specific installation problems which may be encountered.
 
 ---
+macOS Installation (Recommended Method):
+
+For macOS users, the easiest installation method is using the automated Homebrew scripts:
+
+	./brew-setup-complete.sh
+
+This handles all dependencies and creates a complete app bundle. For step-by-step control:
+
+	./brew-install-deps.sh    # Install Homebrew dependencies
+	./brew-build.sh           # Configure and build
+	./create_macos_app.sh     # Create distributable app bundle
+
+See BUILD_MACOS.md for detailed instructions and troubleshooting.
+
+---
 Problems with linking:
 
 You don't have libsndfile in a standard place, like /usr/lib, but /usr/local/lib
