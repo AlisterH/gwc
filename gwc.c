@@ -42,6 +42,10 @@
 #include "audio_edit.h"
 #include <sndfile.h>
 
+#ifdef HAVE_GTK_MAC_INTEGRATION
+#include <gtkosxapplication.h>
+#endif
+
 #include "icons/amplify_dark.xpm"
 #include "icons/amplify.xpm"
 #include "icons/declick_dark.xpm"

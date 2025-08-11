@@ -179,9 +179,22 @@ esac
 AC_MSG_RESULT([$platform_osx])
 if [test x$platform_osx = xyes]; then
   OSXDEF="-DMAC_OS_X"
+  
+  dnl Check for gtk-mac-integration
+  PKG_CHECK_MODULES(GTK_MAC, [gtk-mac-integration-gtk2 >= 2.0.0],
+                   [HAVE_GTK_MAC="yes"], [HAVE_GTK_MAC="no"])
+  
+  if test "x$HAVE_GTK_MAC" = xyes ; then
+    OSXDEF="$OSXDEF -DHAVE_GTK_MAC_INTEGRATION"
+    GTK_CFLAGS="$GTK_CFLAGS $GTK_MAC_CFLAGS"
+    GTK_LIBS="$GTK_LIBS $GTK_MAC_LIBS"
+    AC_MSG_NOTICE([GTK Mac Integration found - enabling native macOS integration])
+  else
+    AC_MSG_NOTICE([GTK Mac Integration not found - building without native macOS integration])
+  fi
+  
   if test "$enablepa" == "yes"; then
     # pulseaudio is enabled (recommended until issues are fixed with coreaudio backend)
-    # Note: gtkmacintegration-gtk2 is not available in Homebrew, so we disable it for now
     OSXLIBS="$LIBS"
   else
     # pulseaudio is not enabled so we need to build CoreAudio backend instead
