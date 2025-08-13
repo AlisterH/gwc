@@ -1,88 +1,97 @@
-# GTK Wave Cleaner - macOS Port
+# Gtk Wave Cleaner (GWC) 0.22
 
-**Professional audio restoration software now fully working on macOS!** 🎵
+Gtk Wave Cleaner is a GUI application to remove noise (hiss, pops, and clicks) from audio files in WAV and similar formats.
 
-![Version](https://img.shields.io/badge/version-0.22-blue)
-![Platform](https://img.shields.io/badge/platform-macOS-green)
-![Status](https://img.shields.io/badge/status-production%20ready-brightgreen)
+## Requirements
+- A *nix based operating system (Linux, BSD, macOS, etc.)
+- GTK2 ([www.gtk.org](https://www.gtk.org/))
+- libsndfile ([www.mega-nerd.com/libsndfile/](http://www.mega-nerd.com/libsndfile/))
+- OSS, ALSA, Pulse Audio, or Core Audio sound drivers (Core Audio recommended on macOS)
+- FFTW libs ([www.fftw.org](http://www.fftw.org/))
+- [Optional] Perl (for `gwcbatch` helper script)
+- [Optional] perldoc (to view `gwcbatch` usage)
+- [Optional] xdg-open (for help menu manual, not required on macOS)
+- [Optional] vorbis-tools and lame (for ogg and mp3 export)
 
-## 🎯 Quick Start
+## License
+The source code and all associated files are freely available under the GNU General Public License (GPL).
 
-**One command installation:**
-```bash
-./brew-setup-complete.sh
+## Installation
+
+### Linux/Unix
+1. Extract the release source tarball: `tar -xvzf <...>`
+2. Enter the directory created.
+3. Run `autoreconf -i` (not needed for release tarballs)
+4. Run `./configure`
+5. Run `make`
+6. Run `make install`
+
+### macOS (Recommended)
+#### Automated Build (Recommended)
+
+**Prerequisites:**  
+Homebrew is required to install dependencies. If you don't have it, install Homebrew from [https://brew.sh](https://brew.sh).
+
+To build and package GWC automatically, run:
+```sh
+./contrib/macosx/scripts/all.sh
+```
+This script will install all dependencies, build the application, and create a distributable app bundle.
+
+#### Step-by-step Build
+
+1. **Install dependencies:**
+    ```sh
+    ./contrib/macosx/scripts/install.sh
+    ```
+2. **Configure and build:**
+    ```sh
+    ./contrib/macosx/scripts/build.sh
+    ```
+3. **Create the app bundle:**
+    ```sh
+    ./contrib/macosx/scripts/app.sh
+    ```
+
+The finished app bundle will be located at `osx_packaging/Gtk Wave Cleaner.app`, and a disk image will be created for easy installation.
+
+For more information, see:
+- `contrib/macosx/GTK_MAC_INTEGRATION_UPDATE.md`
+- `contrib/macosx/scripts/README` (if available)
+- `SCRIPT_UPDATES_COMPLETE.md`
+
+#### Notes for macOS Compilation
+- Native menu bar, dock, and window management are supported via gtk-mac-integration.
+- Core Audio is enabled by default for optimal macOS audio performance.
+- All dependencies are managed via Homebrew.
+- The app bundle is fully self-contained and ready for distribution.
+
+## Additional Options
+- Run `./configure --help` for additional compile options.
+- By default, the GWC binary is installed in `/usr/local/bin/` and documentation in `/usr/local/share/doc/gtk-wave-cleaner`.
+- Override install location with `./configure --prefix=/usr` or similar.
+- If you have playback problems, try disabling ALSA (`--disable-alsa`) to use OSS. In an ALSA environment, you can use it with `aoss` if necessary.
+- Distributions may want to enable PulseAudio (`--enable-pa`).
+- On macOS, Core Audio is enabled by default and works reliably.
+- Note: mp3 and ogg reading support are currently still broken.
+
+For detailed macOS build instructions and troubleshooting, see `contrib/macosx/GTK_MAC_INTEGRATION_UPDATE.md`.
+
+If you have problems installing, check whether they are documented in the `INSTALL` file.
+
+## Instructions for Use
+Check out the help documentation included in this distribution and available from the help menu in GWC.
+
+## Known Issues
+GWC fails to open wav files with metadata, such as those created by recent versions of ffmpeg. GWC will produce an error like:
+
+```
+Failed to open /root/whistle.wav, 'Error : Cannot open file in read/write mode due to string data in header.'
 ```
 
-This will automatically:
-- Install all Homebrew dependencies
-- Build GTK Wave Cleaner
-- Create a distributable macOS app bundle
+Libsndfile does not support RDWR mode for these files. If you are creating them using ffmpeg, try adding `-flags bitexact` to your command line (although this will reduce ffmpeg's performance), or write to a different libsndfile-supported format such as `.au` or `.aiff`. A workaround for existing files is to open and save the file in mhwaveedit, or convert to a different format using `sndfile-convert` or `ffmpeg`, or use `SimplifyWave` from waveutils or `shntool strip` to make a copy of the file with a clean header.
 
-## ✨ What's New in macOS Port
+## Background
+For links and a brief presentation describing the technical aspects of the audio restoration methods used in GWC, visit [http://gwc.sourceforge.net/](http://gwc.sourceforge.net/)
 
-- ✅ **Audio output fixed** - CoreAudio backend now works perfectly
-- ✅ **Professional app bundle** - Complete .app with all dependencies
-- ✅ **Automated build** - One-command Homebrew installation
-- ✅ **Native icons** - High-quality .icns generated from project assets
-- ✅ **Modern compatibility** - Works on Intel and Apple Silicon Macs
-
-## 📋 Requirements
-
-- macOS 10.14 or later
-- Xcode Command Line Tools: `xcode-select --install`
-- Homebrew: https://brew.sh
-
-## 🚀 Build Options
-
-### Automated (Recommended)
-```bash
-./brew-setup-complete.sh     # Everything automated
-```
-
-### Quick Start (One Command)
-```bash
-./contrib/macosx/scripts/all.sh      # Complete automated build
-```
-
-### Step by Step
-```bash
-./contrib/macosx/scripts/install.sh  # Install dependencies
-./contrib/macosx/scripts/build.sh    # Build application
-./contrib/macosx/scripts/app.sh      # Create app bundle
-```
-
-### Manual
-```bash
-autoreconf -fiv
-./configure --enable-coreaudio
-make
-```
-
-## 📖 Documentation
-
-- **[BUILD_MACOS.md](contrib/macosx/docs/BUILD_MACOS.md)** - Detailed macOS build guide
-- **[BREW_BUILD.md](contrib/macosx/docs/BREW_BUILD.md)** - Homebrew automation documentation
-- **[PROJECT_SUMMARY.md](PROJECT_SUMMARY.md)** - Complete technical details
-
-## 🎵 About GTK Wave Cleaner
-
-GTK Wave Cleaner is a professional audio restoration application that removes:
-- Background hiss and noise
-- Clicks and pops
-- Digital artifacts
-- Audio imperfections
-
-Originally designed for Linux, this macOS port brings full functionality to Mac users with native audio support.
-
-## 📦 Distribution
-
-The build process creates:
-- **App Bundle**: `osx_packaging/Gtk Wave Cleaner.app`
-- **Disk Image**: `GWC-YYYYMMDD.dmg`
-- **Standalone**: All dependencies bundled
-
-Perfect for distribution to end users who don't need developer tools.
-
----
-
-**Ready to clean up your audio? Get started with `./brew-setup-complete.sh`!** 🎧
+Contact: jeff@redhawk.org
