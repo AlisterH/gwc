@@ -710,8 +710,10 @@ void help(GtkWidget * widget, gpointer data)
   char *uri = g_strconcat ("file://", HELPDIR, "/", APPNAME, "/", APPNAME, ".html", NULL);
   #ifdef MAC_OS_X
 #ifdef HAVE_GTK_MAC_INTEGRATION
-	  if ( gtkosx_application_get_bundle_id() )
-	    uri = g_strconcat ("file://", g_uri_escape_string(gtkosx_application_get_resource_path(), "/", TRUE), HELPDIR, "/", APPNAME, "/", APPNAME, ".html", NULL);
+	  if ( gtkosx_application_get_bundle_id() ) {
+	    // In macOS app bundle, help files are in Resources/doc/
+	    uri = g_strconcat ("file://", g_uri_escape_string(gtkosx_application_get_resource_path(), "/", TRUE), "/doc/", APPNAME, ".html", NULL);
+	  }
 #endif
 	  //g_message("testing %s", uri);
 	  char *command = g_strdup_printf("%s %s &", "open", uri);

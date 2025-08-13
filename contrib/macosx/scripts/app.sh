@@ -70,25 +70,56 @@ fi
 # Step 2: Install GWC into the app bundle
 echo "📦 Installing GTK Wave Cleaner binary..."
 
-# Configure with gtk-mac-integration if available
-if pkg-config --exists gtk-mac-integration-gtk2; then
-    echo "🔧 Configuring build with GTK Mac Integration..."
-    export PKG_CONFIG_PATH="${BREW_PREFIX}/lib/pkgconfig:${PKG_CONFIG_PATH}"
-    if [[ -f "configure" ]]; then
-        ./configure --prefix=/usr/local
+# Check if we need to rebuild (preserve existing configuration if possible)
+if [[ ! -f "gtk-wave-cleaner" ]]; then
+    echo "🔧 Binary not found, rebuilding with proper macOS integration..."
+    
+    # Set up environment for Homebrew paths (same as build.sh)
+    export PKG_CONFIG_PATH="$(brew --prefix)/lib/pkgconfig:$PKG_CONFIG_PATH"
+    export CPPFLAGS="-I$(brew --prefix)/include $CPPFLAGS"
+    export LDFLAGS="-L$(brew --prefix)/lib $LDFLAGS"
+    
+    # For Apple Silicon Macs, ensure we have the right paths
+    if [ "$(uname -m)" = "arm64" ]; then
+        export PKG_CONFIG_PATH="/opt/homebrew/lib/pkgconfig:$PKG_CONFIG_PATH"
+        export CPPFLAGS="-I/opt/homebrew/include $CPPFLAGS"
+        export LDFLAGS="-L/opt/homebrew/lib $LDFLAGS"
     fi
+    
+    # Configure with macOS integration if available
+    if pkg-config --exists gtk-mac-integration-gtk2; then
+        echo "✅ Configuring with GTK Mac Integration support"
+        ./configure \
+            --prefix=/usr/local \
+            --enable-coreaudio \
+            --disable-pulseaudio \
+            PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \
+            CPPFLAGS="$CPPFLAGS" \
+            LDFLAGS="$LDFLAGS"
+    else
+        echo "⚠️  Warning: Building without GTK Mac Integration"
+        ./configure --prefix=/usr/local --enable-coreaudio --disable-pulseaudio
+    fi
+    
+    # Build the application
+    make
 else
-    echo "⚠️  Building without GTK Mac Integration"
-    if [[ -f "configure" ]]; then
-        ./configure --prefix=/usr/local
-    fi
+    echo "✅ Using existing binary (run 'make clean' first to rebuild)"
 fi
 
 make DESTDIR="$(pwd)/${RESOURCES_DIR}" install
 
-# Move binary to correct location
+# Move binary to correct location and preserve documentation
 if [[ -f "${RESOURCES_DIR}/usr/local/bin/gtk-wave-cleaner" ]]; then
     mv "${RESOURCES_DIR}/usr/local/bin/gtk-wave-cleaner" "${MACOS_DIR}/gtk-wave-cleaner"
+    
+    # Preserve documentation before removing usr directory
+    if [[ -d "${RESOURCES_DIR}/usr/local/share/doc/gtk-wave-cleaner" ]]; then
+        mkdir -p "${RESOURCES_DIR}/doc"
+        cp -r "${RESOURCES_DIR}/usr/local/share/doc/gtk-wave-cleaner/"* "${RESOURCES_DIR}/doc/"
+        echo "📄 Documentation copied to app bundle"
+    fi
+    
     rm -rf "${RESOURCES_DIR}/usr"
 elif [[ -f "${RESOURCES_DIR}/bin/gtk-wave-cleaner" ]]; then
     mv "${RESOURCES_DIR}/bin/gtk-wave-cleaner" "${MACOS_DIR}/gtk-wave-cleaner"
