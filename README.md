@@ -41,9 +41,9 @@ This will automatically:
 
 ### Step by Step
 ```bash
-./brew-install-deps.sh       # Install dependencies
-./brew-build.sh              # Build application
-./create_macos_app.sh        # Create app bundle
+./contrib/macosx/scripts/brew-install-deps.sh       # Install dependencies
+./contrib/macosx/scripts/brew-build.sh              # Build application
+./contrib/macosx/scripts/create_macos_app.sh        # Create app bundle
 ```
 
 ### Manual
@@ -55,8 +55,8 @@ make
 
 ## 📖 Documentation
 
-- **[BUILD_MACOS.md](BUILD_MACOS.md)** - Detailed macOS build guide
-- **[BREW_BUILD.md](BREW_BUILD.md)** - Homebrew automation documentation
+- **[BUILD_MACOS.md](contrib/macosx/docs/BUILD_MACOS.md)** - Detailed macOS build guide
+- **[BREW_BUILD.md](contrib/macosx/docs/BREW_BUILD.md)** - Homebrew automation documentation
 - **[PROJECT_SUMMARY.md](PROJECT_SUMMARY.md)** - Complete technical details
 
 ## 🎵 About GTK Wave Cleaner

@@ -34,11 +34,11 @@ For automated installation on macOS with Homebrew:
 Run "./brew-setup-complete.sh" (installs dependencies, builds, and creates app bundle)
 
 Or step by step:
-Run "./brew-install-deps.sh" (install Homebrew dependencies)
-Run "./brew-build.sh" (configure and build)
-Run "./create_macos_app.sh" (create distributable app bundle)
+Run "./contrib/macosx/scripts/brew-install-deps.sh" (install Homebrew dependencies)
+Run "./contrib/macosx/scripts/brew-build.sh" (configure and build)
+Run "./contrib/macosx/scripts/create_macos_app.sh" (create distributable app bundle)
 
-See BUILD_MACOS.md and BREW_BUILD.md for detailed macOS build instructions.
+See contrib/macosx/docs/BUILD_MACOS.md and contrib/macosx/docs/BREW_BUILD.md for detailed macOS build instructions.
 
 "gtk-wave-cleaner" is the program file.  All you have to do is run it, or click on the menu entry.
 
@@ -51,8 +51,8 @@ Distributions may want to enable pulseaudio (--enable-pa).
 On macOS, Core Audio is enabled by default and works reliably.
 Note that mp3 and ogg reading support are currently still broken, so ignore those options.
 
-For detailed macOS build instructions and troubleshooting, see BUILD_MACOS.md.
-For automated Homebrew builds, see BREW_BUILD.md.
+For detailed macOS build instructions and troubleshooting, see contrib/macosx/docs/BUILD_MACOS.md.
+For automated Homebrew builds, see contrib/macosx/docs/BREW_BUILD.md.
 
 If you have problems installing check whether they are documented in the INSTALL file.
 
