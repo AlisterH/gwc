@@ -28,6 +28,10 @@ brew install autoconf automake libtool pkg-config
 echo "🖼️  Installing GTK2 and GUI libraries..."
 brew install gtk+
 
+# macOS GTK integration
+echo "🍎 Installing GTK macOS integration..."
+brew install gtk-mac-integration
+
 # Audio libraries
 echo "🎵 Installing audio libraries..."
 brew install libsndfile
@@ -50,6 +54,7 @@ echo ""
 echo "📋 Summary of installed packages:"
 echo "   • autoconf, automake, libtool, pkg-config (build tools)"
 echo "   • gtk+ (GTK2 GUI framework)"
+echo "   • gtk-mac-integration (native macOS integration)"
 echo "   • libsndfile (audio file I/O)"
 echo "   • fftw (FFT calculations)"
 echo "   • vorbis-tools, lame (additional audio formats)"

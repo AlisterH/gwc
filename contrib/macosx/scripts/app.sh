@@ -29,32 +29,9 @@ echo "📍 Using Homebrew prefix: ${BREW_PREFIX}"
 # Check for gtk-mac-integration availability
 echo "🔍 Checking for gtk-mac-integration..."
 if ! pkg-config --exists gtk-mac-integration-gtk2; then
-    echo "📦 Building gtk-mac-integration from source..."
-    
-    # Create temporary build directory
-    GTK_MAC_BUILD_DIR=$(mktemp -d)
-    ORIGINAL_DIR=$(pwd)
-    cd "$GTK_MAC_BUILD_DIR"
-    
-    # Download gtk-mac-integration source
-    curl -L -o gtk-mac-integration.tar.xz "https://download.gnome.org/sources/gtk-mac-integration/3.0/gtk-mac-integration-3.0.1.tar.xz"
-    tar -xf gtk-mac-integration.tar.xz
-    cd gtk-mac-integration-*/
-    
-    # Configure and build for GTK2
-    export PKG_CONFIG_PATH="${BREW_PREFIX}/lib/pkgconfig:${PKG_CONFIG_PATH}"
-    export CFLAGS="-I${BREW_PREFIX}/include"
-    export LDFLAGS="-L${BREW_PREFIX}/lib"
-    
-    ./configure --prefix="${BREW_PREFIX}" --with-gtk2 --disable-python --disable-gtk3
-    make -j$(sysctl -n hw.ncpu)
-    make install
-    
-    # Return to original directory
-    cd "$ORIGINAL_DIR"
-    rm -rf "$GTK_MAC_BUILD_DIR"
-    
-    echo "✅ gtk-mac-integration built and installed"
+    echo "⚠️  Warning: gtk-mac-integration not found!"
+    echo "   Install with: brew install gtk-mac-integration"
+    echo "   Continuing without native macOS integration..."
 else
     echo "✅ gtk-mac-integration already available"
 fi
@@ -152,6 +129,12 @@ cp "${BREW_PREFIX}/lib/libfftw3.3.dylib" "${LIB_DIR}/"
 
 # Support libraries
 cp "${BREW_PREFIX}/lib/libintl.8.dylib" "${LIB_DIR}/"
+
+# GTK Mac Integration library (if available)
+if [[ -f "${BREW_PREFIX}/lib/libgtkmacintegration-gtk2.4.dylib" ]]; then
+    cp "${BREW_PREFIX}/lib/libgtkmacintegration-gtk2.4.dylib" "${LIB_DIR}/"
+    echo "📱 GTK Mac Integration library included"
+fi
 
 # Optional: Additional format support
 if [[ -f "${BREW_PREFIX}/lib/libFLAC.12.dylib" ]]; then

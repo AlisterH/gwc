@@ -47,3 +47,4 @@ depcomp
 # Build directories (if any)
 build/
 dist/
+osx_packaging/Gtk\ Wave\ Cleaner.app

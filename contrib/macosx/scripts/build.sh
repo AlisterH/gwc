@@ -31,6 +31,10 @@ if ! brew list fftw &>/dev/null; then
     MISSING_DEPS+=("fftw")
 fi
 
+if ! brew list gtk-mac-integration &>/dev/null; then
+    MISSING_DEPS+=("gtk-mac-integration")
+fi
+
 if ! brew list autoconf &>/dev/null; then
     MISSING_DEPS+=("autoconf")
 fi
@@ -93,6 +97,7 @@ echo "📋 What's built:"
 echo "   • gtk-wave-cleaner (main executable)"
 echo "   • All required libraries compiled"
 echo "   • CoreAudio backend enabled for native macOS audio"
+echo "   • GTK Mac Integration enabled for native macOS experience"
 echo ""
 echo "🚀 Next steps:"
 echo "   • Test: ./gtk-wave-cleaner"
@@ -101,5 +106,6 @@ echo "   • Install system-wide: sudo make install"
 echo ""
 echo "💡 Tips:"
 echo "   • Audio output uses CoreAudio (no additional setup needed)"
+echo "   • GTK Mac Integration provides native menu bar and dock integration"
 echo "   • App bundle includes all dependencies for distribution"
 echo "   • Use 'otool -L gtk-wave-cleaner' to check library dependencies"
