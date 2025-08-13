@@ -92,7 +92,7 @@
 // Note that we only tested if we are building on OSX, and are just assuming we are building with the GDK QUARTZ backend.
 // We should really check that, as we could be building with the X11 backend.
 #ifdef HAVE_GTK_MAC_INTEGRATION
-#include <gtkmacintegration/gtkosxapplication.h>
+#include <gtkosxapplication.h>
 #endif
 //#import <Cocoa/Cocoa.h>
 #endif

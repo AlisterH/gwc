@@ -46,6 +46,8 @@ AC_SUBST(FFTWLIB)
 AC_SUBST(FFTWHDR)
 AC_SUBST(FFTWPREC)
 AC_SUBST(OSXDEF)
+AC_SUBST(GTK_MAC_CFLAGS)
+AC_SUBST(GTK_MAC_LIBS)
 AC_SUBST(PALIB)
 AC_SUBST(PAHDR)
 AC_SUBST(ALSALIB)
@@ -177,7 +179,7 @@ case `uname -s` in
     ;;
 esac
 AC_MSG_RESULT([$platform_osx])
-if [test x$platform_osx = xyes]; then
+if test x$platform_osx = xyes; then
   OSXDEF="-DMAC_OS_X"
   
   dnl Check for gtk-mac-integration
@@ -193,7 +195,7 @@ if [test x$platform_osx = xyes]; then
     AC_MSG_NOTICE([GTK Mac Integration not found - building without native macOS integration])
   fi
   
-  if test "$enablepa" == "yes"; then
+  if test "$enablepa" = "yes"; then
     # pulseaudio is enabled (recommended until issues are fixed with coreaudio backend)
     OSXLIBS="$LIBS"
   else
