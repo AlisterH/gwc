@@ -185,7 +185,7 @@ am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
 distcleancheck_listfiles = \
   find . \( -type f -a \! \
             \( -name .nfs* -o -name .smb* -o -name .__afs* \) \) -print
-ACLOCAL = ${SHELL} '/Users/philippe/Documents/gwc/missing' aclocal-1.18
+ACLOCAL = ${SHELL} '/Users/philippegagne/Documents/Projets/gwc/missing' aclocal-1.18
 ALSACFLAGS = 
 ALSADEF = 
 ALSALIB = 
@@ -193,16 +193,16 @@ ALSA_CFLAGS =
 ALSA_LIBS = 
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 1
-AUTOCONF = ${SHELL} '/Users/philippe/Documents/gwc/missing' autoconf
-AUTOHEADER = ${SHELL} '/Users/philippe/Documents/gwc/missing' autoheader
-AUTOMAKE = ${SHELL} '/Users/philippe/Documents/gwc/missing' automake-1.18
+AUTOCONF = ${SHELL} '/Users/philippegagne/Documents/Projets/gwc/missing' autoconf
+AUTOHEADER = ${SHELL} '/Users/philippegagne/Documents/Projets/gwc/missing' autoheader
+AUTOMAKE = ${SHELL} '/Users/philippegagne/Documents/Projets/gwc/missing' automake-1.18
 AWK = awk
 
 ###
 CC = gcc
 CCDEPMODE = depmode=none
-CFLAGS = -D_FILE_OFFSET_BITS=64 -Wall -g -O2 -I/opt/homebrew/Cellar/gtk+/2.24.33_2/include/gtk-2.0 -I/opt/homebrew/Cellar/gtk+/2.24.33_2/lib/gtk-2.0/include -I/opt/homebrew/Cellar/pango/1.56.4/include/pango-1.0 -I/opt/homebrew/Cellar/fribidi/1.0.16/include/fribidi -I/opt/homebrew/Cellar/harfbuzz/11.3.3/include/harfbuzz -I/opt/homebrew/Cellar/graphite2/1.3.14/include -I/opt/homebrew/Cellar/cairo/1.18.4/include -I/opt/homebrew/Cellar/at-spi2-core/2.56.4/include/atk-1.0 -I/opt/homebrew/Cellar/cairo/1.18.4/include/cairo -I/opt/homebrew/Cellar/fontconfig/2.16.0/include -I/opt/homebrew/opt/freetype/include/freetype2 -I/opt/homebrew/Cellar/libxext/1.3.6/include -I/opt/homebrew/Cellar/xorgproto/2024.1/include -I/opt/homebrew/Cellar/libxrender/0.9.12/include -I/opt/homebrew/Cellar/libx11/1.8.12/include -I/opt/homebrew/Cellar/libxcb/1.17.0/include -I/opt/homebrew/Cellar/libxau/1.0.12/include -I/opt/homebrew/Cellar/libxdmcp/1.1.5/include -I/opt/homebrew/Cellar/pixman/0.46.4/include/pixman-1 -I/opt/homebrew/include/gdk-pixbuf-2.0 -I/opt/homebrew/opt/libpng/include/libpng16 -I/opt/homebrew/opt/libtiff/include -I/opt/homebrew/opt/zstd/include -I/opt/homebrew/Cellar/xz/5.8.1/include -I/opt/homebrew/opt/jpeg-turbo/include -I/opt/homebrew/Cellar/glib/2.84.4/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX15.sdk/usr/include/ffi -I/opt/homebrew/Cellar/glib/2.84.4/include/glib-2.0 -I/opt/homebrew/Cellar/glib/2.84.4/lib/glib-2.0/include -I/opt/homebrew/opt/gettext/include -I/opt/homebrew/Cellar/pcre2/10.45/include -I/opt/homebrew/Cellar/libsndfile/1.2.2_1/include -I/opt/homebrew/Cellar/flac/1.5.0/include -I/opt/homebrew/Cellar/libvorbis/1.3.7/include -I/opt/homebrew/Cellar/libogg/1.3.6/include -I/opt/homebrew/Cellar/opus/1.5.2/include/opus -I/opt/homebrew/Cellar/mpg123/1.33.2/include
-CPPFLAGS = 
+CFLAGS = -D_FILE_OFFSET_BITS=64 -Wall -g -O2 -I/opt/homebrew/Cellar/gtk+/2.24.33_2/include/gtk-2.0 -I/opt/homebrew/Cellar/gtk+/2.24.33_2/lib/gtk-2.0/include -I/opt/homebrew/Cellar/pango/1.56.4/include/pango-1.0 -I/opt/homebrew/Cellar/fribidi/1.0.16/include/fribidi -I/opt/homebrew/Cellar/harfbuzz/11.3.3/include/harfbuzz -I/opt/homebrew/Cellar/graphite2/1.3.14/include -I/opt/homebrew/Cellar/cairo/1.18.4/include -I/opt/homebrew/Cellar/at-spi2-core/2.56.4/include/atk-1.0 -I/opt/homebrew/Cellar/cairo/1.18.4/include/cairo -I/opt/homebrew/Cellar/fontconfig/2.16.0/include -I/opt/homebrew/opt/freetype/include/freetype2 -I/opt/homebrew/Cellar/libxext/1.3.6/include -I/opt/homebrew/Cellar/xorgproto/2024.1/include -I/opt/homebrew/Cellar/libxrender/0.9.12/include -I/opt/homebrew/Cellar/libx11/1.8.12/include -I/opt/homebrew/Cellar/libxcb/1.17.0/include -I/opt/homebrew/Cellar/libxau/1.0.12/include -I/opt/homebrew/Cellar/libxdmcp/1.1.5/include -I/opt/homebrew/Cellar/pixman/0.46.4/include/pixman-1 -I/opt/homebrew/include/gdk-pixbuf-2.0 -I/opt/homebrew/opt/libpng/include/libpng16 -I/opt/homebrew/Cellar/libtiff/4.7.0/include -I/opt/homebrew/opt/zstd/include -I/opt/homebrew/Cellar/xz/5.8.1/include -I/opt/homebrew/opt/jpeg-turbo/include -I/opt/homebrew/Cellar/glib/2.84.3/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX15.sdk/usr/include/ffi -I/opt/homebrew/Cellar/glib/2.84.3/include/glib-2.0 -I/opt/homebrew/Cellar/glib/2.84.3/lib/glib-2.0/include -I/opt/homebrew/opt/gettext/include -I/opt/homebrew/Cellar/pcre2/10.45/include -I/opt/homebrew/Cellar/libsndfile/1.2.2_1/include -I/opt/homebrew/Cellar/flac/1.5.0/include -I/opt/homebrew/Cellar/libvorbis/1.3.7/include -I/opt/homebrew/Cellar/libogg/1.3.6/include -I/opt/homebrew/Cellar/opus/1.5.2/include/opus -I/opt/homebrew/Cellar/mpg123/1.33.2/include
+CPPFLAGS = -I/opt/homebrew/include -I/opt/homebrew/include 
 CSCOPE = cscope
 CTAGS = ctags
 CYGPATH_W = echo
@@ -222,19 +222,21 @@ FFTW3_LIBS = -L/opt/homebrew/Cellar/fftw/3.3.10_2/lib -lfftw3
 FFTWHDR = -DHAVE_FFTW3 -I/opt/homebrew/Cellar/fftw/3.3.10_2/include
 FFTWLIB = -L/opt/homebrew/Cellar/fftw/3.3.10_2/lib -lfftw3
 FFTWPREC = -DFFTWPREC=2
-GTK_CFLAGS = -I/opt/homebrew/Cellar/gtk+/2.24.33_2/include/gtk-2.0 -I/opt/homebrew/Cellar/gtk+/2.24.33_2/lib/gtk-2.0/include -I/opt/homebrew/Cellar/pango/1.56.4/include/pango-1.0 -I/opt/homebrew/Cellar/fribidi/1.0.16/include/fribidi -I/opt/homebrew/Cellar/harfbuzz/11.3.3/include/harfbuzz -I/opt/homebrew/Cellar/graphite2/1.3.14/include -I/opt/homebrew/Cellar/cairo/1.18.4/include -I/opt/homebrew/Cellar/at-spi2-core/2.56.4/include/atk-1.0 -I/opt/homebrew/Cellar/cairo/1.18.4/include/cairo -I/opt/homebrew/Cellar/fontconfig/2.16.0/include -I/opt/homebrew/opt/freetype/include/freetype2 -I/opt/homebrew/Cellar/libxext/1.3.6/include -I/opt/homebrew/Cellar/xorgproto/2024.1/include -I/opt/homebrew/Cellar/libxrender/0.9.12/include -I/opt/homebrew/Cellar/libx11/1.8.12/include -I/opt/homebrew/Cellar/libxcb/1.17.0/include -I/opt/homebrew/Cellar/libxau/1.0.12/include -I/opt/homebrew/Cellar/libxdmcp/1.1.5/include -I/opt/homebrew/Cellar/pixman/0.46.4/include/pixman-1 -I/opt/homebrew/include/gdk-pixbuf-2.0 -I/opt/homebrew/opt/libpng/include/libpng16 -I/opt/homebrew/opt/libtiff/include -I/opt/homebrew/opt/zstd/include -I/opt/homebrew/Cellar/xz/5.8.1/include -I/opt/homebrew/opt/jpeg-turbo/include -I/opt/homebrew/Cellar/glib/2.84.4/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX15.sdk/usr/include/ffi -I/opt/homebrew/Cellar/glib/2.84.4/include/glib-2.0 -I/opt/homebrew/Cellar/glib/2.84.4/lib/glib-2.0/include -I/opt/homebrew/opt/gettext/include -I/opt/homebrew/Cellar/pcre2/10.45/include
-GTK_LIBS = -L/opt/homebrew/Cellar/gtk+/2.24.33_2/lib -lgtk-quartz-2.0 -lgdk-quartz-2.0 -framework Cocoa -L/opt/homebrew/Cellar/pango/1.56.4/lib -lpangocairo-1.0 -lpango-1.0 -L/opt/homebrew/Cellar/harfbuzz/11.3.3/lib -lharfbuzz -framework CoreFoundation -framework ApplicationServices -L/opt/homebrew/Cellar/at-spi2-core/2.56.4/lib -latk-1.0 -L/opt/homebrew/Cellar/cairo/1.18.4/lib -lcairo -L/opt/homebrew/lib -lgdk_pixbuf-2.0 -L/opt/homebrew/Cellar/glib/2.84.4/lib -lgio-2.0 -lgobject-2.0 -lglib-2.0 -L/opt/homebrew/opt/gettext/lib -lintl
-INSTALL = /usr/bin/install -c
+GTK_CFLAGS = -I/opt/homebrew/Cellar/gtk+/2.24.33_2/include/gtk-2.0 -I/opt/homebrew/Cellar/gtk+/2.24.33_2/lib/gtk-2.0/include -I/opt/homebrew/Cellar/pango/1.56.4/include/pango-1.0 -I/opt/homebrew/Cellar/fribidi/1.0.16/include/fribidi -I/opt/homebrew/Cellar/harfbuzz/11.3.3/include/harfbuzz -I/opt/homebrew/Cellar/graphite2/1.3.14/include -I/opt/homebrew/Cellar/cairo/1.18.4/include -I/opt/homebrew/Cellar/at-spi2-core/2.56.4/include/atk-1.0 -I/opt/homebrew/Cellar/cairo/1.18.4/include/cairo -I/opt/homebrew/Cellar/fontconfig/2.16.0/include -I/opt/homebrew/opt/freetype/include/freetype2 -I/opt/homebrew/Cellar/libxext/1.3.6/include -I/opt/homebrew/Cellar/xorgproto/2024.1/include -I/opt/homebrew/Cellar/libxrender/0.9.12/include -I/opt/homebrew/Cellar/libx11/1.8.12/include -I/opt/homebrew/Cellar/libxcb/1.17.0/include -I/opt/homebrew/Cellar/libxau/1.0.12/include -I/opt/homebrew/Cellar/libxdmcp/1.1.5/include -I/opt/homebrew/Cellar/pixman/0.46.4/include/pixman-1 -I/opt/homebrew/include/gdk-pixbuf-2.0 -I/opt/homebrew/opt/libpng/include/libpng16 -I/opt/homebrew/Cellar/libtiff/4.7.0/include -I/opt/homebrew/opt/zstd/include -I/opt/homebrew/Cellar/xz/5.8.1/include -I/opt/homebrew/opt/jpeg-turbo/include -I/opt/homebrew/Cellar/glib/2.84.3/include -I/Library/Developer/CommandLineTools/SDKs/MacOSX15.sdk/usr/include/ffi -I/opt/homebrew/Cellar/glib/2.84.3/include/glib-2.0 -I/opt/homebrew/Cellar/glib/2.84.3/lib/glib-2.0/include -I/opt/homebrew/opt/gettext/include -I/opt/homebrew/Cellar/pcre2/10.45/include
+GTK_LIBS = -L/opt/homebrew/Cellar/gtk+/2.24.33_2/lib -lgtk-quartz-2.0 -lgdk-quartz-2.0 -framework Cocoa -L/opt/homebrew/Cellar/pango/1.56.4/lib -lpangocairo-1.0 -lpango-1.0 -L/opt/homebrew/Cellar/harfbuzz/11.3.3/lib -lharfbuzz -framework CoreFoundation -framework ApplicationServices -L/opt/homebrew/Cellar/at-spi2-core/2.56.4/lib -latk-1.0 -L/opt/homebrew/Cellar/cairo/1.18.4/lib -lcairo -L/opt/homebrew/lib -lgdk_pixbuf-2.0 -L/opt/homebrew/Cellar/glib/2.84.3/lib -lgio-2.0 -lgobject-2.0 -lglib-2.0 -L/opt/homebrew/opt/gettext/lib -lintl
+GTK_MAC_CFLAGS = @GTK_MAC_CFLAGS@
+GTK_MAC_LIBS = @GTK_MAC_LIBS@
+INSTALL = /opt/homebrew/bin/ginstall -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
-LDFLAGS = 
+LDFLAGS = -L/opt/homebrew/lib -L/opt/homebrew/lib 
 LIBOBJS = 
-LIBS = meschach.a -L/opt/homebrew/Cellar/gtk+/2.24.33_2/lib -lgtk-quartz-2.0 -lgdk-quartz-2.0 -framework Cocoa -L/opt/homebrew/Cellar/pango/1.56.4/lib -lpangocairo-1.0 -lpango-1.0 -L/opt/homebrew/Cellar/harfbuzz/11.3.3/lib -lharfbuzz -framework CoreFoundation -framework ApplicationServices -L/opt/homebrew/Cellar/at-spi2-core/2.56.4/lib -latk-1.0 -L/opt/homebrew/Cellar/cairo/1.18.4/lib -lcairo -L/opt/homebrew/lib -lgdk_pixbuf-2.0 -L/opt/homebrew/Cellar/glib/2.84.4/lib -lgio-2.0 -lgobject-2.0 -lglib-2.0 -L/opt/homebrew/opt/gettext/lib -lintl -L/opt/homebrew/Cellar/libsndfile/1.2.2_1/lib -lsndfile   -L/opt/homebrew/Cellar/fftw/3.3.10_2/lib -lfftw3   -lm  -framework CoreAudio -lm
+LIBS = meschach.a -L/opt/homebrew/Cellar/gtk+/2.24.33_2/lib -lgtk-quartz-2.0 -lgdk-quartz-2.0 -framework Cocoa -L/opt/homebrew/Cellar/pango/1.56.4/lib -lpangocairo-1.0 -lpango-1.0 -L/opt/homebrew/Cellar/harfbuzz/11.3.3/lib -lharfbuzz -framework CoreFoundation -framework ApplicationServices -L/opt/homebrew/Cellar/at-spi2-core/2.56.4/lib -latk-1.0 -L/opt/homebrew/Cellar/cairo/1.18.4/lib -lcairo -L/opt/homebrew/lib -lgdk_pixbuf-2.0 -L/opt/homebrew/Cellar/glib/2.84.3/lib -lgio-2.0 -lgobject-2.0 -lglib-2.0 -L/opt/homebrew/opt/gettext/lib -lintl -L/opt/homebrew/Cellar/libsndfile/1.2.2_1/lib -lsndfile   -L/opt/homebrew/Cellar/fftw/3.3.10_2/lib -lfftw3   -lm  -framework CoreAudio -lm
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} '/Users/philippe/Documents/gwc/missing' makeinfo
-MKDIR_P = mkdir -p
+MAKEINFO = ${SHELL} '/Users/philippegagne/Documents/Projets/gwc/missing' makeinfo
+MKDIR_P = /opt/homebrew/bin/gmkdir -p
 MP3HDR = 
 MP3LIB = 
 OBJEXT = o
@@ -254,19 +256,19 @@ PALIB =
 PATH_SEPARATOR = :
 PKG_CONFIG = /opt/homebrew/bin/pkg-config
 PKG_CONFIG_LIBDIR = 
-PKG_CONFIG_PATH = 
-PULSEAUDIO_CFLAGS = -I/opt/homebrew/Cellar/pulseaudio/17.0/include -D_REENTRANT
-PULSEAUDIO_LIBS = -L/opt/homebrew/Cellar/pulseaudio/17.0/lib -lpulse-simple -lpulse -pthread
+PKG_CONFIG_PATH = /opt/homebrew/lib/pkgconfig:/opt/homebrew/lib/pkgconfig:
+PULSEAUDIO_CFLAGS = 
+PULSEAUDIO_LIBS = 
 SET_MAKE = 
 SHELL = /bin/sh
 SNDFILE_CFLAGS = -I/opt/homebrew/Cellar/libsndfile/1.2.2_1/include -I/opt/homebrew/Cellar/flac/1.5.0/include -I/opt/homebrew/Cellar/libvorbis/1.3.7/include -I/opt/homebrew/Cellar/libogg/1.3.6/include -I/opt/homebrew/Cellar/opus/1.5.2/include/opus -I/opt/homebrew/Cellar/mpg123/1.33.2/include
 SNDFILE_LIBS = -L/opt/homebrew/Cellar/libsndfile/1.2.2_1/lib -lsndfile
 STRIP = 
 VERSION = 0.22-06
-abs_builddir = /Users/philippe/Documents/gwc
-abs_srcdir = /Users/philippe/Documents/gwc
-abs_top_builddir = /Users/philippe/Documents/gwc
-abs_top_srcdir = /Users/philippe/Documents/gwc
+abs_builddir = /Users/philippegagne/Documents/Projets/gwc
+abs_srcdir = /Users/philippegagne/Documents/Projets/gwc
+abs_top_builddir = /Users/philippegagne/Documents/Projets/gwc
+abs_top_srcdir = /Users/philippegagne/Documents/Projets/gwc
 ac_ct_CC = gcc
 am__include = include
 am__leading_dot = .
@@ -287,7 +289,7 @@ host_alias =
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /Users/philippe/Documents/gwc/install-sh
+install_sh = ${SHELL} /Users/philippegagne/Documents/Projets/gwc/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -336,7 +338,7 @@ SRC = tap_reverb_file_io.c tap_reverb.c reverb.c dialog.c gwc.c audio_device.c a
 OBJS = $(SRC:.c=.o)
 # Alister: We should be able to avoid most of this - see item 3 and 4 in the comment at the top
 # Alister: leave out meschach/configure.in, as it makes a broken configure, and someone may try to use it!
-EXTRA_DIST = $(SRC) icons data osx_packaging Changelog doc ar.c audio_osx.c audio_pa.c audio_oss.c audio_alsa.c \
+EXTRA_DIST = $(SRC) icons data contrib/macosx Changelog doc ar.c audio_osx.c audio_pa.c audio_oss.c audio_alsa.c \
 ar.h audio_device.h audio_edit.h biquad.h encoding.h fmtheaders.h gtkled.h gtkledbar.h gwc.h mconf.h mp3.h mp3-duration.h reverb_settings.h soundfile.h stat.h tap_reverb.h tap_reverb_common.h tap_reverb_file_io.h \
 meschach/DOC meschach/MACHINES meschach/arnoldi.c meschach/bdfactor.c meschach/bkpfacto.c meschach/chfactor.c meschach/configure meschach/conjgrad.c meschach/copy.c meschach/copyright meschach/dmacheps.c meschach/err.c meschach/err.h \
 meschach/extras.c meschach/fft.c meschach/FILELIST meschach/fmacheps.c meschach/givens.c meschach/hessen.c meschach/hsehldr.c meschach/init.c meschach/iotort.c meschach/iter.h meschach/iter0.c meschach/iternsym.c meschach/itersym.c meschach/itertort.c meschach/ivecop.c meschach/lanczos.c \

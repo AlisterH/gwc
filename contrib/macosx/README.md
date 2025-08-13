@@ -25,7 +25,7 @@ This directory contains all macOS-specific files for GTK Wave Cleaner.
 - **`osx_packaging/`** - App bundle packaging
   - Contains the complete macOS app bundle structure
 
-- **`audio_osx.c`** - macOS Core Audio implementation
+**Note:** The macOS Core Audio implementation (`audio_osx.c`) remains in the project root directory for easier compilation.
 
 ## Quick Start
 

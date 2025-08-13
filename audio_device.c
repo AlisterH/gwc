@@ -26,7 +26,7 @@
 #  include "audio_pa.c"
 # else
 #  ifdef MAC_OS_X /* MacOSX */
-#   include "contrib/macosx/audio_osx.c"
+#   include "audio_osx.c"
 #  else
 #   include "audio_oss.c"
 #  endif 
