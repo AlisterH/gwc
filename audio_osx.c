@@ -1,24 +1,6 @@
 /*****************************************************************************
 *   Gnome Wave Cleaner Version 0.20.
-	if(audio_data->sndfile && buff_num < num_buffers)
-	{
-		// Get current file position for debugging
-		sf_count_t current_pos = sf_seek(audio_data->sndfile, 0, SEEK_CUR);
-		
-		// Force seek to beginning for first few callbacks to test
-		if (callback_count <= 3) {
-			sf_seek(audio_data->sndfile, 0, SEEK_SET);
-			current_pos = sf_seek(audio_data->sndfile, 0, SEEK_CUR);
-			printf("DEBUG: Force reset file position to %lld for callback #%d\n", 
-			       (long long)current_pos, callback_count);
-		}
-		
-		read_count = sf_read_float (audio_data->sndfile, p_float, sample_count) ;
-		if (callback_count <= 5) {
-			printf("DEBUG: sf_read_float returned %d samples (requested %d), file_pos=%lld\n", 
-			       read_count, sample_count, (long long)current_pos);
-			printf("DEBUG: Callback #%d - Writing %d samples to output buffer\n", callback_count, read_count);
-		}yright (C) 2003 Jeffrey J. Welty
+*   Copyright (C) 2003 Jeffrey J. Welty
 *   
 *   This program is free software; you can redistribute it and/or
 *   modify it under the terms of the GNU General Public License
@@ -56,6 +38,11 @@
 
 #include "gwc.h"
 #include "audio_device.h"
+
+// Suppress deprecation warnings for CoreAudio APIs
+// These APIs still work and updating to modern APIs would require significant refactoring
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 
 extern int wavefile_fd ;
 extern int stereo;
@@ -130,7 +117,7 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
 		// Get file position and info for debugging
 		if (audio_data && audio_data->sndfile) {
 			sf_count_t pos = sf_seek(audio_data->sndfile, 0, SEEK_CUR);
-			printf("DEBUG: Current file position: %ld\n", pos);
+			printf("DEBUG: Current file position: %lld\n", (long long)pos);
 			
 			// Check if file is valid
 			if (sf_error(audio_data->sndfile) != SF_ERR_NO_ERROR) {
@@ -141,8 +128,8 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
 			SF_INFO info;
 			memset(&info, 0, sizeof(info));
 			if (sf_command(audio_data->sndfile, SFC_GET_CURRENT_SF_INFO, &info, sizeof(info)) == SF_TRUE) {
-				printf("DEBUG: File info - frames: %ld, channels: %d, samplerate: %d\n", 
-				       info.frames, info.channels, info.samplerate);
+				printf("DEBUG: File info - frames: %lld, channels: %d, samplerate: %d\n", 
+				       (long long)info.frames, info.channels, info.samplerate);
 			} else {
 				printf("DEBUG: Could not get file info\n");
 			}
@@ -192,7 +179,7 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
 		return noErr ;
 	} else {
 		if (callback_count <= 5) {
-			printf("DEBUG: Audio callback - no data to play (done_reading=%d, buff_num=%d, num_buffers=%d)\n",
+			printf("DEBUG: Audio callback - no data to play (done_reading=%d, buff_num=%ld, num_buffers=%ld)\n",
 			       audio_data->done_reading, buff_num, num_buffers);
 		}
 		// Fill buffer with silence
@@ -247,7 +234,7 @@ int process_audio(gfloat *pL, gfloat *pR)  //This function must be called repeat
 		}
 		
 		if (process_audio_call_count <= 5) {
-			printf("DEBUG: process_audio() call #%d - buff_num_play=%d\n", process_audio_call_count, buff_num_play);
+			printf("DEBUG: process_audio() call #%d - buff_num_play=%ld\n", process_audio_call_count, buff_num_play);
 		}
 		
 		printf("DEBUG: In PLAYBACK mode, returning VU levels: pL=%f, pR=%f\n", 
@@ -348,7 +335,7 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate) //An
 	// CRITICAL FIX: Position file to playback start position
 	printf("DEBUG: Seeking file to playback start position: %ld\n", playback_start_position);
 	sf_count_t seek_result = sf_seek(audio_data.sndfile, playback_start_position, SEEK_SET);
-	printf("DEBUG: File seek result: %ld (should equal %ld)\n", seek_result, playback_start_position);
+	printf("DEBUG: File seek result: %lld (should equal %ld)\n", (long long)seek_result, playback_start_position);
 	
 	if (!p_global_mem_alloced)
 	{
@@ -485,6 +472,7 @@ void audio_device_close(int drain)  //Reminder: check to make sure this works wh
 	} ;
 }
 
+#pragma clang diagnostic pop
 
-#endif /* MacOSX */
+#endif /* MAC_OS_X */
 
