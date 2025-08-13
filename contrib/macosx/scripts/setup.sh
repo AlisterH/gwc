@@ -18,11 +18,11 @@ fi
 # Step 1: Install dependencies
 echo "Step 1: Installing dependencies..."
 echo "================================="
-if [ -f "./brew-install-deps.sh" ]; then
-    chmod +x ./brew-install-deps.sh
-    ./brew-install-deps.sh
+if [ -f "./install.sh" ]; then
+    chmod +x ./install.sh
+    ./install.sh
 else
-    echo "❌ brew-install-deps.sh not found"
+    echo "❌ install.sh not found"
     exit 1
 fi
 
@@ -34,11 +34,11 @@ sleep 3
 echo ""
 echo "Step 2: Building GTK Wave Cleaner..."
 echo "===================================="
-if [ -f "./brew-build.sh" ]; then
-    chmod +x ./brew-build.sh
-    ./brew-build.sh
+if [ -f "./build.sh" ]; then
+    chmod +x ./build.sh
+    ./build.sh
 else
-    echo "❌ brew-build.sh not found"
+    echo "❌ build.sh not found"
     exit 1
 fi
 
@@ -50,13 +50,13 @@ sleep 3
 echo ""
 echo "Step 3: Creating macOS App Bundle..."
 echo "===================================="
-if [ -f "./create_macos_app.sh" ]; then
-    chmod +x ./create_macos_app.sh
-    ./create_macos_app.sh
+if [ -f "./app.sh" ]; then
+    chmod +x ./app.sh
+    ./app.sh
 else
-    echo "❌ create_macos_app.sh not found - skipping app bundle creation"
+    echo "❌ app.sh not found - skipping app bundle creation"
     echo "   You can create the app bundle manually later with:"
-    echo "   chmod +x create_macos_app.sh && ./create_macos_app.sh"
+    echo "   chmod +x app.sh && ./app.sh"
 fi
 
 echo ""

@@ -80,10 +80,10 @@ if [[ -n "$ICON_BACKUP" && -f "$ICON_BACKUP" ]]; then
     echo "🎨 Restored AppIcon.icns"
 fi
 
-# Generate fresh icon from data/icons if create-mac-icon.sh exists
-if [[ -f "create-mac-icon.sh" && ! -f "${RESOURCES_DIR}/AppIcon.icns" ]]; then
+# Generate fresh icon from data/icons if icon.sh exists
+if [[ -f "contrib/macosx/scripts/icon.sh" && ! -f "${RESOURCES_DIR}/AppIcon.icns" ]]; then
     echo "🎨 Generating fresh AppIcon.icns from data/icons..."
-    ./create-mac-icon.sh >/dev/null 2>&1
+    ./contrib/macosx/scripts/icon.sh >/dev/null 2>&1
     if [[ -f "AppIcon-new.icns" ]]; then
         mv "AppIcon-new.icns" "${RESOURCES_DIR}/AppIcon.icns"
         echo "✅ Fresh AppIcon.icns created from data/icons"

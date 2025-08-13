@@ -20,8 +20,8 @@ done
 
 echo ""
 echo "🔧 Actions available:"
-echo "   • ./create-mac-icon.sh - Create new .icns from data/icons"
-echo "   • ./create_macos_app.sh - Rebuild app bundle (preserves or generates icon)"
+echo "   • ./icon.sh - Create new .icns from data/icons"
+echo "   • ./app.sh - Rebuild app bundle (preserves or generates icon)"
 echo ""
 echo "💡 The data/icons are high-quality and perfect for Mac icons!"
 echo "   They provide all standard macOS icon sizes and maintain transparency."

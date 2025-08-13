@@ -37,7 +37,7 @@ fi
 
 if [ ${#MISSING_DEPS[@]} -ne 0 ]; then
     echo "❌ Missing dependencies: ${MISSING_DEPS[*]}"
-    echo "   Run ./brew-install-deps.sh first to install them"
+    echo "   Run ./contrib/macosx/scripts/install.sh first to install them"
     exit 1
 fi
 
@@ -96,7 +96,7 @@ echo "   • CoreAudio backend enabled for native macOS audio"
 echo ""
 echo "🚀 Next steps:"
 echo "   • Test: ./gtk-wave-cleaner"
-echo "   • Create app bundle: ./create_macos_app.sh"
+echo "   • Create app bundle: ./contrib/macosx/scripts/app.sh"
 echo "   • Install system-wide: sudo make install"
 echo ""
 echo "💡 Tips:"

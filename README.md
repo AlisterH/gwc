@@ -39,11 +39,16 @@ This will automatically:
 ./brew-setup-complete.sh     # Everything automated
 ```
 
+### Quick Start (One Command)
+```bash
+./contrib/macosx/scripts/all.sh      # Complete automated build
+```
+
 ### Step by Step
 ```bash
-./contrib/macosx/scripts/brew-install-deps.sh       # Install dependencies
-./contrib/macosx/scripts/brew-build.sh              # Build application
-./contrib/macosx/scripts/create_macos_app.sh        # Create app bundle
+./contrib/macosx/scripts/install.sh  # Install dependencies
+./contrib/macosx/scripts/build.sh    # Build application
+./contrib/macosx/scripts/app.sh      # Create app bundle
 ```
 
 ### Manual

@@ -34,9 +34,9 @@ For automated installation on macOS with Homebrew:
 Run "./brew-setup-complete.sh" (installs dependencies, builds, and creates app bundle)
 
 Or step by step:
-Run "./contrib/macosx/scripts/brew-install-deps.sh" (install Homebrew dependencies)
-Run "./contrib/macosx/scripts/brew-build.sh" (configure and build)
-Run "./contrib/macosx/scripts/create_macos_app.sh" (create distributable app bundle)
+Run "./contrib/macosx/scripts/install.sh" (install Homebrew dependencies)
+Run "./contrib/macosx/scripts/build.sh" (configure and build)
+Run "./contrib/macosx/scripts/app.sh" (create distributable app bundle)
 
 See contrib/macosx/docs/BUILD_MACOS.md and contrib/macosx/docs/BREW_BUILD.md for detailed macOS build instructions.
 

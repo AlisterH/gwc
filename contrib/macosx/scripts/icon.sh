@@ -56,7 +56,7 @@ echo "   New:      $(ls -lh AppIcon-new.icns | awk '{print $5}')"
 echo ""
 echo "🔄 To use the new icon:"
 echo "   cp AppIcon-new.icns \"osx_packaging/Gtk Wave Cleaner.app/Contents/Resources/AppIcon.icns\""
-echo "   ./create_macos_app.sh  # Rebuild app bundle"
+echo "   ./app.sh  # Rebuild app bundle"
 
 # Cleanup
 rm -rf "$(dirname "$ICONSET_DIR")"
