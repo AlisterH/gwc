@@ -72,7 +72,7 @@ BINFILES = $(APPNAME)
 # Alister: normally this should automatically cause `make [un]install` to install/uninstall it, but in our case we are doing it manually below
 dist_bin_SCRIPTS = gwcbatch
 # Confusingly we don't have the DOCFILES in the doc directory, only the HELPFILES
-DOCFILES = README INSTALL TODO COPYING Changelog
+DOCFILES = README.md INSTALL TODO COPYING Changelog
 HELPFILES = $(APPNAME).html gtkrc-example.txt
 HELPFILESSRCD = doc
 
