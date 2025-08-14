@@ -111,6 +111,10 @@ GtkWidget *detect_only_widget;
 GtkWidget *leave_click_marks_widget;
 GtkWidget *main_window;
 
+/* Global UI Manager and Action Group for accelerator management */
+GtkUIManager *ui_manager = NULL;
+GtkActionGroup *action_group = NULL;
+
 GtkWidget *l_file_time;
 GtkWidget *l_file_samples;
 GtkWidget *l_file_channels;
@@ -1806,6 +1810,26 @@ gboolean  key_press_cb(GtkWidget * widget, GdkEventKey * event, gpointer data)
 
 /*      g_print("key_press_cb\n") ;  */
 
+    /* Check if focus is on a text entry widget - if so, don't handle shortcuts 
+     * This allows text to be typed normally in dialogs without triggering shortcuts */
+    GtkWidget *focus_widget = gtk_window_get_focus(GTK_WINDOW(main_window));
+    if (focus_widget && GTK_IS_ENTRY(focus_widget)) {
+        return FALSE;  /* Let the entry widget handle the key press */
+    }
+    
+    /* Check if any modal dialog is open - if so, don't handle shortcuts at all */
+    GList *windows = gtk_window_list_toplevels();
+    GList *iter;
+    for (iter = windows; iter != NULL; iter = iter->next) {
+        GtkWidget *window = GTK_WIDGET(iter->data);
+        if (GTK_IS_DIALOG(window) && GTK_WIDGET_VISIBLE(window) && 
+            gtk_window_get_modal(GTK_WINDOW(window))) {
+            g_list_free(windows);
+            return FALSE;  /* Let the dialog handle all key presses */
+        }
+    }
+    g_list_free(windows);
+
     /* GDK_b, GDK_c, GDK_e, GDK_n, GDK_z used through menus */
     switch (event->keyval) {
 	case GDK_space:
@@ -3321,13 +3345,56 @@ void batch(int argc, char **argv)
     return ;
 }
 
+/* Functions to manage accelerators for dialogs */
+void disable_problematic_accelerators(void)
+{
+    if (action_group) {
+        GtkAction *action;
+        
+        action = gtk_action_group_get_action(action_group, "Decrackle");
+        if (action) gtk_action_set_sensitive(action, FALSE);
+        
+        action = gtk_action_group_get_action(action_group, "ToggleEnd");
+        if (action) gtk_action_set_sensitive(action, FALSE);
+        
+        action = gtk_action_group_get_action(action_group, "ToggleBegin");
+        if (action) gtk_action_set_sensitive(action, FALSE);
+        
+        action = gtk_action_group_get_action(action_group, "ExpandSelection");
+        if (action) gtk_action_set_sensitive(action, FALSE);
+        
+        action = gtk_action_group_get_action(action_group, "NextMarker");
+        if (action) gtk_action_set_sensitive(action, FALSE);
+    }
+}
+
+void enable_problematic_accelerators(void)
+{
+    if (action_group) {
+        GtkAction *action;
+        
+        action = gtk_action_group_get_action(action_group, "Decrackle");
+        if (action) gtk_action_set_sensitive(action, TRUE);
+        
+        action = gtk_action_group_get_action(action_group, "ToggleEnd");
+        if (action) gtk_action_set_sensitive(action, TRUE);
+        
+        action = gtk_action_group_get_action(action_group, "ToggleBegin");
+        if (action) gtk_action_set_sensitive(action, TRUE);
+        
+        action = gtk_action_group_get_action(action_group, "ExpandSelection");
+        if (action) gtk_action_set_sensitive(action, TRUE);
+        
+        action = gtk_action_group_get_action(action_group, "NextMarker");
+        if (action) gtk_action_set_sensitive(action, TRUE);
+    }
+}
+
 int main(int argc, char *argv[])
 {
     GtkWidget *main_vbox, *menubar, *toolbar,
 	*led_vbox, *track_times_vbox, *times_vbox, 
 	*bottom_hbox, *detect_only_box, *leave_click_marks_box;
-    GtkActionGroup *action_group;
-    GtkUIManager *ui_manager;
     GError *error;
 
     int i;

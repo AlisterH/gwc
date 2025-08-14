@@ -389,7 +389,7 @@ int filter_dialog(struct sound_prefs current, struct view *v)
     gtk_widget_show (dialog_table);
 
     dlg = gtk_dialog_new_with_buttons("Biquad filter",
-			GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT,
+			GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL,
 			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 			 GTK_STOCK_OK, GTK_RESPONSE_OK, NULL, NULL);
     gtk_dialog_set_default_response (GTK_DIALOG(dlg), GTK_RESPONSE_OK);
