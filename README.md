@@ -26,7 +26,8 @@ The source code and all associated files are freely available under the GNU Gene
 5. Run `make`
 6. Run `make install`
 
-### macOS (Recommended)
+### macOS
+
 #### Automated Build (Recommended)
 
 **Prerequisites:**  
@@ -56,9 +57,7 @@ This script will install all dependencies, build the application, and create a d
 The finished app bundle will be located at `osx_packaging/Gtk Wave Cleaner.app`, and a disk image will be created for easy installation.
 
 For more information, see:
-- `contrib/macosx/GTK_MAC_INTEGRATION_UPDATE.md`
-- `contrib/macosx/scripts/README` (if available)
-- `SCRIPT_UPDATES_COMPLETE.md`
+- `contrib/macosx/README.md`
 
 #### Notes for macOS Compilation
 - Native menu bar, dock, and window management are supported via gtk-mac-integration.
@@ -74,8 +73,6 @@ For more information, see:
 - Distributions may want to enable PulseAudio (`--enable-pa`).
 - On macOS, Core Audio is enabled by default and works reliably.
 - Note: mp3 and ogg reading support are currently still broken.
-
-For detailed macOS build instructions and troubleshooting, see `contrib/macosx/GTK_MAC_INTEGRATION_UPDATE.md`.
 
 If you have problems installing, check whether they are documented in the `INSTALL` file.
 
