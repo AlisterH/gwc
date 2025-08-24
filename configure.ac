@@ -189,7 +189,22 @@ if test x$platform_osx = xyes; then
   if test "x$HAVE_GTK_MAC" = xyes ; then
     OSXDEF="$OSXDEF -DHAVE_GTK_MAC_INTEGRATION"
     GTK_CFLAGS="$GTK_CFLAGS $GTK_MAC_CFLAGS"
-    GTK_LIBS="$GTK_LIBS $GTK_MAC_LIBS"
+    # Only add GTK_MAC_LIBS that are not already in GTK_LIBS
+    GTK_MAC_UNIQUE=""
+    for mac_lib in $GTK_MAC_LIBS; do
+      # Check if this library is not already in GTK_LIBS
+      found=0
+      for gtk_lib in $GTK_LIBS; do
+        if test "$mac_lib" = "$gtk_lib"; then
+          found=1
+          break
+        fi
+      done
+      if test $found -eq 0; then
+        GTK_MAC_UNIQUE="$GTK_MAC_UNIQUE $mac_lib"
+      fi
+    done
+    GTK_LIBS="$GTK_LIBS$GTK_MAC_UNIQUE"
     AC_MSG_NOTICE([GTK Mac Integration found - enabling native macOS integration])
   else
     AC_MSG_NOTICE([GTK Mac Integration not found - building without native macOS integration])

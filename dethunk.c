@@ -82,7 +82,7 @@ int dethunk_new(struct sound_prefs *pPrefs,
 #else /* HAVE_FFTW3 */
     rfftw_plan pFor,pBak ;
 #endif /* HAVE_FFTW3 */
-	double dfs, hdfs;
+	double hdfs;
     extern struct view audio_view ;
     int FFT_SIZE ;
     int repair_size ;
@@ -94,7 +94,7 @@ int dethunk_new(struct sound_prefs *pPrefs,
     repair_size = FFT_SIZE * n_want ;
     n_windows = 2*n_want - 1 ;
 
-    dfs = FFT_SIZE ;
+    /* dfs = FFT_SIZE ; */
     hdfs = FFT_SIZE / 2 ;
 
     {
@@ -352,7 +352,7 @@ int dethunk_current(struct sound_prefs *pPrefs,
 #else /* HAVE_FFTW3 */
     rfftw_plan pFor ;
 #endif /* HAVE_FFTW3 */
-	double dfs, hdfs;
+	double hdfs;
     extern struct view audio_view ;
     int FFT_SIZE ;
 
@@ -360,7 +360,7 @@ int dethunk_current(struct sound_prefs *pPrefs,
 
     for(FFT_SIZE = 8 ; FFT_SIZE < n_samples && FFT_SIZE < 8192 ; FFT_SIZE *= 2) ;
 
-    dfs = FFT_SIZE ;
+    /* dfs = FFT_SIZE ; */
     hdfs = FFT_SIZE / 2 ;
 
     {

@@ -52,7 +52,7 @@ HELPDIR = $(DOCDIR)
 DEFS = -DDATADIR=\"$(DATADIR)\" -DHELPDIR=\"$(HELPDIR)\" -DLIBDIR=\"$(LIBDIR)\" -DAPPNAME=\"$(APPNAME)\" @OSXDEF@ @ALSADEF@ @PAHDR@ @FFTWHDR@ @FFTWPREC@ @OGGHDR@ @MP3HDR@
 CFLAGS = -D_FILE_OFFSET_BITS=64 -Wall @CFLAGS@ @GTK_CFLAGS@ @SNDFILE_CFLAGS@
 
-LIBS= meschach.a @GTK_LIBS@ @SNDFILE_LIBS@ @ALSALIB@ @PALIB@ @FFTWLIB@ @OGGLIB@ @MP3LIB@ @OSXLIBS@ -lm
+LIBS= meschach.a @GTK_LIBS@ @SNDFILE_LIBS@ @ALSALIB@ @PALIB@ @FFTWLIB@ @OGGLIB@ @MP3LIB@ @OSXLIBS@
 
 SRC = tap_reverb_file_io.c tap_reverb.c reverb.c dialog.c gwc.c audio_device.c audio_edit.c audio_util.c gtkled.c gtkledbar.c preferences.c drawing.c amplify.c denoise.c undo.c declick.c sample_block.c decrackle.c stat.c dethunk.c i0.c i1.c chbevl.c markers.c encode.c soundfile.c pinknoise.c biquad.c
 OBJS = $(SRC:.c=.o)

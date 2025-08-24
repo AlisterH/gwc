@@ -249,7 +249,7 @@ int lsar_sample_restore(fftw_real data[], int firstbad, int lastbad, int siglen)
 #ifdef MESCHACH
     int n_bad = lastbad - firstbad + 1 ;
     int autolen = 60 ;
-    int i, j, rows, cols ;
+    int i, j, rows ;
     int rcode ;
     gboolean clipped ;
     double x[100], auto_coefs[101] ;
@@ -300,7 +300,6 @@ int lsar_sample_restore(fftw_real data[], int firstbad, int lastbad, int siglen)
 	for(i = firstbad ; i <= lastbad ; i++) sig->ve[i] = 0.0 ;
 
 	rows = siglen - autolen ;
-	cols = siglen ;
 
 	for(i = 0 ; i < rows ; i++) {
 
@@ -414,7 +413,6 @@ int lsar_sample_restore(fftw_real data[], int firstbad, int lastbad, int siglen)
 	for(i = firstbad ; i <= lastbad ; i++) gsl_vector_set(sig,i,0.0) ;
 
 	rows = siglen - autolen ;
-	cols = siglen ;
 
 	for(i = 0 ; i < rows ; i++) {
 
@@ -688,7 +686,7 @@ struct click_data *clicks, int iterate_flag, int leave_click_marks)
     long window_first ;
     long i,k ;
     int FFT_SIZE = 64 ;
-    int n_repaired[2] , n_this_pass ;
+    int n_repaired[2] , n_this_pass = 0 ;
     int n_not_repaired[2] ;
     char max_exceeded_notice = 0 ;
 #define FFT_WINDOW 1000
@@ -914,7 +912,7 @@ struct click_data *clicks, int iterate_flag, int leave_click_marks)
 			    n_not_repaired[channel]++ ;
 			} else {
 			    n_repaired[channel]++ ;
-			    n_this_pass ++ ;
+			    /* n_this_pass ++ ; */
 			    clicks_repaired = 1 ;
 			}
 		    }
@@ -1072,10 +1070,10 @@ struct click_data *clicks, int iterate_flag, int leave_click_marks)
 				click_end = window_first + i ;
 			    }
 			} else if(in_click == 1 && !sample_is_in_click) {
-			    long width ;
+			    /* long width ; */
 			    int result = DETECT_ONLY ;
 			    click_start = window_first+i ;
-			    width = click_end - click_start ;
+			    /* width = click_end - click_start ; */
     /*  			click_start -= width ;  */
     /*  			click_end += width ;  */
 			    if(click_start < 0) click_start = 0 ;

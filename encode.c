@@ -596,7 +596,7 @@ int encode(int mode, char *origfilename, char *newfilename, long start,
     outsfinfo = insfinfo;
 
     /* skip to position in sound file */
-    if (!sf_seek(in_fd, start, SEEK_SET) == start) {
+    if (sf_seek(in_fd, start, SEEK_SET) != start) {
 	warning("Failed to seek to position in sound file\n");
 	sf_close(in_fd);
 	return (1);
@@ -633,7 +633,7 @@ int start_encode_old(int mode, char *newfilename, long start, long length, char 
     int i=0 ;
     int use_sox = 1 ;
     char cmd[2048] ;
-    char *exec_loc ;
+    char *exec_loc = NULL ;
 
     if (mode == OGG_FMT) {
 	/* execute ogg encoder using prebuilt options */
@@ -655,7 +655,7 @@ int start_encode_old(int mode, char *newfilename, long start, long length, char 
     printf("\n") ;
 
     if(use_sox) {
-    sprintf(cmd, "sox %s -t raw - trim %ld\s %ld\s |", origfilename, start, length) ;
+    sprintf(cmd, "sox %s -t raw - trim %ld %ld |", origfilename, start, length) ;
 
     for(i = 0 ; options[i] != (char *)NULL ; i++) {
 	int j ;
@@ -782,11 +782,11 @@ int start_encode(int mode, char *newfilename, long start, long length, char *ori
     long samples_read;
     long ctr;
     long numframes = 0;
-    int f_des[2], child_pid;
+    int child_pid;
     int i=0 ;
     int use_sox = 0 ;
     char cmd[2048] ;
-    char *exec_loc ;
+    char *exec_loc = NULL ;
 
     if (mode == OGG_FMT) {
 	/* execute ogg encoder using prebuilt options */
@@ -808,7 +808,7 @@ int start_encode(int mode, char *newfilename, long start, long length, char *ori
     printf("\n") ;
 
     if(use_sox) {
-	sprintf(cmd, "sox %s -t raw - trim %ld\s %ld\s |", origfilename, start, length) ;
+	sprintf(cmd, "sox %s -t raw - trim %ld %ld |", origfilename, start, length) ;
 
 	for(i = 0 ; options[i] != (char *)NULL ; i++) {
 	    int j ;
@@ -843,7 +843,7 @@ int start_encode(int mode, char *newfilename, long start, long length, char *ori
     /* now using a named pipe */
     if(mkfifo(pipe_name, S_IRWXU)) {
 	static char buf[254] ;
-	snprintf(buf,255,"Failed to open named pipe to transfer data to %s, cannot proceed", exec_loc) ;
+	snprintf(buf,254,"Failed to open named pipe to transfer data to %s, cannot proceed", exec_loc) ;
 	warning(buf) ;
 	return 1 ;
     }
@@ -860,7 +860,7 @@ int start_encode(int mode, char *newfilename, long start, long length, char *ori
 
     } else {
 	double *framebuf = NULL ;
-	FILE *fp ;
+	/* FILE *fp ; */
 	/* Parent */
 	fprintf(stderr, "encoding child pid is %d\n", child_pid) ;
 

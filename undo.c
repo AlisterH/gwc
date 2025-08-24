@@ -101,7 +101,7 @@ int save_undo_data(long first_sample, long last_sample, struct sound_prefs *p, i
     const int BLOCK_SIZE = 1024 ;
     char buf[BLOCK_SIZE * FRAMESIZE] ;
     long curr ;
-    long blocks ;
+    /* long blocks ; */
     gfloat n_sample = (last_sample-first_sample+1) ;
 
 #ifndef TRUNCATE_OLD
@@ -150,7 +150,7 @@ int save_undo_data(long first_sample, long last_sample, struct sound_prefs *p, i
     if(progress_update_flag)
 	update_progress_bar(0.0, PROGRESS_UPDATE_INTERVAL, TRUE) ;
 
-    blocks = (last_sample - first_sample + 1) / BLOCK_SIZE;
+    /* blocks = (last_sample - first_sample + 1) / BLOCK_SIZE; */
 
     for(curr = first_sample ; curr <= last_sample ; curr += BLOCK_SIZE) {
         long end;
@@ -223,7 +223,7 @@ int undo(struct view *v, struct sound_prefs *p)
     char _filename[1024] ;
     const int BLOCK_SIZE = 1024 ;
     char buf[BLOCK_SIZE * FRAMESIZE] ;
-    long blocks ;
+    /* long blocks ; */
     off_t *data_start_pos ;
     long total_sections;
 #ifndef TRUNCATE_OLD
@@ -305,7 +305,7 @@ int undo(struct view *v, struct sound_prefs *p)
 
         if (undo_type != UNDO_INSERT) {
 #endif
-        blocks = (last_sample - first_sample + 1) / BLOCK_SIZE;
+        /* blocks = (last_sample - first_sample + 1) / BLOCK_SIZE; */
         for(curr = first_sample ; curr <= last_sample ; curr += BLOCK_SIZE) {
               long end;
 	    gfloat p = (gfloat)(curr-first_sample)/(last_sample - first_sample) * (total_sections - n_sections) / total_sections ;

@@ -273,7 +273,7 @@ void fill_sample_buffer(struct sound_prefs *p)
     sb_size = n_blocks*sizeof(struct sample_block) ;
 
     if(!load_sample_block_data(p)) {
-	g_print("Building display information, n_samples=%d, hang on...\n", p->n_samples) ;
+	g_print("Building display information, n_samples=%ld, hang on...\n", p->n_samples) ;
 	push_status_text("Loading audio information") ;
 
 	if(load_sample_block_data(p) == 0) {

@@ -18,14 +18,11 @@ void matrix_solve(MAT *) ;
 static MAT *coef = MNULL ;
 static VEC *b = VNULL ;
 static VEC *answer = VNULL ;
-static int row, col, N, i ;
+static int row, col, N ;
 static int failed ;
 
 /* LUsolve -- given an LU factorisation in A, solve Ax=b */
-VEC	*myLUsolve(A,pivot,b,x)
-MAT	*A;
-PERM	*pivot;
-VEC	*b,*x;
+VEC	*myLUsolve(MAT *A, PERM *pivot, VEC *b, VEC *x)
 {
 	if ( A==(MAT *)NULL || b==(VEC *)NULL || pivot==(PERM *)NULL )
 		error(E_NULL,"LUsolve");

@@ -340,7 +340,6 @@ int filter_dialog(struct sound_prefs current, struct view *v)
 {
     GtkWidget *dlg, *dialog_table ;
     GtkWidget *feather_entry ;
-    int dclose = 0;
     int row = 0 ;
     int dres ;
 
@@ -421,7 +420,6 @@ int filter_dialog(struct sound_prefs current, struct view *v)
 	filter_prefs.Fc = Fc ;
 	filter_prefs.bandwidth = bandwidth ;
 	filter_prefs.filter_type = filter_type ;
-	dclose = 1 ;
     }
 
     gtk_widget_destroy(dlg) ;
