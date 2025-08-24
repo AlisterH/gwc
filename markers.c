@@ -307,7 +307,7 @@ void cdrdao_toc_info(char *filename)
 void store_cdrdao_toc(gpointer user_data)
 {
     if(strcmp(save_cdrdao_toc_filename, wave_filename)) {
-	int l ;
+   int l;
 
 	l = strlen(save_cdrdao_toc_filename) ;
 
@@ -483,7 +483,7 @@ void move_song_marker(void)
       set_status_text("No song markers");
    } else {
       for (i = 0; i < num_song_markers; i++) {
-          err = abs(loc - song_markers[i]);
+          err = labs(loc - song_markers[i]); // use labs for long
           if (err < min_err) {
              min_err = err;
              min_err_loc = i;

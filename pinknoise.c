@@ -253,7 +253,7 @@ int pinknoise_dialog(struct sound_prefs current, struct view *v)
     GtkWidget *amount_pink_entry ;
     GtkWidget *amount_white_entry ;
     GtkWidget *feather_width_entry ;
-    int dclose = 0 ;
+	int dclose = 0;
     int row = 0 ;
     int dres ;
 

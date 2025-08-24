@@ -118,7 +118,7 @@ void filter_audio(struct sound_prefs *p, long first, long last, int channel_mask
     long left[BUFSIZE], right[BUFSIZE] ;
     long x_left[3], x_right[3] ;
     long y_left[3], y_right[3] ;
-    long current, i, f ;
+    long current, i ; // removed unused variable f
     int loops = 0 ;
     long ring_buffer_length ;
     double rb_left[BUFSIZE], rb_right[BUFSIZE] ;
@@ -340,7 +340,7 @@ int filter_dialog(struct sound_prefs current, struct view *v)
 {
     GtkWidget *dlg, *dialog_table ;
     GtkWidget *feather_entry ;
-    int dclose = 0 ;
+    int dclose = 0;
     int row = 0 ;
     int dres ;
 

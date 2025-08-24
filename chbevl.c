@@ -71,10 +71,7 @@ Stephen L. Moshier
 moshier@world.std.com
 */
 
-double chbevl( x, array, n )
-double x;
-double array[];
-int n;
+double chbevl(double x, double *array, int n)
 {
 double b0, b1, b2, *p;
 int i;

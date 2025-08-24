@@ -82,7 +82,7 @@ int dethunk_new(struct sound_prefs *pPrefs,
 #else /* HAVE_FFTW3 */
     rfftw_plan pFor,pBak ;
 #endif /* HAVE_FFTW3 */
-    double dfs, hdfs ;
+	double dfs, hdfs;
     extern struct view audio_view ;
     int FFT_SIZE ;
     int repair_size ;
@@ -352,7 +352,7 @@ int dethunk_current(struct sound_prefs *pPrefs,
 #else /* HAVE_FFTW3 */
     rfftw_plan pFor ;
 #endif /* HAVE_FFTW3 */
-    double dfs, hdfs ;
+	double dfs, hdfs;
     extern struct view audio_view ;
     int FFT_SIZE ;
 
