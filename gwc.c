@@ -235,7 +235,7 @@ void audio_debug_print(char *fmt, ...)
     }
 }
 
-char *sample_to_time_text(long i, int rate, char *prefix, char *buf)
+char *sample_to_time_text(long i, int rate, char *prefix, char *buf, int buf_size)
 {
     int m, s, ms;
 
@@ -246,7 +246,7 @@ char *sample_to_time_text(long i, int rate, char *prefix, char *buf)
     i -= s * rate;
     ms = 1000 * i / rate;
 
-    sprintf(buf, "%s%d:%02d:%03d", prefix, m, s, ms);
+    snprintf(buf, buf_size, "%s%d:%02d:%03d", prefix, m, s, ms);
     return buf;
 }
 
@@ -291,14 +291,18 @@ void append_cdrdao(struct view *v)
         }
 
         if (fp == NULL) {
-            warning(g_strconcat("Cannot write to ", g_get_current_dir(), "/cdrdao.toc: ", strerror(errno), NULL));  //this check prevents a segfault if we can't write to the file
+            char *msg = g_strconcat("Cannot write to ", g_get_current_dir(), "/cdrdao.toc: ", strerror(errno), NULL); 
+            warning(msg); 
+            g_free(msg);  //this check prevents a segfault if we can't write to the file
         }
         else {
             get_region_of_interest(&first, &last, v) ;
             fprintf(fp, "TRACK AUDIO\n");
             fprintf(fp, "FILE \"%s\" %ld %ld\n", wave_filename, first, last - first + 1);
             fclose(fp);
-            set_status_text(g_strconcat("Selection appended to ", g_get_current_dir(), "/cdrdao.toc", NULL));  //we should really review the code looking for other actions that should set the status like this
+            char *status = g_strconcat("Selection appended to ", g_get_current_dir(), "/cdrdao.toc", NULL); 
+            set_status_text(status); 
+            g_free(status);  //we should really review the code looking for other actions that should set the status like this
         }
     }
 }
@@ -312,25 +316,25 @@ void display_times(void)
     get_region_of_interest(&first, &last, &audio_view);
 
 #ifndef OLD
-    sprintf(buf, "Audio Channels: %d", prefs.stereo+1);
+    snprintf(buf, 50, "Audio Channels: %d", prefs.stereo+1);
     gtk_label_set_text(GTK_LABEL(l_file_channels), buf);
-    sprintf(buf, "Samplerate: %d Hz", prefs.rate);
+    snprintf(buf, 50, "Samplerate: %d Hz", prefs.rate);
     gtk_label_set_text(GTK_LABEL(l_file_rate), buf);
     gtk_label_set_text(GTK_LABEL(l_file_time),
 		       sample_to_time_text(prefs.n_samples, prefs.rate,
-					   "Track Length ", buf));
-    sprintf(buf, "Track samples: %ld", audio_view.n_samples);
+					   "Track Length ", buf, 50));
+    snprintf(buf, 50, "Track samples: %ld", audio_view.n_samples);
     gtk_label_set_text(GTK_LABEL(l_file_samples), buf);
     gtk_label_set_text(GTK_LABEL(l_first_time),
 		       sample_to_time_text(first, prefs.rate, "First ",
-					   buf));
+					   buf, 50));
     gtk_label_set_text(GTK_LABEL(l_last_time),
 		       sample_to_time_text(last, prefs.rate, "Last ",
-					   buf));
+					   buf, 50));
     gtk_label_set_text(GTK_LABEL(l_selected_time),
 		       sample_to_time_text(last-first-1, prefs.rate, "Selected ",
-					   buf));
-    sprintf(buf, "Samples: %ld", last - first + 1);
+					   buf, 50));
+    snprintf(buf, 50, "Samples: %ld", last - first + 1);
     gtk_label_set_text(GTK_LABEL(l_samples), buf);
 #else
     gtk_label_set_text(GTK_LABEL(l_file_time),
@@ -437,8 +441,8 @@ void load_preferences(void)
     GKeyFile  *key_file = read_config();
     // We should probably have a separate test for each preference...
     if (g_key_file_has_group(key_file, "config") == TRUE) {
-        strcpy(pathname, g_key_file_get_string(key_file, "config", "pathname", NULL));
-        strcpy(last_filename, g_key_file_get_string(key_file, "config", "last_filename", NULL));
+        g_strlcpy(pathname, g_key_file_get_string(key_file, "config", "pathname", NULL), PATH_MAX + 1);
+        g_strlcpy(last_filename, g_key_file_get_string(key_file, "config", "last_filename", NULL), PATH_MAX + 1);
         audio_view.first_sample = g_key_file_get_integer(key_file, "config", "first_sample_viewed", NULL);
         audio_view.last_sample = g_key_file_get_integer(key_file, "config", "last_sample_viewed", NULL);
         // What's going on here with num_song_markers?
@@ -458,7 +462,7 @@ void load_preferences(void)
         sonogram_log = g_key_file_get_double(key_file, "config", "sonogram_log", NULL);
 /*      audio_view.truncate_tail = g_key_file_get_integer(key_file, "config", "truncate_tail", NULL) ;  */
 /*      audio_view.truncate_head = g_key_file_get_integer(key_file, "config", "truncate_head", NULL) ;  */
-        strcpy(audio_device, g_key_file_get_string(key_file, "config", "audio_device", NULL));
+        g_strlcpy(audio_device, g_key_file_get_string(key_file, "config", "audio_device", NULL), 256);
     }
     if (g_key_file_has_group(key_file, "window") == TRUE) {
     window_width = g_key_file_get_integer(key_file, "window", "width", NULL);
@@ -680,7 +684,7 @@ int prompt_user(char *msg, char *s, int maxlen)
 	dres = 1 ;		/* return we clicked cancel */
     } else {
 	dres = 0 ; 		/* return we clicked yes */
-	strcpy(s, gtk_entry_get_text(GTK_ENTRY(entry)));
+	g_strlcpy(s, gtk_entry_get_text(GTK_ENTRY(entry)), maxlen);
     }
 
     gtk_widget_destroy(dlg) ;
@@ -737,33 +741,21 @@ void help(GtkWidget * widget, gpointer data)
 		return retval;
 	*/	
 		
-  # else
-  /*
-  // This is infuriating as it silently fails if gvfs is not installed, and it will freeze gwc
-  // if gvfs is installed but broken (e.g. because the dbus session isn't working correctly)!
-	if GTK_CHECK_VERSION(2,14,0)
-  	{
-		// not sure if this does what I want
-  		GdkScreen *screen = gtk_widget_get_screen (main_window);
-  		// First try gtk_show_uri(), which fails if gvfs is not installed
-  		// Then use xdg-open, which should work in almost all cases.
-  		// If we were keen we could copy pragha's src/utils.c, which then tries firefox, mozilla, opera...
-  		if ( !gtk_show_uri(screen, uri, gtk_get_current_event_time (), NULL) )
-  		{
-			char *command = g_strdup_printf("%s %s &", command ? command : "xdg-open", uri);
-			system(command);
-			g_free(command);
-		}
-	}
-	else
-  	{ */
-		// I used to think that xdg-open was inferior because it used a hard-coded list of browsers,
-		// but it actually uses the $BROWSER environment variable if set
-  		char *command = g_strdup_printf("%s %s &",  "xdg-open", uri);
-  		system(command);
-  		g_free(command);
-//	}
-  #endif
+  #else
+#if GTK_CHECK_VERSION(2,14,0)
+    GdkScreen *screen = gtk_widget_get_screen(main_window);
+    if (!gtk_show_uri(screen, uri, gtk_get_current_event_time(), NULL))
+    {
+        gchar *command = g_strdup_printf("xdg-open %s &", uri);
+        system(command);
+        g_free(command);
+    }
+#else
+    gchar *command = g_strdup_printf("xdg-open %s &", uri);
+    system(command);
+    g_free(command);
+#endif
+#endif
   g_free(uri);
 }
 
@@ -889,7 +881,7 @@ void manual_declick(GtkWidget * widget, gpointer data)
 		units = "Terabytes" ;
 	    }
 
-	    sprintf(msg_buf, "Repairing > 300 samples  may cause a crash\nYou have selected %lg samples, which will require about %8.0lf %s of memory and a long time.",
+	    snprintf(msg_buf, 1000, "Repairing > 300 samples  may cause a crash\nYou have selected %lg samples, which will require about %8.0lf %s of memory and a long time.",
 			    n, bytes, units ) ;
 	    doit = FALSE;
 	    if (!yesno(msg_buf))
@@ -1084,8 +1076,11 @@ void cut_callback(GtkWidget * widget, gpointer data)
                         set_status_text("Cut done.");
                         main_redraw(FALSE, TRUE);
                     }
-                    else
-                        warning(g_strconcat("Cut failed - could not write to ", CLIPBOARD_FILE, NULL));
+                    else {
+                        char *msg = g_strconcat("Cut failed - could not write to ", CLIPBOARD_FILE, NULL); 
+                        warning(msg); 
+                        g_free(msg);
+                    }
                 file_processing = FALSE;
             }
         }
@@ -1100,8 +1095,11 @@ void copy_callback(GtkWidget * widget, gpointer data)
         if (is_region_selected()) {
             file_processing = TRUE;
                 int rc = audioedit_copy_selection(&audio_view);
-                if (! rc == 0)
-                    warning(g_strconcat("Copy failed - could not write to ", CLIPBOARD_FILE, NULL));
+                if (! rc == 0) { 
+                    char *msg = g_strconcat("Copy failed - could not write to ", CLIPBOARD_FILE, NULL); 
+                    warning(msg); 
+                    g_free(msg); 
+                }
             file_processing = FALSE;
         }
     }

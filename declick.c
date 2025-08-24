@@ -600,7 +600,7 @@ int declick_a_click(struct sound_prefs *p, long first_sample, long last_sample, 
  * + HPF_AVE_WING_LOCAL) * 2 calculations first in order to fill up
  * the hpfl & hpfb arrays with correct rms values
  */
-void get_hpf (long sample, fftw_real channel_data[], double *hpf, double *hpf_ave, double *hpf_dev)
+void get_hpf (long sample, fftw_real channel_data[], double *hpf, double *hpf_ave, double *hpf_dev, int reset)
 {
 	static double hpfl[HPF_AVE_WIDTH_LOCAL];
 	static double suml;
@@ -608,6 +608,16 @@ void get_hpf (long sample, fftw_real channel_data[], double *hpf, double *hpf_av
 	static double hpfb[HPF_AVE_WIDTH_BASE];
 	static double sumb;
 	static int posb;
+
+    if (reset) {
+        suml = 0;
+        posl = 0;
+        sumb = 0;
+        posb = 0;
+        memset(hpfl, 0, sizeof(hpfl));
+        memset(hpfb, 0, sizeof(hpfb));
+        return;
+    }
 
 
 	/* if real sample, get next hpf value into array */
@@ -689,8 +699,17 @@ struct click_data *clicks, int iterate_flag, int leave_click_marks)
     int n_repaired[2] , n_this_pass = 0 ;
     int n_not_repaired[2] ;
     char max_exceeded_notice = 0 ;
+    
+    /* Suppress unused variable warning - n_this_pass increment is commented out in this function */
+    (void)n_this_pass;
 #define FFT_WINDOW 1000
-    char level[2][2*FFT_WINDOW+1][DECLICK_MAX_FFT] ;
+    char (*level)[2*FFT_WINDOW+1][DECLICK_MAX_FFT] ;
+ 
+     level = malloc(sizeof(char[2][2*FFT_WINDOW+1][DECLICK_MAX_FFT])) ; 
+     if (level == NULL) { 
+         warning("Error allocating memory"); 
+         return "Error allocating memory"; 
+     }
 #ifdef HAVE_FFTW3
     FFTW(plan) pLeft, pRight ;
 #else /* HAVE_FFTW3 */
@@ -743,6 +762,9 @@ struct click_data *clicks, int iterate_flag, int leave_click_marks)
     for(window_first = first_sample ; !done && window_first < last_sample ; window_first += window_step ) {
 	int clicks_repaired = 1 ;
 	int min_sample,max_sample ;
+	
+	/* Suppress unused variable warning - clicks_repaired used in different function */
+	(void)clicks_repaired;
 
 	if(window_first + window_size > last_sample) {
 	    window_first = last_sample - window_size ;
@@ -930,6 +952,8 @@ struct click_data *clicks, int iterate_flag, int leave_click_marks)
 	rfftw_destroy_plan(fftw_p);
     #endif /* HAVE_FFTW3 */
 
+    free(level) ;
+
 
     {
 
@@ -963,7 +987,19 @@ struct click_data *clicks, int iterate_flag, int leave_click_marks)
     int offset0,offsetF;
     char max_exceeded_notice = 0 ;
 
-    fftw_real left[2*MAX_WINDOW_SIZE+1], right[2*MAX_WINDOW_SIZE+1], *pdata[2] ;
+    fftw_real *left, *right, *pdata[2] ;
+
+    left = malloc(sizeof(fftw_real[2*MAX_WINDOW_SIZE+1])) ;
+    if (left == NULL) { 
+        warning("Error allocating memory"); 
+        return "Error allocating memory"; 
+    } 
+    right = malloc(sizeof(fftw_real[2*MAX_WINDOW_SIZE+1])) ;
+    if (right == NULL) { 
+        free(left) ;
+        warning("Error allocating memory"); 
+        return "Error allocating memory"; 
+    }
     double hpf, hpf_ave, hpf_dev;
 
     int in_click ;
@@ -1042,6 +1078,9 @@ struct click_data *clicks, int iterate_flag, int leave_click_marks)
 	    /* set up arrays where element 0 is window_first sample */
 	    pdata[0] = &left[EXTRA_DATA_WING];
 	    pdata[1] = &right[EXTRA_DATA_WING];
+
+        get_hpf(0, NULL, NULL, NULL, NULL, 1);
+
 	    for(channel = 0 ; channel < 2 ; channel++) {
 		long click_start, click_end=0 ;
 
@@ -1052,7 +1091,7 @@ struct click_data *clicks, int iterate_flag, int leave_click_marks)
 		sample = offset0 + n-1 + offsetF - HPF_DATA_WING * 2;
 		for(i = sample; i >= 0  ; i--) {
 
-		    get_hpf(i,pdata[channel],&hpf,&hpf_ave,&hpf_dev); 
+		    get_hpf(i,pdata[channel],&hpf,&hpf_ave,&hpf_dev, 0); 
 
 		    if(i <= sample - 2*(HPF_AVE_WING_BASE+HPF_AVE_WING_LOCAL)) {
 			int sample_is_in_click = 0 ;
@@ -1064,7 +1103,7 @@ struct click_data *clicks, int iterate_flag, int leave_click_marks)
 			}
 
 			if(in_click == 0 && sample_is_in_click) {
-			    get_hpf(-HPF_DELTA_WIDTH,pdata[channel],&hpf,&hpf_ave,&hpf_dev);
+			    get_hpf(-HPF_DELTA_WIDTH,pdata[channel],&hpf,&hpf_ave,&hpf_dev, 0);
 			    if (hpf > 2. * hpf_dev/sensitivity + hpf_ave) {
 				in_click = 1 ;
 				click_end = window_first + i ;
@@ -1145,6 +1184,9 @@ struct click_data *clicks, int iterate_flag, int leave_click_marks)
 	    n_last_pass = n_this_pass;
 	} /* while (loop_flag) */
     } /* for (window_first... */
+
+    free(left) ;
+    free(right) ;
 
     d_print("channel_mask: %d\n", channel_mask) ;
 

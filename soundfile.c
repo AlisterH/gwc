@@ -28,12 +28,13 @@
 extern SNDFILE *sndfile;
 extern SF_INFO sfinfo;
 
-static void perr(char *text)
+static void perr(char *text, char *file, int line)
 {
     int err = sf_error(sndfile);
-    puts("##########################################################");
-    puts(text);
-    puts(sf_error_number(err));
+    fprintf(stderr, "##########################################################\n");
+    fprintf(stderr, "Error in %s, line %d:\n", file, line);
+    fprintf(stderr, "%s\n", text);
+    fprintf(stderr, "%s\n", sf_error_number(err));
 }
 
 long soundfile_count_samples_in_file(char *filename)
@@ -182,7 +183,7 @@ static int write_silence(sf_count_t pos, sf_count_t sample_count)
 
     /* go to position ... */
     if (sf_seek(sndfile, pos, SEEK_SET|SFM_WRITE) < 0) {
-        perr("write_silence: sf_seek write pointer");
+        perr("write_silence: sf_seek write pointer", __FILE__, __LINE__);
         warning("Libsndfile reports write pointer seek error in audio file");
         rc = -1;
     }
@@ -193,7 +194,7 @@ static int write_silence(sf_count_t pos, sf_count_t sample_count)
                 buffer_size = sample_count;
 
             if (sf_writef_int(sndfile, buffer, buffer_size) != buffer_size) {
-                perr("write_silence: sf_writef_int");
+                perr("write_silence: sf_writef_int", __FILE__, __LINE__);
                 warning("Libsndfile reports write error in audio file");
                 rc = -1;
                 break;
@@ -256,24 +257,24 @@ int soundfile_shift_samples_right(long lfirst_pos, long lsample_count,
 
             /* start position for reading */
             if (sf_seek(sndfile, read_pos, SEEK_SET|SFM_READ) < 0) {
-                perr("soundfile_shift_samples_right: sf_seek read pointer");
+                perr("soundfile_shift_samples_right: sf_seek read pointer", __FILE__, __LINE__);
                 warning("Libsndfile reports read pointer seek error in audio file");
                 return -1;
             }
             if (sf_readf_int(sndfile, buffer, buffer_size) != buffer_size) {
-                perr("soundfile_shift_samples_right: sf_readf_int");
+                perr("soundfile_shift_samples_right: sf_readf_int", __FILE__, __LINE__);
                 warning("Libsndfile reports read error in audio file");
                 return -1;
             }
 
             /* start position for writing */
             if (sf_seek(sndfile, write_pos, SEEK_SET|SFM_WRITE) < 0) {
-                perr("soundfile_shift_samples_right: sf_seek write pointer");
+                perr("soundfile_shift_samples_right: sf_seek write pointer", __FILE__, __LINE__);
                 warning("Libsndfile reports write pointer seek error in audio file");
                 return -1;
             }
             if (sf_writef_int(sndfile, buffer, buffer_size) != buffer_size) {
-                perr("soundfile_shift_samples_right: sf_writef_int");
+                perr("soundfile_shift_samples_right: sf_writef_int", __FILE__, __LINE__);
                 warning("Libsndfile reports write error in audio file");
                 return -1;
             }
@@ -332,7 +333,7 @@ int soundfile_shift_samples_left(long lfirst_pos, long lsample_count,
         /* start position for writing */
         if (sf_seek(sndfile, first_pos, SEEK_SET|SFM_WRITE) < 0)
         {
-            perr("soundfile_shift_samples_left: sf_seek write pointer");
+            perr("soundfile_shift_samples_left: sf_seek write pointer", __FILE__, __LINE__);
             warning("Libsndfile reports write pointer seek error in audio file");
             return -1;
         }
@@ -340,7 +341,7 @@ int soundfile_shift_samples_left(long lfirst_pos, long lsample_count,
         /* start position for reading */
         if (sf_seek(sndfile, last_pos, SEEK_SET|SFM_READ) < 0)
         {
-            perr("soundfile_shift_samples_left: sf_seek read pointer");
+            perr("soundfile_shift_samples_left: sf_seek read pointer", __FILE__, __LINE__);
             warning("Libsndfile reports read pointer seek error in audio file");
             return -1;
         }
@@ -351,7 +352,7 @@ int soundfile_shift_samples_left(long lfirst_pos, long lsample_count,
         while ((buffer_size = sf_readf_int(sndfile, buffer, buffer_size)) > 0)
         {
             if (sf_writef_int(sndfile, buffer, buffer_size) != buffer_size) {
-                perr("soundfile_shift_samples_left: sf_writef_int");
+                perr("soundfile_shift_samples_left: sf_writef_int", __FILE__, __LINE__);
                 warning("Libsndfile reports write error in audio file");
                 return -1;
             }
@@ -372,7 +373,7 @@ int soundfile_shift_samples_left(long lfirst_pos, long lsample_count,
 
     if (sf_command(sndfile, SFC_FILE_TRUNCATE, &end_pos, sizeof(end_pos)))
     {
-        perr("soundfile_shift_samples_left: sf_command");
+        perr("soundfile_shift_samples_left: sf_command", __FILE__, __LINE__);
         warning("Libsndfile reports truncation of audio file failed");
         return -1;
     }
@@ -405,13 +406,13 @@ int soundfile_insert_samples(long linsert_pos, long lsample_count,
 
     /* go to insert position 'insert_pos'... */
     if (sf_seek(sndfile, insert_pos, SEEK_SET|SFM_WRITE) < 0) {
-        perr("soundfile_insert_samples: sf_seek write pointer");
+        perr("soundfile_insert_samples: sf_seek write pointer", __FILE__, __LINE__);
         warning("Libsndfile reports write pointer seek error in audio file");
         return -1;
     }
     /* ...and insert new data */
     if (sf_writef_int(sndfile, sample_data, sample_count) != sample_count) {
-        perr("soundfile_insert_samples: append with sf_writef_int");
+        perr("soundfile_insert_samples: append with sf_writef_int", __FILE__, __LINE__);
         warning("Libsndfile reports write error in audio file");
         return -1;
     }

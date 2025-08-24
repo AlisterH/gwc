@@ -89,6 +89,9 @@ int dethunk_new(struct sound_prefs *pPrefs,
     int window, n_windows ;
     int n_want = 4 ;
 
+    // Suppress unused variable warning
+    (void)hdfs;
+
     for(FFT_SIZE = 8 ; FFT_SIZE < n_samples/n_want && FFT_SIZE < 8192 ; FFT_SIZE *= 2) ;
 
     repair_size = FFT_SIZE * n_want ;

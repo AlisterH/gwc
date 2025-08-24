@@ -152,18 +152,18 @@ int build_options(int fmt, char *newfilename, char *trackname)
 	/* check for adv low pass */
 
 	if (encoding_prefs.ogg_useadvlowpass == 1) {
+	    static char lowpass_opt[256];
+	    snprintf(lowpass_opt, 256, "lowpass_frequency=%s", encoding_prefs.ogg_lowpass_frequency);
 	    options[optcnt] = "--advanced_encode_option";
-	    options[optcnt + 1] =
-		strcat("lowpass_frequency=",
-		       encoding_prefs.ogg_lowpass_frequency);
+	    options[optcnt + 1] = lowpass_opt;
 	    optcnt = optcnt + 2;
 	}
 	/* check for adv Bitrate Avg Window */
 	if (encoding_prefs.ogg_useadvbravgwindow == 1) {
+	    static char bitrate_opt[256];
+	    snprintf(bitrate_opt, 256, "bitrate_average_window=%s", encoding_prefs.ogg_bitrate_average_window);
 	    options[optcnt] = "--advanced_encode_option";
-	    options[optcnt + 1] =
-		strcat("bitrate_average_window=",
-		       encoding_prefs.ogg_bitrate_average_window);
+	    options[optcnt + 1] = bitrate_opt;
 	    optcnt = optcnt + 2;
 	}
 	if ((strlen(trackname) > 0)) {
@@ -632,7 +632,6 @@ int start_encode_old(int mode, char *newfilename, long start, long length, char 
     int f_des[2], child_pid;
     int i=0 ;
     int use_sox = 1 ;
-    char cmd[2048] ;
     char *exec_loc = NULL ;
 
     if (mode == OGG_FMT) {
@@ -655,32 +654,8 @@ int start_encode_old(int mode, char *newfilename, long start, long length, char 
     printf("\n") ;
 
     if(use_sox) {
-    sprintf(cmd, "sox %s -t raw - trim %ld %ld |", origfilename, start, length) ;
-
-    for(i = 0 ; options[i] != (char *)NULL ; i++) {
-	int j ;
-	strcat(cmd, " ") ;
-
-	for(j = 0 ; j < strlen(options[i]) ; j++) {
-	    char buf[10] ;
-	    int need_esc=0 ;
-
-	    if(options[i][j] == ' ') need_esc = 1 ;
-	    if(options[i][j] == '\'') need_esc = 1 ;
-	    if(options[i][j] == '\"') need_esc = 1 ;
-
-	    if(need_esc)
-		sprintf(buf, "\\%c", options[i][j]) ;
-	    else
-		sprintf(buf, "%c", options[i][j]) ;
-
-	    strcat(cmd, buf) ;
-	}
-    }
-
-    printf("CMD:\n'%s\'\n", cmd) ;
-    system(cmd) ;
-    return 0 ;
+        g_warning("use_sox is not supported and contains a security vulnerability.");
+        return 1;
     }
 
 
@@ -785,7 +760,6 @@ int start_encode(int mode, char *newfilename, long start, long length, char *ori
     int child_pid;
     int i=0 ;
     int use_sox = 0 ;
-    char cmd[2048] ;
     char *exec_loc = NULL ;
 
     if (mode == OGG_FMT) {
@@ -808,32 +782,8 @@ int start_encode(int mode, char *newfilename, long start, long length, char *ori
     printf("\n") ;
 
     if(use_sox) {
-	sprintf(cmd, "sox %s -t raw - trim %ld %ld |", origfilename, start, length) ;
-
-	for(i = 0 ; options[i] != (char *)NULL ; i++) {
-	    int j ;
-	    strcat(cmd, " ") ;
-
-	    for(j = 0 ; j < strlen(options[i]) ; j++) {
-		char buf[10] ;
-		int need_esc=0 ;
-
-		if(options[i][j] == ' ') need_esc = 1 ;
-		if(options[i][j] == '\'') need_esc = 1 ;
-		if(options[i][j] == '\"') need_esc = 1 ;
-
-		if(need_esc)
-		    sprintf(buf, "\\%c", options[i][j]) ;
-		else
-		    sprintf(buf, "%c", options[i][j]) ;
-
-		strcat(cmd, buf) ;
-	    }
-	}
-
-	printf("CMD:\n'%s\'\n", cmd) ;
-	system(cmd) ;
-	return 0 ;
+        g_warning("use_sox is not supported and contains a security vulnerability.");
+        return 1;
     }
 
 

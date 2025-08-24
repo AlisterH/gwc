@@ -460,7 +460,21 @@ void draw_sonogram(struct view *v, struct sound_prefs *pPrefs, GtkWidget *da, do
 
 #define MAXSW 2000
 #define MAXSH 400
-    unsigned char level[2][MAXSW][MAXSH] ;
+    unsigned char (*level)[MAXSW][MAXSH] ;
+
+    level = malloc(sizeof(unsigned char[2][MAXSW][MAXSH]));
+    if (level == NULL) {
+        warning("Error allocating memory");
+        gdk_image_destroy(image);
+#ifdef HAVE_FFTW3
+        FFTW(destroy_plan)(pLeft);
+        FFTW(destroy_plan)(pRight);
+#else
+        rfftw_destroy_plan(p);
+#endif
+        pop_status_text();
+        return;
+    }
 
     push_status_text("Building sonogram") ;
     update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
@@ -669,6 +683,8 @@ ly2_tbl[0] = 99999999;
     gdk_draw_image(audio_pixmap, da->style->white_gc, image, 0, 0, 0, 0,
        v->canvas_width, v->canvas_height); 
     gdk_image_destroy(image);
+
+    free(level);
 
 #define DRAW_CLICKS_NOT
 #ifdef DRAW_CLICKS
@@ -888,7 +904,15 @@ void paint_screen_with_highlight(struct view *v, GtkWidget *da, int y1, int y2, 
 void redraw(struct view *v, struct sound_prefs *p, GtkWidget *da, int cursor_flag, int redraw_data, int sonogram_flag)
 {
 /*  double left[MAX_BUF], right[MAX_BUF] ; */
-    fftw_real left[MAX_BUF], right[MAX_BUF] ;
+    fftw_real *left, *right ;
+    left = malloc(sizeof(fftw_real) * MAX_BUF);
+    right = malloc(sizeof(fftw_real) * MAX_BUF);
+    if (!left || !right) {
+        warning("Error allocating memory");
+        free(left);
+        free(right);
+        return;
+    }
     long i, n ;
     int pixels_per_sample = v->canvas_width / (v->last_sample - v->first_sample + 1) ;
     double samples_per_pixel = (double)(v->last_sample - v->first_sample + 1) / (double)v->canvas_width ;
@@ -1237,5 +1261,7 @@ void redraw(struct view *v, struct sound_prefs *p, GtkWidget *da, int cursor_fla
 
     gdk_gc_set_foreground(da->style->white_gc, white_color) ;
     gdk_gc_set_foreground(da->style->black_gc, black_color) ;
+    free(left);
+    free(right);
     gdk_gc_unref(MyGC) ;
 }

@@ -31,6 +31,7 @@
 #endif
 
 #include "audio_device.h"
+#include "gwc.h"
 
 static int audio_fd = -1 ;
 
@@ -38,6 +39,7 @@ static int audio_fd = -1 ;
 int audio_device_open(char *output_device)
 {
     if( (audio_fd = open(output_device, O_WRONLY)) == -1) {
+        warning("Failed to open OSS audio output device.");
 	return -1;
     }
     return 0;
@@ -57,6 +59,7 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate)
     }
 
     if (ioctl(audio_fd, SNDCTL_DSP_SETFMT, &oss_format) == -1) {
+        warning("Failed to set audio format.");
         return -1;
     }
 
@@ -71,10 +74,12 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate)
 
     
     if (ioctl(audio_fd, SNDCTL_DSP_CHANNELS, channels) == -1) {
+        warning("Failed to set audio channels.");
         return -1;
     }
 
     if (ioctl(audio_fd, SNDCTL_DSP_SPEED, rate) == -1) {
+        warning("Failed to set audio speed.");
         return -1;
     }
 
@@ -84,25 +89,29 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate)
 int audio_device_read(unsigned char *buffer, int buffersize)
 {
     int len = read(audio_fd, buffer, buffersize);
-    if (len == -1)
+    if (len == -1) {
+        warning("Error reading from audio device.");
         return -1;
+    }
     return len;
 }
 
 int audio_device_write(unsigned char *buffer, int buffersize)
 {
     int len = write(audio_fd, buffer, buffersize);
-    if (len == -1)
+    if (len == -1) {
+        warning("Error writing to audio device.");
         return -1;
+    }
     return len;
 }
 
 void audio_device_close(int drain)
 {
     if(audio_fd != -1) {
-	ioctl(audio_fd, SNDCTL_DSP_RESET, NULL) ;
+	ioclt(audio_fd, SNDCTL_DSP_RESET, NULL) ;
 	close(audio_fd) ;
-	audio_fd = -1 ;
+		audio_fd = -1 ;
     }
 }
 
@@ -112,7 +121,10 @@ long audio_device_processed_bytes(void)
     count_info info;
 
     if (audio_fd != -1) {
-	ioctl(audio_fd, SNDCTL_DSP_GETOPTR, &info);
+	if (ioctl(audio_fd, SNDCTL_DSP_GETOPTR, &info) == -1) {
+            warning("Error getting processed bytes from audio device.");
+            return 0;
+        }
 	return info.bytes;
     }
 
@@ -124,7 +136,10 @@ int audio_device_best_buffer_size(int playback_bytes_per_block)
     int bufsize;
     audio_buf_info oss_info;
 
-    ioctl(audio_fd, SNDCTL_DSP_GETOSPACE, &oss_info);
+    if (ioctl(audio_fd, SNDCTL_DSP_GETOSPACE, &oss_info) == -1) {
+        warning("Error getting buffer space from audio device.");
+        return 0;
+    }
 
     for (bufsize = oss_info.fragsize;
          bufsize < oss_info.fragsize*oss_info.fragstotal/2;
@@ -142,7 +157,10 @@ int audio_device_nonblocking_write_buffer_size(int maxbufsize,
     audio_buf_info info;
     int len = 0;
 
-    ioctl(audio_fd, SNDCTL_DSP_GETOSPACE, &info);
+    if (ioctl(audio_fd, SNDCTL_DSP_GETOSPACE, &info) == -1) {
+        warning("Error getting buffer space from audio device.");
+        return 0;
+    }
 
 /*  g_print("fragsize:%d\n", info.fragsize) ;  */
 /*  g_print("fragstotal:%d\n", info.fragstotal) ;  */
@@ -161,4 +179,3 @@ int audio_device_nonblocking_write_buffer_size(int maxbufsize,
     }
     return len;
 }
-

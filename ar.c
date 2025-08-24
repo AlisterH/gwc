@@ -55,7 +55,7 @@ int AutoRegression(
 
    /* Determine and subtract the mean from the input series */
    mean = 0.0;
-   for (t=0;t<length;t++) 
+   for (t=0;t<length;t++)
       mean += inputseries[t];
    mean /= (double)length;
    for (t=0;t<length;t++)
@@ -89,7 +89,7 @@ int AutoRegression(
       free(per);
    if (pef != NULL)
       free(pef);
-   if (ar != NULL) {
+   if (ar != NULL) { // Check if ar itself was allocated
       for (i=0;i<degree+1;i++)
          if (ar[i] != NULL)
             free(ar[i]);
@@ -109,7 +109,7 @@ int AutoRegression(
  
    Two small changes made by NH in November 1998:
    tstarz.h no longer included, just say "typedef double REAL" instead
-   Declare ar by "REAL **ar" instead of "REAL ar[MAXA][MAXA]
+   Declare ar by "REAL **ar" instead of "REAL ar[MAXA][MAXA]"
    
    Further "cleaning" by Paul Bourke.....for personal style only.
 */
@@ -141,7 +141,7 @@ int ARMaxEntropy(
       g[nn] = sn / sd;
       t1 = g[nn];
       if (n != 0) {
-         for (j=2;j<nn;j++) 
+         for (j=2;j<nn;j++)
             h[j] = g[j] + (t1 * g[n - j + 3]);
          for (j=2;j<nn;j++)
             g[j] = h[j];
@@ -263,7 +263,3 @@ int SolveLE(double **mat,double *vec,unsigned int n)
    
    return(TRUE);
 }
-
-
-
-

@@ -43,7 +43,7 @@ void load_reverb_preferences(void)
 
     // We should probably have a separate test for each preference...
     if (g_key_file_has_group(key_file, "reverb_params") == TRUE) {
-        strcpy(reverb_method_name, g_key_file_get_string(key_file, "reverb_params", "reverb_method_name", NULL));
+        g_strlcpy(reverb_method_name, g_key_file_get_string(key_file, "reverb_params", "reverb_method_name", NULL), 128);
         wet_level = g_key_file_get_double(key_file, "reverb_params", "wet_level", NULL);
         dry_level = g_key_file_get_double(key_file, "reverb_params", "dry_level", NULL);
         decay = g_key_file_get_double(key_file, "reverb_params", "decay", NULL);

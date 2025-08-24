@@ -315,6 +315,9 @@ void cdivide(double *a, double *b, double c, double d)
 
     anew = (*a*c + *b*d) / denom ;
     bnew = (*b*c - *a*d) / denom ;
+    
+    *a = anew ;
+    *b = bnew ;
 }
 
 #define bin2freq(r,s,k) ((double)r / 2.0 /(double)(s/2)*(double)k)
@@ -344,6 +347,10 @@ void fft_remove_noise(fftw_real sample[], fftw_real noise_min2[], fftw_real nois
     fftw_real *sig_prev,*Y2_prev,*gain_prev ;
     static int debug_frame = 1 ;
     double SFM, tonality_factor ;
+    
+    /* Suppress unused variable warning */
+    (void)tonality_factor;
+    (void)debug_frame;
 
     sig_prev = bsig_prev[ch] ;
     Y2_prev = bY2_prev[ch] ;
@@ -764,12 +771,29 @@ int denoise(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs, long noi
             long first_sample, long last_sample, int channel_mask) {
     long current ;
     int k ;
-    fftw_real left[DENOISE_MAX_FFT], right[DENOISE_MAX_FFT] ;
-    fftw_real left_noise_max[DENOISE_MAX_FFT], right_noise_max[DENOISE_MAX_FFT], left_noise_avg[DENOISE_MAX_FFT] ;
-    fftw_real left_noise_min[DENOISE_MAX_FFT], right_noise_min[DENOISE_MAX_FFT], right_noise_avg[DENOISE_MAX_FFT] ;
-    fftw_real tmp[DENOISE_MAX_FFT] ;
-    fftw_real left_prev_frame[DENOISE_MAX_FFT] ;
-    fftw_real right_prev_frame[DENOISE_MAX_FFT] ;
+    fftw_real *left, *right ;
+    fftw_real *left_noise_max, *right_noise_max, *left_noise_avg ;
+    fftw_real *left_noise_min, *right_noise_min, *right_noise_avg ;
+    fftw_real *tmp ;
+    fftw_real *left_prev_frame ;
+    fftw_real *right_prev_frame ;
+
+    fftw_real *mem_block = malloc(sizeof(fftw_real) * DENOISE_MAX_FFT * 11);
+    if (!mem_block) {
+        warning("Error allocating memory");
+        return -1;
+    }
+    left = mem_block;
+    right = mem_block + DENOISE_MAX_FFT;
+    left_noise_max = mem_block + 2 * DENOISE_MAX_FFT;
+    right_noise_max = mem_block + 3 * DENOISE_MAX_FFT;
+    left_noise_avg = mem_block + 4 * DENOISE_MAX_FFT;
+    left_noise_min = mem_block + 5 * DENOISE_MAX_FFT;
+    right_noise_min = mem_block + 6 * DENOISE_MAX_FFT;
+    right_noise_avg = mem_block + 7 * DENOISE_MAX_FFT;
+    tmp = mem_block + 8 * DENOISE_MAX_FFT;
+    left_prev_frame = mem_block + 9 * DENOISE_MAX_FFT;
+    right_prev_frame = mem_block + 10 * DENOISE_MAX_FFT;
 #ifdef HAVE_FFTW3
     FFTW(plan) pForLeft, pForRight ;
     FFTW(plan) pFor, pBak ;
@@ -808,6 +832,9 @@ int denoise(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs, long noi
 
     alpha = welty_alpha(0.5, 1.0/(double)pDnprefs->smoothness) ;
     alpha = 1.0 ;
+    
+    /* Suppress unused variable warning - alpha computed but overwritten */
+    (void)alpha;
 
     for(k = 0 ; k < pDnprefs->FFT_SIZE ; k++) {
 	window_coef[k] = fft_window(k,pDnprefs->FFT_SIZE, pDnprefs->window_type) ;
@@ -838,6 +865,9 @@ int denoise(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs, long noi
 	s_amount = pDnprefs->amount ;
 /*      else  */
 /*  	s_amount = amount/(double)(smoothness-3) ;  */
+
+    /* Suppress unused variable warning - s_amount calculated but may not be used in current code path */
+    (void)s_amount;
 
     prev_sample[0] = 0 ;
     prev_sample[1] = 0 ;
@@ -931,6 +961,8 @@ int denoise(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs, long noi
     rfftw_destroy_plan(pBak);
 #endif /* HAVE_FFTW3 */
 
+    free(mem_block);
+
     for(k = 0 ; k < pDnprefs->FFT_SIZE ; k++) {
 /*  	free(two_way_probs[k]) ;  */
     }
@@ -956,10 +988,22 @@ int print_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnpref
     int k ;
     FILE *fp ;
 
-    fftw_real left_noise_max[DENOISE_MAX_FFT], right_noise_max[DENOISE_MAX_FFT], left_noise_avg[DENOISE_MAX_FFT] ;
-    fftw_real left_noise_min[DENOISE_MAX_FFT], right_noise_min[DENOISE_MAX_FFT], right_noise_avg[DENOISE_MAX_FFT] ;
+    fftw_real *left_noise_max, *right_noise_max, *left_noise_avg ;
+    fftw_real *left_noise_min, *right_noise_min, *right_noise_avg ;
     extern int MAXSAMPLEVALUE ;
     double max = MAXSAMPLEVALUE * MAXSAMPLEVALUE ;
+
+    fftw_real *mem_block = malloc(sizeof(fftw_real) * DENOISE_MAX_FFT * 6);
+    if (!mem_block) {
+        warning("Error allocating memory");
+        return 1;
+    }
+    left_noise_max = mem_block;
+    right_noise_max = mem_block + DENOISE_MAX_FFT;
+    left_noise_avg = mem_block + 2 * DENOISE_MAX_FFT;
+    left_noise_min = mem_block + 3 * DENOISE_MAX_FFT;
+    right_noise_min = mem_block + 4 * DENOISE_MAX_FFT;
+    right_noise_avg = mem_block + 5 * DENOISE_MAX_FFT;
 
     get_noise_sample(pPrefs, pDnprefs, noise_start, noise_end,
 		    left_noise_min, left_noise_max, left_noise_avg,
@@ -978,7 +1022,10 @@ int print_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnpref
         double db_right = 20.0*log10(right_noise_avg[k]/(max/2.0)) ;
         fprintf(fp, "%10lgHz %12.1lfdB %12.1lfdB\n", freq, db_left, db_right) ;
     }
-    set_status_text(g_strconcat("noise sample written to ", g_get_current_dir(), "/noise.dat", NULL));
+    free(mem_block);
+    char *status_msg = g_strconcat("noise sample written to ", g_get_current_dir(), "/noise.dat", NULL);
+    set_status_text(status_msg);
+    g_free(status_msg);
 
     fclose(fp) ;
 
@@ -996,8 +1043,19 @@ void get_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs
     rfftw_plan pFor, pBak ;
 #endif /* HAVE_FFTW3 */
 
-    fftw_real left[DENOISE_MAX_FFT], right[DENOISE_MAX_FFT] ;
-    fftw_real tmp[DENOISE_MAX_FFT] ;
+    fftw_real *left, *right ;
+    fftw_real *tmp ;
+
+    left = malloc(sizeof(fftw_real) * DENOISE_MAX_FFT);
+    right = malloc(sizeof(fftw_real) * DENOISE_MAX_FFT);
+    tmp = malloc(sizeof(fftw_real) * DENOISE_MAX_FFT);
+    if (!left || !right || !tmp) {
+        warning("Error allocating memory");
+        free(left);
+        free(right);
+        free(tmp);
+        return;
+    }
 
 #ifdef HAVE_FFTW3
     pForLeft =
@@ -1060,10 +1118,12 @@ void get_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs
 	    }
 	    left_noise_min[k] = MIN(left_noise_min[k], p2) ;
 	    left_noise_max[k] = MAX(left_noise_max[k], p2) ;
-	    left_noise_avg[k] += p2 ;
+	left_noise_avg[k] += p2 ;
 	}
 
 	if(0 && pDnprefs->noise_suppression_method == DENOISE_EXPERIMENTAL) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 	    for(k = 1 ; k <= pDnprefs->FFT_SIZE/2 ; k++) {
 		double p2 ;
 		if(k < pDnprefs->FFT_SIZE/2) {
@@ -1083,6 +1143,7 @@ void get_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs
 /*  		    two_way_probs[j][k] = MAX(two_way_probs[j][k],p2j/p2) ;  */
 		}
 	    }
+#pragma GCC diagnostic pop
 	}
 
 #ifdef HAVE_FFTW3
@@ -1102,10 +1163,12 @@ void get_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs
 	    }
 	    right_noise_min[k] = MIN(right_noise_min[k], p2) ;
 	    right_noise_max[k] = MAX(right_noise_max[k], p2) ;
-	    right_noise_avg[k] += p2 ;
+	right_noise_avg[k] += p2 ;
 	}
 
 	if(0 && pDnprefs->noise_suppression_method == DENOISE_EXPERIMENTAL) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 	    for(k = 1 ; k <= pDnprefs->FFT_SIZE/2 ; k++) {
 		double p2 ;
 		if(k < pDnprefs->FFT_SIZE/2) {
@@ -1125,9 +1188,8 @@ void get_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs
 /*  		    two_way_probs[j][k] = MAX(two_way_probs[j][k],p2j/p2) ;  */
 		}
 	    }
-	}
-
-    }
+#pragma GCC diagnostic pop
+	}    }
 
 
     /* average out the power spectrum samples */
@@ -1188,6 +1250,10 @@ void get_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs
     rfftw_destroy_plan(pFor);
     rfftw_destroy_plan(pBak);
 #endif /* HAVE_FFTW3 */
+
+    free(left);
+    free(right);
+    free(tmp);
 
     audio_normalize(1) ;
 }

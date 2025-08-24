@@ -122,9 +122,11 @@ int audio_device_read(unsigned char *buffer, int buffersize)
 
 int audio_device_write(unsigned char *data, int count)
 {
-    int err ;
-
-    pa_simple_write(pa_device, data, (size_t) count, &err) ;
+    int err_code = 0; // Initialize err_code
+    if (pa_simple_write(pa_device, data, (size_t) count, &err_code) < 0) {
+        pa_perr("audio_device_write: pa_simple_write", err_code);
+        return -1; // Indicate error
+    }
 
     written_frames += count/framesize ;
 
@@ -136,8 +138,12 @@ long query_processed_bytes(void)
 {
 
     if(pa_device != NULL) {
-	int err ;
-	pa_usec_t latency = pa_simple_get_latency(pa_device, &err) ;
+	int err_code = 0; // Initialize err_code
+	pa_usec_t latency = pa_simple_get_latency(pa_device, &err_code) ;
+    if (latency < 0) {
+        pa_perr("query_processed_bytes: pa_simple_get_latency", err_code);
+        return 0; // Return 0 on error
+    }
 	int bytes_unprocessed = (latency*ss.rate)/1000000 * framesize ;
 	if((written_frames) *framesize == last_written_size) {
 	    latency_flag++ ;
@@ -175,8 +181,12 @@ void audio_device_close(int drain)
 
 	_audio_device_processed_bytes = query_processed_bytes() ;
 
-	if(drain)
-	    err = pa_simple_drain(pa_device, &err);
+	if(drain) {
+        int err_code = 0; // Initialize err_code
+	    if (pa_simple_drain(pa_device, &err_code) < 0) {
+            pa_perr("audio_device_close: pa_simple_drain", err_code);
+        }
+    }
 
 	pa_simple_free(pa_device) ;
 
@@ -206,4 +216,3 @@ int audio_device_nonblocking_write_buffer_size(int maxbufsize,
 
     return len;
 }
-

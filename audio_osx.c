@@ -51,14 +51,14 @@ extern int stereo;
 typedef struct
 {	AudioStreamBasicDescription		format ;
 	UInt32 			buf_size ;
-	AudioDeviceID 	device ;
+	AudioDeviceID 		device ;
 	SNDFILE 		*sndfile ;
 	SF_INFO 		sfinfo ;
 	int 			done_playing ;
 	bool			done_reading ;
 } MacOSXAudioData ;
 
-MacOSXAudioData 	audio_data ;
+MacOSXAudioData 		audio_data ;
 
 extern SNDFILE *sndfile;
 extern SF_INFO sfinfo;
@@ -96,8 +96,8 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
 		printf("DEBUG: Audio callback called #%d\n", callback_count);
 	}
 	
-	MacOSXAudioData	*audio_data ;
-	int	size, sample_count, read_count, i ;
+	MacOSXAudioData		*audio_data ;
+	int			size, sample_count, read_count, i ;
 	
 	float maxl = 0, maxr = 0;
 	float *p_float;
@@ -136,10 +136,10 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
 		}
 	}
 	
-	size = data_out->mBuffers[0].mDataByteSize ;  
-	sample_count = size / sizeof (float) ;  // The number of bytes to send.
+	size = data_out->mBuffers[0].mDataByteSize ;
+	sample_count = size / sizeof (float) ;
 	
-	p_float = (float*) data_out->mBuffers [0].mData ;  // Makes buffer point to the data.
+	p_float = (float*) data_out->mBuffers [0].mData ;
 	if((!(audio_data->done_reading))&&(buff_num < num_buffers))
 	{
 		read_count = sf_read_float (audio_data->sndfile, p_float, sample_count) ;
@@ -156,7 +156,7 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
 			}
 		}
 		for(i = 0; i < read_count; i++) //Find the level for the VU meters
-		{  
+		{
 			float vl, vr;
 			vl = p_float[i];
 			vr = p_float[i+1];
@@ -186,7 +186,7 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
 		memset(p_float, 0, size);
 	}
 	return noErr;
-} 
+}
 
 int process_audio(gfloat *pL, gfloat *pR)  //This function must be called repeatedly from the gint play_a_block until the section is played. 
 {	//The pointers pL and pR passed in above return the levels for the VU meters.
@@ -249,9 +249,9 @@ int process_audio(gfloat *pL, gfloat *pR)  //This function must be called repeat
 }
 
 int audio_device_open(char *output_device) 
-{   
-	OSStatus	err ;
-	UInt32		count ;
+{	
+	OSStatus		err ;
+	UInt32			count;
 	
 	printf("DEBUG: Opening CoreAudio device...\n");
 	audio_data.device = kAudioDeviceUnknown ;
@@ -274,8 +274,8 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate) //An
 	//playback_bits is the number of bits per sample
 	//rate is the number of samples per second	
 	
-	OSStatus	err ;
-	UInt32		count;
+	OSStatus		err ;
+	UInt32			count;
 	
 	printf("DEBUG: Setting audio parameters...\n");
 	audio_data.sfinfo = sfinfo;
@@ -286,7 +286,7 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate) //An
 	/*  get a description of the data format used by the default device */
 	count = sizeof (AudioStreamBasicDescription) ;
 	if ((err = AudioDeviceGetProperty (audio_data.device, 0, false, kAudioDevicePropertyStreamFormat,
-									   &count, &(audio_data.format))) != noErr)
+										   &count, &(audio_data.format))) != noErr)
 	{	printf ("AudioDeviceGetProperty (kAudioDevicePropertyStreamFormat) failed with error: %d\n", (int)err) ;
 		return -1 ;
 	} 
@@ -312,7 +312,7 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate) //An
 	channels = (int *) &(audio_data.format.mChannelsPerFrame);
 	
 	if ((err = AudioDeviceSetProperty (audio_data.device, NULL, 0, false, kAudioDevicePropertyStreamFormat,
-									   sizeof (AudioStreamBasicDescription), &(audio_data.format))) != noErr)
+										   sizeof (AudioStreamBasicDescription), &(audio_data.format))) != noErr)
 	{	printf ("AudioDeviceSetProperty (kAudioDevicePropertyStreamFormat) failed.\n") ;
 		return -1;
 	} ;
@@ -337,12 +337,24 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate) //An
 	sf_count_t seek_result = sf_seek(audio_data.sndfile, playback_start_position, SEEK_SET);
 	printf("DEBUG: File seek result: %lld (should equal %ld)\n", (long long)seek_result, playback_start_position);
 	
-	if (!p_global_mem_alloced)
+	if (p_global_mem_alloced)
 	{
-		p_global_mem_alloced = TRUE;
-		pL_global = (gfloat*) malloc(num_buffers*sizeof(gfloat)); // When do I need to free this?
-		pR_global = (gfloat*) malloc(num_buffers*sizeof(gfloat));
+		free(pL_global);  
+		free(pR_global);
+		p_global_mem_alloced = FALSE;
 	}
+	pL_global = (gfloat*) malloc(num_buffers*sizeof(gfloat)); // When do I need to free this?
+	if (pL_global == NULL) {
+		printf("ERROR: Failed to allocate memory for pL_global\n");
+		return -1;
+	}
+	pR_global = (gfloat*) malloc(num_buffers*sizeof(gfloat));
+	if (pR_global == NULL) {
+		printf("ERROR: Failed to allocate memory for pR_global\n");
+		free(pL_global);
+		return -1;
+	}
+	p_global_mem_alloced = TRUE;
 	UInt32 bufferSize = BUFFERSIZE;
 	if((err = AudioDeviceSetProperty( audio_data.device,
 									  NULL, 0,
@@ -414,8 +426,8 @@ long audio_device_processed_bytes(void)
 		else
 		{
 			playback_position = (long) (this_time.mSampleTime - start_sample_time);//*FRAMESIZE;
-																				   //led_bar_light_percent(dial[0], l);  
-																				   //led_bar_light_percent(dial[1], r);
+										   //led_bar_light_percent(dial[0], l);  
+										   //led_bar_light_percent(dial[1], r);
 		}
 	}
 	if (playback_position >= playback_end_position)  //We are done playing.
@@ -431,8 +443,8 @@ long audio_device_processed_bytes(void)
 
 int audio_device_best_buffer_size(int playback_bytes_per_block)  //The result of this doesn't make any difference.
 {
-	OSStatus	err ;
-	UInt32		count, buffer_size ;
+	OSStatus		err ;
+	UInt32			count, buffer_size ;
 	
 	/*  get the buffersize that the default device uses for IO */
 	count = sizeof (UInt32) ;
@@ -446,14 +458,14 @@ int audio_device_best_buffer_size(int playback_bytes_per_block)  //The result of
 }
 
 int audio_device_nonblocking_write_buffer_size(int maxbufsize,    //Normally returns the number of bytes the send buffer is ready for.
-											   int playback_bytes_remaining)
+										   int playback_bytes_remaining)
 {
 	return 1;  // This allows the process_audio to move the VU meters.
 }
 
 void audio_device_close(int drain)  //Reminder: check to make sure this works when no device has been opened.
 {
-	OSStatus	err ;
+	OSStatus		err ;
 	if(p_global_mem_alloced)
 	{
 		free(pL_global);  
@@ -461,7 +473,7 @@ void audio_device_close(int drain)  //Reminder: check to make sure this works wh
 		p_global_mem_alloced = FALSE;
 	}
 	if ((err = AudioDeviceStop (audio_data.device, macosx_audio_out_callback)) != noErr)
-	{	//printf ("AudioDeviceStop failed.\n") ;  //Need to comment out this line in deployment build.
+	{	//printf ("AudioDeviceStop failed.") ;  //Need to comment out this line in deployment build.
 		return ;
 	} ;
 	
@@ -475,4 +487,3 @@ void audio_device_close(int drain)  //Reminder: check to make sure this works wh
 #pragma clang diagnostic pop
 
 #endif /* MAC_OS_X */
-

@@ -16,10 +16,10 @@ prefix = @prefix@
 exec_prefix = @exec_prefix@
 
 if DEBUG
-AM_CFLAGS = -g3 -O0
+AM_CFLAGS = -g3 -O0 -I./meschach
 AM_CXXFLAGS = -g3 -O0
 else
-AM_CFLAGS = -O2
+AM_CFLAGS = -O2 -I./meschach
 AM_CXXFLAGS = -O2
 endif
 
@@ -111,6 +111,16 @@ audio_device.o : audio_device.c audio_alsa.c audio_oss.c audio_osx.c audio_pa.c 
 audio_util.o : audio_util.c Makefile
 	$(COMPILE) -c audio_util.c
 
+# Files that depend on meschach headers need meschach.a built first
+declick.o : declick.c meschach.a Makefile
+	$(COMPILE) -c declick.c
+
+dethunk.o : dethunk.c meschach.a Makefile
+	$(COMPILE) -c dethunk.c
+
+stat.o : stat.c meschach.a Makefile
+	$(COMPILE) -c stat.c
+
 .c.o :
 	$(COMPILE) -c $<
 
@@ -158,7 +168,7 @@ meschach/meschach.a :
 	 sed -i.bak 's|/\* #undef STDC_HEADERS \*/|#define STDC_HEADERS 1|' machine.h ; \
 	 sed -i.bak 's|/\* #undef HAVE_PROTOTYPES \*/|#define HAVE_PROTOTYPES 1|' machine.h ; \
 	 sed -i.bak 's|/\* #undef HAVE_PROTOTYPES_IN_STRUCT \*/|#define HAVE_PROTOTYPES_IN_STRUCT 1|' machine.h ; \
-	 make part1 ; make part2 ; cp machine.h ..)
+	 $(MAKE) OPT_CFLAGS="-Wno-deprecated-non-prototype -Wno-parentheses" part1 ; $(MAKE) OPT_CFLAGS="-Wno-deprecated-non-prototype -Wno-parentheses" part2 ; cp machine.h ..)
 
 clean :
 	rm -f $(APPNAME) *.o core meschach.a meschach/meschach.a machine.h

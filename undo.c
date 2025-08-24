@@ -54,7 +54,7 @@ int start_save_undo(char *undo_msg, struct view *v)
 
     undo_level++ ;
 
-	sprintf(_filename, "gwc_undo_%d.dat", undo_level) ;
+	snprintf(_filename, 1024, "gwc_undo_%d.dat", undo_level) ;
     // Alister: we need to save our working files somewhere other than the working directory (which isn't even necessarily the location of the file we are working on), 
 	// because it may not be writeable, and we need to allow for multiple instances of gwc to run from the same working directory without interfering with each other.
 	gchar *filename = _filename ;
@@ -234,7 +234,7 @@ int undo(struct view *v, struct sound_prefs *p)
 	return undo_level ;
     }
 
-	sprintf(_filename, "gwc_undo_%d.dat", undo_level) ;
+	snprintf(_filename, 1024, "gwc_undo_%d.dat", undo_level) ;
 	gchar *filename = _filename ;
 	if (g_file_test (tmpdir, G_FILE_TEST_IS_DIR)) //tmpdir exists
 		filename = g_build_filename (tmpdir, _filename, NULL);
@@ -361,7 +361,7 @@ void undo_purge(void)
     char _filename[1024] ;
 
     while(undo_level>0) {
-	sprintf(_filename, "gwc_undo_%d.dat", undo_level) ;
+	snprintf(_filename, 1024, "gwc_undo_%d.dat", undo_level) ;
 	gchar *filename = _filename ;
 	if (g_file_test (tmpdir, G_FILE_TEST_IS_DIR)) //tmpdir exists
 		filename = g_build_filename (tmpdir, _filename, NULL);
