@@ -3,7 +3,7 @@
 Gtk Wave Cleaner is a GUI application to remove noise (hiss, pops, and clicks) from audio files in WAV and similar formats.
 
 ## Requirements
-- A *nix based operating system (Linux, BSD, macOS, etc.)
+- A *nix based operating system (Linux, BSD, macOS, etc; on 64bit Windows 10/11 you can use Microsoft's "Windows Subsystem for Linux", with the pulseaudio backend)
 - GTK2 ([www.gtk.org](https://www.gtk.org/))
 - libsndfile ([www.mega-nerd.com/libsndfile/](http://www.mega-nerd.com/libsndfile/))
 - OSS, ALSA, Pulse Audio, or Core Audio sound drivers (Core Audio recommended on macOS)
