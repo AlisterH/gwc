@@ -243,6 +243,8 @@ void get_sample_stats(struct sample_display_block *result, long first, long last
 char *get_undo_msg(void) ;
 int get_undo_levels(void) ;
 int gwc_dialog_run(GtkDialog *);
+void disable_problematic_accelerators(void);
+void enable_problematic_accelerators(void);
 void gwc_window_set_title(char *title) ;
 double high_pass_filter(fftw_real x[], int N) ;
 void info(char *msg) ;

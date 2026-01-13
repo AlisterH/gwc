@@ -29,6 +29,11 @@
 #include "tap_reverb_file_io.h"
 #include "tap_reverb.h"
 
+/* Simple warning function for tap_reverb module */
+static void warning(const char *msg) {
+    fprintf(stderr, "Warning: %s\n", msg);
+}
+
 
 /* ***** VERY IMPORTANT! *****
  *

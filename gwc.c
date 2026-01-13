@@ -42,6 +42,10 @@
 #include "audio_edit.h"
 #include <sndfile.h>
 
+#ifdef HAVE_GTK_MAC_INTEGRATION
+#include <gtkosxapplication.h>
+#endif
+
 #include "icons/amplify_dark.xpm"
 #include "icons/amplify.xpm"
 #include "icons/declick_dark.xpm"
@@ -87,7 +91,9 @@
 #ifdef MAC_OS_X
 // Note that we only tested if we are building on OSX, and are just assuming we are building with the GDK QUARTZ backend.
 // We should really check that, as we could be building with the X11 backend.
-#include <gtkmacintegration/gtkosxapplication.h>
+#ifdef HAVE_GTK_MAC_INTEGRATION
+#include <gtkosxapplication.h>
+#endif
 //#import <Cocoa/Cocoa.h>
 #endif
 
@@ -104,6 +110,10 @@ GtkWidget *hscrollbar;
 GtkWidget *detect_only_widget;
 GtkWidget *leave_click_marks_widget;
 GtkWidget *main_window;
+
+/* Global UI Manager and Action Group for accelerator management */
+GtkUIManager *ui_manager = NULL;
+GtkActionGroup *action_group = NULL;
 
 GtkWidget *l_file_time;
 GtkWidget *l_file_samples;
@@ -703,8 +713,12 @@ void help(GtkWidget * widget, gpointer data)
 
   char *uri = g_strconcat ("file://", HELPDIR, "/", APPNAME, "/", APPNAME, ".html", NULL);
   #ifdef MAC_OS_X
-	  if ( gtkosx_application_get_bundle_id() )
-	    uri = g_strconcat ("file://", g_uri_escape_string(gtkosx_application_get_resource_path(), "/", TRUE), HELPDIR, "/", APPNAME, "/", APPNAME, ".html", NULL);
+#ifdef HAVE_GTK_MAC_INTEGRATION
+	  if ( gtkosx_application_get_bundle_id() ) {
+	    // In macOS app bundle, help files are in Resources/doc/
+	    uri = g_strconcat ("file://", g_uri_escape_string(gtkosx_application_get_resource_path(), "/", TRUE), "/doc/", APPNAME, ".html", NULL);
+	  }
+#endif
 	  //g_message("testing %s", uri);
 	  char *command = g_strdup_printf("%s %s &", "open", uri);
 	  system(command);
@@ -1796,6 +1810,26 @@ gboolean  key_press_cb(GtkWidget * widget, GdkEventKey * event, gpointer data)
 
 /*      g_print("key_press_cb\n") ;  */
 
+    /* Check if focus is on a text entry widget - if so, don't handle shortcuts 
+     * This allows text to be typed normally in dialogs without triggering shortcuts */
+    GtkWidget *focus_widget = gtk_window_get_focus(GTK_WINDOW(main_window));
+    if (focus_widget && GTK_IS_ENTRY(focus_widget)) {
+        return FALSE;  /* Let the entry widget handle the key press */
+    }
+    
+    /* Check if any modal dialog is open - if so, don't handle shortcuts at all */
+    GList *windows = gtk_window_list_toplevels();
+    GList *iter;
+    for (iter = windows; iter != NULL; iter = iter->next) {
+        GtkWidget *window = GTK_WIDGET(iter->data);
+        if (GTK_IS_DIALOG(window) && GTK_WIDGET_VISIBLE(window) && 
+            gtk_window_get_modal(GTK_WINDOW(window))) {
+            g_list_free(windows);
+            return FALSE;  /* Let the dialog handle all key presses */
+        }
+    }
+    g_list_free(windows);
+
     /* GDK_b, GDK_c, GDK_e, GDK_n, GDK_z used through menus */
     switch (event->keyval) {
 	case GDK_space:
@@ -2211,12 +2245,14 @@ static void drag_data_received(GtkWidget *widget, GdkDragContext *d, gint32 i, g
 }
 
 #ifdef MAC_OS_X
+#ifdef HAVE_GTK_MAC_INTEGRATION
 void app_open_file_cb (GtkosxApplication *theApp, gchar *path, gpointer p)
 {
     strcpy(wave_filename, path);
     open_wave_filename();
 }
-#endif
+#endif  // HAVE_GTK_MAC_INTEGRATION
+#endif  // MAC_OS_X
 
 void store_selection_filename(gpointer user_data)
 {
@@ -2368,7 +2404,7 @@ void save_selection_as_encoded(int fmt, char *filename, char *filename_new, stru
 
 void store_selected_filename_as_encoded(gpointer user_data)
 {
-    int enc_format = NULL ;
+    int enc_format = 0;
     int l;
     char trackname[1024] = "" ;
 
@@ -3309,13 +3345,56 @@ void batch(int argc, char **argv)
     return ;
 }
 
+/* Functions to manage accelerators for dialogs */
+void disable_problematic_accelerators(void)
+{
+    if (action_group) {
+        GtkAction *action;
+        
+        action = gtk_action_group_get_action(action_group, "Decrackle");
+        if (action) gtk_action_set_sensitive(action, FALSE);
+        
+        action = gtk_action_group_get_action(action_group, "ToggleEnd");
+        if (action) gtk_action_set_sensitive(action, FALSE);
+        
+        action = gtk_action_group_get_action(action_group, "ToggleBegin");
+        if (action) gtk_action_set_sensitive(action, FALSE);
+        
+        action = gtk_action_group_get_action(action_group, "ExpandSelection");
+        if (action) gtk_action_set_sensitive(action, FALSE);
+        
+        action = gtk_action_group_get_action(action_group, "NextMarker");
+        if (action) gtk_action_set_sensitive(action, FALSE);
+    }
+}
+
+void enable_problematic_accelerators(void)
+{
+    if (action_group) {
+        GtkAction *action;
+        
+        action = gtk_action_group_get_action(action_group, "Decrackle");
+        if (action) gtk_action_set_sensitive(action, TRUE);
+        
+        action = gtk_action_group_get_action(action_group, "ToggleEnd");
+        if (action) gtk_action_set_sensitive(action, TRUE);
+        
+        action = gtk_action_group_get_action(action_group, "ToggleBegin");
+        if (action) gtk_action_set_sensitive(action, TRUE);
+        
+        action = gtk_action_group_get_action(action_group, "ExpandSelection");
+        if (action) gtk_action_set_sensitive(action, TRUE);
+        
+        action = gtk_action_group_get_action(action_group, "NextMarker");
+        if (action) gtk_action_set_sensitive(action, TRUE);
+    }
+}
+
 int main(int argc, char *argv[])
 {
     GtkWidget *main_vbox, *menubar, *toolbar,
 	*led_vbox, *track_times_vbox, *times_vbox, 
 	*bottom_hbox, *detect_only_box, *leave_click_marks_box;
-    GtkActionGroup *action_group;
-    GtkUIManager *ui_manager;
     GError *error;
 
     int i;
@@ -3664,6 +3743,7 @@ int main(int argc, char *argv[])
     /* and the window */
     gtk_widget_show_all(main_window);
 	#ifdef MAC_OS_X
+#ifdef HAVE_GTK_MAC_INTEGRATION
 	// Note that we only tested if we are building on OSX, and are assuming we are building with the GDK QUARZ backend.
 	// We should really check that, as we could be building with the X11 backend.
 
@@ -3706,6 +3786,7 @@ int main(int argc, char *argv[])
 	
 	// Possible todo:
 	// implement native file dialogs using nativefiledialog library or tinyfiledialogs or something
+#endif  // HAVE_GTK_MAC_INTEGRATION
 	#endif
 
     /* and the idle function */
@@ -3770,11 +3851,13 @@ int main(int argc, char *argv[])
     }
 
     #ifdef MAC_OS_X    
+#ifdef HAVE_GTK_MAC_INTEGRATION
     // Re #1 above - we actually need this, otherwise nothing happens at all.
     // It has has to be down here after e.g. open_wave_filename, otherwise running `gwc somefile` crashes on osx.
     // But the rest of the gtkosx_application stuff needs to be before that otherwise it freezes when 
     // clicking the icon after running `gwc somefile`
     gtkosx_application_ready (theApp);
+#endif
     #endif
 
     gtk_main();

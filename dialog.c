@@ -27,9 +27,16 @@
 int gwc_dialog_run(GtkDialog *dlg)
 {
     int dres ;
+    
+    /* Disable problematic accelerators while dialog is open */
+    disable_problematic_accelerators();
+    
     //we could do this and remove a bunch of other uses of gtk_widget_show()
     //gtk_widget_show_all(GTK_WIDGET(dlg));
     dres = gtk_dialog_run(GTK_DIALOG(dlg));
+
+    /* Re-enable accelerators after dialog is closed */
+    enable_problematic_accelerators();
 
     if (dres == GTK_RESPONSE_OK)
 	return 0 ;

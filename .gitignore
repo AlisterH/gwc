@@ -1,0 +1,50 @@
+# Compiled object files
+*.o
+
+# Static libraries
+*.a
+
+# Executable
+gtk-wave-cleaner
+
+# Build artifacts
+meschach/machine.h
+meschach/makefile
+meschach/config.status
+
+# Autotools generated files
+config.log
+config.status
+Makefile
+Makefile.in
+autom4te.cache/
+aclocal.m4
+configure
+compile
+install-sh
+missing
+depcomp
+
+# Backup files
+*.bak
+*~
+
+# macOS specific
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Temporary files
+.#*
+\#*#
+*.tmp
+
+# IDE files
+.vscode/
+*.swp
+*.swo
+
+# Build directories (if any)
+build/
+dist/
+osx_packaging/Gtk\ Wave\ Cleaner.app

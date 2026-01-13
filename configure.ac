@@ -46,6 +46,8 @@ AC_SUBST(FFTWLIB)
 AC_SUBST(FFTWHDR)
 AC_SUBST(FFTWPREC)
 AC_SUBST(OSXDEF)
+AC_SUBST(GTK_MAC_CFLAGS)
+AC_SUBST(GTK_MAC_LIBS)
 AC_SUBST(PALIB)
 AC_SUBST(PAHDR)
 AC_SUBST(ALSALIB)
@@ -116,7 +118,7 @@ then
     if test "x$HAVE_PULSE_AUDIO" = xyes ; then
         pa="yes";
 	PALIB=$PULSEAUDIO_LIBS
-	PAHDR="-DHAVE_PULSE_AUDIO" ;
+	PAHDR="-DHAVE_PULSE_AUDIO $PULSEAUDIO_CFLAGS" ;
 	alsa="disabled";
 	ALSALIB="";
 	ALSADEF="";
@@ -138,30 +140,22 @@ fi
 dnl enable single precision FFTW3 if installed
 AC_ARG_ENABLE(single-fftw3,
             [  --enable-single-fftw3    compile single precision FFTW3 support (default double precision)],
-            FFTWLIB="-lfftw3f";FFTWHDR="-DHAVE_FFTW3";FFTWPREC="-DFFTWPREC=1")
+            [use_single_fftw=yes], [use_single_fftw=no])
 
-if test "$FFTWLIB" = ""
-then
-dnl Detect which version of fftw libs exist, if any
-FFTWPREC=""
-AC_CHECK_LIB(fftw3, fftw_plan_r2r_1d,FFTWLIB="-lfftw3";FFTWHDR="-DHAVE_FFTW3";FFTWPREC="-DFFTWPREC=2",
-    AC_CHECK_LIB(fftw3f, fftwf_plan_r2r_1d,FFTWLIB="-lfftw3f";FFTWHDR="-DHAVE_FFTW3";FFTWPREC="-DFFTWPREC=1",
-        AC_CHECK_LIB(fftw, fftw_create_plan, ,
-	    AC_CHECK_LIB(dfftw, fftw_create_plan))))
-
-if test "$FFTWLIB" = ""
-then
-AC_CHECK_LIB(rfftw, rfftw_one, FFTWLIB="-lrfftw -lfftw";FFTWHDR="-DHAVE_FFTW",
-    AC_CHECK_LIB(drfftw, rfftw_one, FFTWLIB="-ldrfftw -ldfftw";FFTWHDR="-DHAVE_DFFTW",
-	AC_MSG_ERROR("You need to install the fftw 3.x libraries from www.fftw.org")))
-fi
+dnl Use pkg-config to detect FFTW3
+if test "$use_single_fftw" = "yes"; then
+    PKG_CHECK_MODULES(FFTW3, fftw3f >= 3.0.0,
+                     [FFTWLIB="$FFTW3_LIBS";FFTWHDR="-DHAVE_FFTW3 $FFTW3_CFLAGS";FFTWPREC="-DFFTWPREC=1"],
+                     [AC_MSG_ERROR([FFTW3 single precision library not found])])
+else
+    PKG_CHECK_MODULES(FFTW3, fftw3 >= 3.0.0,
+                     [FFTWLIB="$FFTW3_LIBS";FFTWHDR="-DHAVE_FFTW3 $FFTW3_CFLAGS";FFTWPREC="-DFFTWPREC=2"],
+                     [AC_MSG_ERROR([FFTW3 library not found. Install fftw3 or use --enable-single-fftw3 for single precision.])])
 fi
 
 
 dnl Checks for header files.
-AC_HEADER_STDC
-AC_CHECK_HEADERS(fcntl.h limits.h malloc.h sys/ioctl.h sys/time.h unistd.h sndfile.h)
-AC_HEADER_TIME
+AC_CHECK_HEADERS([fcntl.h limits.h malloc.h sys/ioctl.h sys/time.h unistd.h sndfile.h])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -171,8 +165,6 @@ dnl refer to comments in gwc.c where these versions are required:
 PKG_CHECK_MODULES(GTK, [ gtk+-2.0 >= 2.16 glib-2.0 >= 2.30 ])
 
 dnl Checks for library functions.
-AC_PROG_GCC_TRADITIONAL
-AC_TYPE_SIGNAL
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(gettimeofday)
 
@@ -187,11 +179,25 @@ case `uname -s` in
     ;;
 esac
 AC_MSG_RESULT([$platform_osx])
-if [test x$platform_osx = xyes]; then
+if test x$platform_osx = xyes; then
   OSXDEF="-DMAC_OS_X"
-  if test "$enablepa" == "yes"; then
+  
+  dnl Check for gtk-mac-integration
+  PKG_CHECK_MODULES(GTK_MAC, [gtk-mac-integration-gtk2 >= 2.0.0],
+                   [HAVE_GTK_MAC="yes"], [HAVE_GTK_MAC="no"])
+  
+  if test "x$HAVE_GTK_MAC" = xyes ; then
+    OSXDEF="$OSXDEF -DHAVE_GTK_MAC_INTEGRATION"
+    GTK_CFLAGS="$GTK_CFLAGS $GTK_MAC_CFLAGS"
+    GTK_LIBS="$GTK_LIBS $GTK_MAC_LIBS"
+    AC_MSG_NOTICE([GTK Mac Integration found - enabling native macOS integration])
+  else
+    AC_MSG_NOTICE([GTK Mac Integration not found - building without native macOS integration])
+  fi
+  
+  if test "$enablepa" = "yes"; then
     # pulseaudio is enabled (recommended until issues are fixed with coreaudio backend)
-    OSXLIBS="$LIBS -lgtkmacintegration-gtk2"
+    OSXLIBS="$LIBS"
   else
     # pulseaudio is not enabled so we need to build CoreAudio backend instead
     AC_MSG_NOTICE([
@@ -201,8 +207,9 @@ This currently does not seem to work.
 Use --enable-pa to build with the pulseaudio backend instead.
 *******************************************************************
 ])
-    OSXLIBS="$LIBS -framework CoreAudio -lgtkmacintegration-gtk2" 
+    OSXLIBS="$LIBS -framework CoreAudio" 
   fi
 fi
 
-AC_OUTPUT(Makefile)
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT
