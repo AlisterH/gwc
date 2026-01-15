@@ -39,7 +39,7 @@ AC_LANG(C)
 dnl Checks for libraries.
 
 dnl Replace `main' with a function in -lm:
-AC_CHECK_LIB(m, cos)
+AC_CHECK_LIB(m, cos, [M_LIBS="-lm"], [M_LIBS=""])
 
 dnl setup macros variables to be replaced in Makefile.in
 AC_SUBST(FFTWLIB)
@@ -48,6 +48,7 @@ AC_SUBST(FFTWPREC)
 AC_SUBST(OSXDEF)
 AC_SUBST(GTK_MAC_CFLAGS)
 AC_SUBST(GTK_MAC_LIBS)
+AC_SUBST(M_LIBS)
 AC_SUBST(PALIB)
 AC_SUBST(PAHDR)
 AC_SUBST(ALSALIB)
