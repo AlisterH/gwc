@@ -1,5 +1,5 @@
 /* XPM */
-static char *select_all_dark_xpm[] = {
+static const char *select_all_dark_xpm[] = {
 "28 28 5 1",
 " 	c None",
 "1	c #FFFFFF",

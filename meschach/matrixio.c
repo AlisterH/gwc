@@ -86,7 +86,7 @@ MAT     *a;
 MAT	*m_finput(FILE *fp, MAT *a)
 #endif
 {
-     MAT        *im_finput(),*bm_finput();
+     MAT        *im_finput(FILE *fp,MAT *mat),*bm_finput(FILE *fp, MAT *a);
      
      if ( isatty(fileno(fp)) )
 	  return im_finput(fp,a);
@@ -213,7 +213,7 @@ PERM    *px;
 PERM    *px_finput(FILE *fp,PERM *px)
 #endif
 {
-     PERM       *ipx_finput(),*bpx_finput();
+     PERM       *ipx_finput(FILE *fp, PERM *px),*bpx_finput(FILE *fp, PERM *px);
      
      if ( isatty(fileno(fp)) )
 	  return ipx_finput(fp,px);
@@ -339,7 +339,7 @@ VEC     *x;
 VEC     *v_finput(FILE *fp,VEC *x)
 #endif
 {
-     VEC        *ifin_vec(),*bfin_vec();
+     VEC        *ifin_vec(FILE *fp,VEC *x),*bfin_vec(FILE *fp,VEC *x);
      
      if ( isatty(fileno(fp)) )
 	  return ifin_vec(fp,x);
@@ -656,7 +656,7 @@ IVEC	*x;
 IVEC	*iv_finput(FILE *fp, IVEC *x)
 #endif
 {
-   IVEC	*iiv_finput(),*biv_finput();
+   IVEC	*iiv_finput(FILE *fp, IVEC *x),*biv_finput(FILE *fp, IVEC *x);
    
    if ( isatty(fileno(fp)) )
      return iiv_finput(fp,x);

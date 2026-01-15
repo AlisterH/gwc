@@ -246,7 +246,7 @@ int mem_stat_free_list(int mark, int list)
 #endif
 {
    unsigned int i,j;
-   int	 (*free_fn)();
+   int	 (*free_fn)(void *);
 
    if ( list < 0 || list >= MEM_CONNECT_MAX_LISTS 
        || mem_connect[list].free_funcs == NULL )
@@ -276,7 +276,7 @@ int mem_stat_free_list(int mark, int list)
       else {
 	 j--;
 	 if (mem_stat_var[j].mark == mark) {
-	     free_fn = mem_connect[list].free_funcs[mem_stat_var[j].type];
+	     free_fn = (int (*)(void *))mem_connect[list].free_funcs[mem_stat_var[j].type];
 #ifdef DEBUG
 	     printf("# Freeing variable(s) registered in file \"%s\", line %d\n",
 		    mem_stat_var[j].fname, mem_stat_var[j].line);

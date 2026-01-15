@@ -96,7 +96,7 @@ int mem_stat_free_list(int mark,int list);
 int mem_stat_show_mark(void);
 void mem_stat_dump(FILE *fp,int list);
 int mem_attach_list(int list,int ntypes,char *type_names[],
-	int (*free_funcs[])(), MEM_ARRAY info_sum[]);
+	int (*free_funcs[])(void *), MEM_ARRAY info_sum[]);
 int mem_free_vars(int list);
 int mem_is_list_attached(int list);
 void mem_dump_list(FILE *fp,int list);
@@ -152,7 +152,7 @@ int mem_stat_reg_vars();
 
 typedef struct {
    char **type_names;        /* array of names of types (strings) */
-   int  (**free_funcs)();    /* array of functions for releasing types */
+   int  (**free_funcs)(void *);    /* array of functions for releasing types */
    unsigned ntypes;          /* max number of types */
    MEM_ARRAY *info_sum;      /* local array for keeping track of memory */
 } MEM_CONNECT;

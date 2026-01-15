@@ -50,7 +50,7 @@ static	char	rcsid[] = "$Id: qrfactor.c,v 1.5 1994/01/13 05:35:07 des Exp $";
 
 #define		sign(x)	((x) > 0.0 ? 1 : ((x) < 0.0 ? -1 : 0 ))
 
-extern	VEC	*Usolve();	/* See matrix2.h */
+extern	VEC	*Usolve(const MAT *A,const VEC *b,VEC *x,double diag_val);	/* See matrix2.h */
 
 /* Note: The usual representation of a Householder transformation is taken
    to be:

@@ -209,7 +209,7 @@ VEC	*x, *out;
 #ifdef PROTOTYPES_IN_STRUCT
 VEC	*v_map(double (*f)(double), const VEC *x, VEC *out)
 #else
-VEC	*v_map(double (*f)(), const VEC *x, VEC *out)
+VEC	*v_map(double (*f)(double), const VEC *x, VEC *out)
 #endif
 #endif
 {
@@ -238,7 +238,7 @@ VEC	*x, *out;
 #ifdef PROTOTYPES_IN_STRUCT
 VEC	*_v_map(double (*f)(void *,double), void *params, const VEC *x, VEC *out)
 #else
-VEC	*_v_map(double (*f)(), void *params, const VEC *x, VEC *out)
+VEC	*_v_map(double (*f)(void *,double), void *params, const VEC *x, VEC *out)
 #endif
 #endif
 {
