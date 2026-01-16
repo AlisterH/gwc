@@ -43,6 +43,7 @@ depcomp
 .vscode/
 *.swp
 *.swo
+tags
 
 # Build directories (if any)
 build/
