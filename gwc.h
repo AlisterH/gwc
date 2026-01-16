@@ -17,6 +17,10 @@
 *   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 *******************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 /* gwc.h */
 #define _ISOC9X_SOURCE  1
 #define _ISOC99_SOURCE  1
@@ -25,6 +29,7 @@
 #include <math.h>
 
 #include <gtk/gtk.h>
+
 #ifdef HAVE_FFTW3
 #include <fftw3.h>
 #if (FFTWPREC == 1)

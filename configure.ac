@@ -42,9 +42,6 @@ dnl Replace `main' with a function in -lm:
 AC_CHECK_LIB(m, cos, [M_LIBS="-lm"], [M_LIBS=""])
 
 dnl setup macros variables to be replaced in Makefile.in
-AC_SUBST(FFTWLIB)
-AC_SUBST(FFTWHDR)
-AC_SUBST(FFTWPREC)
 AC_SUBST(OSXDEF)
 AC_SUBST(GTK_MAC_CFLAGS)
 AC_SUBST(GTK_MAC_LIBS)
@@ -138,21 +135,37 @@ else
 fi
 
 
-dnl enable single precision FFTW3 if installed
-AC_ARG_ENABLE(single-fftw3,
-            [  --enable-single-fftw3    compile single precision FFTW3 support (default double precision)],
-            [use_single_fftw=yes], [use_single_fftw=no])
+dnl ------------------------------------------------------------
+dnl FFTW3 (single or double precision)
+dnl ------------------------------------------------------------
 
-dnl Use pkg-config to detect FFTW3
-if test "$use_single_fftw" = "yes"; then
-    PKG_CHECK_MODULES(FFTW3, fftw3f >= 3.0.0,
-                     [FFTWLIB="$FFTW3_LIBS";FFTWHDR="-DHAVE_FFTW3 $FFTW3_CFLAGS";FFTWPREC="-DFFTWPREC=1"],
-                     [AC_MSG_ERROR([FFTW3 single precision library not found])])
-else
-    PKG_CHECK_MODULES(FFTW3, fftw3 >= 3.0.0,
-                     [FFTWLIB="$FFTW3_LIBS";FFTWHDR="-DHAVE_FFTW3 $FFTW3_CFLAGS";FFTWPREC="-DFFTWPREC=2"],
-                     [AC_MSG_ERROR([FFTW3 library not found. Install fftw3 or use --enable-single-fftw3 for single precision.])])
-fi
+AC_ARG_WITH([fftw-precision],
+  AS_HELP_STRING([--with-fftw-precision=single|double],
+                 [choose FFTW3 precision (default: double)]),
+  [fftw_precision="$withval"],
+  [fftw_precision="double"])
+
+FFTW_LIBS=""
+FFTW_CFLAGS=""
+
+AS_IF([test "x$fftw_precision" = "xsingle"], [
+  PKG_CHECK_MODULES([FFTW], [fftw3f >= 3.0.0], [
+    AC_DEFINE([HAVE_FFTW3], [1], [Have FFTW3])
+    AC_DEFINE([FFTWPREC], [1], [FFTW precision: single])
+  ], [
+    AC_MSG_ERROR([Single-precision FFTW3 (fftw3f) not found])
+  ])
+], [
+  PKG_CHECK_MODULES([FFTW], [fftw3 >= 3.0.0], [
+    AC_DEFINE([HAVE_FFTW3], [1], [Have FFTW3])
+    AC_DEFINE([FFTWPREC], [0], [FFTW precision: double])
+  ], [
+    AC_MSG_ERROR([Double-precision FFTW3 (fftw3) not found])
+  ])
+])
+
+AC_SUBST([FFTW_LIBS])
+AC_SUBST([FFTW_CFLAGS])
 
 
 dnl Checks for header files.
@@ -227,5 +240,6 @@ Use --enable-pa to build with the pulseaudio backend instead.
   fi
 fi
 
+AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

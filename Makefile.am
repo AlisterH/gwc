@@ -1,10 +1,9 @@
 # Alister: there are issues with the way this is all set up.
 # 1. It is too complicated - we aren't letting autotools do enough for us.
 # 2. Make does not recognise if header files have changed and rebuild the necessary objects.
-# 3. We haven't properly integrated meschach.  Make here doesn't recognise if any of meschach's header or source files have changed, and autoconf or autoreconf here doesn't touch it. (also see note in meschach/configure - neither autoconf nor building in meschach actually works in our version).
-# 4. `make dist` needs to be told to include all of the header and source files, as we haven't specified them as gwc_SOURCES.
-# 5. `make clean` errors trying to clean the meschach directory if `make` has not been run :)
-# 6. `make install-strip` doesn't strip
+# 3. We haven't properly integrated meschach.  Make here doesn't recognise if any of meschach's header or source files have changed; note that autoconf or autoreconf also don't touch it, and shouldn't, as it uses a legacy build system (also see note in meschach/configure - does building in meschach still not work in our version?).
+# 4. `make dist` needs to be told to include all of the header and source files, as we haven't specified them as gtk-wave-cleaner_SOURCES.
+# 5. `make install-strip` doesn't strip
 # etc
 
 # Note if we contemplate updating meschach or using an external meschach library we need to check what Jeff did to our version:
@@ -22,6 +21,8 @@ else
 AM_CFLAGS = -O2 -I$(srcdir)/meschach
 AM_CXXFLAGS = -O2
 endif
+
+AM_CPPFLAGS = -DHAVE_CONFIG_H $(FFTW_CFLAGS) -I$(top_srcdir)/meschach -I$(top_builddir)/meschach -I$(top_srcdir) -I$(top_builddir)
 
 # Alister: OSX potential issues
 # On an old test system I initially couldn't use -lgtkmacintegration as it wasn't building
@@ -49,16 +50,43 @@ HELPDIR = $(DOCDIR)
 #DOCDIR = /usr/share/doc/packages/gtk-wave-cleaner
 #HELPDIR = $(DOCDIR)
 
-DEFS = -DDATADIR=\"$(DATADIR)\" -DHELPDIR=\"$(HELPDIR)\" -DLIBDIR=\"$(LIBDIR)\" -DAPPNAME=\"$(APPNAME)\" @OSXDEF@ @ALSADEF@ @PAHDR@ @FFTWHDR@ @FFTWPREC@ @OGGHDR@ @MP3HDR@
+DEFS = -DDATADIR=\"$(DATADIR)\" -DHELPDIR=\"$(HELPDIR)\" -DLIBDIR=\"$(LIBDIR)\" -DAPPNAME=\"$(APPNAME)\" @OSXDEF@ @ALSADEF@ @PAHDR@ @OGGHDR@ @MP3HDR@
 CFLAGS = -D_FILE_OFFSET_BITS=64 -Wall @CFLAGS@ @GTK_CFLAGS@ @SNDFILE_CFLAGS@
 
-LIBS= meschach.a @GTK_LIBS@ @SNDFILE_LIBS@ @ALSALIB@ @PALIB@ @FFTWLIB@ @OGGLIB@ @MP3LIB@ @OSXLIBS@ @M_LIBS@
+LIBS= meschach.a $(FFTW_LIBS) @GTK_LIBS@ @SNDFILE_LIBS@ @ALSALIB@ @PALIB@ @OGGLIB@ @MP3LIB@ @OSXLIBS@ @M_LIBS@
 
-SRC = tap_reverb_file_io.c tap_reverb.c reverb.c dialog.c gwc.c audio_device.c audio_edit.c audio_util.c gtkled.c gtkledbar.c preferences.c drawing.c amplify.c denoise.c undo.c declick.c sample_block.c decrackle.c stat.c dethunk.c i0.c i1.c chbevl.c markers.c encode.c soundfile.c pinknoise.c biquad.c
-OBJS = $(SRC:.c=.o)
+gtk_wave_cleaner_SOURCES = \
+	tap_reverb_file_io.c \
+	tap_reverb.c \
+	reverb.c \
+	dialog.c \
+	gwc.c \
+	audio_device.c \
+	audio_edit.c \
+	audio_util.c \
+	gtkled.c \
+	gtkledbar.c \
+	preferences.c \
+	drawing.c \
+	amplify.c \
+	denoise.c \
+	undo.c \
+	declick.c \
+	sample_block.c \
+	decrackle.c \
+	stat.c \
+	dethunk.c \
+	i0.c \
+	i1.c \
+	chbevl.c \
+	markers.c \
+	encode.c \
+	soundfile.c \
+	pinknoise.c \
+	biquad.c
 # Alister: We should be able to avoid most of this - see item 3 and 4 in the comment at the top
 # Alister: leave out meschach/configure.in, as it makes a broken configure, and someone may try to use it!
-EXTRA_DIST = $(SRC) icons data contrib/macosx Changelog doc ar.c audio_osx.c audio_pa.c audio_oss.c audio_alsa.c \
+EXTRA_DIST = $(gtk_wave_cleaner_SOURCES) icons data contrib/macosx Changelog doc ar.c audio_osx.c audio_pa.c audio_oss.c audio_alsa.c \
 ar.h audio_device.h audio_edit.h biquad.h encoding.h fmtheaders.h gtkled.h gtkledbar.h gwc.h mconf.h mp3.h mp3-duration.h reverb_settings.h soundfile.h stat.h tap_reverb.h tap_reverb_common.h tap_reverb_file_io.h \
 meschach/DOC meschach/MACHINES meschach/arnoldi.c meschach/bdfactor.c meschach/bkpfacto.c meschach/chfactor.c meschach/configure meschach/conjgrad.c meschach/copy.c meschach/copyright meschach/dmacheps.c meschach/err.c meschach/err.h \
 meschach/extras.c meschach/fft.c meschach/FILELIST meschach/fmacheps.c meschach/givens.c meschach/hessen.c meschach/hsehldr.c meschach/init.c meschach/iotort.c meschach/iter.h meschach/iter0.c meschach/iternsym.c meschach/itersym.c meschach/itertort.c meschach/ivecop.c meschach/lanczos.c \
@@ -68,8 +96,7 @@ meschach/spbkp.c meschach/spchfctr.c meschach/splufctr.c meschach/sprow.c mescha
 meschach/zcopy.c meschach/zfunc.c meschach/zgivens.c meschach/zhessen.c meschach/zhsehldr.c meschach/zlufctr.c meschach/zmachine.c meschach/zmatio.c meschach/zmatlab.c meschach/zmatop.c meschach/zmatrix.h meschach/zmatrix2.h meschach/zmemory.c meschach/znorm.c meschach/zqrfctr.c meschach/zschur.c \
 meschach/zsolve.c meschach/ztorture.c meschach/zvecop.c
 
-BINFILES = $(APPNAME)
-# Alister: normally this should automatically cause `make [un]install` to install/uninstall it, but in our case we are doing it manually below
+bin_PROGRAMS = $(APPNAME)
 dist_bin_SCRIPTS = gwcbatch
 # Confusingly we don't have the DOCFILES in the doc directory, only the HELPFILES
 DOCFILES = README.md INSTALL TODO COPYING Changelog
@@ -89,7 +116,6 @@ DATADIRS = \
 
 ###
 CC = @CC@
-COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)
 #Alister: I don't think we ever needed OSX_CFLAGS
 #COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) $(OSX_CFLAGS)
 
@@ -97,32 +123,32 @@ COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)
 #EFENCE = -lefence
 EFENCE =
 
-all : gwc
+gtk_wave_cleaner_CPPFLAGS = $(AM_CPPFLAGS)
+gtk_wave_cleaner_LDADD = $(FFTW_LIBS)
 
-gwc : meschach.a $(OBJS)
-	$(CC) $(OBJS) $(EFENCE) $(LDFLAGS) $(LIBS) -o $(APPNAME)
-        # Alister: If you have trouble building on a Mac
-        # set OSX_OBJS and OSX_LIBS above and use this:
-        #$(CC) $(OSX_LIBS) $(OBJS) $(OSX_OBJS) $(EFENCE) $(LDFLAGS) $(LIBS) -o $(APPNAME)
+BUILT_SOURCES = meschach/machine.h
+CLEANFILES = meschach/machine.h
 
-audio_device.o : audio_device.c audio_alsa.c audio_oss.c audio_osx.c audio_pa.c Makefile
-	$(COMPILE) -c audio_device.c
+gtk_wave_cleaner_LDADD = meschach.a $(FFTW_LIBS)\
+	@GTK_LIBS@ @SNDFILE_LIBS@ @ALSALIB@ @PALIB@ \
+	@OGGLIB@ @MP3LIB@ @OSXLIBS@ @M_LIBS@
+
+
+audio_device.o : $(srcdir)/audio_device.c $(srcdir)/audio_alsa.c $(srcdir)/audio_oss.c $(srcdir)/audio_osx.c $(srcdir)/audio_pa.c Makefile
+	$(COMPILE) -c $(srcdir)/audio_device.c
 	
-audio_util.o : audio_util.c Makefile
-	$(COMPILE) -c audio_util.c
+audio_util.o : $(srcdir)/audio_util.c Makefile
+	$(COMPILE) -c $(srcdir)/audio_util.c
 
 # Files that depend on meschach headers need meschach.a built first
-declick.o : declick.c meschach.a Makefile
-	$(COMPILE) -c declick.c
+declick.o : $(srcdir)/declick.c meschach.a Makefile
+	$(COMPILE) -c $(srcdir)/declick.c
 
-dethunk.o : dethunk.c meschach.a Makefile
-	$(COMPILE) -c dethunk.c
+dethunk.o : $(srcdir)/dethunk.c meschach.a Makefile
+	$(COMPILE) -c $(srcdir)/dethunk.c
 
-stat.o : stat.c meschach.a Makefile
-	$(COMPILE) -c stat.c
-
-.c.o :
-	$(COMPILE) -c $<
+stat.o : $(srcdir)/stat.c meschach.a Makefile
+	$(COMPILE) -c $(srcdir)/stat.c
 
 # Alister: note that we can mostly install to the OSX appdir using something like this:
 # make DESTDIR=/tmp/gwc/osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources install
@@ -132,45 +158,24 @@ stat.o : stat.c meschach.a Makefile
 # The .desktop and icon files aren't used, anyway, but at least it installs the docs!
 # How do we get it to load the logo in the about dialog from either the icon files or the .icns?
 
-install : gwc
-	install -d "$(DESTDIR)"$(BINDIR)
-	install -d "$(DESTDIR)"$(DOCDIR)/$(APPNAME)
-	install -d "$(DESTDIR)"$(HELPDIR)/$(APPNAME)
-	install -p $(BINFILES) $(dist_bin_SCRIPTS) "$(DESTDIR)"$(BINDIR)
-	install -p -m 0644 $(DOCFILES) "$(DESTDIR)"$(DOCDIR)/$(APPNAME)
-	for hf in $(HELPFILES) ; do install -p -m 0644 $(HELPFILESSRCD)/$$hf "$(DESTDIR)"$(HELPDIR)/$(APPNAME) ; done
-	for hf in $(DATADIRS) ; do install -d "$(DESTDIR)"$(DATADIR)/$$hf && install -p -m 0644 data/$$hf/$(APPNAME).* "$(DESTDIR)"$(DATADIR)/$$hf ; done
-#	if we are using DESTDIR this is pointless, so should we skip it?:
-	gtk-update-icon-cache -f -t "$(DESTDIR)"$(DATADIR)/icons/hicolor
-
-uninstall :
-	( cd "$(DESTDIR)"$(BINDIR) && rm -f $(BINFILES) $(dist_bin_SCRIPTS) )
-	( cd "$(DESTDIR)"$(DOCDIR)/$(APPNAME) && rm -f $(DOCFILES) )
-	( cd "$(DESTDIR)"$(HELPDIR)/$(APPNAME) && rm -f $(HELPFILES) )
-# Alister: note osx errors on --ignore-fail-on-non-empty
-# But we wouldn't normally run `make uninstall` on osx
-# If we need to we can install gnu coreutils and use its rmdir
-	( rmdir --ignore-fail-on-non-empty "$(DESTDIR)"$(DOCDIR)/$(APPNAME) $(DOCDIR) )
-	( for hf in $(DATADIRS) ; do rm "$(DESTDIR)"$(DATADIR)/$$hf/$(APPNAME).* && rmdir -p --ignore-fail-on-non-empty "$(DESTDIR)"$(DATADIR)/$$hf; done )
-# Alister: why does this test not work?
-#	( if [$(DOCDIR) != $(HELPDIR)]; then rmdir --ignore-fail-on-non-empty "$(DESTDIR)"$(HELPDIR)/$(APPNAME) "$(DESTDIR)"$(HELPDIR); fi)
-# should we be running this on uninstall?:
-#	gtk-update-icon-cache -f -t "$(DESTDIR)"$(DATADIR)/icons/hicolor
-
-# Supposedly means `make clean` etc still works if someone makes a file called clean
+# This supposedly means `make clean` etc still works if someone makes a file called clean
 .PHONY: clean distclean maintainer-clean clean-local distclean-local maintainer-clean-local
 
-meschach.a : meschach/meschach.a
-	cp meschach/meschach.a .
+meschach/machine.h:
+	@echo "Configuring bundled meschach"
+	@mkdir -p meschach
+	cd meschach && \
+	  $(abs_srcdir)/meschach/configure --srcdir=$(abs_srcdir)/meschach
 
-meschach/meschach.a :
+meschach.a : meschach/meschach.a
+	cp meschach/meschach.a $@
+
+meschach/meschach.a : meschach/machine.h
 # Build Meschach without sparse matrix support (part3) since GWC doesn't use it
 # and sparse.c has compilation issues with modern compilers
 	@echo "Building bundled meschach library"
-	(cd meschach && \
-	 ./configure &&\
-	 $(MAKE) CFLAGS="-std=c89 -DANSI_C -DHAVE_PROTOTYPES -DPROTOTYPES_IN_STRUCT" part1 && \
-	 $(MAKE) CFLAGS="-std=c89 -DANSI_C -DHAVE_PROTOTYPES -DPROTOTYPES_IN_STRUCT" part2)
+	$(MAKE) -C meschach  CFLAGS="-I. -I$(abs_srcdir)/meschach -std=c89 -DANSI_C -DHAVE_PROTOTYPES -DPROTOTYPES_IN_STRUCT" part1
+	$(MAKE) -C meschach  CFLAGS="-I. -I$(abs_srcdir)/meschach -std=c89 -DANSI_C -DHAVE_PROTOTYPES -DPROTOTYPES_IN_STRUCT" part2
 
 #	@echo "Building bundled meschach (legacy mode)"
 #	$(MAKE) -C meschach clean
