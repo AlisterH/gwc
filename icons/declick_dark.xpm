@@ -1,5 +1,5 @@
 /* XPM */
-static char * declick_dark_xpm[] = {
+static const char * declick_dark_xpm[] = {
 "28 28 12 1",
 " 	c None",
 ".	c #F32626",

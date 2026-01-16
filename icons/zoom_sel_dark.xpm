@@ -1,5 +1,5 @@
 /* XPM */
-static char *zoom_sel_dark_xpm[] = {
+static const char *zoom_sel_dark_xpm[] = {
 "28 28 22 1",
 " 	c None",
 "B	c #FFFFFF",

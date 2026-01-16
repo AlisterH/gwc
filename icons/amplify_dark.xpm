@@ -1,5 +1,5 @@
 /* XPM */
-static char * amplify_dark_xpm[] = {
+static const char * amplify_dark_xpm[] = {
 "28 28 14 1",
 " 	c None",
 ".	c #EA8585",

@@ -1,5 +1,5 @@
 /* XPM */
-static char *spectral_dark_xpm[] = {
+static const char *spectral_dark_xpm[] = {
 "28 28 15 1",
 " 	c None",
 "1	c #5F6262",
