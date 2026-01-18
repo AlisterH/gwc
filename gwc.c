@@ -56,6 +56,8 @@
 #include "icons/declick.xpm"
 #include "icons/decrackle_dark.xpm"
 #include "icons/decrackle.xpm"
+#include "icons/delete_dark.xpm"
+#include "icons/delete.xpm"
 #include "icons/estimate_dark.xpm"
 #include "icons/estimate.xpm"
 #include "icons/filter_dark.xpm"
@@ -2586,6 +2588,7 @@ static struct {
 	{"declick_m_icon", declick_m_xpm, declick_m_dark_xpm },
 	{"declick_w_icon", declick_w_xpm, declick_w_dark_xpm },
 	{"decrackle_icon", decrackle_xpm, decrackle_dark_xpm },
+	{"delete_icon", delete_xpm, delete_dark_xpm },
 	{"estimate_icon", estimate_xpm, estimate_dark_xpm },
 	{"filter_icon", filter_xpm, filter_dark_xpm },
 	{"gwc_icon", gtk_wave_cleaner_xpm, gtk_wave_cleaner_xpm },
@@ -2665,7 +2668,7 @@ static const GtkActionEntry entries[] = {
   { "Cut", GTK_STOCK_CUT, "Cut", NULL, "Cut current selection to internal clipboard", G_CALLBACK(cut_callback) },
   { "Copy", GTK_STOCK_COPY, "Copy", NULL, "Copy current selection to internal clipboard", G_CALLBACK(copy_callback) },
   { "Paste", GTK_STOCK_PASTE, "Paste", NULL, "Insert internal clipboard before current selection", G_CALLBACK(paste_callback) },
-  { "Delete", GTK_STOCK_DELETE, "Delete", NULL, "Delete current selection from audio data", G_CALLBACK(delete_callback) },
+  { "Delete", "delete_icon", "Delete", NULL, "Delete current selection from audio data", G_CALLBACK(delete_callback) },
   { "ViewMenu", NULL, "_View" },
   { "ZoomSelect", "zoom_sel_icon", "Zoom to selection", NULL, "Zoom in on selected portion", G_CALLBACK(zoom_select) },
   { "ZoomIn", "zoom_in_icon", "Zoom in", NULL, "Zoom in", G_CALLBACK(zoom_in) },
