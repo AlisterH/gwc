@@ -3569,11 +3569,14 @@ int main(int argc, char *argv[])
         g_error_free (error);
         exit (EXIT_FAILURE);
       }
-
+	
+	GtkIconSize GWC_ICON_SIZE;
+	GWC_ICON_SIZE = gtk_icon_size_register("gwc", 28, 28);
     menubar = gtk_ui_manager_get_widget (ui_manager, "/MainMenu");
     gtk_box_pack_start (GTK_BOX (main_vbox), menubar, FALSE, FALSE, 0);
     toolbar = gtk_ui_manager_get_widget (ui_manager, "/MainToolbar");
     gtk_toolbar_set_style (GTK_TOOLBAR(toolbar), GTK_TOOLBAR_ICONS);
+	gtk_toolbar_set_icon_size(GTK_TOOLBAR(toolbar), GWC_ICON_SIZE);
     gtk_box_pack_start (GTK_BOX (main_vbox), toolbar, FALSE, FALSE, 0);
 
 /*// Need to do stuff like this if we want handles so we can rearrange things.
