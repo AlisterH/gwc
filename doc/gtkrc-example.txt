@@ -3,11 +3,12 @@
 ## This file is distributed as an example of gtk settings which people might find useful.
 ## To apply these settings for all GTK2 programs they should typically be added to ~/.gtkrc-2.0 or ~/.gtkrc-2.0.mine
 ## Changes will take effect upon restarting the program.
-## If a line is prefixed by a # that means it is commented out.
+## Lines prefixed by ## are instructions/comments
+## Lines prefixed by # are settings that are commented out - remove the # to enable these settings
 
 ## To use a special gtkrc just for GWC save it along with the config file i.e. as ~/.config/gtk-wave-cleaner/gtkrc
 ## For reference, if we had not implemented reading this file, you could have still done it by launching GWC like this:
-## GTK2_RC_FILES=/usr/share/doc/gtk-wave-cleaner/gtkrc-example.txt gtk-wave-cleaner
+## GTK2_RC_FILES=./DOC/gtkrc-example.txt gtk-wave-cleaner
 
 
 
@@ -18,24 +19,18 @@
 ## It seems you need to specify the actual path of the included file i.e. don't use ~ or $HOME.
 ## Settings in the special gtkrc must be below the include for them to override anything explicitly set in the included file.
 
-## GWC's toolbar icons are 28x28 and by default gtk scales them down.
-## This will instead display the icons at their native size, so they will be bigger and clearer.
-## Presumably we don't need all of these for GWC.
-gtk-icon-sizes = "panel-menu=28,28:panel=28,28:gtk-menu=28,28:gtk-large-toolbar=28,28:gtk-small-toolbar=28,28:gtk-button=28,28:gtk-dnd=28,28"
+## Use a dark theme (needs to be installed separately)
+#include "/usr/share/themes/Adwaita-dark/gtk-2.0/gtkrc"
 
-## Using this instead would in a default setup increase the icon size slightly but only in the toolbar.
-## Combine it with part of the line above to set it to 28 pixels.
-# gtk-toolbar-icon-size = large-toolbar
-
-## This is the obvious step to take it further and display them at 200%
-## This is useful for high dpi screens like my cellphone, and I guess Apple "retina" displays.
-## But how do we make other gui elements like scrollbars bigger too? 
-## And do we need to do anything to make text bigger, particularly on OSX or windows?  Perhaps we need a theme designed for hidpi?
-# gtk-icon-sizes = "panel-menu=56,56:panel=56,56:gtk-menu=56,56:gtk-large-toolbar=56,56:gtk-small-toolbar=56,56:gtk-button=56,56:gtk-dnd=56,56"
+## GWC's toolbar icons are 28x28 by default, a non-standard size, category "gwc".
+# We can double the icon sizes like this:
+#gtk-icon-sizes = "gwc=56,56:gtk-menu=28,28:gtk-dnd=64,64:gtk-button=64,64"
+## There are other categories; we don't need all of these for GWC:
+#gtk-icon-sizes = "panel-menu=28,28:panel=28,28:gtk-menu=28,28:gtk-large-toolbar=28,28:gtk-small-toolbar=28,28:gtk-button=28,28:gtk-dnd=28,28:gtk-dialog=28,28"
 
 ## Allow users to change shortcut keys by hovering the mouse over the respective menu item, and pressing the desired key combination.  
 ## Sadly this doesn't work in the osx native application menu, which GWC now supports.
-## N.B. many other programs probably don't save the changes as this option is not well known.
+## N.B. many other gtk2 programs probably don't save the changes as this option was not well known.
 gtk-can-change-accels=1
 
 ## Show icons in the menu.
@@ -43,7 +38,7 @@ gtk-can-change-accels=1
 gtk-menu-images=1
 
 ## Show icons on buttons e.g. "Save" and "Cancel".
-## Not typically used in windows or osx, although MS office is one of many exceptions.
+## Not typical behaviour in windows or osx, although MS office is one of many exceptions.
 gtk-button-images=1
 
 ## use the win32 button ordering instead of the GNOME HIG one.
@@ -54,3 +49,24 @@ gtk-button-images=1
 
 ## Disable beep on errors (not sure if this affects GWC).
 gtk-error-bell = 0
+
+# Specify a font and size
+style "font"
+{
+font_name = "Sans 16"
+}
+widget_class "*" style "font"
+
+# make scrollbars thicker
+style "myscrollbar"
+{
+     GtkScrollbar::slider-width=24
+}
+class "GtkScrollbar" style "myscrollbar"
+
+## Disable font antialiasing
+## Generally doesn't work as it is overridden by fontconfig settings
+## Note for nice aliased fonts you need a bitmap font or something well hinted like Arial
+#gtk-xft-antialias = 0
+#gtk-xft-hinting = 1
+#gtk-xft-hintstyle = "hintnone"
