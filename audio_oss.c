@@ -109,7 +109,7 @@ int audio_device_write(unsigned char *buffer, int buffersize)
 void audio_device_close(int drain)
 {
     if(audio_fd != -1) {
-	ioclt(audio_fd, SNDCTL_DSP_RESET, NULL) ;
+	ioctl(audio_fd, SNDCTL_DSP_RESET, NULL) ;
 	close(audio_fd) ;
 		audio_fd = -1 ;
     }
