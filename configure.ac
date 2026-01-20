@@ -107,31 +107,30 @@ dnl enable pulseaudio on user request and check installation
 PALIB=""
 PAHDR=""
 
-AC_ARG_ENABLE(pa, [  --enable-pa           compile Pulse Audio support (default disabled)],enablepa="yes",enablepa="no")
 
+AC_ARG_ENABLE(pa,
+  AS_HELP_STRING([--enable-pa],
+                 [compile PulseAudio support (default disabled)]),
+  [enablepa="$enableval"],
+  [enablepa="no"])
 
-AC_MSG_CHECKING([Pulse Audio enabled])
-if test "$enablepa" == "yes"
-then
-    if test "x$HAVE_PULSE_AUDIO" = xyes ; then
-        pa="yes";
-	PALIB=$PULSEAUDIO_LIBS
-	PAHDR="-DHAVE_PULSE_AUDIO $PULSEAUDIO_CFLAGS" ;
-	alsa="disabled";
-	ALSALIB="";
-	ALSADEF="";
-	AC_MSG_NOTICE([
-***********************!!!!!!! Notice !!!!!!!**********************
-The Pulseaudio libraries were found and you have chosen to use the
-Pulseaudio driver.  Note that ALSA is recommended as a better sound
-driver to use, but on some systems (e.g. Ubuntu), getting ALSA to
-work may be complicated.
-*******************************************************************
-])
-    fi
+PALIB=""
+PAHDR=""
+
+if test "x$enablepa" = "xyes"; then
+  PKG_CHECK_MODULES([PULSEAUDIO], [libpulse-simple >= 0.9.0], [
+    PALIB="$PULSEAUDIO_LIBS"
+    PAHDR="-DHAVE_PULSE_AUDIO $PULSEAUDIO_CFLAGS"
+    pa="yes"
+
+    alsa="disabled"
+    ALSALIB=""
+    ALSADEF=""
+  ], [
+    AC_MSG_ERROR([PulseAudio support requested but libpulse-simple was not found])
+  ])
 else
-    AC_MSG_RESULT($enablepa)
-    pa="disabled"
+  pa="disabled"
 fi
 
 
@@ -169,7 +168,7 @@ AC_SUBST([FFTW_CFLAGS])
 
 
 dnl Checks for header files.
-AC_CHECK_HEADERS([fcntl.h limits.h malloc.h sys/ioctl.h sys/time.h unistd.h sndfile.h])
+AC_CHECK_HEADERS([fcntl.h limits.h malloc.h sys/ioctl.h sys/time.h unistd.h])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -225,16 +224,15 @@ if test x$platform_osx = xyes; then
   fi
   
   if test "$enablepa" = "yes"; then
-    # pulseaudio is enabled (recommended until issues are fixed with coreaudio backend)
+    # pulseaudio is enabled
     OSXLIBS="$LIBS"
   else
     # pulseaudio is not enabled so we need to build CoreAudio backend instead
     AC_MSG_NOTICE([
-**********************!!!!!!! Warning !!!!!!!**********************
+***********************!!!!!!! INFORMATION !!!!!!!***********************
 You are building on Apple OSX with the CoreAudio backend.
-This currently does not seem to work.
-Use --enable-pa to build with the pulseaudio backend instead.
-*******************************************************************
+Use --enable-pa if you wish to build with the pulseaudio backend instead.
+*************************************************************************
 ])
     OSXLIBS="$LIBS -framework CoreAudio" 
   fi
