@@ -2,10 +2,20 @@ GWC Changelog
 
 KNOWN ISSUE: GWC fails to open wav files with metadata; refer to the README for details.
 
+0.22-07
+TBC, 2026
+CODE: fixes to allow (and automate) building on recent MACOS (thanks to Philippe Gagné)
+BUGFIX: problems with coreaudio backend and dialogs with Quartz GTK backend (thanks to Philippe Gagné)
+CODE: build system fixes so that everything works properly with modern tools
+CODE: include built-in delete icon so there is no need to install a gtk icon theme
+DOC: expanded gtkrc example configuration, providing more help for people to enlarge the gui for hidpi screens
+NEW: double-click to select between song markers (or select current view when there are none), and triple-click to select current view (thanks to Jeff Welty who came back to help with some things and added this)
+CHANGED BEHAVIOUR: the toolbar icons now use the custom "gwc" gtk icon size category, so anyone setting the icon size via gtkrc will need to update their configuration (refer to doc/gtkrc-example.txt)
+
 0.22-06
 Feb 17, 2023
 BUGFIX: minor bugs and a crash
-NEW: icon variants used with dark GTK themes
+NEW: icon variants used with dark GTK themes (thanks to Jean-Rene Bastien and Lars Windolf).
 
 0.22-05
 May 28, 2021

@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT([Gtk Wave Cleaner], [0.22-06], [http://gwc.sourceforge.net])
+AC_INIT([Gtk Wave Cleaner], [0.22-07], [http://gwc.sourceforge.net])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([1.12 foreign no-define tar-ustar])
 

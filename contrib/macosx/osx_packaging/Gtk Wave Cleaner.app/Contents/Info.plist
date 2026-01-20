@@ -11,9 +11,9 @@
     <key>CFBundleDisplayName</key>
     <string>GTK Wave Cleaner</string>
     <key>CFBundleShortVersionString</key>
-    <string>0.22</string>
+    <string>0.22.07</string>
     <key>CFBundleVersion</key>
-    <string>0.22</string>
+    <string>0.22.07</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleSignature</key>
