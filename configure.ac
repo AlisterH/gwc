@@ -1,5 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT([Gtk Wave Cleaner], [0.22-06], [http://gwc.sourceforge.net])
+AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([1.12 foreign no-define tar-ustar])
 
 PKG_CHECK_MODULES(SNDFILE, sndfile >= 1.0.0,
@@ -97,11 +98,14 @@ AC_ARG_ENABLE(alsa, [  --disable-alsa           disable ALSA support (default en
 if test "$enable_alsa" != "no"
 then
     PKG_CHECK_MODULES(ALSA, alsa >= 0.9.0, alsa="yes";ALSALIB=$ALSA_LIBS;ALSADEF="-DHAVE_ALSA";ALSACFLAGS=$ALSA_CFLAGS, alsa="disabled")
+    AC_DEFINE([HAVE_ALSA], [1], [Define if ALSA support is enabled])
 else
     alsa="disabled"
     AC_MSG_CHECKING([for ALSA])
     AC_MSG_RESULT($alsa)
 fi
+
+AM_CONDITIONAL([HAVE_ALSA], [test "x$alsa" = "xyes"])
 
 dnl enable pulseaudio on user request and check installation
 PALIB=""
@@ -122,6 +126,7 @@ if test "x$enablepa" = "xyes"; then
     PALIB="$PULSEAUDIO_LIBS"
     PAHDR="-DHAVE_PULSE_AUDIO $PULSEAUDIO_CFLAGS"
     pa="yes"
+    AC_DEFINE([HAVE_PULSE_AUDIO], [1], [Define if PulseAudio support is enabled])
 
     alsa="disabled"
     ALSALIB=""
@@ -133,6 +138,7 @@ else
   pa="disabled"
 fi
 
+AM_CONDITIONAL([HAVE_PULSE_AUDIO], [test "x$pa" = "xyes"])
 
 dnl ------------------------------------------------------------
 dnl FFTW3 (single or double precision)
@@ -193,6 +199,7 @@ case `uname -s` in
 esac
 AC_MSG_RESULT([$platform_osx])
 if test x$platform_osx = xyes; then
+  AC_DEFINE([MAC_OS_X], [1], [Define if building on macOS])
   OSXDEF="-DMAC_OS_X"
   
   dnl Check for gtk-mac-integration
@@ -238,6 +245,7 @@ Use --enable-pa if you wish to build with the pulseaudio backend instead.
   fi
 fi
 
-AC_CONFIG_HEADERS([config.h])
+AM_CONDITIONAL([MAC_OS_X], [test "x$platform_osx" = "xyes"])
+
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

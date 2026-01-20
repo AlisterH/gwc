@@ -61,7 +61,6 @@ gtk_wave_cleaner_SOURCES = \
 	reverb.c \
 	dialog.c \
 	gwc.c \
-	audio_device.c \
 	audio_edit.c \
 	audio_util.c \
 	gtkled.c \
@@ -132,11 +131,33 @@ BUILT_SOURCES = meschach/machine.h
 CLEANFILES = meschach/machine.h
 
 
-audio_device.o : $(srcdir)/audio_device.c $(srcdir)/audio_alsa.c $(srcdir)/audio_oss.c $(srcdir)/audio_osx.c $(srcdir)/audio_pa.c Makefile
-	$(COMPILE) -c $(srcdir)/audio_device.c
-	
-audio_util.o : $(srcdir)/audio_util.c Makefile
-	$(COMPILE) -c $(srcdir)/audio_util.c
+# PulseAudio (highest priority)
+if HAVE_PULSE_AUDIO
+gtk_wave_cleaner_SOURCES += audio_pa.c
+endif
+
+# ALSA (only if PA is not enabled)
+if HAVE_ALSA
+if !HAVE_PULSE_AUDIO
+gtk_wave_cleaner_SOURCES += audio_alsa.c
+endif
+endif
+
+# macOS CoreAudio (only if PA and ALSA are not enabled)
+if MAC_OS_X
+if !HAVE_PULSE_AUDIO
+gtk_wave_cleaner_SOURCES += audio_osx.c
+endif
+endif
+
+# OSS fallback
+if !HAVE_PULSE_AUDIO
+if !HAVE_ALSA
+if !MAC_OS_X
+gtk_wave_cleaner_SOURCES += audio_oss.c
+endif
+endif
+endif
 
 # Files that depend on meschach headers need meschach.a built first
 declick.o : $(srcdir)/declick.c meschach.a Makefile
