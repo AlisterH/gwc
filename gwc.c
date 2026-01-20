@@ -167,7 +167,7 @@ char audio_device[256]="/dev/dsp";
 
 gint window_x;
 gint window_y;
-gint window_width = 800;
+gint window_width = 990;
 gint window_height = 580;
 gboolean window_maximised;
 
