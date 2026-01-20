@@ -13,8 +13,10 @@ meschach/makefile
 meschach/config.status
 
 # Autotools generated files
+autoscan.log
 config.log
 config.status
+configure.scan
 Makefile
 Makefile.in
 autom4te.cache/
