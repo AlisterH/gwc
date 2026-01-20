@@ -225,7 +225,7 @@ clean-local:
 # Use distclean-local rather than distclean
 distclean-local:
 	-$(MAKE) -C meschach realclean
-	rm -f .deps
+	rm -rf .deps
 
 maintainer-clean-local:
 	rm -f configure aclocal.m4 compile install-sh missing depcomp config.h.in Makefile.in
