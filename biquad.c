@@ -47,6 +47,12 @@ static gfloat Fc;
 static int filter_type;
 static int feather_width;
 
+/* response plot data */
+#define RESP_POINTS 256
+static double resp_db[RESP_POINTS];
+static int resp_n = 0;
+static GtkWidget *response_area = NULL;
+
 int row2filter(int row)
 {
     if(row == 0) return LPF ;
@@ -304,35 +310,121 @@ static GtkWidget *bandwidth_entry ;
 static struct sound_prefs local_sound_prefs ;
 static long first_sample, last_sample ;
 
+/* GTK2 expose handler for response plot */
+static gboolean response_expose(GtkWidget *widget,
+                                GdkEventExpose *event,
+                                gpointer data)
+{
+    int w = widget->allocation.width;
+    int h = widget->allocation.height;
+
+    GdkGC *gc = widget->style->fg_gc[GTK_STATE_NORMAL];
+    GdkGC *bg = widget->style->white_gc;
+
+    double min_db = -60.0;
+    double max_db =  20.0;
+    int i;
+
+    gdk_draw_rectangle(widget->window, bg, TRUE, 0, 0, w, h);
+
+    gdk_draw_line(widget->window, gc, 40, h-30, w-10, h-30);
+    gdk_draw_line(widget->window, gc, 40, 10,   40,  h-30);
+
+    /* ----- Axis labels ----- */
+    PangoLayout *layout;
+    PangoFontDescription *font;
+    int lw, lh;
+
+    layout = gtk_widget_create_pango_layout(widget, NULL);
+    font = pango_font_description_from_string("Sans 9");
+    pango_layout_set_font_description(layout, font);
+
+    /* Y axis label */
+    pango_layout_set_text(layout, "dB", -1);
+    pango_layout_get_pixel_size(layout, &lw, &lh);
+    gdk_draw_layout(widget->window, gc,
+                    42,           /* just right of Y axis */
+                    12,           /* just below top */
+                    layout);
+
+    /* X axis label */
+    pango_layout_set_text(layout, "Frequency (Hz)", -1);
+    pango_layout_get_pixel_size(layout, &lw, &lh);
+    gdk_draw_layout(widget->window, gc,
+                    w - lw - 12,   /* inside right edge */
+                    h - lh - 32,   /* just above X axis */
+                    layout);
+
+    int db;
+    for (db = -60; db <= 20; db += 20) {
+        int y = h-30 - (db - min_db) * (h-40) / (max_db - min_db);
+        char buf[16];
+
+        gdk_draw_line(widget->window, gc, 35, y, 40, y);
+        snprintf(buf, sizeof(buf), "%d", db);
+        pango_layout_set_text(layout, buf, -1);
+        gdk_draw_layout(widget->window, gc, 8, y - 6, layout);
+    }
+
+    const int freqs[] = {10, 100, 1000, 10000};
+    int j;
+
+    for (j = 0; j < 4; j++) {
+        double t = log((double)freqs[j] / 10.0) /
+                   log(20000.0 / 10.0);
+        int x = 40 + t * (w - 50);
+        char buf[16];
+
+        gdk_draw_line(widget->window, gc, x, h-30, x, h-25);
+        snprintf(buf, sizeof(buf), "%d", freqs[j]);
+        pango_layout_set_text(layout, buf, -1);
+        gdk_draw_layout(widget->window, gc, x - 10, h - 22, layout);
+    }
+
+    if (resp_n < 2)
+        return TRUE;
+
+    for (i = 1; i < resp_n; i++) {
+        int x1 = 40 + (i-1) * (w-50) / (resp_n-1);
+        int x2 = 40 +  i    * (w-50) / (resp_n-1);
+
+        int y1 = h-30 - (resp_db[i-1] - min_db) * (h-40) / (max_db - min_db);
+        int y2 = h-30 - (resp_db[i]   - min_db) * (h-40) / (max_db - min_db);
+
+        gdk_draw_line(widget->window, gc, x1, y1, x2, y2);
+    }
+
+    pango_font_description_free(font);
+    g_object_unref(layout);
+    return TRUE;
+}
+
 void show_response(GtkWidget *w, gpointer gdata)
 {
-    biquad *iir_left ;
-    double freq, d_freq=10 ;
+    biquad *iir;
+    int i;
+    double fmin = 10.0;
+    double fmax = 20000.0;
 
     Fc = atof(gtk_entry_get_text((GtkEntry *)freq_entry)) ;
     dbGain = atof(gtk_entry_get_text((GtkEntry *)dbGain_entry)) ;
     bandwidth = atof(gtk_entry_get_text((GtkEntry *)bandwidth_entry)) ;
-    iir_left  = BiQuad_new(filter_type, dbGain, Fc, 44100, bandwidth) ;
+    iir = BiQuad_new(filter_type, dbGain, Fc, 44100, bandwidth) ;
+    if (!iir)
+        return;
 
-    for(freq = 10 ; freq < 20001 ; freq += d_freq) {
-	double from_formula ;
-	double rl = BiQuad_response(freq, 44100, iir_left, &from_formula) ;
-	g_print("freq:%5.0lf response(dB):%10.4lg formula(dB):%10.4lg\n", freq, rl, from_formula) ;
-	if(freq > 90) d_freq = 100 ;
-	if(freq > 900) d_freq = 1000 ;
-	if(freq > 9000) d_freq = 2000 ;
+    resp_n = RESP_POINTS;
+
+    for (i = 0; i < RESP_POINTS; i++) {
+        double t = (double)i / (RESP_POINTS - 1);
+        double freq = fmin * pow(fmax / fmin, t);
+        double dummy;
+        resp_db[i] = BiQuad_response(freq, 44100, iir, &dummy);
     }
-    free(iir_left) ;
 
-    g_print("first_sample:%ld last_sample:%ld\n", first_sample, last_sample) ;
+    free(iir);
 
-
-    {
-	struct denoise_prefs p ;
-	p.n_noise_samples = 10 ;
-	p.FFT_SIZE = 8192 ;
-	print_noise_sample(&local_sound_prefs, &p, first_sample, last_sample) ;
-    }
+    gtk_widget_queue_draw(response_area);
 }
 
 
@@ -344,7 +436,6 @@ int filter_dialog(struct sound_prefs current, struct view *v)
     int dres ;
 
     GtkWidget *type_window_list;
-    GtkWidget *show_response_button ;
 
     gchar *type_window_titles[] = { "Filter Type" };
     gchar *type_window_parms[7][1] = { {"Low Pass"},
@@ -402,11 +493,36 @@ int filter_dialog(struct sound_prefs current, struct view *v)
 
     gtk_box_pack_start (GTK_BOX (GTK_DIALOG(dlg)->vbox), dialog_table, TRUE, TRUE, 0);
 
-    show_response_button = gtk_button_new_with_label("Show Response") ;
-    gtk_signal_connect(GTK_OBJECT(show_response_button), "clicked", GTK_SIGNAL_FUNC(show_response), NULL) ;
-    gtk_widget_show(show_response_button) ;
+    response_area = gtk_drawing_area_new();
+    gtk_widget_set_size_request(response_area, 420, 220);
+    gtk_signal_connect(GTK_OBJECT(response_area), "expose-event",
+                       GTK_SIGNAL_FUNC(response_expose), NULL);
+    gtk_widget_show(response_area);
 
-    gtk_box_pack_start (GTK_BOX (GTK_DIALOG(dlg)->vbox), show_response_button, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox),
+                       response_area, TRUE, TRUE, 0);
+    /* ------------------------------------------------------------ */
+    /* Live filter response updates                                 */
+    /* ------------------------------------------------------------ */
+
+    /* Update when numeric entries change */
+    gtk_signal_connect(GTK_OBJECT(freq_entry), "changed",
+                       GTK_SIGNAL_FUNC(show_response), NULL);
+
+    gtk_signal_connect(GTK_OBJECT(dbGain_entry), "changed",
+                       GTK_SIGNAL_FUNC(show_response), NULL);
+
+    gtk_signal_connect(GTK_OBJECT(bandwidth_entry), "changed",
+                       GTK_SIGNAL_FUNC(show_response), NULL);
+
+    /* Update when filter type changes */
+    gtk_signal_connect(GTK_OBJECT(type_window_list), "select-row",
+                       GTK_SIGNAL_FUNC(show_response), NULL);
+
+    /* Draw initial response when dialog is shown */
+    show_response(NULL, NULL);
+
+    /* ------------------------------------------------------------ */
 
     dres = gwc_dialog_run(GTK_DIALOG(dlg)) ;
 
