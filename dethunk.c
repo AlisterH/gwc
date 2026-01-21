@@ -635,7 +635,7 @@ void estimate_region(fftw_real data[], int firstbad, int lastbad, int siglen)
 }
 
 //alister: note this implementation will not currently edit right to the end of the file
-//             so, leave some space a the beginning and end of your recordings if you are clipping them before bringing them into GWC!
+//             so, leave some space at the beginning and end of your recordings if you are clipping them before bringing them into GWC!
 int dethunk(struct sound_prefs *pPrefs,
             long first_sample, long last_sample, int channel_mask)
 {
