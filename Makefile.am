@@ -1,18 +1,10 @@
-# Alister: there are issues with the way this is all set up.
-# 1. It is too complicated - we aren't letting autotools do enough for us.
-# 2. Make does not recognise if header files have changed and rebuild the necessary objects.
-# 3. We haven't properly integrated meschach.  Make here doesn't recognise if any of meschach's header or source files have changed; note that autoconf or autoreconf also don't touch it, and shouldn't, as it uses a legacy build system (also see note in meschach/configure - does building in meschach still not work in our version?).
-# 4. `make dist` needs to be told to include all of the header and source files, as we haven't specified them as gtk-wave-cleaner_SOURCES.
-# 5. `make install-strip` doesn't strip
-# etc
+# Alister: are we finally letting autotools do enough for us? Please report any remaining build issues
+# Note that Meschach uses a legacy build system, so isn't properly integrated - autoconf or autoreconf don't touch it, and shouldn't (also see note in meschach/configure - does building in meschach still not work in our version?).
 
 # Note if we contemplate updating meschach or using an external meschach library we need to check what Jeff did to our version:
 # - Jeff said he fixed a bad memory leak (I *think* this is also fixed in the debian version).
 # - Jeff made a change to err.c, which I have commented
 # - Anything else?
-
-prefix = @prefix@
-exec_prefix = @exec_prefix@
 
 if DEBUG
 AM_CFLAGS = -g3 -O0 -I$(srcdir)/meschach
@@ -34,21 +26,7 @@ AM_CPPFLAGS = -DHAVE_CONFIG_H $(FFTW_CFLAGS) -I$(top_srcdir)/meschach -I$(top_bu
 # Don't need coreaudio if using pulseaudio
 #OSX_LIBS = -lgtkmacintegration-gtk2
 
-BINDIR = @bindir@
-DATADIR = @datadir@
-# is this one used for anything?:
-DATAROOTDIR = @datarootdir@
-LIBDIR = @libdir@
-SYSCONFDIR = @sysconfdir@
 APPNAME = gtk-wave-cleaner
-
-DOCDIR = $(DATADIR)/doc
-# Alister: if you set HELPDIR different to DOCDIR, you will need to add it to the uninstall routine below
-HELPDIR = $(DOCDIR)
-
-# use this for SuSE and maybe other distros
-#DOCDIR = /usr/share/doc/packages/gtk-wave-cleaner
-#HELPDIR = $(DOCDIR)
 
 DEFS = -DDATADIR=\"$(DATADIR)\" -DHELPDIR=\"$(HELPDIR)\" -DLIBDIR=\"$(LIBDIR)\" -DAPPNAME=\"$(APPNAME)\" @OSXDEF@ @ALSADEF@ @PAHDR@ @OGGHDR@ @MP3HDR@
 CFLAGS = -D_FILE_OFFSET_BITS=64 -Wall @CFLAGS@ @GTK_CFLAGS@ @SNDFILE_CFLAGS@
@@ -82,11 +60,69 @@ gtk_wave_cleaner_SOURCES = \
 	encode.c \
 	soundfile.c \
 	pinknoise.c \
-	biquad.c
-# Alister: We should be able to avoid most of this - see item 3 and 4 in the comment at the top
+	biquad.c \
+	audio_device.h \
+	audio_edit.h \
+	biquad.h \
+	encoding.h \
+	fmtheaders.h \
+	gtkled.h \
+	gtkledbar.h \
+	gwc.h \
+	mconf.h \
+	mp3.h \
+	mp3-duration.h \
+	reverb_settings.h \
+	soundfile.h \
+	stat.h \
+	tap_reverb.h \
+	tap_reverb_common.h \
+	tap_reverb_file_io.h \
+	icons/declick_m_dark.xpm \
+	icons/declick_w.xpm \
+	icons/declick_w_dark.xpm \
+	icons/decrackle.xpm \
+	icons/decrackle_dark.xpm \
+	icons/delete.xpm \
+	icons/delete_dark.xpm \
+	icons/estimate.xpm \
+	icons/estimate_dark.xpm \
+	icons/filter.xpm \
+	icons/filter_dark.xpm \
+	icons/gtk-wave-cleaner.xpm \
+	icons/noise_sample.xpm \
+	icons/noise_sample_dark.xpm \
+	icons/pinknoise.xpm \
+	icons/pinknoise_dark.xpm \
+	icons/remove_noise.xpm \
+	icons/remove_noise_dark.xpm \
+	icons/select_all.xpm \
+	icons/select_all_dark.xpm \
+	icons/silence.xpm \
+	icons/silence_dark.xpm \
+	icons/spectral.xpm \
+	icons/spectral_dark.xpm \
+	icons/start.xpm \
+	icons/start_dark.xpm \
+	icons/stop.xpm \
+	icons/stop_dark.xpm \
+	icons/view_all.xpm \
+	icons/view_all_dark.xpm \
+	icons/zoom_in.xpm \
+	icons/zoom_in_dark.xpm \
+	icons/zoom_out.xpm \
+	icons/zoom_out_dark.xpm \
+	icons/zoom_sel.xpm \
+	icons/zoom_sel_dark.xpm \
+	icons/amplify.xpm \
+	icons/amplify_dark.xpm \
+	icons/declick.xpm \
+	icons/declick_dark.xpm \
+	icons/declick_m.xpm
+
 # Alister: leave out meschach/configure.in, as it makes a broken configure, and someone may try to use it!
-EXTRA_DIST = $(gtk_wave_cleaner_SOURCES) icons data contrib/macosx Changelog doc ar.c audio_osx.c audio_pa.c audio_oss.c audio_alsa.c \
-ar.h audio_device.h audio_edit.h biquad.h encoding.h fmtheaders.h gtkled.h gtkledbar.h gwc.h mconf.h mp3.h mp3-duration.h reverb_settings.h soundfile.h stat.h tap_reverb.h tap_reverb_common.h tap_reverb_file_io.h \
+# ar.c and ar.h are here as if ar.c is added to gtk_wave_cleaner_SOURCES the build fails, and it seems that we don't actually need to compile it anyway
+EXTRA_DIST = contrib/macosx INSTALL ar.c ar.h\ 
 meschach/DOC meschach/MACHINES meschach/arnoldi.c meschach/bdfactor.c meschach/bkpfacto.c meschach/chfactor.c meschach/configure meschach/conjgrad.c meschach/copy.c meschach/copyright meschach/dmacheps.c meschach/err.c meschach/err.h \
 meschach/extras.c meschach/fft.c meschach/FILELIST meschach/fmacheps.c meschach/givens.c meschach/hessen.c meschach/hsehldr.c meschach/init.c meschach/iotort.c meschach/iter.h meschach/iter0.c meschach/iternsym.c meschach/itersym.c meschach/itertort.c meschach/ivecop.c meschach/lanczos.c \
 meschach/ls.dat meschach/lufactor.c meschach/machine.c meschach/machine.h.in meschach/makefile.in meschach/matlab.c meschach/matlab.h meschach/matop.c meschach/matrix.h meschach/matrix2.h meschach/matrixio.c meschach/maxint.c meschach/meminfo.c meschach/meminfo.h meschach/memory.c meschach/memstat.c \
@@ -95,23 +131,34 @@ meschach/spbkp.c meschach/spchfctr.c meschach/splufctr.c meschach/sprow.c mescha
 meschach/zcopy.c meschach/zfunc.c meschach/zgivens.c meschach/zhessen.c meschach/zhsehldr.c meschach/zlufctr.c meschach/zmachine.c meschach/zmatio.c meschach/zmatlab.c meschach/zmatop.c meschach/zmatrix.h meschach/zmatrix2.h meschach/zmemory.c meschach/znorm.c meschach/zqrfctr.c meschach/zschur.c \
 meschach/zsolve.c meschach/ztorture.c meschach/zvecop.c
 
+# all this stuff needs to be installed/packaged
 bin_PROGRAMS = $(APPNAME)
 dist_bin_SCRIPTS = gwcbatch
-# Confusingly we don't have the DOCFILES in the doc directory, only the HELPFILES
-DOCFILES = README.md INSTALL TODO COPYING Changelog
-HELPFILES = $(APPNAME).html gtkrc-example.txt
-HELPFILESSRCD = doc
+dist_doc_DATA = doc/gtkrc-example.txt README.md COPYING ChangeLog # Historically Automake automatically included some of these, but not anymore
+dist_html_DATA = doc/$(APPNAME).html
+dist_desktop_DATA = data/applications/gtk-wave-cleaner.desktop
+desktopdir = $(datadir)/applications
+# these need to be in the source dist, but not installed/packaged
+dist_noinst_DATA = INSTALL TODO
 
-DATADIRS = \
-    icons/hicolor/16x16/apps \
-    icons/hicolor/22x22/apps \
-    icons/hicolor/24x24/apps \
-    icons/hicolor/32x32/apps \
-    icons/hicolor/64x64/apps \
-    icons/hicolor/128x128/apps \
-    icons/hicolor/256x256/apps \
-    icons/hicolor/scalable/apps\
-    applications
+dist_icons_scalable_apps_DATA = data/icons/hicolor/scalable/apps/gtk-wave-cleaner.svg
+icons_scalable_appsdir = $(datadir)/icons/hicolor/scalable/apps
+dist_icons_16x16_apps_DATA = data/icons/hicolor/16x16/apps/gtk-wave-cleaner.png
+icons_16x16_appsdir = $(datadir)/icons/hicolor/16x16/apps
+dist_icons_22x22_apps_DATA = data/icons/hicolor/22x22/apps/gtk-wave-cleaner.png
+icons_22x22_appsdir = $(datadir)/icons/hicolor/22x22/apps
+dist_icons_24x24_apps_DATA = data/icons/hicolor/24x24/apps/gtk-wave-cleaner.png
+icons_24x24_appsdir = $(datadir)/icons/hicolor/24x24/apps
+dist_icons_32x32_apps_DATA = data/icons/hicolor/32x32/apps/gtk-wave-cleaner.png
+icons_32x32_appsdir = $(datadir)/icons/hicolor/32x32/apps
+dist_icons_48x48_apps_DATA = data/icons/hicolor/48x48/apps/gtk-wave-cleaner.png
+icons_48x48_appsdir = $(datadir)/icons/hicolor/48x48/apps
+dist_icons_64x64_apps_DATA = data/icons/hicolor/64x64/apps/gtk-wave-cleaner.png
+icons_64x64_appsdir = $(datadir)/icons/hicolor/64x64/apps
+dist_icons_128x128_apps_DATA = data/icons/hicolor/128x128/apps/gtk-wave-cleaner.png
+icons_128x128_appsdir = $(datadir)/icons/hicolor/128x128/apps
+dist_icons_256x256_apps_DATA = data/icons/hicolor/256x256/apps/gtk-wave-cleaner.png
+icons_256x256_appsdir = $(datadir)/icons/hicolor/256x256/apps
 
 ###
 CC = @CC@
