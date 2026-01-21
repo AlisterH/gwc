@@ -787,7 +787,7 @@ void set_misc_preferences(GtkWidget * widget, gpointer data)
 					   dialog_table, row++);
 
     sonogram_log_entry =
-	gtk_check_button_new_with_label("Log frequency in sonogram");
+	gtk_check_button_new_with_label("Use logarithmic frequency scale for sonogram display");
     if (sonogram_log)
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(sonogram_log_entry),
 				     TRUE);
