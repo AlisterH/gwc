@@ -129,25 +129,38 @@ int reverb_audio(struct sound_prefs *p, long first, long last, int channel_mask)
     return 0 ;
 }
 
-
-static void preset_combo_changed(GtkComboBox *combo, gpointer user_data)
+/* If we come here, then the user has selected a row in the list. */
+void reverb_selection_made( GtkWidget      *clist,
+                     gint            row,
+                     gint            column,
+                     GdkEventButton *event,
+                     gpointer        data )
 {
-    const gchar *name = gtk_combo_box_get_active_text(combo);
-    if (name) {
-        strncpy(reverb_method_name, name, 127);
-        reverb_method_name[127] = '\0';   // ensure termination
-    }
+    gchar *text;
+
+    /* Get the text that is stored in the selected row and column
+     * which was clicked in. We will receive it as a pointer in the
+     * argument text.
+     */
+    gtk_clist_get_text(GTK_CLIST(clist), row, column, &text);
+
+    strcpy(reverb_method_name, text) ;
+
+    return;
 }
+
 
 
 int reverb_dialog(struct sound_prefs current, struct view *v)
 {
-    GtkWidget *dlg, *dialog_table ;
+    GtkWidget *dlg, *maxtext, *dialog_table, *settings_frame ;
     GtkWidget *wet_entry ;
     GtkWidget *dry_entry ;
     GtkWidget *decay_entry ;
-    GtkWidget *preset_combo, *preset_label ;
+    GtkWidget *reverb_method_window_list ;
+    GtkWidget *scrolled_window ;
 
+    gchar *reverb_method_window_titles[] = { "TAP Reverb Name" };
 
     int dclose = 0 ;
     int row = 0 ;
@@ -159,71 +172,67 @@ int reverb_dialog(struct sound_prefs current, struct view *v)
 
     gtk_table_set_row_spacings(GTK_TABLE(dialog_table), 4) ;
     gtk_table_set_col_spacings(GTK_TABLE(dialog_table), 6) ;
+    gtk_widget_show (dialog_table);
 
     dlg = gtk_dialog_new_with_buttons("Reverb",
 			GTK_WINDOW(main_window), GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_MODAL,
 			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-			GTK_STOCK_OK, GTK_RESPONSE_OK, NULL, NULL);
+			 GTK_STOCK_OK, GTK_RESPONSE_OK, NULL, NULL);
     gtk_dialog_set_default_response (GTK_DIALOG(dlg), GTK_RESPONSE_OK);
 
     row++ ;
 
     load_reverb_preferences() ;
 
-    preset_combo = gtk_combo_box_text_new();
-    /* Populate dropdown using TAP preset list */
+    wet_entry = add_number_entry_with_label_double(wet_level, "Wet (Db) -30 to 3", dialog_table, row++) ;
+    dry_entry = add_number_entry_with_label_double(dry_level, "Dry (Db) -30 to 3", dialog_table, row++) ;
+    decay_entry = add_number_entry_with_label_double(decay, "(ms) 0 to 2500", dialog_table, row++) ;
+
+    reverb_method_window_list =
+        gtk_clist_new_with_titles(1, reverb_method_window_titles);
+    gtk_clist_set_selection_mode(GTK_CLIST(reverb_method_window_list),
+                                 GTK_SELECTION_SINGLE);
+
+    gtk_signal_connect(GTK_OBJECT(reverb_method_window_list), "select_row",
+		       GTK_SIGNAL_FUNC(reverb_selection_made),
+		      NULL);
+
     {
-        REVTYPE *revitem = get_revroot();
-        while ((revitem = get_next_revtype(revitem)) != NULL) {
-            gtk_combo_box_text_append_text(
-                GTK_COMBO_BOX_TEXT(preset_combo),
-                revitem->name
-            );
-        }
+	REVTYPE *revitem = get_revroot() ;
+
+	gchar * row_text[1] ;
+	gchar buf[256] ;
+	row_text[0] = buf ;
+
+	while( (revitem = get_next_revtype(revitem)) != NULL) {
+	    int i, new_row ;
+
+	    for(i = 0 ; revitem->name[i] != '\0' ; i++)
+		buf[i] = (gchar) revitem->name[i] ;
+
+	    buf[i] = '\0' ;
+
+	    new_row = gtk_clist_append(GTK_CLIST(reverb_method_window_list), row_text);
+
+	    if(!strcmp(reverb_method_name, revitem->name)) gtk_clist_select_row(GTK_CLIST(reverb_method_window_list), new_row, 0) ;
+	}
     }
 
-    /* Set current selection based on saved preference (or first item) */
-    {
-        int idx = 0;
-        int match_index = -1;
-        REVTYPE *revitem = get_revroot();
-        while ((revitem = get_next_revtype(revitem)) != NULL) {
-            if (!strcmp(reverb_method_name, revitem->name)) {
-                match_index = idx;
-                break;
-            }
-            idx++;
-        }
-        gtk_combo_box_set_active(GTK_COMBO_BOX(preset_combo),
-                                 (match_index >= 0) ? match_index : 0);
-    }
+    gtk_widget_show(reverb_method_window_list);
+    
+    /* Create a scrolled window to pack the CList widget into */
+    scrolled_window = gtk_scrolled_window_new (NULL, NULL);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
+				    GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
 
-    /* Attach combo to column 1 of the same row */
-    gtk_table_attach(GTK_TABLE(dialog_table), preset_combo,
-                     0, 1, row, row+1,
-                     GTK_EXPAND | GTK_FILL, GTK_FILL, 2, 2);
-    preset_label = gtk_label_new("TAP Reverb Preset");
-    /* left-align label text within its cell */
-    gtk_misc_set_alignment(GTK_MISC(preset_label), 0.0, 0.5);
-    gtk_table_attach(GTK_TABLE(dialog_table), preset_label,
-                     1, 2, row, row+1,
-                     GTK_FILL, GTK_FILL, 2, 2);
-    row++;
+    gtk_widget_show (scrolled_window);
 
+    gtk_container_add(GTK_CONTAINER(scrolled_window), reverb_method_window_list);
 
-    /* Capture selection change */
-	g_signal_connect(preset_combo, "changed",
-					 G_CALLBACK(preset_combo_changed),
-					 NULL);
-
-    wet_entry = add_number_entry_with_label_double(wet_level, "Wet Level (Db) -30 to 3", dialog_table, row++) ;
-    dry_entry = add_number_entry_with_label_double(dry_level, "Dry Level (Db) -30 to 3", dialog_table, row++) ;
-    decay_entry = add_number_entry_with_label_double(decay, "Decay (ms) 0 to 2500", dialog_table, row++) ;
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox),
+		       scrolled_window, TRUE, TRUE, 0);
 
     gtk_box_pack_start (GTK_BOX (GTK_DIALOG(dlg)->vbox), dialog_table, TRUE, TRUE, 0);
-    /* Ensure all widgets are visible before running the dialog */
-    gtk_widget_show_all(dlg);
-
 
     dres = gwc_dialog_run(GTK_DIALOG(dlg)) ;
 
