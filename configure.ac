@@ -30,6 +30,38 @@ esac],
 
 AM_CONDITIONAL(DEBUG, test x"$debug" = x"true")
 
+dnl ------------------------------------------------------------
+dnl Strong debug policy:
+dnl  - If --enable-debug: strip any -O* from flags and force -g3 -O0
+dnl  - Else: add -O2 only if user didn't specify -O*
+dnl ------------------------------------------------------------
+
+AS_IF([test "x$debug" = "xtrue"], [
+  AC_MSG_NOTICE([Debugging enabled: forcing -g3 -O0 (overriding any -O*)])
+
+  dnl Strip any existing optimisation flags from CFLAGS/CXXFLAGS
+  CFLAGS=`echo " $CFLAGS " | sed -E 's/[[:space:]]-O([0-9]|s|g|fast|z)?[[:space:]]/ /g; s/^ //; s/ $//'`
+  CXXFLAGS=`echo " $CXXFLAGS " | sed -E 's/[[:space:]]-O([0-9]|s|g|fast|z)?[[:space:]]/ /g; s/^ //; s/ $//'`
+
+  dnl Optional: strip existing -g* so you don't end up with -g -g3 (harmless but messy)
+  CFLAGS=`echo " $CFLAGS " | sed -E 's/[[:space:]]-g([0-9])?[[:space:]]/ /g; s/^ //; s/ $//'`
+  CXXFLAGS=`echo " $CXXFLAGS " | sed -E 's/[[:space:]]-g([0-9])?[[:space:]]/ /g; s/^ //; s/ $//'`
+
+  dnl Force debug flags
+  CFLAGS="$CFLAGS -g3 -O0"
+  CXXFLAGS="$CXXFLAGS -g3 -O0"
+
+  dnl Optional (often helpful for stack traces/backtraces)
+  dnl CFLAGS="$CFLAGS -fno-omit-frame-pointer"
+  dnl CXXFLAGS="$CXXFLAGS -fno-omit-frame-pointer"
+
+], [
+  dnl Non-debug: only add -O2 if user didn't specify any -O*
+  AS_CASE([" $CFLAGS "],
+    [*" -O"*], [:],
+    [CFLAGS="$CFLAGS -O2"])
+])
+
 PKG_CHECK_MODULES(PULSEAUDIO, libpulse-simple >= 0.9.0,
                    HAVE_PULSE_AUDIO="yes", HAVE_PULSE_AUDIO="no")
 

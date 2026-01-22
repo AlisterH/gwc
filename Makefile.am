@@ -6,15 +6,17 @@
 # - Jeff made a change to err.c, which I have commented
 # - Anything else?
 
-if DEBUG
-AM_CFLAGS = -g3 -O0 -I$(srcdir)/meschach
-AM_CXXFLAGS = -g3 -O0
-else
-AM_CFLAGS = -O2 -I$(srcdir)/meschach
-AM_CXXFLAGS = -O2
-endif
+APPNAME = gtk-wave-cleaner
 
-AM_CPPFLAGS = -DHAVE_CONFIG_H $(FFTW_CFLAGS) -I$(top_srcdir)/meschach -I$(top_builddir)/meschach -I$(top_srcdir) -I$(top_builddir)
+AM_CFLAGS = -I$(srcdir)/ -D_FILE_OFFSET_BITS=64 -Wall @GTK_CFLAGS@ @SNDFILE_CFLAGS@
+
+AM_CPPFLAGS = -I$(top_srcdir)/meschach -I$(top_builddir)/meschach -I$(top_srcdir) -I$(top_builddir) \
+  -DHAVE_CONFIG_H @FFTW_CFLAGS@ \
+  -DDATADIR=\"$(datadir)\" \
+  -DHELPDIR=\"$(datadir)/doc/$(APPNAME)\" \
+  -DLIBDIR=\"$(libdir)\" \
+  -DAPPNAME=\"$(APPNAME)\" \
+  @OSXDEF@ @ALSADEF@ @PAHDR@ @OGGHDR@ @MP3HDR@
 
 # Alister: OSX potential issues
 # On an old test system I initially couldn't use -lgtkmacintegration as it wasn't building
@@ -25,13 +27,6 @@ AM_CPPFLAGS = -DHAVE_CONFIG_H $(FFTW_CFLAGS) -I$(top_srcdir)/meschach -I$(top_bu
 #OSX_LIBS = -framework CoreAudio -lgtkmacintegration-gtk2
 # Don't need coreaudio if using pulseaudio
 #OSX_LIBS = -lgtkmacintegration-gtk2
-
-APPNAME = gtk-wave-cleaner
-
-DEFS = -DDATADIR=\"$(DATADIR)\" -DHELPDIR=\"$(HELPDIR)\" -DLIBDIR=\"$(LIBDIR)\" -DAPPNAME=\"$(APPNAME)\" @OSXDEF@ @ALSADEF@ @PAHDR@ @OGGHDR@ @MP3HDR@
-CFLAGS = -D_FILE_OFFSET_BITS=64 -Wall @CFLAGS@ @GTK_CFLAGS@ @SNDFILE_CFLAGS@
-
-LIBS= meschach.a $(FFTW_LIBS) @GTK_LIBS@ @SNDFILE_LIBS@ @ALSALIB@ @PALIB@ @OGGLIB@ @MP3LIB@ @OSXLIBS@ @M_LIBS@
 
 gtk_wave_cleaner_SOURCES = \
 	tap_reverb_file_io.c \
@@ -122,7 +117,7 @@ gtk_wave_cleaner_SOURCES = \
 
 # Alister: leave out meschach/configure.in, as it makes a broken configure, and someone may try to use it!
 # ar.c and ar.h are here as if ar.c is added to gtk_wave_cleaner_SOURCES the build fails, and it seems that we don't actually need to compile it anyway
-EXTRA_DIST = contrib/macosx INSTALL ar.c ar.h\ 
+EXTRA_DIST = contrib/macosx INSTALL ar.c ar.h \
 meschach/DOC meschach/MACHINES meschach/arnoldi.c meschach/bdfactor.c meschach/bkpfacto.c meschach/chfactor.c meschach/configure meschach/conjgrad.c meschach/copy.c meschach/copyright meschach/dmacheps.c meschach/err.c meschach/err.h \
 meschach/extras.c meschach/fft.c meschach/FILELIST meschach/fmacheps.c meschach/givens.c meschach/hessen.c meschach/hsehldr.c meschach/init.c meschach/iotort.c meschach/iter.h meschach/iter0.c meschach/iternsym.c meschach/itersym.c meschach/itertort.c meschach/ivecop.c meschach/lanczos.c \
 meschach/ls.dat meschach/lufactor.c meschach/machine.c meschach/machine.h.in meschach/makefile.in meschach/matlab.c meschach/matlab.h meschach/matop.c meschach/matrix.h meschach/matrix2.h meschach/matrixio.c meschach/maxint.c meschach/meminfo.c meschach/meminfo.h meschach/memory.c meschach/memstat.c \
@@ -161,22 +156,21 @@ dist_icons_256x256_apps_DATA = data/icons/hicolor/256x256/apps/gtk-wave-cleaner.
 icons_256x256_appsdir = $(datadir)/icons/hicolor/256x256/apps
 
 ###
-CC = @CC@
 #Alister: I don't think we ever needed OSX_CFLAGS
 #COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) $(OSX_CFLAGS)
 
 ### handy to have around for checking buffer overruns
 #EFENCE = -lefence
-EFENCE =
 
 gtk_wave_cleaner_CPPFLAGS = $(AM_CPPFLAGS)
-gtk_wave_cleaner_LDADD = meschach.a $(FFTW_LIBS)\
+
+gtk_wave_cleaner_LDADD = meschach.a @FFTW_LIBS@ \
 	@GTK_LIBS@ @SNDFILE_LIBS@ @ALSALIB@ @PALIB@ \
 	@OGGLIB@ @MP3LIB@ @OSXLIBS@ @M_LIBS@
 
 BUILT_SOURCES = meschach/machine.h
-CLEANFILES = meschach/machine.h
-
+CLEANFILES = meschach/machine.h meschach.a
+MOSTLYCLEANFILES = core
 
 # PulseAudio (highest priority)
 if HAVE_PULSE_AUDIO
@@ -207,14 +201,7 @@ endif
 endif
 
 # Files that depend on meschach headers need meschach.a built first
-declick.o : $(srcdir)/declick.c meschach.a Makefile
-	$(COMPILE) -c $(srcdir)/declick.c
-
-dethunk.o : $(srcdir)/dethunk.c meschach.a Makefile
-	$(COMPILE) -c $(srcdir)/dethunk.c
-
-stat.o : $(srcdir)/stat.c meschach.a Makefile
-	$(COMPILE) -c $(srcdir)/stat.c
+declick.o dethunk.o stat.o : meschach.a
 
 # Alister: note that we can mostly install to the OSX appdir using something like this:
 # make DESTDIR=/tmp/gwc/osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources install
@@ -223,6 +210,13 @@ stat.o : $(srcdir)/stat.c meschach.a Makefile
 # mv /osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/Resources/bin/gtk-wave-cleaner /osx_packaging/Gtk\ Wave\ Cleaner.app/Contents/MacOS/gtk-wave-cleaner.bin
 # The .desktop and icon files aren't used, anyway, but at least it installs the docs!
 # How do we get it to load the logo in the about dialog from either the icon files or the .icns?
+
+all-local:
+	@$(MAKE) --version 2>/dev/null | grep -q 'GNU Make' || { \
+	echo "ERROR: GNU make is required."; \
+	echo "Install it and run: gmake"; \
+	exit 1; \
+	}
 
 # This supposedly means `make clean` etc still works if someone makes a file called clean
 .PHONY: clean distclean maintainer-clean clean-local distclean-local maintainer-clean-local
@@ -256,7 +250,6 @@ meschach/meschach.a : meschach/machine.h
 
 # Use clean-local rather than clean, otherwise `make distclean` doesn't work
 clean-local:
-	rm -f $(APPNAME) *.o core meschach.a
 	-$(MAKE) -C meschach clean
 
 # don't need this much manual code to clean meschach dir
