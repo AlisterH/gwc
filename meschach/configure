@@ -4673,21 +4673,21 @@ esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
 echo 'computing machine epsilon(s)'
-echo $CC -o macheps dmacheps.c
-$CC -o macheps dmacheps.c
+echo $CC -o macheps "$srcdir/dmacheps.c"
+$CC -o macheps "$srcdir/dmacheps.c"
 cat >>confdefs.h <<_ACEOF
 #define D_MACHEPS `./macheps`
 _ACEOF
 
-echo $CC -o macheps fmacheps.c
-$CC -o macheps fmacheps.c
+echo $CC -o macheps "$srcdir/fmacheps.c"
+$CC -o macheps "$srcdir/fmacheps.c"
 cat >>confdefs.h <<_ACEOF
 #define F_MACHEPS `./macheps`
 _ACEOF
 
 echo computing M_MAX_INT
-echo $CC -o maxint maxint.c
-$CC -o maxint maxint.c
+echo $CC -o maxint "$srcdir/maxint.c"
+$CC -o maxint "$srcdir/maxint.c"
 cat >>confdefs.h <<_ACEOF
 #define M_MAX_INT `./maxint`
 _ACEOF
