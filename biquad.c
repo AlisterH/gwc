@@ -53,6 +53,18 @@ static double resp_db[RESP_POINTS];
 static int resp_n = 0;
 static GtkWidget *response_area = NULL;
 
+/* noise spectrum overlay */
+#define NOISE_POINTS 4096
+static double noise_freq[NOISE_POINTS];
+static double noise_left_db[NOISE_POINTS];
+static double noise_right_db[NOISE_POINTS];
+static int noise_n = 0;
+static gboolean noise_valid = FALSE;
+/* predicted (filtered) noise overlay */
+static double predicted_noise_left_db[NOISE_POINTS];
+static double predicted_noise_right_db[NOISE_POINTS];
+static gboolean predicted_noise_valid = FALSE;
+
 int row2filter(int row)
 {
     if(row == 0) return LPF ;
@@ -118,6 +130,13 @@ void save_filter_preferences(void)
     write_config(key_file);
 }
 
+void show_response(GtkWidget *w, gpointer gdata);
+
+static void filter_type_changed(GtkWidget *clist,
+                                gint row,
+                                gint column,
+                                GdkEventButton *event,
+                                gpointer data);
 
 void filter_audio(struct sound_prefs *p, long first, long last, int channel_mask)
 {
@@ -126,8 +145,6 @@ void filter_audio(struct sound_prefs *p, long first, long last, int channel_mask
     long y_left[3], y_right[3] ;
     long current, i ; // removed unused variable f
     int loops = 0 ;
-    long ring_buffer_length ;
-    double rb_left[BUFSIZE], rb_right[BUFSIZE] ;
 
     load_filter_preferences() ;
 
@@ -169,12 +186,6 @@ extern biquad *BiQuad_new(int type, smp_type dbGain, /* gain of filter */
 
     iir_left  = BiQuad_new(filter_type, dbGain, Fc, p->rate, bandwidth) ;
     iir_right = BiQuad_new(filter_type, dbGain, Fc, p->rate, bandwidth) ;
-
-    ring_buffer_length = p->rate / Fc + 0.5 ;
-    for(i = 0 ; i < ring_buffer_length ; i++) {
-	rb_left[i] = 0.0 ;
-	rb_right[i] = 0.0 ;
-    }
 #else
     FILTER iir_left, iir_right ;
 
@@ -298,17 +309,147 @@ extern biquad *BiQuad_new(int type, smp_type dbGain, /* gain of filter */
     main_redraw(FALSE, TRUE) ;
 }
 
-void type_window_select(GtkWidget * clist, gint row, gint column,
-		       GdkEventButton * event, gpointer data)
-{
-    filter_type = row2filter(row) ;
-}
 
 static GtkWidget *dbGain_entry ;
 static GtkWidget *freq_entry ;
 static GtkWidget *bandwidth_entry ;
 static struct sound_prefs local_sound_prefs ;
-static long first_sample, last_sample ;
+
+/* ------------------------------------------------------------ */
+/* Enable/disable Gain control depending on filter type         */
+/* ------------------------------------------------------------ */
+static void
+update_filter_ui(int filter_type)
+{
+    gboolean gain_ok =
+        (filter_type == PEQ ||
+         filter_type == LSH ||
+         filter_type == HSH);
+
+    gtk_widget_set_sensitive(dbGain_entry, gain_ok);
+
+}
+
+ static void
+ filter_type_changed(GtkWidget *clist,
+                     gint row,
+                     gint column,
+                     GdkEventButton *event,
+                     gpointer data)
+ {
+     filter_type = row2filter(row);
+
+     update_filter_ui(filter_type);
+
+     /* Redraw response and predicted noise */
+     show_response(NULL, NULL);
+ }
+
+/* ------------------------------------------------------------ */
+/* Capture noise spectrum for plotting                           */
+/* ------------------------------------------------------------ */
+static void
+capture_noise_spectrum(struct view *v,
+                       struct sound_prefs *pPrefs,
+                       struct denoise_prefs *pDnprefs)
+{
+    int k;
+	long first = v->selected_first_sample;
+	long last  = v->selected_last_sample;
+
+    long nsamples;
+
+    /* ------------------------------------------------------------ */
+    /* Defensive bounds checks:
+     * - selection must be within [0, nsamples-1]
+     * - selection should be at least FFT_SIZE long if possible
+     *   (get_noise_sample typically reads FFT windows)
+     * ------------------------------------------------------------ */
+    nsamples = pPrefs->n_samples; /* maintained elsewhere from soundfile_count_samples() */
+    if (nsamples <= 0)
+        return;
+
+    /* Validate FFT size against our local buffer allocation assumptions */
+    if (pDnprefs->FFT_SIZE <= 0 || pDnprefs->FFT_SIZE > DENOISE_MAX_FFT)
+        return;
+
+    /* Clamp selection to file bounds */
+    if (first < 0) first = 0;
+    if (last  < 0) last  = 0;
+    if (first > last) {
+        long tmp = first;
+        first = last;
+        last = tmp;
+    }
+    if (last >= nsamples)
+        last = nsamples - 1;
+    if (first >= nsamples)
+        first = nsamples - 1;
+
+    /* Ensure we have at least FFT_SIZE samples if the file is long enough.
+     * If selection is too short, shift/expand it without exceeding EOF. */
+    if ((last - first + 1) < pDnprefs->FFT_SIZE) {
+        if (nsamples >= pDnprefs->FFT_SIZE) {
+            /* Prefer to keep the selection ending at 'last' (useful near EOF) */
+            first = last - pDnprefs->FFT_SIZE + 1;
+            if (first < 0) {
+                first = 0;
+                last = pDnprefs->FFT_SIZE - 1;
+            }
+        } else {
+            /* File shorter than FFT; fall back to whole file.
+             * (Ideally get_noise_sample should pad; at least this won't read past EOF.) */
+            first = 0;
+            last = nsamples - 1;
+        }
+    }
+
+	fftw_real *mem_block;
+	fftw_real *left_noise_min, *left_noise_max, *left_noise_avg;
+	fftw_real *right_noise_min, *right_noise_max, *right_noise_avg;
+
+	mem_block = malloc(sizeof(fftw_real) * DENOISE_MAX_FFT * 6);
+	if (!mem_block)
+	return;
+
+	left_noise_max  = mem_block;
+	right_noise_max = mem_block + DENOISE_MAX_FFT;
+	left_noise_avg  = mem_block + 2 * DENOISE_MAX_FFT;
+	left_noise_min  = mem_block + 3 * DENOISE_MAX_FFT;
+	right_noise_min = mem_block + 4 * DENOISE_MAX_FFT;
+	right_noise_avg = mem_block + 5 * DENOISE_MAX_FFT;
+
+	get_noise_sample(pPrefs, pDnprefs,
+					first, last,
+					left_noise_min, left_noise_max, left_noise_avg,
+					right_noise_min, right_noise_max, right_noise_avg);
+
+    noise_n = pDnprefs->FFT_SIZE / 2;
+    if (noise_n > NOISE_POINTS)
+        noise_n = NOISE_POINTS;
+
+    for (k = 1; k <= noise_n; k++) {
+        double freq = (double)pPrefs->rate / 2.0 /
+                      (double)(pDnprefs->FFT_SIZE / 2) * k;
+        double mag_l, mag_r;
+
+        noise_freq[k-1] = freq;
+        /* ------------------------------------------------------------ */
+        /* Convert FFT magnitude to dB                                  */
+        /* Reference: FFT size (not signal max)                          */
+        /* ------------------------------------------------------------ */
+
+        mag_l = left_noise_avg[k] ;
+        mag_r = right_noise_avg[k] ;
+
+        noise_left_db[k-1]  = 20.0 * log10(mag_l + 1e-20);
+        noise_right_db[k-1] = 20.0 * log10(mag_r + 1e-20);
+    }
+
+    free(mem_block);
+
+    noise_valid = TRUE;
+}
 
 /* GTK2 expose handler for response plot */
 static gboolean response_expose(GtkWidget *widget,
@@ -318,17 +459,22 @@ static gboolean response_expose(GtkWidget *widget,
     int w = widget->allocation.width;
     int h = widget->allocation.height;
 
-    GdkGC *gc = widget->style->fg_gc[GTK_STATE_NORMAL];
-    GdkGC *bg = widget->style->white_gc;
+    GdkGC *bg = widget->style->bg_gc[GTK_STATE_NORMAL];
 
-    double min_db = -60.0;
-    double max_db =  20.0;
+	/* ----- Dark green GC for filter + measured noise ----- */
+	// because black turns to light grey in a dark theme
+	GdkGC *green_gc = gdk_gc_new(widget->window);
+	GdkColor dark_green = { 0, 0, 32768, 0 };
+	gdk_gc_set_rgb_fg_color(green_gc, &dark_green);
+
+    double min_db = -100.0;
+    double max_db =  300.0;
     int i;
 
     gdk_draw_rectangle(widget->window, bg, TRUE, 0, 0, w, h);
 
-    gdk_draw_line(widget->window, gc, 40, h-30, w-10, h-30);
-    gdk_draw_line(widget->window, gc, 40, 10,   40,  h-30);
+    gdk_draw_line(widget->window, green_gc, 40, h-30, w-10, h-30);
+    gdk_draw_line(widget->window, green_gc, 40, 10,   40,  h-30);
 
     /* ----- Axis labels ----- */
     PangoLayout *layout;
@@ -342,7 +488,7 @@ static gboolean response_expose(GtkWidget *widget,
     /* Y axis label */
     pango_layout_set_text(layout, "dB", -1);
     pango_layout_get_pixel_size(layout, &lw, &lh);
-    gdk_draw_layout(widget->window, gc,
+    gdk_draw_layout(widget->window, green_gc,
                     42,           /* just right of Y axis */
                     12,           /* just below top */
                     layout);
@@ -350,20 +496,20 @@ static gboolean response_expose(GtkWidget *widget,
     /* X axis label */
     pango_layout_set_text(layout, "Frequency (Hz)", -1);
     pango_layout_get_pixel_size(layout, &lw, &lh);
-    gdk_draw_layout(widget->window, gc,
+    gdk_draw_layout(widget->window, green_gc,
                     w - lw - 12,   /* inside right edge */
                     h - lh - 32,   /* just above X axis */
                     layout);
 
     int db;
-    for (db = -60; db <= 20; db += 20) {
+    for (db = (int)min_db; db <= (int)max_db; db += 20) {
         int y = h-30 - (db - min_db) * (h-40) / (max_db - min_db);
         char buf[16];
 
-        gdk_draw_line(widget->window, gc, 35, y, 40, y);
+        gdk_draw_line(widget->window, green_gc, 35, y, 40, y);
         snprintf(buf, sizeof(buf), "%d", db);
         pango_layout_set_text(layout, buf, -1);
-        gdk_draw_layout(widget->window, gc, 8, y - 6, layout);
+        gdk_draw_layout(widget->window, green_gc, 8, y - 6, layout);
     }
 
     const int freqs[] = {10, 100, 1000, 10000};
@@ -375,14 +521,15 @@ static gboolean response_expose(GtkWidget *widget,
         int x = 40 + t * (w - 50);
         char buf[16];
 
-        gdk_draw_line(widget->window, gc, x, h-30, x, h-25);
+        gdk_draw_line(widget->window, green_gc, x, h-30, x, h-25);
         snprintf(buf, sizeof(buf), "%d", freqs[j]);
         pango_layout_set_text(layout, buf, -1);
-        gdk_draw_layout(widget->window, gc, x - 10, h - 22, layout);
+        gdk_draw_layout(widget->window, green_gc, x - 10, h - 22, layout);
     }
 
     if (resp_n < 2)
         return TRUE;
+
 
     for (i = 1; i < resp_n; i++) {
         int x1 = 40 + (i-1) * (w-50) / (resp_n-1);
@@ -391,9 +538,64 @@ static gboolean response_expose(GtkWidget *widget,
         int y1 = h-30 - (resp_db[i-1] - min_db) * (h-40) / (max_db - min_db);
         int y2 = h-30 - (resp_db[i]   - min_db) * (h-40) / (max_db - min_db);
 
-        gdk_draw_line(widget->window, gc, x1, y1, x2, y2);
+        gdk_draw_line(widget->window, green_gc, x1, y1, x2, y2);
     }
 
+    /* ---- Noise spectrum overlay ---- */
+    if (noise_valid && noise_n > 1) {
+        for (i = 1; i < noise_n; i++) {
+            double t1 = log(noise_freq[i-1] / 10.0) / log(20000.0 / 10.0);
+            double t2 = log(noise_freq[i]   / 10.0) / log(20000.0 / 10.0);
+
+            int x1 = 40 + t1 * (w - 50);
+            int x2 = 40 + t2 * (w - 50);
+
+            int y1 = h-30 - (noise_left_db[i-1] - min_db) *
+                     (h-40) / (max_db - min_db);
+            int y2 = h-30 - (noise_left_db[i] - min_db) *
+                     (h-40) / (max_db - min_db);
+
+            gdk_draw_line(widget->window, green_gc, x1, y1, x2, y2);
+
+            y1 = h-30 - (noise_right_db[i-1] - min_db) *
+                 (h-40) / (max_db - min_db);
+            y2 = h-30 - (noise_right_db[i] - min_db) *
+                 (h-40) / (max_db - min_db);
+
+            gdk_draw_line(widget->window, green_gc, x1, y1, x2, y2);
+        }
+    }
+
+    /* ---- Predicted noise (filtered) overlay ---- */
+    if (predicted_noise_valid && noise_n > 1) {
+        GdkGC *blue_gc = gdk_gc_new(widget->window);
+        GdkColor blue = { 0, 0, 0, 65535 };
+        gdk_gc_set_rgb_fg_color(blue_gc, &blue);
+
+        for (i = 1; i < noise_n; i++) {
+            double t1 = log(noise_freq[i-1] / 10.0) / log(20000.0 / 10.0);
+            double t2 = log(noise_freq[i]   / 10.0) / log(20000.0 / 10.0);
+
+            int x1 = 40 + t1 * (w - 50);
+            int x2 = 40 + t2 * (w - 50);
+
+            int y1 = h-30 - (predicted_noise_left_db[i-1] - min_db) *
+                     (h-40) / (max_db - min_db);
+            int y2 = h-30 - (predicted_noise_left_db[i] - min_db) *
+                     (h-40) / (max_db - min_db);
+
+            gdk_draw_line(widget->window, blue_gc, x1, y1, x2, y2);
+
+            y1 = h-30 - (predicted_noise_right_db[i-1] - min_db) *
+                 (h-40) / (max_db - min_db);
+            y2 = h-30 - (predicted_noise_right_db[i] - min_db) *
+                 (h-40) / (max_db - min_db);
+
+            gdk_draw_line(widget->window, blue_gc, x1, y1, x2, y2);
+        }
+
+        g_object_unref(blue_gc);
+    }
     pango_font_description_free(font);
     g_object_unref(layout);
     return TRUE;
@@ -405,11 +607,14 @@ void show_response(GtkWidget *w, gpointer gdata)
     int i;
     double fmin = 10.0;
     double fmax = 20000.0;
+    double srate;
+
+    srate = local_sound_prefs.rate;
 
     Fc = atof(gtk_entry_get_text((GtkEntry *)freq_entry)) ;
     dbGain = atof(gtk_entry_get_text((GtkEntry *)dbGain_entry)) ;
     bandwidth = atof(gtk_entry_get_text((GtkEntry *)bandwidth_entry)) ;
-    iir = BiQuad_new(filter_type, dbGain, Fc, 44100, bandwidth) ;
+    iir = BiQuad_new(filter_type, dbGain, Fc, srate, bandwidth) ;
     if (!iir)
         return;
 
@@ -419,10 +624,31 @@ void show_response(GtkWidget *w, gpointer gdata)
         double t = (double)i / (RESP_POINTS - 1);
         double freq = fmin * pow(fmax / fmin, t);
         double dummy;
-        resp_db[i] = BiQuad_response(freq, 44100, iir, &dummy);
+        resp_db[i] = BiQuad_response(freq, srate, iir, &dummy);
     }
+    /* ------------------------------------------------------------ */
+    /* Predict filtered noise (display only)                        */
+    /* ------------------------------------------------------------ */
+    predicted_noise_valid = FALSE;
+    if (noise_valid && noise_n > 1) {
+        for (i = 0; i < noise_n; i++) {
+            double dummy;
+            double f = noise_freq[i];
+            double gain_db;
 
-    free(iir);
+            if (f < 1.0)
+                continue;
+
+            gain_db = BiQuad_response(f, srate, iir, &dummy);
+
+            predicted_noise_left_db[i]  =
+                noise_left_db[i]  + gain_db;
+            predicted_noise_right_db[i] =
+                noise_right_db[i] + gain_db;
+        }
+        predicted_noise_valid = TRUE;
+    }
+   free(iir);
 
     gtk_widget_queue_draw(response_area);
 }
@@ -448,8 +674,6 @@ int filter_dialog(struct sound_prefs current, struct view *v)
     };
 
     local_sound_prefs = current ;
-    first_sample = v->selected_first_sample ;
-    last_sample = v->selected_last_sample ;
 
     load_filter_preferences();
     filter_type = filter_prefs.filter_type ;
@@ -467,8 +691,6 @@ int filter_dialog(struct sound_prefs current, struct view *v)
 
     gtk_clist_select_row(GTK_CLIST(type_window_list),
 			 filter2row(filter_prefs.filter_type), 0);
-    gtk_signal_connect(GTK_OBJECT(type_window_list), "select_row",
-		       GTK_SIGNAL_FUNC(type_window_select), NULL);
 
     gtk_widget_show(type_window_list);
 
@@ -516,13 +738,27 @@ int filter_dialog(struct sound_prefs current, struct view *v)
                        GTK_SIGNAL_FUNC(show_response), NULL);
 
     /* Update when filter type changes */
-    gtk_signal_connect(GTK_OBJECT(type_window_list), "select-row",
-                       GTK_SIGNAL_FUNC(show_response), NULL);
+	gtk_signal_connect(GTK_OBJECT(type_window_list), "select_row",
+					   GTK_SIGNAL_FUNC(filter_type_changed), NULL);
+
+	update_filter_ui(filter_type);
 
     /* Draw initial response when dialog is shown */
     show_response(NULL, NULL);
 
     /* ------------------------------------------------------------ */
+
+    /* Capture noise spectrum once on dialog open */
+    {
+        struct denoise_prefs p;
+        memset(&p, 0, sizeof(p));
+        p.n_noise_samples = 10;
+        p.FFT_SIZE = 8192;
+		noise_valid = FALSE; /* capture_noise_spectrum() sets TRUE only on success */
+        capture_noise_spectrum(v, &local_sound_prefs, &p);
+		/* Force redraw now that noise exists */
+		show_response(NULL, NULL);
+    }
 
     dres = gwc_dialog_run(GTK_DIALOG(dlg)) ;
 
@@ -716,35 +952,37 @@ smp_type srate, smp_type bandwidth)
 double BiQuad_response(double freq, double srate, biquad *p, double *from_formula)
 {
     double omega = 2.0 * M_PI * freq /(double)srate;
-    double phi = sin(omega/2) ;
-    double a0 = p->can_a0 ;
-    double a1 = p->can_a1 ;
-    double a2 = p->can_a2 ;
-    double b0 = p->can_b0 ;
-    double b1 = p->can_b1 ;
-    double b2 = p->can_b2 ;
+    double z_re = cos(omega);
+    double z_im = -sin(omega);
 
-    double phi2 = phi*phi ;
+    /* Normalized coefficients (actual filter) */
+    double b0 = p->a0;
+    double b1 = p->a1;
+    double b2 = p->a2;
+    double a1 = p->a3;
+    double a2 = p->a4;
+	/* H(e^jw) numerator */
+    double num_re =
+        b0 + b1 * z_re + b2 * (2*z_re*z_re - 1);
+    double num_im =
+        b1 * z_im + b2 * (2*z_re*z_im);
 
-    *from_formula = 
-     10*log10( M_SQR(b0+b1+b2) - 4.0*(b0*b1 + 4.0*b0*b2 + b1*b2)*phi + 16.0*b0*b2*phi2 )
-     -10*log10( M_SQR(a0+a1+a2) - 4.0*(a0*a1 + 4.0*a0*a2 + a1*a2)*phi + 16.0*a0*a2*phi2 )  ;
+    /* ------------------------------------------------------------ */
+    /* Absolute magnitude response |H(e^jw)| in dB                  */
+    /* No DC or peak normalization                                  */
+    /* ------------------------------------------------------------ */
 
-    int i ;
-    double sum_dry2 = 0, sum_wet2  = 0;
+    /* H(e^jw) denominator */
+    double den_re =
+        1.0 + a1 * z_re + a2 * (2*z_re*z_re - 1);
+    double den_im =
+        a1 * z_im + a2 * (2*z_re*z_im);
 
-    p->x1 = p->x2 = 0;
-    p->y1 = p->y2 = 0;
+    double num_mag = sqrt(num_re*num_re + num_im*num_im);
+    double den_mag = sqrt(den_re*den_re + den_im*den_im);
 
-    for(i = 0 ; i < srate ; i++) {
-	double x = sin(2.0*M_PI*freq/srate*(double)i) ;
-	double y ;
-	sum_dry2 += x*x ;
-	y = BiQuad(x, p) ;
-	sum_wet2 += y*y ;
-    }
-
-    return 20.0*log10(sum_wet2/sum_dry2) ;
+    *from_formula = 20.0 * log10(num_mag / den_mag);
+   return *from_formula;
 }
 
 

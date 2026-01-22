@@ -277,6 +277,9 @@ int  pinknoise_dialog(struct sound_prefs current, struct view *) ;
 int  play_wavefile_data(long first, long last) ;
 void pop_status_text(void) ;
 int print_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs, long noise_start, long noise_end) ;
+void get_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs, long noise_start, long noise_end,
+		    fftw_real *left_noise_min, fftw_real *left_noise_max, fftw_real *left_noise_avg,
+		    fftw_real *right_noise_min, fftw_real *right_noise_max, fftw_real *right_noise_avg) ;
 int  process_audio(gfloat *pL, gfloat *pR) ;
 void push_status_text(gchar *msg) ;
 int read_fft_real_wavefile_data(fftw_real left[], fftw_real right[], long first, long last) ;
