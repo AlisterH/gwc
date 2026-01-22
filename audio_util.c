@@ -43,6 +43,7 @@
 #include <unistd.h>
 #include <gtk/gtk.h>
 #include <sndfile.h>
+#include <stdarg.h>
 
 #ifdef HAVE_OGG
 #include "vorbis/codec.h"
@@ -105,6 +106,24 @@ extern struct encoding_prefs encoding_prefs;
 int current_sample ;
 
 void position_wavefile_pointer(long sample_number) ;
+
+
+static int gwc_fail(const char *where, const char *fmt, ...)
+{
+    char msg[512];
+    char buf[600];
+    va_list ap;
+
+    va_start(ap, fmt);
+    vsnprintf(msg, sizeof(msg), fmt, ap);
+    va_end(ap);
+
+    snprintf(buf, sizeof(buf), "%s: %s", where, msg);
+    warning(buf);
+
+    return 0; /* conventional failure */
+}
+
 
 void audio_normalize(int flag)
 {
@@ -803,7 +822,7 @@ void position_wavefile_pointer(long sample_number)
 /*  		    fprintf(stderr, "curr_frame:%d presample_number:%d\n", curr_frame,presample_number) ;  */
 /*  		    fprintf(stderr, "position_wf_ptr, want:%d got%d\n", (int)sample_number, (int)new_pos) ;  */
 		if(samples_to_read > 1152) {
-		    exit(1) ;
+		    exit(1) ; // If we ever use the mp3 code we should do away with this, which effectively crashes out of the program
 		}
 
 		unsigned int done ;
@@ -952,10 +971,10 @@ int read_wavefile_data(long left[], long right[], long first, long last)
 	}
 
 	if(n_read == 0) {
-	    char tmp[100] ;
-	    snprintf(tmp, sizeof(tmp), "Attempted to read past end of audio, first=%ld, last=%ld", first, last) ;
-	    warning(tmp) ;
-	    exit(1) ;
+    gwc_fail("read_wavefile_data",
+             "Attempted to read past end of audio, first=%ld, last=%ld",
+             first, last);
+    return (int)s_i; /* return what we managed to read */
 	}
     }
 
@@ -985,6 +1004,12 @@ int read_fft_real_wavefile_data(fftw_real left[], fftw_real right[], long first,
 	while(s_i < n) {
 	    long n_this = MIN((n-s_i), bufsize_short) ;
 	    int n_read = read_raw_wavefile_data((char *)audio_buffer2, pos, pos+n_this-1) ;
+		
+		if (n_read < 0) {
+			stop_playback(1);
+			audio_state = AUDIO_IS_IDLE;
+			return 1;   /* indicate “done / stop” to the main loop if we encounter an error*/
+		}
 
 	    pos += n_read ;
 
@@ -1005,10 +1030,10 @@ int read_fft_real_wavefile_data(fftw_real left[], fftw_real right[], long first,
 	    }
 
 	    if(n_read == 0) {
-		char tmp[100] ;
-		snprintf(tmp, sizeof(tmp), "read_fft_real Attempted to read past end of audio, first=%ld, last=%ld", first, last) ;
-		warning(tmp) ;
-		//exit(1) ;
+		gwc_fail("read_fft_real_wavefile_data",
+				 "Attempted to read past end of audio, first=%ld, last=%ld",
+				 first, last);
+		return (int)s_i; /* return what we managed to read */
 	    }
 
 	}
@@ -1029,10 +1054,10 @@ int read_fft_real_wavefile_data(fftw_real left[], fftw_real right[], long first,
 	    }
 
 	    if(n_read == 0) {
-		char tmp[100] ;
-		snprintf(tmp, sizeof(tmp), "Attempted to read past end of audio, first=%ld, last=%ld", first, last) ;
-		warning(tmp) ;
-		exit(1) ;
+		gwc_fail("read_fft_real_wavefile_data",
+				 "Attempted to read past end of audio, first=%ld, last=%ld",
+				 first, last);
+		return (int)s_i; /* return what we managed to read */
 	    }
 
 	}
@@ -1069,10 +1094,11 @@ int read_float_wavefile_data(float left[], float right[], long first, long last)
 	}
 
 	if(n_read == 0) {
-	    char tmp[100] ;
-	    snprintf(tmp, sizeof(tmp), "Attempted to read past end of audio, first=%ld, last=%ld", first, last) ;
-	    warning(tmp) ;
-	    exit(1) ;
+    gwc_fail("read_float_wavefile_data",
+             "Attempted to read past end of audio, first=%ld, last=%ld",
+             first, last);
+    return (int)s_i; /* return what we managed to read */
+
 	}
 
     }
