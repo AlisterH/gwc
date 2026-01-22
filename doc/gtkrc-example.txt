@@ -20,7 +20,7 @@
 ## Settings in the special gtkrc must be below the include for them to override anything explicitly set in the included file.
 
 ## Use a dark theme (needs to be installed separately)
-#include "/usr/share/themes/Adwaita-dark/gtk-2.0/gtkrc"
+include "/usr/share/themes/Adwaita-dark/gtk-2.0/gtkrc"
 
 ## GWC's toolbar icons are 28x28 by default, a non-standard size, category "gwc".
 # We can double the icon sizes like this:
@@ -70,3 +70,5 @@ class "GtkScrollbar" style "myscrollbar"
 #gtk-xft-antialias = 0
 #gtk-xft-hinting = 1
 #gtk-xft-hintstyle = "hintnone"
+
+

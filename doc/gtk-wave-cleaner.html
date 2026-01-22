@@ -101,7 +101,7 @@ but make sure the result doesn't sound goofy.</li>
 
 <p><li>If you do not have a good noise sample and cannot splice one in from another 
 recording you can use <b>Generate pink noise</b> to overwrite a selected region 
-with pink and or white noise, which is a good approximation for hiss.  You can 
+with pink and/or white noise, which is a good approximation for hiss.  You can 
 then use this for your noise sample.</li>
 
 <p><li>
@@ -137,6 +137,12 @@ select the entire track and denoise the whole thing.  In most cases the defaults
 given above will work quite well, so don't think this is hard, it's really easy!
 At this point you may skip saving the undo data, which for most songs is tens of megabytes and will take
 some time to save.
+<p>
+</li>
+<li>
+A user reported very good results using FFT de-noise in 4 passes, each
+operating at different frequency range with larger window
+for low frequencies and smaller for high frequencies.
 </li>
 </ul>
 </ul>
@@ -173,10 +179,10 @@ displayed in the spectrogram view works quite well.</li>
 
 <p><li>
 There is an optional FFT click detector implemented now.  The settings are the dB above
-average that the click amplitude must be in order to be marked and or fixed.
+average that the click amplitude must be in order to be marked and/or fixed.
 Humans generally can detect a 3 dB change, so that's the default level for weak
 click detection.  While the FFT click detector appears to work better than the old click detector, it is
-only based on some limited observations of mine, so this is not always the case.  It is also MUCH SLOWER.</li>
+only based on some limited observations of mine, so this is not always the case.  It is also slower.</li>
 
 <p><li>
 <b><i>&lt;HINT> - use the spacebar
@@ -222,6 +228,14 @@ The estimation repair looks at the frequencies to the left and right of the
 selection (or current view), and blends those frequencies across the repair
 area.  The result will be better than what was there to begin with,
 as of version 0.20-08 this works quite well, but remember, UNDO is your friend!
+</li>
+</ul>
+
+<ul>
+<li>
+<h2>Clipping Restoration</h2> If your audio was recorded too loud so the audio signal reached its maximum and was clipped, and you cannot make a new recording, you can try:
+1) Amplifying the signal by a value less than 1.0, then
+2) Applying the declicking algorithm manually by selecting the clipped region.
 </li>
 </ul>
 
@@ -286,14 +300,16 @@ like gcover to create jewel case covers.</li>
 <h1>Keyboard shortcuts for hidden features:</h1>
 <ul>
 <li>spacebar - start and stop playback</li>
+<li>spacebar - start and stop looping playback</li>
 <li>'a' - Create or append "cdrdao.toc", with the currently selected (or viewed) audio segment</li>
 <li>'u' - increase the scale on audio display</li>
 <li>'d' - decrease the scale on audio display</li>
-<li>'r' - reset the scale on audio display to 1.0</li>
+<li>'j' - increase the intensity of the spectrogram display</li>
+<li>'k' - decrease the intensity of the spectrogram display</li>
+<li>'r' - reset the audio display scale and spectrogram intensity to 1.0</li>
 <li>'s' - stop playback, and automatically highlight last 1/2 second of audio played</li>
 <li>'2' - when zoomed in, go back by one revolution of a 33 1/3 rpm record</li>
 <li>'3' - when zoomed in, go foward by one revolution of a 33 1/3 rpm record</li>
-<li>TODO: there are more hidden away in gwc.c, but we should give them all menu entries so the shortcuts are user configurable</li>
 </ul>
 
 <hr>

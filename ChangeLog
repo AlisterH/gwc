@@ -1,31 +1,34 @@
 GWC Changelog
 
-KNOWN ISSUE: GWC fails to open wav files with metadata; refer to the README for details.
+KNOWN ISSUES:
+- GWC fails to open wav files with metadata - this is a limitation of libsndfile, refer to README.md for details.
+- "Split audio on song markers" will overwrite existing files without confirmation (https://github.com/AlisterH/gwc/issues/8)
 
 0.22-07
 TBC, 2026
-CODE: fixes to allow (and automate) building on recent MACOS (thanks to Philippe Gagné)
-BUGFIX: problems with coreaudio backend and dialogs with Quartz GTK backend (thanks to Philippe Gagné)
-CODE: build system fixes so that everything works properly with modern tools
-CODE: include built-in delete icon so there is no need to install a gtk icon theme
-DOC: expanded gtkrc example configuration, providing more help for people to enlarge the gui for hidpi screens
-NEW: double-click to select between song markers (or select current view when there are none), and triple-click to select current view (thanks to Jeff Welty who came back to help with some things and added this)
-CHANGED BEHAVIOUR: the toolbar icons now use the custom "gwc" gtk icon size category, so anyone setting the icon size via gtkrc will need to update their configuration (refer to doc/gtkrc-example.txt)
+CODE: fixes to allow (and automate) building on recent MACOS (thanks to Philippe Gagné).
+BUGFIX: MACOS problems with coreaudio backend and dialogs with Quartz GTK backend (thanks to Philippe Gagné).
+CODE: build system fixes so that everything should work properly with modern tools.
+CODE: include built-in delete icon so there is no need to install a gtk icon theme.
+DOC: expanded gtkrc example configuration, providing more help for people to enlarge the gui for hidpi screens.
+NEW: double-click to select between song markers (or select current view when there are none), and triple-click to select current view (thanks to Jeff Welty who came back a few years ago to help with some things and added this).
+NEW: draw a graph in the biquad filter dialog to help people with the settings.
+CHANGED BEHAVIOUR: the toolbar icons now use the custom "gwc" gtk icon size category, so if anyone is setting the icon size via gtkrc they will need to update their configuration (refer to doc/gtkrc-example.txt).
 
 0.22-06
 Feb 17, 2023
-BUGFIX: minor bugs and a crash
+BUGFIX: minor bugs and a crash.
 NEW: icon variants used with dark GTK themes (thanks to Jean-Rene Bastien and Lars Windolf).
 
 0.22-05
 May 28, 2021
 BUGFIX: fix various obscure bugs, crashes and failures, notably several related to batch mode.
-BUGFIX: fix various bugs, crashes and failures in gwcbatch, particularly for filenames including spaces, and file extensions other than .wav (which were previously overwritten without creating a backup)
-NEW: implement drag-and-drop to open a file
-NEW: allow to select audio during playback (this was possible in earlier versions but the ability was lost)
-NEW: allow zoom actions to stop playback
-CODE: minor ui and code improvements
-CODE: fix compile failure with gcc10
+BUGFIX: fix various bugs, crashes and failures in gwcbatch, particularly for filenames including spaces, and file extensions other than .wav (which were previously overwritten without creating a backup).
+NEW: implement drag-and-drop to open a file.
+NEW: allow to select audio during playback (this was possible in earlier versions but the ability was lost).
+NEW: allow zoom actions to stop playback.
+CODE: minor ui and code improvements.
+CODE: fix compile failure with gcc10.
 DOC: minor doc improvements; implement --help
 
 0.22-04
