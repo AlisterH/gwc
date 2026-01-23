@@ -642,9 +642,9 @@ void show_response(GtkWidget *w, gpointer gdata)
             gain_db = BiQuad_response(f, srate, iir, &dummy);
 
             predicted_noise_left_db[i]  =
-                noise_left_db[i]  + gain_db;
+                noise_left_db[i]  + 2.0 * gain_db;
             predicted_noise_right_db[i] =
-                noise_right_db[i] + gain_db;
+                noise_right_db[i] + 2.0 * gain_db;
         }
         predicted_noise_valid = TRUE;
     }
