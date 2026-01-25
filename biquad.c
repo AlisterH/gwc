@@ -442,8 +442,8 @@ capture_noise_spectrum(struct view *v,
         mag_l = left_noise_avg[k] ;
         mag_r = right_noise_avg[k] ;
 
-        noise_left_db[k-1]  = 20.0 * log10(mag_l + 1e-20);
-        noise_right_db[k-1] = 20.0 * log10(mag_r + 1e-20);
+        noise_left_db[k-1]  = 10.0 * log10(mag_l + 1e-20);
+        noise_right_db[k-1] = 10.0 * log10(mag_r + 1e-20);
     }
 
     free(mem_block);
@@ -530,6 +530,46 @@ static gboolean response_expose(GtkWidget *widget,
     if (resp_n < 2)
         return TRUE;
 
+    /* ------------------------------------------------------------ */
+    /* Dashed vertical line at centre frequency (Fc)                */
+    /* ------------------------------------------------------------ */
+    if (Fc > 0.0) {
+        double fmin = 10.0;
+        double fmax = 20000.0;
+        double t;
+        int x_fc;
+
+        if (Fc < fmin)
+            t = 0.0;
+        else if (Fc > fmax)
+            t = 1.0;
+        else
+            t = log(Fc / fmin) / log(fmax / fmin);
+
+        x_fc = 40 + t * (w - 50);
+
+        /* Create dashed GC */
+        GdkGC *dash_gc = gdk_gc_new(widget->window);
+        GdkColor dash_color = { 0, 20000, 20000, 20000 }; /* light grey */
+        gdk_gc_set_rgb_fg_color(dash_gc, &dash_color);
+
+        {
+            gint8 dashes[] = { 4, 4 };
+            gdk_gc_set_line_attributes(dash_gc,
+                                       1,
+                                       GDK_LINE_ON_OFF_DASH,
+                                       GDK_CAP_BUTT,
+                                       GDK_JOIN_MITER);
+            gdk_gc_set_dashes(dash_gc, 0, dashes, 2);
+        }
+
+        gdk_draw_line(widget->window,
+                      dash_gc,
+                      x_fc, 10,
+                      x_fc, h - 30);
+
+        g_object_unref(dash_gc);
+    }
 
     for (i = 1; i < resp_n; i++) {
         int x1 = 40 + (i-1) * (w-50) / (resp_n-1);
@@ -642,9 +682,9 @@ void show_response(GtkWidget *w, gpointer gdata)
             gain_db = BiQuad_response(f, srate, iir, &dummy);
 
             predicted_noise_left_db[i]  =
-                noise_left_db[i]  + 2.0 * gain_db;
+                noise_left_db[i]  + gain_db;
             predicted_noise_right_db[i] =
-                noise_right_db[i] + 2.0 * gain_db;
+                noise_right_db[i] + gain_db;
         }
         predicted_noise_valid = TRUE;
     }
