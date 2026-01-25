@@ -65,6 +65,8 @@ static double predicted_noise_left_db[NOISE_POINTS];
 static double predicted_noise_right_db[NOISE_POINTS];
 static gboolean predicted_noise_valid = FALSE;
 
+GdkColor dark_green = { 0, 0, 32768, 0 };
+
 int row2filter(int row)
 {
     if(row == 0) return LPF ;
@@ -143,7 +145,7 @@ void filter_audio(struct sound_prefs *p, long first, long last, int channel_mask
     long left[BUFSIZE], right[BUFSIZE] ;
     long x_left[3], x_right[3] ;
     long y_left[3], y_right[3] ;
-    long current, i ; // removed unused variable f
+    long current, i ;
     int loops = 0 ;
 
     load_filter_preferences() ;
@@ -448,7 +450,83 @@ capture_noise_spectrum(struct view *v,
 
     free(mem_block);
 
-    noise_valid = TRUE;
+   noise_valid = TRUE;
+}
+
+/* ------------------------------------------------------------ */
+/* helpers for plotting dB curves                     */
+/* ------------------------------------------------------------ */
+static int
+db_to_y(double db, int h, double db_min, double db_max)
+{
+    double t;
+
+    if (db > db_max)
+        t = 0.0;
+    else if (db < db_min)
+        t = 1.0;
+    else
+        t = (db_max - db) / (db_max - db_min);
+
+    return 10 + t * (h - 40);
+}
+
+static void
+draw_db_curve(GtkWidget *widget,
+              GdkGC     *gc,
+              const double *db,
+              int        n,
+              int        w,
+              int        h,
+              double     db_min,
+              double     db_max)
+{
+    int i;
+
+    for (i = 1; i < n; i++) {
+        int x1 = 40 + (i - 1) * (w - 50) / (n - 1);
+        int x2 = 40 +  i      * (w - 50) / (n - 1);
+
+        int y1 = db_to_y(db[i - 1], h, db_min, db_max);
+        int y2 = db_to_y(db[i],     h, db_min, db_max);
+
+        gdk_draw_line(widget->window, gc, x1, y1, x2, y2);
+    }
+}
+
+/* ------------------------------------------------------------ */
+/* Draw dB curve using frequency array (log-frequency X axis)   */
+/* ------------------------------------------------------------ */
+static void
+draw_db_curve_freq(GtkWidget *widget,
+                   GdkGC     *gc,
+                   const double *freq,
+                   const double *db,
+                   int        n,
+                   int        w,
+                   int        h,
+                   double     db_min,
+                   double     db_max,
+                   double     fmin,
+                   double     fmax)
+{
+    int i;
+
+    for (i = 1; i < n; i++) {
+        if (freq[i-1] <= 0.0 || freq[i] <= 0.0)
+            continue;
+
+        double t1 = log(freq[i-1] / fmin) / log(fmax / fmin);
+        double t2 = log(freq[i]   / fmin) / log(fmax / fmin);
+
+        int x1 = 40 + t1 * (w - 50);
+        int x2 = 40 + t2 * (w - 50);
+
+        int y1 = db_to_y(db[i-1], h, db_min, db_max);
+        int y2 = db_to_y(db[i],   h, db_min, db_max);
+
+        gdk_draw_line(widget->window, gc, x1, y1, x2, y2);
+    }
 }
 
 /* GTK2 expose handler for response plot */
@@ -462,14 +540,12 @@ static gboolean response_expose(GtkWidget *widget,
     GdkGC *bg = widget->style->bg_gc[GTK_STATE_NORMAL];
 
 	/* ----- Dark green GC for filter + measured noise ----- */
-	// because black turns to light grey in a dark theme
+	// hard code colours - if you get standard gtk colours e.g. a black turns to light grey in a dark theme
 	GdkGC *green_gc = gdk_gc_new(widget->window);
-	GdkColor dark_green = { 0, 0, 32768, 0 };
 	gdk_gc_set_rgb_fg_color(green_gc, &dark_green);
 
     double min_db = -100.0;
     double max_db =  300.0;
-    int i;
 
     gdk_draw_rectangle(widget->window, bg, TRUE, 0, 0, w, h);
 
@@ -550,8 +626,7 @@ static gboolean response_expose(GtkWidget *widget,
 
         /* Create dashed GC */
         GdkGC *dash_gc = gdk_gc_new(widget->window);
-        GdkColor dash_color = { 0, 20000, 20000, 20000 }; /* light grey */
-        gdk_gc_set_rgb_fg_color(dash_gc, &dash_color);
+        gdk_gc_set_rgb_fg_color(dash_gc, &dark_green);
 
         {
             gint8 dashes[] = { 4, 4 };
@@ -571,40 +646,23 @@ static gboolean response_expose(GtkWidget *widget,
         g_object_unref(dash_gc);
     }
 
-    for (i = 1; i < resp_n; i++) {
-        int x1 = 40 + (i-1) * (w-50) / (resp_n-1);
-        int x2 = 40 +  i    * (w-50) / (resp_n-1);
-
-        int y1 = h-30 - (resp_db[i-1] - min_db) * (h-40) / (max_db - min_db);
-        int y2 = h-30 - (resp_db[i]   - min_db) * (h-40) / (max_db - min_db);
-
-        gdk_draw_line(widget->window, green_gc, x1, y1, x2, y2);
-    }
+    /* ---- Filter response ---- */
+    draw_db_curve(widget, green_gc,
+                  resp_db, resp_n,
+                  w, h, min_db, max_db);
 
     /* ---- Noise spectrum overlay ---- */
     if (noise_valid && noise_n > 1) {
-        for (i = 1; i < noise_n; i++) {
-            double t1 = log(noise_freq[i-1] / 10.0) / log(20000.0 / 10.0);
-            double t2 = log(noise_freq[i]   / 10.0) / log(20000.0 / 10.0);
+        draw_db_curve_freq(widget, green_gc,
+                           noise_freq, noise_left_db, noise_n,
+                           w, h, min_db, max_db,
+                           10.0, 20000.0);
 
-            int x1 = 40 + t1 * (w - 50);
-            int x2 = 40 + t2 * (w - 50);
-
-            int y1 = h-30 - (noise_left_db[i-1] - min_db) *
-                     (h-40) / (max_db - min_db);
-            int y2 = h-30 - (noise_left_db[i] - min_db) *
-                     (h-40) / (max_db - min_db);
-
-            gdk_draw_line(widget->window, green_gc, x1, y1, x2, y2);
-
-            y1 = h-30 - (noise_right_db[i-1] - min_db) *
-                 (h-40) / (max_db - min_db);
-            y2 = h-30 - (noise_right_db[i] - min_db) *
-                 (h-40) / (max_db - min_db);
-
-            gdk_draw_line(widget->window, green_gc, x1, y1, x2, y2);
-        }
-    }
+        draw_db_curve_freq(widget, green_gc,
+                           noise_freq, noise_right_db, noise_n,
+                           w, h, min_db, max_db,
+                           10.0, 20000.0);
+   }
 
     /* ---- Predicted noise (filtered) overlay ---- */
     if (predicted_noise_valid && noise_n > 1) {
@@ -612,27 +670,16 @@ static gboolean response_expose(GtkWidget *widget,
         GdkColor blue = { 0, 0, 0, 65535 };
         gdk_gc_set_rgb_fg_color(blue_gc, &blue);
 
-        for (i = 1; i < noise_n; i++) {
-            double t1 = log(noise_freq[i-1] / 10.0) / log(20000.0 / 10.0);
-            double t2 = log(noise_freq[i]   / 10.0) / log(20000.0 / 10.0);
+        draw_db_curve_freq(widget, blue_gc,
+                           noise_freq, predicted_noise_left_db, noise_n,
+                           w, h, min_db, max_db,
+                           10.0, 20000.0);
 
-            int x1 = 40 + t1 * (w - 50);
-            int x2 = 40 + t2 * (w - 50);
+        draw_db_curve_freq(widget, blue_gc,
+                           noise_freq, predicted_noise_right_db, noise_n,
+                           w, h, min_db, max_db,
+                           10.0, 20000.0);
 
-            int y1 = h-30 - (predicted_noise_left_db[i-1] - min_db) *
-                     (h-40) / (max_db - min_db);
-            int y2 = h-30 - (predicted_noise_left_db[i] - min_db) *
-                     (h-40) / (max_db - min_db);
-
-            gdk_draw_line(widget->window, blue_gc, x1, y1, x2, y2);
-
-            y1 = h-30 - (predicted_noise_right_db[i-1] - min_db) *
-                 (h-40) / (max_db - min_db);
-            y2 = h-30 - (predicted_noise_right_db[i] - min_db) *
-                 (h-40) / (max_db - min_db);
-
-            gdk_draw_line(widget->window, blue_gc, x1, y1, x2, y2);
-        }
 
         g_object_unref(blue_gc);
     }
