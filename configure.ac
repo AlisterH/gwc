@@ -38,6 +38,7 @@ dnl ------------------------------------------------------------
 
 AS_IF([test "x$debug" = "xtrue"], [
   AC_MSG_NOTICE([Debugging enabled: forcing -g3 -O0 (overriding any -O*)])
+  AC_DEFINE([DEBUG], [1], [Define for debug builds])
 
   dnl Strip any existing optimisation flags from CFLAGS/CXXFLAGS
   CFLAGS=`echo " $CFLAGS " | sed -E 's/[[:space:]]-O([0-9]|s|g|fast|z)?[[:space:]]/ /g; s/^ //; s/ $//'`
