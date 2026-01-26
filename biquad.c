@@ -69,6 +69,7 @@ static GdkWindow *response_window = NULL;
 static GdkGC *green_gc = NULL;
 static GdkGC *dash_gc  = NULL;
 static GdkGC *blue_gc  = NULL;
+static GdkGC *bg_gc = NULL;
 
 int row2filter(int row)
 {
@@ -516,7 +517,8 @@ draw_db_curve_freq(GtkWidget *widget,
     int i;
 
     for (i = 1; i < n; i++) {
-        if (freq[i-1] <= 0.0 || freq[i] <= 0.0)
+        /* Don't plot to the left of the y axis */
+        if (freq[i-1] <= fmin || freq[i] <= fmin)
             continue;
 
         double t1 = log(freq[i-1] / fmin) / log(fmax / fmin);
@@ -540,8 +542,6 @@ static gboolean response_expose(GtkWidget *widget,
     int w = widget->allocation.width;
     int h = widget->allocation.height;
 
-    GdkGC *bg = widget->style->bg_gc[GTK_STATE_NORMAL];
-
 	/* AI advises guarding against unrealized widgets */
 	if (!GTK_WIDGET_REALIZED(widget))
 		return TRUE;
@@ -556,6 +556,7 @@ static gboolean response_expose(GtkWidget *widget,
 		if (green_gc) g_object_unref(green_gc);
 		if (dash_gc)  g_object_unref(dash_gc);
 		if (blue_gc)  g_object_unref(blue_gc);
+		if (bg_gc)  g_object_unref(bg_gc);
 
 		green_gc = dash_gc = blue_gc = NULL;
 
@@ -580,13 +581,18 @@ static gboolean response_expose(GtkWidget *widget,
 			GdkColor blue = { 0, 0, 0, 65535 };
 			blue_gc = gdk_gc_new(response_window);
 			gdk_gc_set_rgb_fg_color(blue_gc, &blue);
+			
+			bg_gc = gdk_gc_new(widget->window);
+			/* For now just set a gray background - later we can figure out how to set suitable line colours to use with this: GdkGC *bg = widget->style->bg_gc[GTK_STATE_NORMAL]; */
+			GdkColor gray = { 0, 59624, 59624, 59367 };
+			gdk_gc_set_rgb_fg_color(bg_gc, &gray);
 		}
 	}
 
     double min_db = -100.0;
     double max_db =  300.0;
 
-    gdk_draw_rectangle(widget->window, bg, TRUE, 0, 0, w, h);
+    gdk_draw_rectangle(widget->window, bg_gc, TRUE, 0, 0, w, h);
 
     gdk_draw_line(widget->window, green_gc, 40, h-30, w-10, h-30);
     gdk_draw_line(widget->window, green_gc, 40, 10,   40,  h-30);
