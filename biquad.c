@@ -65,6 +65,11 @@ static double predicted_noise_left_db[NOISE_POINTS];
 static double predicted_noise_right_db[NOISE_POINTS];
 static gboolean predicted_noise_valid = FALSE;
 
+static GdkWindow *response_window = NULL;
+static GdkGC *green_gc = NULL;
+static GdkGC *dash_gc  = NULL;
+static GdkGC *blue_gc  = NULL;
+
 int row2filter(int row)
 {
     if(row == 0) return LPF ;
@@ -537,22 +542,45 @@ static gboolean response_expose(GtkWidget *widget,
 
     GdkGC *bg = widget->style->bg_gc[GTK_STATE_NORMAL];
 
-	GdkColor dark_green = { 0, 0, 32768, 0 };
-	/* ----- Dark green GC for filter + measured noise ----- */
-	/* hard code colours - if you get standard gtk colours e.g. a black turns to light grey in a dark theme */
-	GdkGC *green_gc = gdk_gc_new(widget->window);
-	gdk_gc_set_rgb_fg_color(green_gc, &dark_green);
-	/* Create dashed GC for horizontal and vertical lines */
-	GdkGC *dash_gc = gdk_gc_new(widget->window);
-	gdk_gc_set_rgb_fg_color(dash_gc, &dark_green);
-	{
-		gint8 dashes[] = { 4, 4 };
-		gdk_gc_set_line_attributes(dash_gc,
-								   1,
-								   GDK_LINE_ON_OFF_DASH,
-								   GDK_CAP_BUTT,
-								   GDK_JOIN_MITER);
-		gdk_gc_set_dashes(dash_gc, 0, dashes, 2);
+	/* AI advises guarding against unrealized widgets */
+	if (!GTK_WIDGET_REALIZED(widget))
+		return TRUE;
+
+	/* Don't set up all this more often than we need to */
+	if (widget->window != response_window) {
+
+		/* Window changed or first realization */
+		response_window = widget->window;
+
+		/* Drop old GCs */
+		if (green_gc) g_object_unref(green_gc);
+		if (dash_gc)  g_object_unref(dash_gc);
+		if (blue_gc)  g_object_unref(blue_gc);
+
+		green_gc = dash_gc = blue_gc = NULL;
+
+		/* Recreate GCs for this window */
+		{
+			GdkColor dark_green = { 0, 0, 32768, 0 };
+
+			green_gc = gdk_gc_new(response_window);
+			gdk_gc_set_rgb_fg_color(green_gc, &dark_green);
+
+			dash_gc = gdk_gc_new(response_window);
+			gdk_gc_set_rgb_fg_color(dash_gc, &dark_green);
+
+			gint8 dashes[] = { 4, 4 };
+			gdk_gc_set_line_attributes(dash_gc,
+									   1,
+									   GDK_LINE_ON_OFF_DASH,
+									   GDK_CAP_BUTT,
+									   GDK_JOIN_MITER);
+			gdk_gc_set_dashes(dash_gc, 0, dashes, 2);
+
+			GdkColor blue = { 0, 0, 0, 65535 };
+			blue_gc = gdk_gc_new(response_window);
+			gdk_gc_set_rgb_fg_color(blue_gc, &blue);
+		}
 	}
 
     double min_db = -100.0;
@@ -643,7 +671,6 @@ static gboolean response_expose(GtkWidget *widget,
                       x_fc, 10,
                       x_fc, h - 30);
 
-        g_object_unref(dash_gc);
     }
 
     /* ---- Filter response ---- */
@@ -681,7 +708,6 @@ static gboolean response_expose(GtkWidget *widget,
                            10.0, 20000.0);
 
 
-        g_object_unref(blue_gc);
     }
     pango_font_description_free(font);
     g_object_unref(layout);
