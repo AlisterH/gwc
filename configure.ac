@@ -3,7 +3,12 @@ AC_INIT([Gtk Wave Cleaner], [0.22-07], [http://gwc.sourceforge.net])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([1.12 foreign no-define tar-ustar])
 
-PKG_CHECK_MODULES(SNDFILE, sndfile >= 1.0.0,
+dnl Checks for programs.
+AC_PROG_CC
+
+PKG_PROG_PKG_CONFIG
+
+PKG_CHECK_MODULES(SNDFILE, sndfile >= 1.0.2,
                    HAVE_LIBSNDFILE1="yes", HAVE_LIBSNDFILE1="no")
 
 if test "x$HAVE_LIBSNDFILE1" = xno ; then
@@ -62,13 +67,6 @@ AS_IF([test "x$debug" = "xtrue"], [
     [*" -O"*], [:],
     [CFLAGS="$CFLAGS -O2"])
 ])
-
-PKG_CHECK_MODULES(PULSEAUDIO, libpulse-simple >= 0.9.0,
-                   HAVE_PULSE_AUDIO="yes", HAVE_PULSE_AUDIO="no")
-
-dnl Checks for programs.
-AC_PROG_CC
-AC_LANG(C)
 
 dnl Checks for libraries.
 
@@ -130,8 +128,15 @@ AC_ARG_ENABLE(alsa, [  --disable-alsa           disable ALSA support (default en
 
 if test "$enable_alsa" != "no"
 then
-    PKG_CHECK_MODULES(ALSA, alsa >= 0.9.0, alsa="yes";ALSALIB=$ALSA_LIBS;ALSADEF="-DHAVE_ALSA";ALSACFLAGS=$ALSA_CFLAGS, alsa="disabled")
-    AC_DEFINE([HAVE_ALSA], [1], [Define if ALSA support is enabled])
+    PKG_CHECK_MODULES(ALSA, alsa >= 0.9.0, [
+		alsa="yes"
+		ALSALIB=$ALSA_LIBS
+		ALSADEF="-DHAVE_ALSA"
+		ALSACFLAGS=$ALSA_CFLAGS
+		AC_DEFINE([HAVE_ALSA], [1], [Define if ALSA support is enabled])
+	], [
+		alsa="disabled"
+	])
 else
     alsa="disabled"
     AC_MSG_CHECKING([for ALSA])
@@ -213,12 +218,11 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_TYPE_SIZE_T
 
+dnl Checks for library functions.
+AC_CHECK_FUNCS(gettimeofday)
+
 dnl refer to comments in gwc.c where these versions are required:
 PKG_CHECK_MODULES(GTK, [ gtk+-2.0 >= 2.16 glib-2.0 >= 2.30 ])
-
-dnl Checks for library functions.
-AC_FUNC_VPRINTF
-AC_CHECK_FUNCS(gettimeofday)
 
 dnl check for osx platform
 AC_MSG_CHECKING([for Mac OS X platform])
