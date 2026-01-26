@@ -65,8 +65,6 @@ static double predicted_noise_left_db[NOISE_POINTS];
 static double predicted_noise_right_db[NOISE_POINTS];
 static gboolean predicted_noise_valid = FALSE;
 
-GdkColor dark_green = { 0, 0, 32768, 0 };
-
 int row2filter(int row)
 {
     if(row == 0) return LPF ;
@@ -539,10 +537,23 @@ static gboolean response_expose(GtkWidget *widget,
 
     GdkGC *bg = widget->style->bg_gc[GTK_STATE_NORMAL];
 
+	GdkColor dark_green = { 0, 0, 32768, 0 };
 	/* ----- Dark green GC for filter + measured noise ----- */
-	// hard code colours - if you get standard gtk colours e.g. a black turns to light grey in a dark theme
+	/* hard code colours - if you get standard gtk colours e.g. a black turns to light grey in a dark theme */
 	GdkGC *green_gc = gdk_gc_new(widget->window);
 	gdk_gc_set_rgb_fg_color(green_gc, &dark_green);
+	/* Create dashed GC for horizontal and vertical lines */
+	GdkGC *dash_gc = gdk_gc_new(widget->window);
+	gdk_gc_set_rgb_fg_color(dash_gc, &dark_green);
+	{
+		gint8 dashes[] = { 4, 4 };
+		gdk_gc_set_line_attributes(dash_gc,
+								   1,
+								   GDK_LINE_ON_OFF_DASH,
+								   GDK_CAP_BUTT,
+								   GDK_JOIN_MITER);
+		gdk_gc_set_dashes(dash_gc, 0, dashes, 2);
+	}
 
     double min_db = -100.0;
     double max_db =  300.0;
@@ -551,6 +562,9 @@ static gboolean response_expose(GtkWidget *widget,
 
     gdk_draw_line(widget->window, green_gc, 40, h-30, w-10, h-30);
     gdk_draw_line(widget->window, green_gc, 40, 10,   40,  h-30);
+	/* ----- Horizontal line at 0 dB ----- */
+	int y0 = db_to_y(0.0, h, min_db, max_db);
+	gdk_draw_line(widget->window, dash_gc, 40, y0, w-10, y0);
 
     /* ----- Axis labels ----- */
     PangoLayout *layout;
@@ -623,20 +637,6 @@ static gboolean response_expose(GtkWidget *widget,
             t = log(Fc / fmin) / log(fmax / fmin);
 
         x_fc = 40 + t * (w - 50);
-
-        /* Create dashed GC */
-        GdkGC *dash_gc = gdk_gc_new(widget->window);
-        gdk_gc_set_rgb_fg_color(dash_gc, &dark_green);
-
-        {
-            gint8 dashes[] = { 4, 4 };
-            gdk_gc_set_line_attributes(dash_gc,
-                                       1,
-                                       GDK_LINE_ON_OFF_DASH,
-                                       GDK_CAP_BUTT,
-                                       GDK_JOIN_MITER);
-            gdk_gc_set_dashes(dash_gc, 0, dashes, 2);
-        }
 
         gdk_draw_line(widget->window,
                       dash_gc,
