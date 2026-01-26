@@ -5,7 +5,7 @@ KNOWN ISSUES:
 - "Split audio on song markers" will overwrite existing files without confirmation (https://github.com/AlisterH/gwc/issues/8)
 
 0.22-07
-TBC, 2026
+Jan 26, 2026
 CODE: fixes to allow (and automate) building on recent MACOS (thanks to Philippe Gagné).
 BUGFIX: MACOS problems with coreaudio backend and dialogs with Quartz GTK backend (thanks to Philippe Gagné).
 CODE: build system fixes so that everything should work properly with modern tools.
