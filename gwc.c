@@ -199,12 +199,28 @@ int stop_playback_force = 1 ;
 
 #ifndef DEBUG
 static void
-null_log_handler (const gchar *domain,
-                  GLogLevelFlags level,
-                  const gchar *message,
-                  gpointer data)
+gio_critical_filter(const gchar *log_domain,
+                        GLogLevelFlags log_level,
+                        const gchar *message,
+                        gpointer user_data)
 {
-    /* intentionally empty */
+    if (log_domain &&
+        strcmp(log_domain, "GLib-GIO") == 0 &&
+        (log_level & G_LOG_LEVEL_CRITICAL) &&
+        message &&
+        (
+            strstr(message, "standard::is-hidden") ||
+            strstr(message, "standard::is-backup") ||
+            strstr(message, "g_file_info_get_is_hidden") ||
+            strstr(message, "g_file_info_get_is_backup")
+        ))
+    {
+        /* swallow it */
+        return;
+    }
+
+    /* everything else behaves normally */
+    g_log_default_handler(log_domain, log_level, message, user_data);
 }
 #endif
 
@@ -3471,7 +3487,7 @@ int main(int argc, char *argv[])
 	#ifndef DEBUG
 	g_log_set_handler ("GLib-GIO",
 					   G_LOG_LEVEL_CRITICAL,
-					   null_log_handler,
+					   gio_critical_filter,
 					   NULL);
 	#endif
 	
