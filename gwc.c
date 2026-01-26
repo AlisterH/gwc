@@ -197,6 +197,17 @@ gint file_is_open = FALSE;
 gint file_processing = FALSE;
 int stop_playback_force = 1 ;
 
+#ifndef DEBUG
+static void
+null_log_handler (const gchar *domain,
+                  GLogLevelFlags level,
+                  const gchar *message,
+                  gpointer data)
+{
+    /* intentionally empty */
+}
+#endif
+
 void d_print(char *fmt, ...)
 {
     if (debug) {
@@ -3455,6 +3466,14 @@ int main(int argc, char *argv[])
      * from the command line and are returned to the application. */
     gtk_init(&argc, &argv);
     g_set_application_name("Gtk Wave Cleaner");
+
+	/* Suppress stdoutput spam caused by recent Glib versions when using save file selectors*/
+	#ifndef DEBUG
+	g_log_set_handler ("GLib-GIO",
+					   G_LOG_LEVEL_CRITICAL,
+					   null_log_handler,
+					   NULL);
+	#endif
 	
     main_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
     if (gtk_icon_theme_has_icon(gtk_icon_theme_get_default(), APPNAME) == FALSE)
