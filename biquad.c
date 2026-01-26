@@ -70,6 +70,7 @@ static GdkGC *green_gc = NULL;
 static GdkGC *dash_gc  = NULL;
 static GdkGC *blue_gc  = NULL;
 static GdkGC *bg_gc = NULL;
+static double max_plot_freq = 20000.0;
 
 int row2filter(int row)
 {
@@ -641,7 +642,7 @@ static gboolean response_expose(GtkWidget *widget,
 
     for (j = 0; j < 4; j++) {
         double t = log((double)freqs[j] / 10.0) /
-                   log(20000.0 / 10.0);
+                   log(max_plot_freq / 10.0);
         int x = 40 + t * (w - 50);
         char buf[16];
 
@@ -659,7 +660,7 @@ static gboolean response_expose(GtkWidget *widget,
     /* ------------------------------------------------------------ */
     if (Fc > 0.0) {
         double fmin = 10.0;
-        double fmax = 20000.0;
+        double fmax = max_plot_freq;
         double t;
         int x_fc;
 
@@ -689,12 +690,12 @@ static gboolean response_expose(GtkWidget *widget,
         draw_db_curve_freq(widget, green_gc,
                            noise_freq, noise_left_db, noise_n,
                            w, h, min_db, max_db,
-                           10.0, 20000.0);
+                           10.0, max_plot_freq);
 
         draw_db_curve_freq(widget, green_gc,
                            noise_freq, noise_right_db, noise_n,
                            w, h, min_db, max_db,
-                           10.0, 20000.0);
+                           10.0, max_plot_freq);
    }
 
     /* ---- Predicted noise (filtered) overlay ---- */
@@ -706,12 +707,12 @@ static gboolean response_expose(GtkWidget *widget,
         draw_db_curve_freq(widget, blue_gc,
                            noise_freq, predicted_noise_left_db, noise_n,
                            w, h, min_db, max_db,
-                           10.0, 20000.0);
+                           10.0, max_plot_freq);
 
         draw_db_curve_freq(widget, blue_gc,
                            noise_freq, predicted_noise_right_db, noise_n,
                            w, h, min_db, max_db,
-                           10.0, 20000.0);
+                           10.0, max_plot_freq);
 
 
     }
@@ -725,10 +726,16 @@ void show_response(GtkWidget *w, gpointer gdata)
     biquad *iir;
     int i;
     double fmin = 10.0;
-    double fmax = 20000.0;
+    double fmax;
     double srate;
 
     srate = local_sound_prefs.rate;
+    max_plot_freq = srate * 0.5;
+    /* in real life this should never occur */
+    if (max_plot_freq < fmin)
+        max_plot_freq = fmin;
+
+    fmax = max_plot_freq;
 
     Fc = atof(gtk_entry_get_text((GtkEntry *)freq_entry)) ;
     dbGain = atof(gtk_entry_get_text((GtkEntry *)dbGain_entry)) ;
