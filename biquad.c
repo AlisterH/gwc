@@ -52,6 +52,7 @@ static int feather_width;
 static double resp_db[RESP_POINTS];
 static int resp_n = 0;
 static GtkWidget *response_area = NULL;
+static unsigned int channel_mask = 0x03; /* default: both; but we actually get this from the view */
 
 /* noise spectrum overlay */
 #define NOISE_POINTS 4096
@@ -686,17 +687,19 @@ static gboolean response_expose(GtkWidget *widget,
                   w, h, min_db, max_db);
 
     /* ---- Noise spectrum overlay ---- */
-    if (noise_valid && noise_n > 1) {
-        draw_db_curve_freq(widget, green_gc,
-                           noise_freq, noise_left_db, noise_n,
-                           w, h, min_db, max_db,
-                           10.0, max_plot_freq);
+	if (channel_mask & 0x01) {
+		draw_db_curve_freq(widget, green_gc,
+						   noise_freq, noise_left_db, noise_n,
+						   w, h, min_db, max_db,
+						   10.0, max_plot_freq);
+	}
 
-        draw_db_curve_freq(widget, green_gc,
-                           noise_freq, noise_right_db, noise_n,
-                           w, h, min_db, max_db,
-                           10.0, max_plot_freq);
-   }
+	if (channel_mask & 0x02) {
+		draw_db_curve_freq(widget, green_gc,
+						   noise_freq, noise_right_db, noise_n,
+						   w, h, min_db, max_db,
+						   10.0, max_plot_freq);
+	}
 
     /* ---- Predicted noise (filtered) overlay ---- */
     if (predicted_noise_valid && noise_n > 1) {
@@ -704,15 +707,19 @@ static gboolean response_expose(GtkWidget *widget,
         GdkColor blue = { 0, 0, 0, 65535 };
         gdk_gc_set_rgb_fg_color(blue_gc, &blue);
 
-        draw_db_curve_freq(widget, blue_gc,
-                           noise_freq, predicted_noise_left_db, noise_n,
-                           w, h, min_db, max_db,
-                           10.0, max_plot_freq);
+	if (channel_mask & 0x01) {
+		draw_db_curve_freq(widget, blue_gc,
+						   noise_freq, predicted_noise_left_db, noise_n,
+						   w, h, min_db, max_db,
+						   10.0, max_plot_freq);
+	}
 
-        draw_db_curve_freq(widget, blue_gc,
-                           noise_freq, predicted_noise_right_db, noise_n,
-                           w, h, min_db, max_db,
-                           10.0, max_plot_freq);
+	if (channel_mask & 0x02) {
+		draw_db_curve_freq(widget, blue_gc,
+						   noise_freq, predicted_noise_right_db, noise_n,
+						   w, h, min_db, max_db,
+						   10.0, max_plot_freq);
+	}
 
 
     }
@@ -800,6 +807,7 @@ int filter_dialog(struct sound_prefs current, struct view *v)
     };
 
     local_sound_prefs = current ;
+    channel_mask = v->channel_selection_mask;
 
     load_filter_preferences();
     filter_type = filter_prefs.filter_type ;
