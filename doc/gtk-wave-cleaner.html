@@ -57,7 +57,8 @@ background noise level for noise elimination.</li>
 
 <ul>
 <li>
-If you try to open a wav file created by software such as a recent ffmpeg, GWC will produce an error like this: "Failed to open /root/whistle.wav, 'Error : Cannot open file in read/write mode due to string data in header.'".  Libsndfile does not support RDWR mode for these files - one workaround is to open and save the file in mhwaveedit. Or if you are creating the files using ffmpeg try adding "-flags bitexact" into your command line (although this will reduce ffmpeg's performance), or writing to a different libsndfile supported format such as au or aiff.
+<i>KNOWN ISSUE</i> - If you try to open a wav file created by software such as a recent ffmpeg, GWC will produce an error like this: "Failed to open /root/whistle.wav, 'Error : Cannot open file in read/write mode due to string data in header.'".  Libsndfile does not support RDWR mode for these files - one workaround is to open and save the file in mhwaveedit. Or if you are creating the files using ffmpeg try like this <i>ffmpeg -i input.wav -bitexact output.wav</i> (note that this is not the same as <i>ffmpeg -bitexact -i input.wav output.wav</i> or <i>ffmpeg -i input.wav -flags bitexact output.wav</i>), or writing to a different libsndfile supported format such as au or aiff.
+
 </li>
 </ul>
 

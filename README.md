@@ -86,7 +86,7 @@ GWC fails to open wav files with metadata, such as those created by recent versi
 Failed to open /root/whistle.wav, 'Error : Cannot open file in read/write mode due to string data in header.'
 ```
 
-Libsndfile does not support RDWR mode for these files. If you are creating them using ffmpeg, try adding `-flags bitexact` to your command line (although this will reduce ffmpeg's performance), or write to a different libsndfile-supported format such as `.au` or `.aiff`. A workaround for existing files is to open and save the file in mhwaveedit, or convert to a different format using `sndfile-convert` or `ffmpeg`, or use `SimplifyWave` from waveutils or `shntool strip` to make a copy of the file with a clean header.
+Libsndfile does not support RDWR mode for these files. If you are creating them using ffmpeg, try like this `ffmpeg -i input.wav -bitexact output.wav` (note that this is not the same as `ffmpeg -bitexact -i input.wav output.wav` or `ffmpeg -i input.wav -flags bitexact output.wav`), or write to a different libsndfile supported format such as `.au` or `.aiff`. A workaround for existing files is to open and save the file in mhwaveedit, or convert to a different format using `sndfile-convert` or `ffmpeg`, or use `SimplifyWave` from waveutils or `shntool strip` to make a copy of the file with a clean header.
 
 ## Background
 For links and a brief presentation describing the technical aspects of the audio restoration methods used in GWC, visit [http://gwc.sourceforge.net/](http://gwc.sourceforge.net/)
