@@ -730,13 +730,25 @@ static void
 add_to_recent_files(const char *filename)
 {
     gchar *uri;
+    gchar *content_type;
+    const gchar *groups[] = { "gwc", NULL };
+    GtkRecentData data;
 
     uri = g_filename_to_uri(filename, NULL, NULL);
     if (uri) {
-        gtk_recent_manager_add_item(
+        memset(&data, 0, sizeof(data));
+        content_type = g_content_type_guess(filename, NULL, 0, NULL);
+        data.app_name = "Gtk Wave Cleaner";
+        data.app_exec = "gwc %u";
+        data.mime_type  = content_type;
+        data.groups     = (gchar **)groups;
+        data.is_private = FALSE;
+
+        gtk_recent_manager_add_full(
             gtk_recent_manager_get_default(),
-            uri
-        );
+            uri,
+            &data);
+        g_free(content_type);
         g_free(uri);
     }
 }
@@ -744,25 +756,29 @@ add_to_recent_files(const char *filename)
 static void
 recent_file_activated(GtkRecentChooser *chooser, gpointer user_data)
 {
-    GtkRecentInfo *info;
+    gchar *uri;
     gchar *filename;
 
-    info = gtk_recent_chooser_get_current_item(chooser);
-    if (!info)
-        return;
+    if ((file_processing == FALSE) && (audio_playback == FALSE)
+	&& (cursor_playback == FALSE))
 
-    filename = g_filename_from_uri(
-        gtk_recent_info_get_uri(info),
-        NULL, NULL
-    );
+	{
+		uri = gtk_recent_chooser_get_current_uri(chooser);
+		if (!uri)
+			return;
 
-    if (filename) {
-        strncpy(wave_filename, filename, PATH_MAX);
-        open_wave_filename();
-        g_free(filename);
-    }
+		filename = g_filename_from_uri(uri, NULL, NULL);
+		g_free(uri);
 
-    gtk_recent_info_unref(info);
+		if (!filename)
+			return;
+
+		strncpy(wave_filename, filename, PATH_MAX);
+		wave_filename[PATH_MAX] = '\0';
+		g_free(filename);
+
+		open_wave_filename();
+	}
 }
 
 void help(GtkWidget * widget, gpointer data)
@@ -2714,6 +2730,7 @@ register_stock_icons (int textAvg, int bgAvg)
 static const GtkActionEntry entries[] = {
   { "FileMenu", NULL, "_File" },
   { "Open", GTK_STOCK_OPEN, "_Open...", "<control>O", "Open a file", G_CALLBACK(open_file_selection) },
+  { "FileOpenRecent", NULL, "Open _Recent", NULL, NULL, NULL },
   { "SaveSelection", NULL, "Save selection as...", "<control>S", "Save the current selection to a new wavfile", G_CALLBACK(save_as_selection) },
   { "SaveSimple", NULL, "Simple encode selection as MP3...", NULL, "Save the current selection to an MP3 encoded file, simple options", G_CALLBACK(save_as_mp3_simple_selection) },
   { "SaveMP3", NULL, "Encode selection as MP3...", NULL, "Save the current selection to an MP3 encoded file", G_CALLBACK(save_as_mp3_selection) },
@@ -2779,7 +2796,7 @@ static const char *ui_description =
 "  <menubar name='MainMenu'>"
 "    <menu action='FileMenu'>"
 "      <menuitem action='Open'/>"
-"      <menuitem action='OpenRecent'/>"
+"      <menu action='FileOpenRecent'/>"
 "      <separator/>"
 "      <menuitem action='SaveSelection'/>"
 "      <menuitem action='SaveSimple'/>"
@@ -2872,6 +2889,7 @@ static const char *ui_description =
 "      <toolitem action='ZoomIn'/>"
 "      <toolitem action='ZoomOut'/>"
 "      <toolitem action='ViewAll'/>"
+"      <separator/>"
 "      <toolitem action='SelectAll'/>"
 "      <toolitem action='Spectral'/>"
 "      <separator/>"
@@ -3638,28 +3656,6 @@ int main(int argc, char *argv[])
 					G_N_ELEMENTS (radio_entries), 0, 
 					radio_action_callback, main_window);*/
 
-    /* Open Recent action */
-    {
-        GtkAction *recent;
-
-        recent = gtk_recent_action_new(
-            "OpenRecent",
-            "Open Recent",
-            "Open a recently used audio file",
-            GTK_STOCK_OPEN
-        );
-
-        gtk_recent_action_set_show_numbers(GTK_RECENT_ACTION(recent), TRUE);
-
-        g_signal_connect(
-            recent, "item-activated",
-            G_CALLBACK(recent_file_activated), NULL
-        );
-
-        gtk_action_group_add_action(action_group, recent);
-        g_object_unref(recent);
-    }
-
     gtk_ui_manager_insert_action_group (ui_manager, action_group, 0);
 
     gtk_accel_map_load( g_build_filename (g_get_user_config_dir (), APPNAME, ACCELERATORS_FILE, NULL) );
@@ -3673,6 +3669,52 @@ int main(int argc, char *argv[])
         g_error_free (error);
         exit (EXIT_FAILURE);
       }
+	
+	{
+		GtkWidget *recent_menu;
+		GtkWidget *recent_item;
+
+		/* Get the "Open Recent" menu item created by UIManager */
+		recent_item = gtk_ui_manager_get_widget(
+			ui_manager, "/MainMenu/FileMenu/FileOpenRecent");
+
+		if (recent_item) {
+			recent_menu =
+				gtk_recent_chooser_menu_new_for_manager(
+					gtk_recent_manager_get_default());
+
+			gtk_recent_chooser_set_limit(
+				GTK_RECENT_CHOOSER(recent_menu), 30);
+
+			gtk_recent_chooser_set_sort_type(
+				GTK_RECENT_CHOOSER(recent_menu),
+				GTK_RECENT_SORT_MRU
+			);
+
+			/* Only show files opened by GWC */
+			{
+				GtkRecentFilter *filter;
+
+				filter = gtk_recent_filter_new();
+				gtk_recent_filter_add_group(filter, "gwc");
+
+				gtk_recent_chooser_set_filter(
+					GTK_RECENT_CHOOSER(recent_menu), filter);
+			}
+
+			gtk_recent_chooser_set_show_icons(
+				GTK_RECENT_CHOOSER(recent_menu), FALSE);
+
+			g_signal_connect(
+				recent_menu, "item-activated",
+				G_CALLBACK(recent_file_activated), NULL);
+
+			gtk_menu_item_set_submenu(
+				GTK_MENU_ITEM(recent_item), recent_menu);
+
+			gtk_widget_show(recent_menu);
+		}
+	}
 	
 	GtkIconSize GWC_ICON_SIZE;
 	GWC_ICON_SIZE = gtk_icon_size_register("gwc", 28, 28);
