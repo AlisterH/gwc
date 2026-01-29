@@ -753,6 +753,10 @@ void set_misc_preferences(GtkWidget * widget, gpointer data)
     extern int denoise_normalize;
     int dres;
     int row = 0;
+	GtkWidget *recent_limit_spin;
+	GtkAdjustment *recent_limit_adj;
+	extern int recent_files_limit;
+	extern void update_recent_menu_limit(void);
 
     dlg =
 	gtk_dialog_new_with_buttons("Miscellaneous preferences",
@@ -800,6 +804,36 @@ void set_misc_preferences(GtkWidget * widget, gpointer data)
 	add_number_entry_with_label(audio_device,
 			   "Audio device try (/dev/dsp for OSS) (default, plughw:0,0, hw:0,0 or hw:1,0 ... for ALSA)", dialog_table, row++);
 
+	recent_limit_adj =
+		GTK_ADJUSTMENT(gtk_adjustment_new(
+			recent_files_limit,  /* current */
+			1,                   /* min */
+			50,                  /* max */
+			1,                   /* step */
+			5,                   /* page */
+			0));
+
+	recent_limit_spin =
+		gtk_spin_button_new(recent_limit_adj, 1, 0);
+
+	GtkWidget *recent_label;
+	recent_label = gtk_label_new("Number of recent files");
+	gtk_misc_set_alignment(GTK_MISC(recent_label), 0.0, 0.5); /* left-align */
+	
+	gtk_widget_show(recent_limit_spin);
+	gtk_widget_show(recent_label);
+
+	gtk_table_attach(GTK_TABLE(dialog_table),
+					 recent_limit_spin,
+					 0, 1, row, row + 1,
+					 GTK_FILL, GTK_FILL, 0, 0);
+
+	gtk_table_attach(GTK_TABLE(dialog_table),
+					 recent_label,
+					 1, 2, row, row + 1,
+					 GTK_FILL, GTK_FILL, 0, 0);
+
+	row++;
 
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox), dialog_table,
 		       TRUE, TRUE, 0);
@@ -820,6 +854,10 @@ void set_misc_preferences(GtkWidget * widget, gpointer data)
 					 (sonogram_log_entry));
 	strcpy(audio_device, 
 	    gtk_entry_get_text(((GtkEntry *) audio_device_entry)));
+	recent_files_limit =
+		gtk_spin_button_get_value_as_int(
+			GTK_SPIN_BUTTON(recent_limit_spin));
+	update_recent_menu_limit();
 
 	save_preferences();
 

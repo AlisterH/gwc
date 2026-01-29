@@ -151,6 +151,7 @@ double stop_key_highlight_interval = 0.5;
 double song_key_highlight_interval = 15;
 double song_mark_silence = 2.0;
 int sonogram_log = 0;
+int recent_files_limit = 10;
 gint declick_iterate_flag = 0;
 double decrackle_level = 0.2;
 gint decrackle_window = 2000;
@@ -196,6 +197,9 @@ gchar *selected_filename;
 gint file_is_open = FALSE;
 gint file_processing = FALSE;
 int stop_playback_force = 1 ;
+
+GtkWidget *recent_menu = NULL;
+
 /* Forward declarations                                        */
 void open_wave_filename(void);
 static void add_to_recent_files(const char *filename);
@@ -492,6 +496,7 @@ void load_preferences(void)
         song_key_highlight_interval = g_key_file_get_double(key_file, "config", "song_key_highlight_interval", NULL);
         song_mark_silence = g_key_file_get_double(key_file, "config", "song_mark_silence", NULL);
         sonogram_log = g_key_file_get_double(key_file, "config", "sonogram_log", NULL);
+        recent_files_limit = g_key_file_get_integer(key_file, "config", "recent_files_limit", NULL);
 /*      audio_view.truncate_tail = g_key_file_get_integer(key_file, "config", "truncate_tail", NULL) ;  */
 /*      audio_view.truncate_head = g_key_file_get_integer(key_file, "config", "truncate_head", NULL) ;  */
         g_strlcpy(audio_device, g_key_file_get_string(key_file, "config", "audio_device", NULL), 256);
@@ -527,6 +532,7 @@ void save_preferences(void)
     g_key_file_set_double(key_file, "config", "song_key_highlight_interval", song_key_highlight_interval);
     g_key_file_set_double(key_file, "config", "song_mark_silence", song_mark_silence);
     g_key_file_set_integer(key_file, "config", "sonogram_log", sonogram_log);
+    g_key_file_set_integer(key_file, "config", "recent_files_limit", recent_files_limit);
     g_key_file_set_string(key_file, "config", "audio_device", audio_device);
     g_key_file_set_integer(key_file, "window", "width", window_width);
     g_key_file_set_integer(key_file, "window", "height", window_height);
@@ -729,12 +735,20 @@ int prompt_user(char *msg, char *s, int maxlen)
 static void
 add_to_recent_files(const char *filename)
 {
+    gchar *absolute;
     gchar *uri;
     gchar *content_type;
     const gchar *groups[] = { "gwc", NULL };
     GtkRecentData data;
 
-    uri = g_filename_to_uri(filename, NULL, NULL);
+    /* Make filename absolute to cater for files loaded from the command line as g_filename_to_uri() requires an absolute path*/
+    absolute = g_canonicalize_filename(filename, NULL);
+    if (!absolute)
+        return;
+
+    uri = g_filename_to_uri(absolute, NULL, NULL);
+    g_free(absolute);
+
     if (uri) {
         memset(&data, 0, sizeof(data));
         content_type = g_content_type_guess(filename, NULL, 0, NULL);
@@ -779,6 +793,22 @@ recent_file_activated(GtkRecentChooser *chooser, gpointer user_data)
 
 		open_wave_filename();
 	}
+}
+
+void update_recent_menu_limit(void)
+{
+    if (recent_menu) {
+        GtkRecentManager *mgr;
+
+        gtk_recent_chooser_set_limit(
+            GTK_RECENT_CHOOSER(recent_menu),
+            recent_files_limit);
+
+        mgr = gtk_recent_manager_get_default();
+
+        /* Force chooser to rebuild */
+        g_signal_emit_by_name(mgr, "changed");
+    }
 }
 
 void help(GtkWidget * widget, gpointer data)
@@ -3671,7 +3701,6 @@ int main(int argc, char *argv[])
       }
 	
 	{
-		GtkWidget *recent_menu;
 		GtkWidget *recent_item;
 
 		/* Get the "Open Recent" menu item created by UIManager */
@@ -3684,7 +3713,7 @@ int main(int argc, char *argv[])
 					gtk_recent_manager_get_default());
 
 			gtk_recent_chooser_set_limit(
-				GTK_RECENT_CHOOSER(recent_menu), 30);
+				GTK_RECENT_CHOOSER(recent_menu), recent_files_limit);
 
 			gtk_recent_chooser_set_sort_type(
 				GTK_RECENT_CHOOSER(recent_menu),
