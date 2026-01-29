@@ -196,6 +196,9 @@ gchar *selected_filename;
 gint file_is_open = FALSE;
 gint file_processing = FALSE;
 int stop_playback_force = 1 ;
+/* Forward declarations                                        */
+void open_wave_filename(void);
+static void add_to_recent_files(const char *filename);
 
 #ifndef DEBUG
 static void
@@ -721,6 +724,45 @@ int prompt_user(char *msg, char *s, int maxlen)
     main_redraw(FALSE, TRUE);
 
     return dres;
+}
+
+static void
+add_to_recent_files(const char *filename)
+{
+    gchar *uri;
+
+    uri = g_filename_to_uri(filename, NULL, NULL);
+    if (uri) {
+        gtk_recent_manager_add_item(
+            gtk_recent_manager_get_default(),
+            uri
+        );
+        g_free(uri);
+    }
+}
+
+static void
+recent_file_activated(GtkRecentChooser *chooser, gpointer user_data)
+{
+    GtkRecentInfo *info;
+    gchar *filename;
+
+    info = gtk_recent_chooser_get_current_item(chooser);
+    if (!info)
+        return;
+
+    filename = g_filename_from_uri(
+        gtk_recent_info_get_uri(info),
+        NULL, NULL
+    );
+
+    if (filename) {
+        strncpy(wave_filename, filename, PATH_MAX);
+        open_wave_filename();
+        g_free(filename);
+    }
+
+    gtk_recent_info_unref(info);
 }
 
 void help(GtkWidget * widget, gpointer data)
@@ -2134,6 +2176,7 @@ void open_wave_filename(void)
 	    audio_view.channel_selection_mask = 3 ;
 		file_is_open = TRUE;
 		fill_sample_buffer(&prefs);
+		add_to_recent_files(wave_filename);
 
 		/* display entire file data if this file changed since last edit session */
 		if (strcmp(wave_filename, last_filename)) {
@@ -2227,6 +2270,7 @@ void old_open_wave_filename(void)
 		    audio_view.selection_region = FALSE;
 		    file_is_open = TRUE;
 		    fill_sample_buffer(&prefs);
+		    add_to_recent_files(wave_filename);
 
 		    /* display entire file data if this file changed since last edit session */
 		    if (strcmp(wave_filename, last_filename)) {
@@ -2735,6 +2779,8 @@ static const char *ui_description =
 "  <menubar name='MainMenu'>"
 "    <menu action='FileMenu'>"
 "      <menuitem action='Open'/>"
+"      <menuitem action='OpenRecent'/>"
+"      <separator/>"
 "      <menuitem action='SaveSelection'/>"
 "      <menuitem action='SaveSimple'/>"
 "      <menuitem action='SaveMP3'/>"
@@ -2742,6 +2788,7 @@ static const char *ui_description =
 "      <menuitem action='SaveCDRDAO'/>"
 "      <menuitem action='SaveMarkers'/>"
 "      <menuitem action='SaveSplit'/>"
+"      <separator/>"
 "      <menuitem action='Quit'/>"
 "    </menu>"
 "    <menu action='EditMenu'>"
@@ -3590,6 +3637,28 @@ int main(int argc, char *argv[])
     gtk_action_group_add_radio_actions (action_group, radio_entries, 
 					G_N_ELEMENTS (radio_entries), 0, 
 					radio_action_callback, main_window);*/
+
+    /* Open Recent action */
+    {
+        GtkAction *recent;
+
+        recent = gtk_recent_action_new(
+            "OpenRecent",
+            "Open Recent",
+            "Open a recently used audio file",
+            GTK_STOCK_OPEN
+        );
+
+        gtk_recent_action_set_show_numbers(GTK_RECENT_ACTION(recent), TRUE);
+
+        g_signal_connect(
+            recent, "item-activated",
+            G_CALLBACK(recent_file_activated), NULL
+        );
+
+        gtk_action_group_add_action(action_group, recent);
+        g_object_unref(recent);
+    }
 
     gtk_ui_manager_insert_action_group (ui_manager, action_group, 0);
 
