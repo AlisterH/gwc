@@ -247,7 +247,7 @@ void config_audio_device(int rate_set, int bits_set, int stereo_set)
 long playback_samples_remaining = 0 ;
 long playback_total_bytes ;
 int playback_bytes_per_block ;
-int looped_count ;
+static long playback_processed_base = 0;
 
 #define MAXBUFSIZE 32768
 int BUFSIZE ;
@@ -264,8 +264,30 @@ long set_playback_cursor_position(struct view *v, long millisec_per_visual_frame
     long first, last ;
 
     if(audio_state == AUDIO_IS_PLAYBACK) {
-	long bytes = audio_device_processed_bytes()-looped_count*playback_total_bytes ;
+
+        long bytes = audio_device_processed_bytes() - playback_processed_base;
+        extern int audio_is_looping;
+
+        if (bytes < 0)
+            bytes = 0;
+
 	get_region_of_interest(&first, &last, v) ;
+
+	/*
+	 * IMPORTANT:
+	 * audio_device_processed_bytes() is "what has actually been processed/played"
+	 * by the backend, and may lag behind what we've queued/written.
+	 *
+	 * When looping, we must wrap based on processed bytes, not on the moment
+	 * we start feeding the next loop, otherwise the cursor can jump/drift left.
+	 */
+	if (audio_is_looping && playback_total_bytes > 0) {
+		bytes = bytes % playback_total_bytes;
+	} else {
+		/* Non-looping: clamp so cursor doesn't run past end */
+		if (bytes > playback_total_bytes)
+			bytes = playback_total_bytes;
+	}
 
 	v->cursor_position = first_playback_sample+bytes/(PLAYBACK_FRAMESIZE) ;
 
@@ -329,6 +351,9 @@ long start_playback(char *output_device, struct view *v, struct sound_prefs *p, 
 
     BUFSIZE = audio_device_best_buffer_size(playback_bytes_per_block);
 
+    /* Capture "processed bytes" baseline for cursor tracking. */
+    playback_processed_base = audio_device_processed_bytes();
+
     playback_bytes_per_block = BUFSIZE ;
 
     if(playback_bytes_per_block > MAXBUFSIZE) {
@@ -363,7 +388,6 @@ long start_playback(char *output_device, struct view *v, struct sound_prefs *p, 
 /*      g_print("BUFSIZE %ld (%lg fragments)\n", (long)BUFSIZE, (double)BUFSIZE/(double)oss_info.fragsize) ;  */
 
     v->prev_cursor_position = -1 ;
-    looped_count = 0 ;
 
     return playback_samples ;
 }
@@ -1418,9 +1442,8 @@ int process_audio(gfloat *pL, gfloat *pR)
 	    } else {
 		playback_position = playback_start_position ;
 		playback_samples_remaining = (playback_end_position-playback_start_position) ;
-		sf_seek(sndfile, playback_position, SEEK_SET) ;
+		position_wavefile_pointer(playback_position) ;
 		g_print("Loop with playback_samples_remaining:%ld\n", playback_samples_remaining) ;
-		looped_count++ ;
 	    }
 	}
     }
