@@ -7,13 +7,20 @@
 # Executable
 gtk-wave-cleaner
 
+# Symlink I like to use
+gwc
+
 # Build artifacts
 meschach/machine.h
 meschach/makefile
 meschach/config.status
+meschach/macheps
+meschach/maxint
 
 # Autotools generated files
 autoscan.log
+config.h
+config.h.in
 config.log
 config.status
 configure.scan
@@ -26,6 +33,7 @@ compile
 install-sh
 missing
 depcomp
+stamp-h1
 
 # Backup files
 *.bak
@@ -35,6 +43,7 @@ depcomp
 .DS_Store
 .AppleDouble
 .LSOverride
+.deps/
 
 # Temporary files
 .#*

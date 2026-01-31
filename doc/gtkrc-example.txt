@@ -19,8 +19,10 @@
 ## It seems you need to specify the actual path of the included file i.e. don't use ~ or $HOME.
 ## Settings in the special gtkrc must be below the include for them to override anything explicitly set in the included file.
 
-## Use a dark theme (needs to be installed separately)
+## Use a dark theme (needs separate install of something like gnome-themes-extra)
 include "/usr/share/themes/Adwaita-dark/gtk-2.0/gtkrc"
+## On OSX macports
+include "/opt/local/share/themes/Adwaita-dark/gtk-2.0/gtkrc"
 
 ## GWC's toolbar icons are 28x28 by default, a non-standard size, category "gwc".
 # We can double the icon sizes like this:
@@ -69,6 +71,8 @@ class "GtkScrollbar" style "myscrollbar"
 ## Note for nice aliased fonts you need a bitmap font or something well hinted like Arial
 #gtk-xft-antialias = 0
 #gtk-xft-hinting = 1
-#gtk-xft-hintstyle = "hintnone"
-
+#gtk-xft-hintstyle = "hintfull"
+#
+# On OSX use `export PANGOCAIRO_BACKEND=fc` to use fontconfig settings instead of coretext backend
+# On my old mac I put it in ~/.bash_profile
 
