@@ -17,7 +17,7 @@
 *   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 /*
- *  audio_osx.h
+ *  audio_osx.c
  *  gwc_mac
  *
  *  Created by Rob Frohne on 11/8/04.
@@ -35,6 +35,9 @@
 #include <unistd.h>
 #include <math.h>
 #include <time.h>
+#include <string.h>
+#include <stdint.h>
+#include <stdatomic.h>
 
 #include "gwc.h"
 #include "audio_device.h"
@@ -46,6 +49,8 @@
 
 extern int wavefile_fd ;
 extern int stereo;
+extern int audio_is_looping;
+extern int looped_count = 0;
 
 
 typedef struct
@@ -69,19 +74,91 @@ extern long playback_start_position;
 extern long playback_samples_remaining;
 extern long playback_total_bytes ;
 extern int FRAMESIZE;
+extern int PLAYBACK_FRAMESIZE;
 int BUFFERSIZE = 1024; // The size of the buffers we will send.
-long buff_num; // An index to allow us to create the array to run the VU meters.
-long num_buffers; // The number of buffers we will send.
-long buff_num_play;  // The index of the buffer we are playing.
+static long buff_num = 0;
+static long buff_num_play = 0;
+static long num_buffers = 0;
 
-gfloat* pL_global;
-gfloat* pR_global;
-bool p_global_mem_alloced = FALSE; //Tells if we have reserved memory for the two above arrays.
+/* -------------------------
+ * Meter ring buffer (small, lock-free SPSC)
+ * Callback thread produces peaks, UI thread consumes them.
+ * ------------------------- */
+#define METER_RING_SIZE 512
+/* Power-of-two required for mask indexing */
+#define METER_RING_MASK (METER_RING_SIZE - 1)
+#if (METER_RING_SIZE & (METER_RING_SIZE - 1)) != 0
+#error "METER_RING_SIZE must be a power of two"
+#endif
+
+static gfloat meterL[METER_RING_SIZE];
+static gfloat meterR[METER_RING_SIZE];
+static atomic_uint_fast32_t meter_widx = 0;
+static atomic_uint_fast32_t meter_ridx = 0;
+static _Atomic float last_meterL = 0.0f;
+static _Atomic float last_meterR = 0.0f;
+/* Playback region cursor in libsndfile frames (same units as sf_seek) */
+static sf_count_t play_cursor = 0;
+static sf_count_t play_end	= 0; /* exclusive */
+
+/* Total frames rendered since start of playback, including loops (UI timebase) */
+static atomic_uint_fast64_t rendered_frames_abs = 0;
+
+static inline void
+meter_ring_reset(void)
+{
+	atomic_store_explicit(&meter_widx, 0, memory_order_relaxed);
+	atomic_store_explicit(&meter_ridx, 0, memory_order_relaxed);
+	atomic_store_explicit(&last_meterL, 0.0f, memory_order_relaxed);
+	atomic_store_explicit(&last_meterR, 0.0f, memory_order_relaxed);
+	atomic_store_explicit(&rendered_frames_abs, 0, memory_order_relaxed);
+}
+
+/* Producer: CoreAudio callback thread */
+static inline void
+meter_ring_push(float l, float r)
+{
+	/* Always update "last known" values */
+	atomic_store_explicit(&last_meterL, l, memory_order_relaxed);
+	atomic_store_explicit(&last_meterR, r, memory_order_relaxed);
+
+	/* Ring indices */
+	uint32_t w	= (uint32_t)atomic_load_explicit(&meter_widx, memory_order_relaxed);
+	uint32_t ridx = (uint32_t)atomic_load_explicit(&meter_ridx, memory_order_acquire);
+
+	/* If full (distance == size), drop oldest by advancing read index */
+	if ((w - ridx) >= METER_RING_SIZE) {
+    	atomic_store_explicit(&meter_ridx, ridx + 1, memory_order_release);
+	}
+
+	meterL[w & METER_RING_MASK] = (gfloat) l;
+	meterR[w & METER_RING_MASK] = (gfloat) r;
+	atomic_store_explicit(&meter_widx, w + 1, memory_order_release);
+}
+
+/* Consumer: UI thread (process_audio) */
+static inline int
+meter_ring_pop(float *l, float *r)
+{
+
+	uint32_t ridx = (uint32_t)atomic_load_explicit(&meter_ridx, memory_order_relaxed);
+	uint32_t w	= (uint32_t)atomic_load_explicit(&meter_widx, memory_order_acquire);
+
+	if (ridx == w) {
+    	return 0; /* empty */
+	}
+
+	*l = (float) meterL[ridx & METER_RING_MASK];
+	*r = (float) meterR[ridx & METER_RING_MASK];
+	atomic_store_explicit(&meter_ridx, ridx + 1, memory_order_release);
+	return 1;
+}
 
 Float64 start_sample_time;
 struct timeval playback_start_time;
 bool playback_just_started = FALSE;
 static bool coreaudio_device_started = FALSE;  // Track if device has been started
+static bool coreaudio_ioproc_installed = FALSE; // Track IOProc install state
 
 
 static OSStatus
@@ -90,101 +167,138 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
 						   AudioBufferList*	data_out, const AudioTimeStamp* time_out,
 						   void* client_data)
 {	
-	static int callback_count = 0;
-	callback_count++;
-	if (callback_count <= 20) {  // Increase the limit to see more callbacks
-		printf("DEBUG: Audio callback called #%d\n", callback_count);
-	}
-	
-	MacOSXAudioData		*audio_data ;
-	int			size, sample_count, read_count, i ;
-	
-	float maxl = 0, maxr = 0;
-	float *p_float;
+	UInt32              	size_bytes;
+	void					*out_ptr;
+	float            		*p_float;
+	UInt32              	out_samples;
+	UInt32              	out_frames;
+	int                 	ch;
+	sf_count_t           	frames_to_read;
+	sf_count_t           	frames_read;
+	float                	maxl = 0.0f, maxr = 0.0f;
 	
 	if (playback_just_started)
 	{
 		playback_just_started = FALSE;
 		start_sample_time = time_out->mSampleTime;
-		printf("DEBUG: Playback started, sample time: %f\n", start_sample_time);
 	}
 	
-	audio_data = (MacOSXAudioData*) client_data ;
-	
-	if (callback_count <= 5) {
-		printf("DEBUG: Callback - audio_data=%p, sndfile=%p\n", audio_data, audio_data ? audio_data->sndfile : NULL);
-		
-		// Get file position and info for debugging
-		if (audio_data && audio_data->sndfile) {
-			sf_count_t pos = sf_seek(audio_data->sndfile, 0, SEEK_CUR);
-			printf("DEBUG: Current file position: %lld\n", (long long)pos);
-			
-			// Check if file is valid
-			if (sf_error(audio_data->sndfile) != SF_ERR_NO_ERROR) {
-				printf("DEBUG: libsndfile error: %s\n", sf_strerror(audio_data->sndfile));
-			}
-			
-			// Get file info
-			SF_INFO info;
-			memset(&info, 0, sizeof(info));
-			if (sf_command(audio_data->sndfile, SFC_GET_CURRENT_SF_INFO, &info, sizeof(info)) == SF_TRUE) {
-				printf("DEBUG: File info - frames: %lld, channels: %d, samplerate: %d\n", 
-				       (long long)info.frames, info.channels, info.samplerate);
-			} else {
-				printf("DEBUG: Could not get file info\n");
-			}
-		}
+	MacOSXAudioData *audio_data = (MacOSXAudioData*) client_data ;
+	if (!audio_data || !audio_data->sndfile) {
+    	/* No file – output silence */
+    	size_bytes = data_out->mBuffers[0].mDataByteSize;
+    	memset(data_out->mBuffers[0].mData, 0, size_bytes);
+    	return noErr;
 	}
-	
-	size = data_out->mBuffers[0].mDataByteSize ;
-	sample_count = size / sizeof (float) ;
-	
-	p_float = (float*) data_out->mBuffers [0].mData ;
-	if((!(audio_data->done_reading))&&(buff_num < num_buffers))
-	{
-		read_count = sf_read_float (audio_data->sndfile, p_float, sample_count) ;
-		if (callback_count <= 5) {
-			printf("DEBUG: sf_read_float returned %d samples (requested %d)\n", read_count, sample_count);
-			printf("DEBUG: Callback #%d - Writing %d samples to output buffer\n", callback_count, read_count);
-		}
-		if(read_count < sample_count)
-		{
-			memset (&(p_float [read_count]), 0, (sample_count - read_count) * sizeof (float)) ; //set the rest of the buffer to 0.
-			audio_data->done_reading = SF_TRUE;
-			if (callback_count <= 5) {
-				printf("DEBUG: Reached end of audio data\n");
-			}
-		}
-		for(i = 0; i < read_count; i++) //Find the level for the VU meters
-		{
-			float vl, vr;
-			vl = p_float[i];
-			vr = p_float[i+1];
-			
-			if(vl > maxl) maxl = vl ;
-			if(-vl > maxl) maxl = -vl ;
-			
-			if(stereo) {
-				i++ ;
-				if(vr > maxr) maxr = vr ;
-				if(-vr > maxr) maxr = -vr ;
-			} else {
-				maxr = maxl ;
-			}
-		}
-		pL_global[buff_num] = (gfloat) maxl;
-		pR_global[buff_num] = (gfloat) maxr;
-		buff_num++;
-		
-		return noErr ;
-	} else {
-		if (callback_count <= 5) {
-			printf("DEBUG: Audio callback - no data to play (done_reading=%d, buff_num=%ld, num_buffers=%ld)\n",
-			       audio_data->done_reading, buff_num, num_buffers);
-		}
-		// Fill buffer with silence
-		memset(p_float, 0, size);
+
+ 	/* Output buffer */
+	size_bytes = data_out->mBuffers[0].mDataByteSize;
+	out_ptr = data_out->mBuffers[0].mData;
+
+	if (!out_ptr || size_bytes == 0) {
+    	return noErr;
 	}
+
+	/* Determine channel count (expected 1 or 2) */
+	ch = audio_data->sfinfo.channels;
+	if (ch < 1) ch = 1;
+	if (ch > 2) ch = 2;
+
+	out_samples = size_bytes / sizeof(float);
+	out_frames  = (ch > 0) ? (out_samples / (UInt32)ch) : 0;
+	p_float 	= (float*)out_ptr;
+
+	if (out_frames == 0) {
+    	return noErr;
+	}
+	/*
+ 	* Fill output buffer respecting region [play_cursor, play_end).
+ 	* If looping is enabled, wrap and continue filling within the same callback.
+ 	*/
+	sf_count_t frames_needed = (sf_count_t)out_frames;
+	sf_count_t frames_written_total = 0;
+	sf_count_t out_off = 0; /* frame offset into p_float */
+
+	/* If already done and not looping, output silence */
+	if (audio_data->done_reading && !audio_is_looping) {
+    	memset(p_float, 0, size_bytes);
+    	meter_ring_push(0.0f, 0.0f);
+    	return noErr;
+	}
+
+	while (frames_needed > 0) {
+    	/* End reached? */
+    	if (play_end > 0 && play_cursor >= play_end) {
+        	if (audio_is_looping) {
+            	/* Wrap to start of selection */
+            	sf_seek(audio_data->sndfile, playback_start_position, SEEK_SET);
+            	play_cursor = (sf_count_t)playback_start_position;
+            	looped_count++;
+            	audio_data->done_reading = FALSE;
+        	} else {
+            	/* Not looping: pad remainder with zeros */
+            	memset(p_float + out_off * ch, 0, (size_t)(frames_needed * ch) * sizeof(float));
+            	audio_data->done_reading = TRUE;
+            	break;
+        	}
+    	}
+
+    	/* Determine how many frames we can read before region end */
+    	frames_to_read = frames_needed;
+    	if (play_end > 0 && play_cursor + frames_to_read > play_end) {
+        	frames_to_read = play_end - play_cursor;
+    	}
+
+    	/* Read FRAMES */
+    	frames_read = sf_readf_float(audio_data->sndfile,
+                                 	p_float + out_off * ch,
+                                 	frames_to_read);
+
+    	/* Short read => EOF: if looping, wrap next iteration; else pad zeros */
+    	if (frames_read < frames_to_read) {
+        	sf_count_t remain = frames_to_read - frames_read;
+        	memset(p_float + (out_off + frames_read) * ch, 0, (size_t)(remain * ch) * sizeof(float));
+        	audio_data->done_reading = TRUE;
+    	}
+
+    	/* Peaks over frames_read (only actual samples) */
+    	if (frames_read > 0) {
+        	if (ch == 1) {
+            	for (sf_count_t f = 0; f < frames_read; f++) {
+                	float v = fabsf(p_float[out_off + f]);
+                	if (v > maxl) maxl = v;
+            	}
+            	if (maxl > maxr) maxr = maxl;
+        	} else {
+            	for (sf_count_t f = 0; f < frames_read; f++) {
+                	float vl = fabsf(p_float[(out_off + f) * 2 + 0]);
+                	float vr = fabsf(p_float[(out_off + f) * 2 + 1]);
+                	if (vl > maxl) maxl = vl;
+                	if (vr > maxr) maxr = vr;
+            	}
+        	}
+    	}
+
+    	play_cursor += frames_read;
+    	frames_written_total += frames_read;
+    	out_off += frames_to_read; 	/* we filled frames_to_read (rest may be zeros) */
+    	frames_needed -= frames_to_read;
+
+    	/* If we padded zeros due to short read and not looping, stop */
+    	if (audio_data->done_reading && !audio_is_looping) {
+        	/* already padded zeros above, or will be padded on next loop */
+        	break;
+    	}
+	}
+	/* Update UI timebase using actual frames written (not zeros) */
+	if (frames_written_total > 0) {
+    	atomic_fetch_add_explicit(&rendered_frames_abs,
+                              	(uint_fast64_t)frames_written_total,
+                              	memory_order_relaxed);
+	}
+	/* Publish meters for UI */
+	meter_ring_push(maxl, maxr);
+
 	return noErr;
 }
 
@@ -206,43 +320,16 @@ int process_audio(gfloat *pL, gfloat *pR)  //This function must be called repeat
     }
    	else if(audio_state == AUDIO_IS_PLAYBACK) 
 	{
-		// Start CoreAudio device on first process_audio call if not already started
-		if (!coreaudio_device_started) {
-			OSStatus err;
-			printf("DEBUG: Starting CoreAudio device from process_audio()...\n");
-			err = AudioDeviceStart(audio_data.device, macosx_audio_out_callback);
-			if (err != noErr) {
-				printf("ERROR: AudioDeviceStart failed with error: %d (0x%x)\n", (int)err, (unsigned int)err);
-				return 1;
-			}
-			printf("DEBUG: CoreAudio device started successfully from process_audio()\n");
-			
-			// Verify the device is actually running
-			UInt32 isRunning = 0;
-			UInt32 size = sizeof(UInt32);
-			err = AudioDeviceGetProperty(audio_data.device, 0, false, kAudioDevicePropertyDeviceIsRunning, &size, &isRunning);
-			if (err == noErr) {
-				printf("DEBUG: Device running verification: %s\n", isRunning ? "YES" : "NO");
-			} else {
-				printf("DEBUG: Could not verify device running status, error: %d\n", (int)err);
-			}
-			
-			coreaudio_device_started = TRUE;
-			
-			// Give the device a moment to fully initialize
-			usleep(10000); // 10ms delay
-		}
-		
-		if (process_audio_call_count <= 5) {
-			printf("DEBUG: process_audio() call #%d - buff_num_play=%ld\n", process_audio_call_count, buff_num_play);
-		}
-		
-		printf("DEBUG: In PLAYBACK mode, returning VU levels: pL=%f, pR=%f\n", 
-		       pL_global[buff_num_play], pR_global[buff_num_play]);
-		
-		*pL = pL_global[buff_num_play];
-		*pR = pR_global[buff_num_play];
-		buff_num_play++;
+    	float l = 0.0f, r = 0.0f;
+
+    	/* Consume a meter sample from the ring; if empty use last known */
+    	if (!meter_ring_pop(&l, &r)) {
+        	l = atomic_load_explicit(&last_meterL, memory_order_relaxed);
+        	r = atomic_load_explicit(&last_meterR, memory_order_relaxed);
+    	}
+
+    	if (pL) *pL = (gfloat) l;
+    	if (pR) *pR = (gfloat) r;
 		return 0 ;
 	}
 	return 1 ;
@@ -290,9 +377,10 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate) //An
 	{	printf ("AudioDeviceGetProperty (kAudioDevicePropertyStreamFormat) failed with error: %d\n", (int)err) ;
 		return -1 ;
 	} 
-	
-	rate = (int *) &(audio_data.format.mSampleRate);
-	channels = (int *) &(audio_data.format.mChannelsPerFrame);
+
+	/* FIX: return values to caller (do NOT reassign the pointer parameters) */
+	if (rate) 	*rate 	= (int)audio_data.format.mSampleRate;
+	if (channels) *channels = (int)audio_data.format.mChannelsPerFrame;
 	
 	printf("DEBUG: Device format - Sample rate: %f, Channels: %d\n", 
 	       audio_data.format.mSampleRate, (int)audio_data.format.mChannelsPerFrame);
@@ -308,8 +396,9 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate) //An
 	
 	audio_data.format.mSampleRate = audio_data.sfinfo.samplerate ;
 	audio_data.format.mChannelsPerFrame = audio_data.sfinfo.channels ;
-	rate = (int *) &(audio_data.format.mSampleRate);
-	channels = (int *) &(audio_data.format.mChannelsPerFrame);
+
+	if (rate) 	*rate 	= (int)audio_data.format.mSampleRate;
+	if (channels) *channels = (int)audio_data.format.mChannelsPerFrame;
 	
 	if ((err = AudioDeviceSetProperty (audio_data.device, NULL, 0, false, kAudioDevicePropertyStreamFormat,
 										   sizeof (AudioStreamBasicDescription), &(audio_data.format))) != noErr)
@@ -328,7 +417,16 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate) //An
 	buff_num = 0;
 	buff_num_play = 0;
 	num_buffers = (playback_end_position - playback_start_position)/BUFFERSIZE; 
-	
+
+	/* Reset meter ring for new playback */
+	meter_ring_reset();	
+	/* Set region cursor in sndfile frames (end is exclusive) */
+	play_cursor = (sf_count_t)playback_start_position;
+	play_end	= (sf_count_t)playback_end_position;
+	/* Ensure timebase is re-initialised for cursor logic */
+	start_sample_time = 0.0;
+	playback_just_started = TRUE;
+
 	printf("DEBUG: Audio setup - start_pos=%ld, end_pos=%ld, buffersize=%d, num_buffers=%ld\n",
 	       playback_start_position, playback_end_position, BUFFERSIZE, num_buffers);
 	       
@@ -336,25 +434,7 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate) //An
 	printf("DEBUG: Seeking file to playback start position: %ld\n", playback_start_position);
 	sf_count_t seek_result = sf_seek(audio_data.sndfile, playback_start_position, SEEK_SET);
 	printf("DEBUG: File seek result: %lld (should equal %ld)\n", (long long)seek_result, playback_start_position);
-	
-	if (p_global_mem_alloced)
-	{
-		free(pL_global);  
-		free(pR_global);
-		p_global_mem_alloced = FALSE;
-	}
-	pL_global = (gfloat*) malloc(num_buffers*sizeof(gfloat)); // When do I need to free this?
-	if (pL_global == NULL) {
-		printf("ERROR: Failed to allocate memory for pL_global\n");
-		return -1;
-	}
-	pR_global = (gfloat*) malloc(num_buffers*sizeof(gfloat));
-	if (pR_global == NULL) {
-		printf("ERROR: Failed to allocate memory for pR_global\n");
-		free(pL_global);
-		return -1;
-	}
-	p_global_mem_alloced = TRUE;
+
 	UInt32 bufferSize = BUFFERSIZE;
 	if((err = AudioDeviceSetProperty( audio_data.device,
 									  NULL, 0,
@@ -366,79 +446,79 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate) //An
 		printf("AudioDeviceAddIOProc failed to set buffer size. \n");
 	}
 	   
-	   /* Fire off the device. */
-	if ((err = AudioDeviceAddIOProc (audio_data.device, macosx_audio_out_callback,
-									 (void *) &audio_data)) != noErr)
-	{	printf ("AudioDeviceAddIOProc failed with error: %d\n", (int)err) ;
-		return -1;
-	} 
+	/* If we are reconfiguring, stop and remove the old IOProc cleanly */
+	if (coreaudio_device_started) {
+    	AudioDeviceStop(audio_data.device, macosx_audio_out_callback);
+    	coreaudio_device_started = FALSE;
+	}
+	if (coreaudio_ioproc_installed) {
+    	AudioDeviceRemoveIOProc(audio_data.device, macosx_audio_out_callback);
+    	coreaudio_ioproc_installed = FALSE;
+	}
+
+	/* Install IOProc once per configuration */
+	if ((err = AudioDeviceAddIOProc(audio_data.device, macosx_audio_out_callback,
+                                	(void *)&audio_data)) != noErr) {
+    	printf("AudioDeviceAddIOProc failed with error: %d\n", (int)err);
+    	return -1;
+	}
+	coreaudio_ioproc_installed = TRUE;
 	printf("DEBUG: AudioDeviceAddIOProc completed successfully\n");
-	
-	// Test: Try to immediately start the device to see if callback gets triggered
-	printf("DEBUG: Testing immediate device start...\n");
-	err = AudioDeviceStart(audio_data.device, macosx_audio_out_callback);
-	if (err != noErr) {
-		printf("DEBUG: Immediate AudioDeviceStart failed with error: %d\n", (int)err);
-	} else {
-		printf("DEBUG: Immediate AudioDeviceStart succeeded - KEEPING DEVICE STARTED\n");
-		// Give it a moment to see if callback gets called
-		usleep(100000); // 100ms
-		printf("DEBUG: After 100ms delay, checking if callback was called...\n");
-		// DON'T stop the device - keep it running!
-		coreaudio_device_started = TRUE; // Mark as started so process_audio won't try to start again
+
+	/* Start the device once */
+	if (!coreaudio_device_started) {
+    	printf("DEBUG: Starting CoreAudio device from audio_device_set_params()...\n");
+    	err = AudioDeviceStart(audio_data.device, macosx_audio_out_callback);
+    	if (err != noErr) {
+        	printf("ERROR: AudioDeviceStart failed with error: %d (0x%x)\n", (int)err, (unsigned int)err);
+        	AudioDeviceRemoveIOProc(audio_data.device, macosx_audio_out_callback);
+        	coreaudio_ioproc_installed = FALSE;
+        	return -1;
+    	}
+    	coreaudio_device_started = TRUE;
 	}
 	
-	printf("DEBUG: CoreAudio device configured but NOT started yet (will start on first process_audio call)\n");
-	// DON'T start the device here - let process_audio() start it when needed
-	// err = AudioDeviceStart (audio_data.device, macosx_audio_out_callback) ;
-	playback_just_started = TRUE;
+	/*
+ 	* IMPORTANT: initialise the cursor timebase immediately so the UI
+ 	* can move the cursor / stop playback even before the first callback.
+ 	*/
+	{
+    	AudioTimeStamp ts;
+    	if (AudioDeviceGetCurrentTime(audio_data.device, &ts) == noErr) {
+        	start_sample_time = ts.mSampleTime;
+    	}
+	}
 	audio_data.done_playing = SF_FALSE ;
 	audio_data.done_reading = FALSE;
-	return 0; //All went well.  
+	return 0;
 }
 
 int audio_device_read(unsigned char *buffer, int buffersize){return 0;} // Leave this stub function because we don't want to read data.
 int audio_device_write(unsigned char *buffer, int buffersize){return 0;} // Not quite what the title says in OS X.
 long audio_device_processed_bytes(void)
 {
-	AudioTimeStamp this_time;
-	OSStatus err;
-	UInt32 num_processes;
-	UInt32		count;
-	extern int audio_playback ;
-	
-	count = sizeof(UInt32);
-	if ((err = AudioDeviceGetProperty (audio_data.device, 0, false, kAudioDevicePropertyDeviceIsRunning,
-									   &count, &num_processes)) != noErr)
-	{	printf ("AudioDeviceGetProperty (AudioDeviceGetProperty) failed.  The device probably isn't running.\n") ;
-		return -1;
-	} 
-	else
-	{
-		printf("DEBUG: Device is running check - num_processes=%u\n", (unsigned int)num_processes);
-		
-		if((err = AudioDeviceGetCurrentTime(audio_data.device, &this_time)) != noErr)
-		{
-			printf("Could not get the current time.  The error number is: %i (device running: %u)\n", err, (unsigned int)num_processes);
-			// If we can't get time, just increment playback_position manually
-			playback_position += BUFFERSIZE; // Rough estimate
-		}
-		else
-		{
-			playback_position = (long) (this_time.mSampleTime - start_sample_time);//*FRAMESIZE;
-										   //led_bar_light_percent(dial[0], l);  
-										   //led_bar_light_percent(dial[1], r);
-		}
+	extern int audio_playback;
+
+	/* Use callback-driven counter for deterministic cursor/stop behaviour */
+	uint_fast64_t frames_abs = atomic_load_explicit(&rendered_frames_abs, memory_order_relaxed);
+	long region_len = (playback_end_position - playback_start_position);
+	if (region_len < 1) region_len = 1;
+
+	/* playback_position is a frame index in the file */
+	if (audio_is_looping) {
+    	playback_position = playback_start_position + (long)(frames_abs % (uint_fast64_t)region_len);
+	} else {
+    	long advanced = (long)frames_abs;
+    	long pos = playback_start_position + advanced;
+    	if (pos > playback_end_position) pos = playback_end_position;
+    	playback_position = pos;
+    	if (advanced >= region_len) {
+        	audio_data.done_playing = SF_TRUE;
+        	audio_playback = FALSE;
+    	}
 	}
-	if (playback_position >= playback_end_position)  //We are done playing.
-	{	
-		/* Tell the main application to terminate. */
-		audio_data.done_playing = SF_TRUE ;
-		audio_playback = FALSE;
-	}
-	
-	return playback_position*FRAMESIZE
-		;
+
+	return (long)(frames_abs * (uint_fast64_t)PLAYBACK_FRAMESIZE);
 }  // This is used to set the cursor.  We need to make this return a number controlled by a timer.
 
 int audio_device_best_buffer_size(int playback_bytes_per_block)  //The result of this doesn't make any difference.
@@ -466,22 +546,21 @@ int audio_device_nonblocking_write_buffer_size(int maxbufsize,    //Normally ret
 void audio_device_close(int drain)  //Reminder: check to make sure this works when no device has been opened.
 {
 	OSStatus		err ;
-	if(p_global_mem_alloced)
-	{
-		free(pL_global);  
-		free(pR_global);
-		p_global_mem_alloced = FALSE;
+	if (coreaudio_device_started) {
+    	err = AudioDeviceStop(audio_data.device, macosx_audio_out_callback);
+    	/* Even on success we must clear the flag */
+    	coreaudio_device_started = FALSE;
 	}
-	if ((err = AudioDeviceStop (audio_data.device, macosx_audio_out_callback)) != noErr)
-	{	//printf ("AudioDeviceStop failed.") ;  //Need to comment out this line in deployment build.
-		return ;
-	} ;
 	
-	err = AudioDeviceRemoveIOProc (audio_data.device, macosx_audio_out_callback) ;
-	if (err != noErr)
-	{	printf ("AudioDeviceRemoveIOProc failed.\n") ;//Need to comment out this line in deployment build.
-		return ;
-	} ;
+	if (coreaudio_ioproc_installed) {
+    	err = AudioDeviceRemoveIOProc(audio_data.device, macosx_audio_out_callback);
+    	coreaudio_ioproc_installed = FALSE;
+    	if (err != noErr) {
+        	printf("AudioDeviceRemoveIOProc failed.\n");
+        	return;
+    	}
+	}
+
 }
 
 #pragma clang diagnostic pop
