@@ -35,9 +35,8 @@ groove may be able to dislodge more remaining particles.</li>
 
 <li>
 Make sure you stop any programs or processes which use a lot of cpu or memory, 
-or intensive disk access !!
-<br>Otherwise your recording software may fail to record some parts of the audio,
-without telling you there has been a problem !!
+or intensive disk access, otherwise your recording software may fail to record some parts of the audio,
+without telling you there has been a problem !! (perhaps not likely a problem with modern hardware?)
 </li>
 </ul>
 
@@ -55,10 +54,13 @@ at the start of each recording, this information is used by GWC to assess the
 background noise level for noise elimination.</li>
 </ul>
 
+<h1>Known Issues</i></h1>
 <ul>
-<li>
-<i>KNOWN ISSUE</i> - If you try to open a wav file created by software such as a recent ffmpeg, GWC will produce an error like this: "Failed to open /root/whistle.wav, 'Error : Cannot open file in read/write mode due to string data in header.'".  Libsndfile does not support RDWR mode for these files - one workaround is to open and save the file in mhwaveedit. Or if you are creating the files using ffmpeg try like this <i>ffmpeg -i input.wav -bitexact output.wav</i> (note that this is not the same as <i>ffmpeg -bitexact -i input.wav output.wav</i> or <i>ffmpeg -i input.wav -flags bitexact output.wav</i>), or writing to a different libsndfile supported format such as au or aiff.
-
+<li>If you try to open a "wav" file created by software such as a recent ffmpeg, GWC will produce an error like this: "Failed to open /root/whistle.wav, 'Error : Cannot open file in read/write mode due to string data in header.'".  Libsndfile does not support RDWR mode for these files - one workaround is to open and save the file in mhwaveedit. Or if you are creating the files using ffmpeg try like this <i>ffmpeg -i input.wav -bitexact output.wav</i> (note that this is not the same as <i>ffmpeg -bitexact -i input.wav output.wav</i> or <i>ffmpeg -i input.wav -flags bitexact output.wav</i>), or writing to a different libsndfile supported format such as au or aiff.
+</li>
+<p><li>Mono files look like stereo files, because the waveform is displayed twice.
+</li>
+<p><li>On some systems (Mac with default coreaudio backend) GWC may fail to play files with unusual sample rates (typically 44,100Hz and 48,000Hz should be fine).
 </li>
 </ul>
 
@@ -67,7 +69,7 @@ background noise level for noise elimination.</li>
 <li>To select sections of audio for GWC to operate on you click and drag in the displayed audio waveform. </li>
 <p><li>Start dragging anywhere between the centers of the left and right channels to select both channels, or start dragging
 above or below this region to select just one channel.</li>
-<li>If you do not make a selection GWC will operate on all the audio in the current view, but note that <b>if you have clicked in the top or bottom quarter of the waveform it will only operate on the left or right channel</b>.</li>
+<p><li>If you do not make a selection GWC will operate on all the audio in the current view, but note that <b>if you have clicked in the top or bottom quarter of the waveform it will only operate on the left or right channel</b>.</li>
 <p><li>Use <b>edit markers</b> to help you navigate and select sections of audio.  There are 200 markers available.  
 You set them by using the "B" and "E" keys, and clear them using the "Markers>Clear markers" menu item.
 "B" toggles the first marker at the <em>start</em> of the currently selected region.  "E" toggles the second
@@ -404,9 +406,10 @@ like gcover to create jewel case covers.</li>
     </li></ul></b>
 </li></ul>
 <h1>Appearance and customisation</h1>
+GWC uses the rather old GTK2 GUI toolkit.
 Refer to the included doc/gtkrc-example.txt file for examples of how to configure:
 <ul><li>A dark theme</li>
-<li>Gui font</li>
+<li>The gui font</li>
 <li>Icon, font and scrollbar sizes</li>
 <li>Keyboard accelerators </li></ul>
 </body>

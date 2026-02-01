@@ -80,13 +80,17 @@ If you have problems installing, check whether they are documented in the `INSTA
 Check out the help documentation included in this distribution and available from the help menu in GWC.
 
 ## Known Issues
-GWC fails to open wav files with metadata, such as those created by recent versions of ffmpeg. GWC will produce an error like:
+1. GWC fails to open wav files with metadata, such as those created by recent versions of ffmpeg. GWC will produce an error like:
 
 ```
 Failed to open /root/whistle.wav, 'Error : Cannot open file in read/write mode due to string data in header.'
 ```
 
 Libsndfile does not support RDWR mode for these files. If you are creating them using ffmpeg, try like this `ffmpeg -i input.wav -bitexact output.wav` (note that this is not the same as `ffmpeg -bitexact -i input.wav output.wav` or `ffmpeg -i input.wav -flags bitexact output.wav`), or write to a different libsndfile supported format such as `.au` or `.aiff`. A workaround for existing files is to open and save the file in mhwaveedit, or convert to a different format using `sndfile-convert` or `ffmpeg`, or use `SimplifyWave` from waveutils or `shntool strip` to make a copy of the file with a clean header.
+
+2. Mono files look like stereo files, because the waveform is displayed twice.
+
+3. On some systems (Mac with default coreaudio backend) GWC may fail to play files with unusual sample rates (typically 44,100Hz and 48,000Hz should be fine).
 
 ## Background
 For links and a brief presentation describing the technical aspects of the audio restoration methods used in GWC, visit [http://gwc.sourceforge.net/](http://gwc.sourceforge.net/)
