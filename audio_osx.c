@@ -35,8 +35,6 @@
 #include <unistd.h>
 #include <math.h>
 #include <time.h>
-#include <string.h>
-#include <stdint.h>
 #include <stdatomic.h>
 
 #include "gwc.h"
@@ -47,10 +45,8 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 
-extern int wavefile_fd ;
 extern int stereo;
 extern int audio_is_looping;
-extern int looped_count = 0;
 
 
 typedef struct
@@ -76,6 +72,10 @@ extern long playback_total_bytes ;
 extern int FRAMESIZE;
 extern int PLAYBACK_FRAMESIZE;
 int BUFFERSIZE = 1024; // The size of the buffers we will send.
+/* Staging buffer for mono->stereo expansion in callback */
+static float *mono_tmp = NULL;
+static size_t mono_tmp_frames_cap = 0;
+
 static long buff_num = 0;
 static long buff_num_play = 0;
 static long num_buffers = 0;
@@ -128,7 +128,7 @@ meter_ring_push(float l, float r)
 
 	/* If full (distance == size), drop oldest by advancing read index */
 	if ((w - ridx) >= METER_RING_SIZE) {
-    	atomic_store_explicit(&meter_ridx, ridx + 1, memory_order_release);
+    	atomic_store_explicit(&meter_ridx, w + 1, memory_order_release);
 	}
 
 	meterL[w & METER_RING_MASK] = (gfloat) l;
@@ -173,6 +173,7 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
 	UInt32              	out_samples;
 	UInt32              	out_frames;
 	int                 	ch;
+	int                 	file_ch;
 	sf_count_t           	frames_to_read;
 	sf_count_t           	frames_read;
 	float                	maxl = 0.0f, maxr = 0.0f;
@@ -199,13 +200,18 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
     	return noErr;
 	}
 
-	/* Determine channel count (expected 1 or 2) */
-	ch = audio_data->sfinfo.channels;
-	if (ch < 1) ch = 1;
-	if (ch > 2) ch = 2;
+	/*
+ 	* IMPORTANT:
+ 	* Device is forced to stereo (2ch). File may be mono or stereo.
+ 	*/
+	ch = 2; /* device/output channels */
+	file_ch = audio_data->sfinfo.channels;
+	if (file_ch < 1) file_ch = 1;
+	if (file_ch > 2) file_ch = 2;
+
 
 	out_samples = size_bytes / sizeof(float);
-	out_frames  = (ch > 0) ? (out_samples / (UInt32)ch) : 0;
+	out_frames  = (out_samples / (UInt32)ch);
 	p_float 	= (float*)out_ptr;
 
 	if (out_frames == 0) {
@@ -233,7 +239,6 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
             	/* Wrap to start of selection */
             	sf_seek(audio_data->sndfile, playback_start_position, SEEK_SET);
             	play_cursor = (sf_count_t)playback_start_position;
-            	looped_count++;
             	audio_data->done_reading = FALSE;
         	} else {
             	/* Not looping: pad remainder with zeros */
@@ -249,10 +254,37 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
         	frames_to_read = play_end - play_cursor;
     	}
 
-    	/* Read FRAMES */
+	/* Read FRAMES */
+	if (file_ch == 2) {
+    	/* Stereo file can read directly into stereo output */
     	frames_read = sf_readf_float(audio_data->sndfile,
                                  	p_float + out_off * ch,
                                  	frames_to_read);
+	} else {
+    	/* Mono file: read to staging buffer then expand to stereo output */
+    	if (mono_tmp_frames_cap < (size_t)frames_to_read) {
+        	size_t newcap = (size_t)frames_to_read;
+        	float *nb = (float*)realloc(mono_tmp, newcap * sizeof(float));
+        	if (!nb) {
+            	/* allocation failure: output silence */
+            	memset(p_float + out_off * ch, 0, (size_t)(frames_to_read * ch) * sizeof(float));
+            	frames_read = 0;
+        	} else {
+            	mono_tmp = nb;
+            	mono_tmp_frames_cap = newcap;
+            	frames_read = sf_readf_float(audio_data->sndfile, mono_tmp, frames_to_read);
+        	}
+    	} else {
+        	frames_read = sf_readf_float(audio_data->sndfile, mono_tmp, frames_to_read);
+    	}
+
+    	/* Expand mono -> stereo (duplicate) for frames actually read */
+    	for (sf_count_t f = 0; f < frames_read; f++) {
+        	float v = mono_tmp[f];
+        	p_float[(out_off + f) * 2 + 0] = v;
+        	p_float[(out_off + f) * 2 + 1] = v;
+    	}
+	}
 
     	/* Short read => EOF: if looping, wrap next iteration; else pad zeros */
     	if (frames_read < frames_to_read) {
@@ -263,13 +295,15 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
 
     	/* Peaks over frames_read (only actual samples) */
     	if (frames_read > 0) {
-        	if (ch == 1) {
+/*        	if (ch == 1) {
             	for (sf_count_t f = 0; f < frames_read; f++) {
                 	float v = fabsf(p_float[out_off + f]);
                 	if (v > maxl) maxl = v;
             	}
             	if (maxl > maxr) maxr = maxl;
-        	} else {
+        	} else { */
+    	/* we currently always make the output stereo */
+    	{
             	for (sf_count_t f = 0; f < frames_read; f++) {
                 	float vl = fabsf(p_float[(out_off + f) * 2 + 0]);
                 	float vr = fabsf(p_float[(out_off + f) * 2 + 1]);
@@ -392,17 +426,32 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate) //An
 	if (audio_data.sfinfo.channels < 1 || audio_data.sfinfo.channels > 2)
 	{	printf ("Error : channels = %d.\n", audio_data.sfinfo.channels) ;
 		return -1;
-	} 
+	}
+	/*
+ 	* IMPORTANT: Force device to stereo.
+ 	* Many CoreAudio devices refuse 1-channel stream formats.
+ 	* Mono files are duplicated to stereo in the callback.
+ 	*/
 	
 	audio_data.format.mSampleRate = audio_data.sfinfo.samplerate ;
-	audio_data.format.mChannelsPerFrame = audio_data.sfinfo.channels ;
+//	audio_data.format.mChannelsPerFrame = audio_data.sfinfo.channels ;
+	audio_data.format.mChannelsPerFrame = 2;
+
+	/* Return to caller what we are actually using on the device */
+	if (rate) 	*rate = (int)audio_data.format.mSampleRate;
+	if (channels) *channels = (int)audio_data.format.mChannelsPerFrame;
 
 	if (rate) 	*rate 	= (int)audio_data.format.mSampleRate;
 	if (channels) *channels = (int)audio_data.format.mChannelsPerFrame;
 	
 	if ((err = AudioDeviceSetProperty (audio_data.device, NULL, 0, false, kAudioDevicePropertyStreamFormat,
 										   sizeof (AudioStreamBasicDescription), &(audio_data.format))) != noErr)
-	{	printf ("AudioDeviceSetProperty (kAudioDevicePropertyStreamFormat) failed.\n") ;
+	{
+    	printf("AudioDeviceSetProperty (kAudioDevicePropertyStreamFormat) failed: %d (0x%x)\n",
+           	(int)err, (unsigned int)err);
+    	printf("  Tried: rate=%0.1f ch=%u\n",
+           	audio_data.format.mSampleRate,
+           	(unsigned)audio_data.format.mChannelsPerFrame);
 		return -1;
 	} ;
 	

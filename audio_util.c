@@ -220,6 +220,7 @@ void config_audio_device(int rate_set, int bits_set, int stereo_set)
 	warning(buf) ;
     }
 
+#if !defined MAC_OS_X || defined HAVE_PULSE_AUDIO
     if(channels != stereo + 1) {
 	char buf[80] ;
 	if(stereo == 0)
@@ -229,6 +230,10 @@ void config_audio_device(int rate_set, int bits_set, int stereo_set)
 	warning(buf) ;
     }
     stereo_set = channels - 1 ;
+#else
+	/* CoreAudio backend duplicates mono audio to stereo; */
+	stereo_set = stereo;
+#endif
 
 // Alister: eh? does this make sense if rate has been set from rate_set above?
     if(ABS(rate_set-rate) > 10) {
