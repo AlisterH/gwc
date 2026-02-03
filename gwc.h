@@ -212,7 +212,7 @@ double blackman(int k, int N) ;
 double blackman_hybrid(int k, int n_flat, int N) ;
 int close_undo(void) ;
 int close_wavefile(struct view *v) ;
-void config_audio_device(int speed, int bits, int stereo) ;
+int config_audio_device(int speed, int bits, int stereo) ;
 void d_print(char *, ...) ;
 int declick_a_click(struct sound_prefs *p, long first_sample, long last_sample, int channel_mask) ;
 void declick_set_preferences(GtkWidget * widget, gpointer data) ;

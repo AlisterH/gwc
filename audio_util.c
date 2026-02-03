@@ -166,7 +166,7 @@ void write_wav_header(int thefd, int speed, long bcount, int bits, int stereo)
 	    write(thefd, &header, sizeof(header));
 }
 
-void config_audio_device(int rate_set, int bits_set, int stereo_set)
+int config_audio_device(int rate_set, int bits_set, int stereo_set)
 {
     AUDIO_FORMAT format,format_set;
     int channels ;
@@ -203,7 +203,16 @@ void config_audio_device(int rate_set, int bits_set, int stereo_set)
     rate = rate_set ;
 
     if (audio_device_set_params(&format_set, &channels, &rate) == -1) {
-	warning("unknown error setting device parameter") ;
+    	warning("unknown error setting device parameter");
+    	/*
+     	* IMPORTANT:
+     	* If we continue after this failure, start_playback() will still
+     	* set audio_state=AUDIO_IS_PLAYBACK and the UI will remain "busy"
+     	* until the user presses Stop. Abort playback start here.
+     	*/
+    	audio_state = AUDIO_IS_IDLE;
+    	audio_device_close(1);
+    	return 0;
     }
 
     if(format != format_set) {
@@ -247,6 +256,7 @@ void config_audio_device(int rate_set, int bits_set, int stereo_set)
     rate = rate_set ;
     audio_bits = bits_set ;
     stereo = stereo_set ;
+    return 1;
 }
 
 long playback_samples_remaining = 0 ;
@@ -349,7 +359,12 @@ long start_playback(char *output_device, struct view *v, struct sound_prefs *p, 
     playback_bytes_per_block = playback_samples*PLAYBACK_FRAMESIZE ;
 
     //  This was moved down 8 lines to make it work in OS X.  Rob
-    config_audio_device(p->rate, p->playback_bits, p->stereo);	//Set up the audio device.
+	if (!config_audio_device(p->rate, p->playback_bits, p->stereo)) {
+    	/* config_audio_device already warned and closed the device */
+    	/* Ensure we do not enter playback state */
+    	audio_state = AUDIO_IS_IDLE;
+    	return 0;
+	}
     //stereo is 1 if it is stereo
     //playback_bits is the number of bits per sample
     //rate is the number of samples per second
