@@ -19,10 +19,43 @@
 /* fmtheaders.h */
 /* This is not an original file, it was copied from the gramofile application */
 
-#ifndef _FMTHEADERS_H
-#define _FMTHEADERS_H	1
+#ifndef FMTHEADERS_H
+#define FMTHEADERS_H
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+//Not possible to use this to test building for ancient OSX, as the headers are no longer available
+//#define MAC_OS_X_VERSION_MIN_REQUIRED 1030
 
 #include <sys/types.h>
+
+#if defined(__APPLE__) && defined(__MACH__)
+#include <AvailabilityMacros.h>
+#endif
+/* ------------------------------
+ * Portable unsigned type helpers
+ * ------------------------------
+ *
+ * On modern macOS (10.3+) and most Unix systems, use stdint.h
+ * On older macOS (pre-10.3), fallback to legacy BSD __ types.
+ */
+#if (defined(__APPLE__) && defined(__MACH__) && \
+     defined(MAC_OS_X_VERSION_MIN_REQUIRED) && \
+     (MAC_OS_X_VERSION_MIN_REQUIRED < 1030)) || !defined(__APPLE__)
+
+# ifndef __UCHAR_LEGACY_DEFINED
+typedef __u_char  u_char;
+typedef __u_short u_short;
+typedef __u_int   u_int;
+typedef __u_long  u_long;
+typedef __quad_t  quad_t;
+typedef __u_quad_t u_quad_t;
+#  define __UCHAR_LEGACY_DEFINED
+# endif
+
+#endif /* end portable types */
 
 /* Definitions for .VOC files */
 
@@ -31,18 +64,6 @@
 #define DATALEN(bp)	((u_long)(bp.BlockLen[0]) | \
                          ((u_long)(bp.BlockLen[1]) << 8) | \
                          ((u_long)(bp.BlockLen[2]) << 16) )
-# ifndef MAC_OS_X
-# ifndef __u_char_defined
-typedef __u_char u_char;
-typedef __u_short u_short;
-typedef __u_int u_int;
-typedef __u_long u_long;
-typedef __quad_t quad_t;
-typedef __u_quad_t u_quad_t;
-typedef __fsid_t fsid_t;
-#  define __u_char_defined
-# endif
-# endif /* MAC_OS_X*/
 
 typedef struct vochead {
   u_char  Magic[20];	/* must be VOC_MAGIC */

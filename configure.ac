@@ -5,6 +5,19 @@ AM_INIT_AUTOMAKE([1.12 foreign no-define tar-ustar])
 
 dnl Checks for programs.
 AC_PROG_CC
+AC_CANONICAL_HOST
+
+dnl check for osx platform
+AC_MSG_CHECKING([for Mac OS X platform])
+case "$host_os" in
+  darwin*)
+    platform_osx=yes
+    ;;
+  *)
+    platform_osx=no
+    ;;
+esac
+AC_MSG_RESULT([$platform_osx])
 
 PKG_PROG_PKG_CONFIG
 
@@ -68,7 +81,6 @@ dnl Replace `main' with a function in -lm:
 AC_CHECK_LIB(m, cos, [M_LIBS="-lm"], [M_LIBS=""])
 
 dnl setup macros variables to be replaced in Makefile.in
-AC_SUBST(OSXDEF)
 AC_SUBST(GTK_MAC_CFLAGS)
 AC_SUBST(GTK_MAC_LIBS)
 AC_SUBST(M_LIBS)
@@ -142,15 +154,11 @@ dnl enable pulseaudio on user request and check installation
 PALIB=""
 PAHDR=""
 
-
 AC_ARG_ENABLE(pa,
   AS_HELP_STRING([--enable-pa],
                  [compile PulseAudio support (default disabled)]),
   [enablepa="$enableval"],
   [enablepa="no"])
-
-PALIB=""
-PAHDR=""
 
 if test "x$enablepa" = "xyes"; then
   PKG_CHECK_MODULES([PULSEAUDIO], [libpulse-simple >= 0.9.0], [
@@ -211,30 +219,27 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_TYPE_SIZE_T
 
+dnl ------------------------------------------------------------
+dnl Endianness detection (canonical, with PowerPC macOS fallback)
+dnl ------------------------------------------------------------
+AC_C_BIGENDIAN(
+  [AC_DEFINE([WORDS_BIGENDIAN], [1], [Define if the system is big-endian])],
+  [],
+  [case "$host_cpu" in
+     powerpc*) AC_DEFINE([WORDS_BIGENDIAN], [1], [Define if the system is big-endian]) ;;
+   esac]
+)
+
 dnl Checks for library functions.
 AC_CHECK_FUNCS(gettimeofday)
 
 dnl refer to comments in gwc.c where these versions are required:
 PKG_CHECK_MODULES(GTK, [ gtk+-2.0 >= 2.16 glib-2.0 >= 2.30 ])
 
-dnl check for osx platform
-AC_MSG_CHECKING([for Mac OS X platform])
-case `uname -s` in
-  Darwin)
-    platform_osx=yes
-    ;;
-  *)
-    platform_osx=no
-    ;;
-esac
-AC_MSG_RESULT([$platform_osx])
 if test x$platform_osx = xyes; then
   AC_DEFINE([MAC_OS_X], [1], [Define if building on macOS])
-  OSXDEF="-DMAC_OS_X"
   
-dnl ----------------------------
 dnl CoreAudio / AudioUnit detection
-dnl ----------------------------
 AC_ARG_ENABLE([audiounit],
   AS_HELP_STRING([--enable-audiounit], [enable AudioUnit backend (default yes)]),
   [case "${enableval}" in
@@ -252,26 +257,16 @@ AC_MSG_RESULT([$have_audiounit])
   PKG_CHECK_MODULES(GTK_MAC, [gtk-mac-integration-gtk2 >= 2.0.0],
                    [HAVE_GTK_MAC="yes"], [HAVE_GTK_MAC="no"])
   
-  if test "x$HAVE_GTK_MAC" = xyes ; then
-    OSXDEF="$OSXDEF -DHAVE_GTK_MAC_INTEGRATION"
-    GTK_CFLAGS="$GTK_CFLAGS $GTK_MAC_CFLAGS"
-    # Only add GTK_MAC_LIBS that are not already in GTK_LIBS
-    GTK_MAC_UNIQUE=""
-    for mac_lib in $GTK_MAC_LIBS; do
-      # Check if this library is not already in GTK_LIBS
-      found=0
-      for gtk_lib in $GTK_LIBS; do
-        if test "$mac_lib" = "$gtk_lib"; then
-          found=1
-          break
-        fi
-      done
-      if test $found -eq 0; then
-        GTK_MAC_UNIQUE="$GTK_MAC_UNIQUE $mac_lib"
-      fi
-    done
-    GTK_LIBS="$GTK_LIBS$GTK_MAC_UNIQUE"
-    AC_MSG_NOTICE([GTK Mac Integration found - enabling native macOS integration])
+if test "x$HAVE_GTK_MAC" = xyes ; then
+  AC_DEFINE([HAVE_GTK_MAC_INTEGRATION], [1], [Define if gtk-mac-integration is available])
+  GTK_CFLAGS="$GTK_CFLAGS $GTK_MAC_CFLAGS"
+  for mac_lib in $GTK_MAC_LIBS; do
+    case " $GTK_LIBS " in
+      *" $mac_lib "*) : ;;  # already in GTK_LIBS
+      *) GTK_LIBS="$GTK_LIBS $mac_lib" ;;
+    esac
+  done
+  AC_MSG_NOTICE([GTK Mac Integration found - enabling native macOS integration])
   else
     AC_MSG_NOTICE([GTK Mac Integration not found - building without native macOS integration])
   fi
@@ -279,36 +274,28 @@ AC_MSG_RESULT([$have_audiounit])
   if test "$enablepa" = "yes"; then
     # pulseaudio is enabled
     OSXLIBS="$LIBS"
+
   else
-    # pulseaudio is not enabled: detect which CoreAudio backend to use
-    AC_MSG_NOTICE([
-***********************!!!!!!! INFORMATION !!!!!!!***********************
-You are building on Apple OSX without PulseAudio; selecting macOS backend.
-*************************************************************************
+
+    if test "x$have_audiounit" = "xyes" && test "x$enable_audiounit" = "xyes"; then
+      AC_DEFINE([USE_LEGACY_HAL], [0], [Use legacy HAL if 1, AudioUnit if 0])
+      AC_MSG_NOTICE([
+*****************************!!!!!!! INFORMATION !!!!!!!*****************************
+You are building on Apple OSX without PulseAudio; Using AudioUnit backend.
+*************************************************************************************
 ])
-
-dnl Determine which backend to use
-if test "x$have_audiounit" = "xyes" && test "x$enable_audiounit" = "xyes"; then
-  USE_LEGACY_HAL=0
-  AC_DEFINE([USE_LEGACY_HAL], [0], [Use legacy HAL if 1, AudioUnit if 0])    # AudioUnit
-else
-  USE_LEGACY_HAL=1
-  
-  AC_DEFINE([USE_LEGACY_HAL], [1], [Use legacy HAL if 1, AudioUnit if 0])    # Legacy HAL
-fi
-
-dnl Print which backend will be used
-if test "$USE_LEGACY_HAL" -eq 1; then
-  AC_MSG_NOTICE([Using legacy CoreAudio HAL backend])
-  OSXLIBS="$LIBS -framework CoreAudio"
-else
-  AC_MSG_NOTICE([Using AudioUnit backend])
-  OSXLIBS="$LIBS -framework AudioUnit -framework AudioToolbox -framework CoreAudio"
-fi
-
-AC_SUBST(OSXLIBS)
-
+      OSXLIBS="$LIBS -framework AudioUnit -framework AudioToolbox -framework CoreAudio"
+    else
+      AC_DEFINE([USE_LEGACY_HAL], [1], [Use legacy HAL if 1, AudioUnit if 0])
+      AC_MSG_NOTICE([
+*****************************!!!!!!! INFORMATION !!!!!!!*****************************
+You are building on Apple OSX without PulseAudio; Using legacy CoreAudio HAL backend.
+*************************************************************************************
+    ])
+      OSXLIBS="$LIBS -framework CoreAudio"
+    fi
   fi
+  AC_SUBST(OSXLIBS)
 fi
 
 AM_CONDITIONAL([MAC_OS_X], [test "x$platform_osx" = "xyes"])

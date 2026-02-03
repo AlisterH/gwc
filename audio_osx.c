@@ -19,14 +19,15 @@
 *   - Progress reporting uses rendered_file_frames_abs (file frames produced).
 *****************************************************************************/
 
-#ifdef MAC_OS_X
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include <sndfile.h>
 #include <time.h>
 
 #include "gwc.h"
 #include "audio_device.h"
-#include "config.h"
 
 /* If your configure system doesn't define this, default to legacy HAL. */
 #ifndef USE_LEGACY_HAL
@@ -612,5 +613,3 @@ void audio_device_close(int drain)
 	audiounit_teardown();
 #endif
 }
-
-#endif /* MAC_OS_X */

@@ -19,25 +19,16 @@
 
 /* audio_util.c */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <memory.h>
-
-#ifdef MAC_OS_X
-
-/* this seems to give wrong results on intel macs :( */
-#include <machine/endian.h>
-
-/* doing this doesn't seem to fix it, and would presumably break it on */
-/* powerpc macs (but are we otherwise supported there?) */
-/*#define __BYTE_ORDER __LITTLE_ENDIAN */
-
-#else
-#include <endian.h>
-#endif
 
 #include <fcntl.h>
 #include <unistd.h>
@@ -176,17 +167,10 @@ int config_audio_device(int rate_set, int bits_set, int stereo_set)
     /* play everything as 16 bit, signed integers */
     /* using the appropriate endianness */
 
-/* Alister: I have swapped this around as an intel mac seems to think */
-/* the first test is true regardless of whether you test for BE or LE */
-/* Presumably it might fail on a powerpc mac now?                     */
-/* Also, does it break other platforms (since LE is normal these days */
-/* it should really stay default                                      */
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-    format_set = GWC_S16_LE ;
-#elif __BYTE_ORDER == __BIG_ENDIAN
-    format_set = GWC_S16_BE ;
+#ifdef WORDS_BIGENDIAN
+    format_set = GWC_S16_BE;
 #else
-    format_set = GWC_S16_LE ;
+    format_set = GWC_S16_LE;
 #endif
 
     rate = rate_set ;

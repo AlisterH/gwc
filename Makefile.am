@@ -16,7 +16,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/meschach -I$(top_builddir)/meschach -I$(top_srcdir
   -DHELPDIR=\"$(datadir)/doc/$(APPNAME)\" \
   -DLIBDIR=\"$(libdir)\" \
   -DAPPNAME=\"$(APPNAME)\" \
-  @OSXDEF@ @ALSADEF@ @PAHDR@ @OGGHDR@ @MP3HDR@
+  @ALSADEF@ @PAHDR@ @OGGHDR@ @MP3HDR@
 
 # Alister: OSX potential issues
 # On an old test system I initially couldn't use -lgtkmacintegration as it wasn't building
@@ -161,8 +161,6 @@ icons_256x256_appsdir = $(datadir)/icons/hicolor/256x256/apps
 
 ### handy to have around for checking buffer overruns
 #EFENCE = -lefence
-
-gtk_wave_cleaner_CPPFLAGS = $(AM_CPPFLAGS)
 
 gtk_wave_cleaner_LDADD = meschach.a @FFTW_LIBS@ \
 	@GTK_LIBS@ @SNDFILE_LIBS@ @ALSALIB@ @PALIB@ \
