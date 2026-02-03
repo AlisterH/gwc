@@ -13,13 +13,7 @@ PKG_CHECK_MODULES(SNDFILE, sndfile >= 1.0.2,
 
 if test "x$HAVE_LIBSNDFILE1" = xno ; then
     AC_MSG_ERROR([
-Libsndfile 1.0.2 or greater needed, find it at http://www.zip.com.au/~erikd/libsndfile/
-OR perhaps configure can not file libsndfile, in which you can try 1 of 3 things:
-1) set the environment variable PKG_CONFIG_PATH
-   to find the package file for libsndfile for example:
-   export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
-2) re-install libsndfile in /usr instead of /usr/local, where it installs by default.
-3) There are some packages for libsndfile now, be sure to install libsndfile-devel
+Libsndfile 1.0.2 or greater not found
 ])
 fi
 
@@ -87,7 +81,6 @@ AC_SUBST(OGGLIB)
 AC_SUBST(OGGHDR)
 AC_SUBST(MP3LIB)
 AC_SUBST(MP3HDR)
-AC_SUBST(OSXLIBS)
 
 dnl enable ogg/vorbis libs on user request and check installation
 OGGLIB=""
@@ -239,6 +232,22 @@ if test x$platform_osx = xyes; then
   AC_DEFINE([MAC_OS_X], [1], [Define if building on macOS])
   OSXDEF="-DMAC_OS_X"
   
+dnl ----------------------------
+dnl CoreAudio / AudioUnit detection
+dnl ----------------------------
+AC_ARG_ENABLE([audiounit],
+  AS_HELP_STRING([--enable-audiounit], [enable AudioUnit backend (default yes)]),
+  [case "${enableval}" in
+       yes) enable_audiounit=yes ;;
+       no) enable_audiounit=no ;;
+       *) AC_MSG_ERROR([bad value ${enableval} for --enable-audiounit]) ;;
+   esac],
+  [enable_audiounit=yes])
+
+AC_MSG_CHECKING([for AudioUnit/AudioUnit.h])
+AC_CHECK_HEADER([AudioUnit/AudioUnit.h], [have_audiounit=yes], [have_audiounit=no])
+AC_MSG_RESULT([$have_audiounit])
+
   dnl Check for gtk-mac-integration
   PKG_CHECK_MODULES(GTK_MAC, [gtk-mac-integration-gtk2 >= 2.0.0],
                    [HAVE_GTK_MAC="yes"], [HAVE_GTK_MAC="no"])
@@ -271,14 +280,34 @@ if test x$platform_osx = xyes; then
     # pulseaudio is enabled
     OSXLIBS="$LIBS"
   else
-    # pulseaudio is not enabled so we need to build CoreAudio backend instead
+    # pulseaudio is not enabled: detect which CoreAudio backend to use
     AC_MSG_NOTICE([
 ***********************!!!!!!! INFORMATION !!!!!!!***********************
-You are building on Apple OSX with the CoreAudio backend.
-Use --enable-pa if you wish to build with the pulseaudio backend instead.
+You are building on Apple OSX without PulseAudio; selecting macOS backend.
 *************************************************************************
 ])
-    OSXLIBS="$LIBS -framework CoreAudio" 
+
+dnl Determine which backend to use
+if test "x$have_audiounit" = "xyes" && test "x$enable_audiounit" = "xyes"; then
+  USE_LEGACY_HAL=0
+  AC_DEFINE([USE_LEGACY_HAL], [0], [Use legacy HAL if 1, AudioUnit if 0])    # AudioUnit
+else
+  USE_LEGACY_HAL=1
+  
+  AC_DEFINE([USE_LEGACY_HAL], [1], [Use legacy HAL if 1, AudioUnit if 0])    # Legacy HAL
+fi
+
+dnl Print which backend will be used
+if test "$USE_LEGACY_HAL" -eq 1; then
+  AC_MSG_NOTICE([Using legacy CoreAudio HAL backend])
+  OSXLIBS="$LIBS -framework CoreAudio"
+else
+  AC_MSG_NOTICE([Using AudioUnit backend])
+  OSXLIBS="$LIBS -framework AudioUnit -framework AudioToolbox -framework CoreAudio"
+fi
+
+AC_SUBST(OSXLIBS)
+
   fi
 fi
 

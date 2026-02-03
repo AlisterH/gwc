@@ -90,7 +90,7 @@ Libsndfile does not support RDWR mode for these files. If you are creating them 
 
 2. Mono files look like stereo files, because the waveform is displayed twice.
 
-3. On some systems (Mac with default coreaudio backend) GWC may fail to play files with unusual sample rates (typically 44,100Hz and 48,000Hz should be fine).
+3. On some systems (very old Mac with default coreaudio backend) GWC may fail to play files with unusual sample rates (typically 44,100Hz and 48,000Hz should be fine).
 
 ## Background
 For links and a brief presentation describing the technical aspects of the audio restoration methods used in GWC, visit [http://gwc.sourceforge.net/](http://gwc.sourceforge.net/)
