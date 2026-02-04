@@ -1431,15 +1431,18 @@ int process_audio(gfloat *pL, gfloat *pR)
 		unsigned char zeros[1024] ;
 		long zeros_needed ;
 		memset(zeros,0,sizeof(zeros)) ;
-		audio_state = AUDIO_IS_PLAYBACK ;
 		audio_playback = FALSE ;
 
 		zeros_needed = playback_bytes_per_block - (playback_total_bytes % playback_bytes_per_block) ;
 		if(zeros_needed < PLAYBACK_FRAMESIZE) zeros_needed = PLAYBACK_FRAMESIZE ; 
 		do {
 		    len = audio_device_write(zeros, MIN(zeros_needed, sizeof(zeros))) ;
-		    zeros_needed -= len ;
-		} while (len >= 0 && zeros_needed > 0) ;
+                	if (len <= 0) break;      	/* stop on error or no progress */
+                	zeros_needed -= len ;
+            	} while (zeros_needed > 0) ;
+
+            	/* Finish and release the device like the Stop button does */
+            	stop_playback(0);
 
 		g_print("Stop playback with playback_samples_remaining:%ld\n", playback_samples_remaining) ;
 		return 1 ;
