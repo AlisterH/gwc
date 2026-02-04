@@ -467,6 +467,7 @@ double spectral_amp = 1.0 ;
    pixel with a max function else average them */
 #define COMBINE_MAX
 
+static int sonogram_ready_flag = 1;
 void draw_sonogram(struct view *v, struct sound_prefs *pPrefs, GtkWidget *da, double samples_per_pixel, int cursor_flag)
 {
     int FFT_SIZE ;
@@ -500,6 +501,8 @@ void draw_sonogram(struct view *v, struct sound_prefs *pPrefs, GtkWidget *da, do
     level = malloc(sizeof(unsigned char[2][MAXSW][MAXSH]));
     if (level == NULL) {
         warning("Error allocating memory");
+        /* Prevent further sonogram redraw attempts */
+        sonogram_ready_flag = 0;
         gdk_image_destroy(image);
 #ifdef HAVE_FFTW3
         FFTW(destroy_plan)(pLeft);
@@ -514,7 +517,8 @@ void draw_sonogram(struct view *v, struct sound_prefs *pPrefs, GtkWidget *da, do
     push_status_text("Building sonogram") ;
     update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
 
-
+    if (!sonogram_ready_flag)
+        return;
     /* only draw the sonogram at a scale of 1.0 */
     view_scale = 1.0 ;
 
@@ -522,8 +526,11 @@ void draw_sonogram(struct view *v, struct sound_prefs *pPrefs, GtkWidget *da, do
     image = gdk_image_new(GDK_IMAGE_FASTEST, gdk_visual_get_system(),
         v->canvas_width, v->canvas_height);
     if (image == NULL) {
-       printf("Unable to create image\n");
-       exit(1);
+       /* The exit(1) here looked very dangerous - it should never occur, but let's be safe */
+		sonogram_ready_flag = 0;   /* prevent further sonogram redraws */
+		pop_status_text() ;
+		push_status_text("ERROR: Building sonogram failed; this should never happen") ;
+		return;
     }
     for(y = 0 ; y < v->canvas_height ; y++) {
         for(x = 0 ; x < v->canvas_width ; x++) {
@@ -1165,7 +1172,7 @@ void redraw(struct view *v, struct sound_prefs *p, GtkWidget *da, int cursor_fla
     }
 
 
-    if(sonogram_flag == TRUE) {
+    if(sonogram_flag == TRUE && sonogram_ready_flag == TRUE) {
 	if (redraw_data)
 	    draw_sonogram(v, p, da, samples_per_pixel, cursor_flag)   ;
         gdk_draw_rectangle(audio_pixmap, MyGC, TRUE,
