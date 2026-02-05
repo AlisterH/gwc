@@ -34,19 +34,12 @@
 static snd_pcm_t *handle = NULL;
 static snd_pcm_uframes_t written_frames = 0;
 
-/* Frames we estimate were queued but got dropped when ALSA stream was reset
-* (e.g. XRUN recovery via snd_pcm_prepare()). This keeps "processed bytes"
-* from jumping forward incorrectly after recovery. */
-static snd_pcm_uframes_t dropped_frames = 0;
-
 /* cached monotonic "processed bytes" value */
 static long _audio_device_processed_bytes = 0;
 
 /* true ALSA ring buffer size (frames). Must NOT be confused with "avail". */
 static snd_pcm_uframes_t buffer_size_frames = 0;
 static snd_pcm_uframes_t period_size_frames = 0;
-
-static snd_pcm_uframes_t estimate_queued_frames_best_effort(void);
 
 static void snd_perr(char *text, int err)
 {
@@ -66,7 +59,6 @@ int audio_device_open(char *output_device)
 	}
 
 	written_frames = 0;
-	dropped_frames = 0;
 	_audio_device_processed_bytes = 0;
 	buffer_size_frames = 0;
 	period_size_frames = 0;
@@ -168,7 +160,6 @@ if (handle == NULL) {
 
 	/* New stream configuration => reset all counters */
 	written_frames = 0;
-	dropped_frames = 0;
 	_audio_device_processed_bytes = 0;
 
 	/*
@@ -229,17 +220,11 @@ static int recover_snd_handle(int err)
 	if (err == -EPIPE) { /* underrun */
     	fprintf(stderr, "recover_snd_handle: err == -EPIPE\n");
 
-    	/* Best-effort estimate of queued frames that will be dropped by prepare */
-    	snd_pcm_uframes_t q = estimate_queued_frames_best_effort();
-
     	err = snd_pcm_prepare(handle);
     	if (err < 0) {
         	snd_perr("ALSA recover_snd_handle: can't recover underrun, prepare failed", err);
         	return err;
     	}
-
-    	/* Only account dropped frames if prepare succeeded */
-    	dropped_frames += q;
     	return 0;
 	}
 	else if (err == -ESTRPIPE) { /* suspend */
@@ -248,17 +233,11 @@ static int recover_snd_handle(int err)
         	sleep(1);
 
     	if (err < 0) {
-        	/* Best-effort estimate of queued frames that may be dropped */
-        	snd_pcm_uframes_t q = estimate_queued_frames_best_effort();
-
         	err = snd_pcm_prepare(handle);
         	if (err < 0) {
             	snd_perr("ALSA recover_snd_handle: can't recover suspend, prepare failed", err);
             	return err;
         	}
-
-        	/* Only account dropped frames if prepare succeeded */
-        	dropped_frames += q;
     	}
     	return 0;
 	}
@@ -345,42 +324,6 @@ if (r == -EAGAIN) {
 
 	written_frames += total_frames;
 	return (int)snd_pcm_frames_to_bytes(handle, total_frames);
-}
-
-/* Best-effort estimate of queued frames currently pending playback.
-* This is used only to adjust dropped_frames during XRUN/suspend recovery.
-*
-* We prefer delay (distance between app and sound position), but fall back
-* to status/avail when needed. */
-static snd_pcm_uframes_t estimate_queued_frames_best_effort(void)
-{
-	snd_pcm_sframes_t delay = 0;
-	snd_pcm_status_t *status;
-	int err;
-
-	if (handle == NULL)
-    	return 0;
-
-	err = snd_pcm_delay(handle, &delay);
-	if (err >= 0 && delay > 0)
-    	return (snd_pcm_uframes_t)delay;
-
-	snd_pcm_status_alloca(&status);
-	err = snd_pcm_status(handle, status);
-	if (err < 0)
-    	return 0;
-
-	if (buffer_size_frames == 0)
-    	return 0;
-
-	/* queued ≈ buffer_size - avail (clamped) */
-	{
-    	snd_pcm_sframes_t avail = (snd_pcm_sframes_t)snd_pcm_status_get_avail(status);
-    	snd_pcm_sframes_t q = (snd_pcm_sframes_t)buffer_size_frames - avail;
-    	if (q < 0) q = 0;
-    	if ((snd_pcm_uframes_t)q > buffer_size_frames) q = (snd_pcm_sframes_t)buffer_size_frames;
-    	return (snd_pcm_uframes_t)q;
-	}
 }
 
 long query_processed_bytes(void)

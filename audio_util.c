@@ -387,7 +387,7 @@ long start_playback(char *output_device, struct view *v, struct sound_prefs *p, 
 
 	playback_bytes_per_block *= n ;
 	if(playback_bytes_per_block > MAXBUFSIZE) playback_bytes_per_block = MAXBUFSIZE ;
-	process_audio(&lv, &rv) ;
+	process_audio() ;
 	v->cursor_position = first+playback_bytes_per_block/(PLAYBACK_FRAMESIZE) ;
 	playback_bytes_per_block = old_playback_bytes ;
     }
@@ -1292,23 +1292,18 @@ void flush_wavefile_data(void)
 
 /* process_audio for mac_os_x is found in the audio_osx.c */
 #if !defined MAC_OS_X || defined HAVE_PULSE_AUDIO
-int process_audio(gfloat *pL, gfloat *pR)
+int process_audio()
 {
     int len = 0 ;
     int i, frame ;
     short *p_short ;
     int *p_int ;
     unsigned char  *p_char ;
-    short maxl = 0, maxr = 0 ;
     extern int audio_playback ;
     long n_samples_to_read, n_read ;
-    double maxpossible ;
     double feather_out_N ;
     int feather_out = 0 ;
 
-    *pL = 0.0 ;
-    *pR = 0.0 ;
-	
 
     if(audio_state == AUDIO_IS_IDLE) {
 	d_print("process_audio says NOTHING is going on.\n") ;
@@ -1359,15 +1354,12 @@ if (audio_state == AUDIO_IS_PLAYBACK && playback_finishing) {
 
     if(audio_type == SNDFILE_TYPE) {
 	if(BYTESPERSAMPLE < 3) {
-	    maxpossible = 1 << 15 ;
 	    n_read = sf_readf_short(sndfile, p_short, n_samples_to_read) ;
 	} else {
-	    maxpossible = 1 << 23 ;
 	    n_read = sf_readf_int(sndfile, p_int, n_samples_to_read) ;
 	}
     } else {
 #if defined(HAVE_MP3) || defined(HAVE_OGG)
-	maxpossible = 1 << 15 ;
 	n_read = read_raw_wavefile_data((char *)p_char, current_ogg_or_mp3_pos, current_ogg_or_mp3_pos+n_samples_to_read-1) ;
 #endif
     }
@@ -1379,63 +1371,34 @@ if (audio_state == AUDIO_IS_PLAYBACK && playback_finishing) {
 	fprintf(stderr, "Feather out n_read=%ld, playback_samples_remaining=%ld, N=%lf\n", n_read, playback_samples_remaining, feather_out_N) ;
     }
 
-    for(frame = 0  ; frame < n_read ; frame++) {
-	int vl, vr ;
-	// I don't understand how all this code works, but if I remove the multiplication by two then the level meter actually works for mono files in ALSA, and for some reason there seem to be no side effects.
-	// However, note that the level meters work quite differently in different configurations, and arguably don't show anything helpful, anyway.
-	// Perhaps we should multiply by (stereo + 1) though?
-	// i = frame*2 ;
-	i = frame;
+    /* We no longer compute per-block meter peaks here: meters come from sample_buffer+cursor.
+     * Keep only the feather-out fade because it actually modifies samples. */
+    if (feather_out == 1) {
+        int ch = stereo ? 2 : 1;
 
-	if(BYTESPERSAMPLE < 3) {
-	    if(feather_out == 1 && n_read-(frame+1) < FEATHER_WIDTH) {
-		int j = ((n_read-(frame))-1) ;
-		double p = (double)(j)/feather_out_N ;
+        for (frame = 0; frame < n_read; frame++) {
+            /* Fade only the last FEATHER_WIDTH frames of this buffer */
+            if (n_read - (frame + 1) < FEATHER_WIDTH) {
+                int j = (int)((n_read - frame) - 1);
+                double p = (double)j / feather_out_N;
 
-		if(i > n_read - 100) {
-		    //printf("j:%d %lf %hd %hd ", j, p, p_short[i], p_short[i+1]) ;
-		}
+                /* Correct interleaved indexing: frame * channels */
+                int base = frame * ch;
 
-		p_short[i] *= p ;
-		p_short[i+1] *= p ;
+                /* 16-bit path only (BYTESPERSAMPLE forced to 2 in this function) */
+                p_short[base] = (short)((double)p_short[base] * p);
+                if (stereo) {
+                    p_short[base + 1] = (short)((double)p_short[base + 1] * p);
+                }
 
-		//if(i > n_read - 100) {
-		//    printf("%hd %hd\n", p_short[i], p_short[i+1]) ;
-		//}
-
-		if(frame == n_read-1) fprintf(stderr, "Feather out final %lf, n_read=%ld\n", p, n_read) ;
-	    }
-
-	    vl = p_short[i] ;
-	    vr = p_short[i+1] ;
-
-	} else {
-	    if(feather_out == 1 && n_read-(i+1) < 10000) {
-		double p = 1.0 - (double)(n_read-(i+1))/9999.0 ;
-		printf(".") ;
-		p_int[i] *= p ;
-		p_int[i+1] *= p ;
-	    }
-
-	    vl = p_int[i] ;
-	    vr = p_int[i+1] ;
-	}
-
-	if(vl > maxl) maxl = vl ;
-	if(-vl > maxl) maxl = -vl ;
-
-	if(stereo) {
-	    if(vr > maxr) maxr = vr ;
-	    if(-vr > maxr) maxr = -vr ;
-	} else {
-	    maxr = maxl ;
-	}
+                if (frame == n_read - 1) {
+                    fprintf(stderr, "Feather out final %lf, n_read=%ld\n", p, n_read);
+                }
+            }
+        }
     }
-#undef BYTESPERSAMPLE
-    if(feather_out == 1) printf("\n") ;
 
-    *pL = (gfloat) maxl / maxpossible ;
-    *pR = (gfloat) maxr / maxpossible ;
+#undef BYTESPERSAMPLE
 
     if(audio_state == AUDIO_IS_RECORDING) {
 	len = write(wavefile_fd, audio_buffer, len) ;

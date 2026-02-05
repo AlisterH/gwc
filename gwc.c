@@ -1400,14 +1400,13 @@ long playback_samples_per_block;
 
 gint play_a_block(gpointer data)
 {
-    gfloat l, r;
     long first, last, bytes_left;
 
     get_region_of_interest(&first, &last, &audio_view);
 
     if (audio_playback == TRUE) {
     	/* Keep feeding audio while we're actively decoding/writing */
-    	if (process_audio(&l, &r) != 0) {
+    	if (process_audio() != 0) {
         	d_print("process_audio returns nonzero.\n");
     	}
     }

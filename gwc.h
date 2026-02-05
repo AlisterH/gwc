@@ -285,7 +285,7 @@ int print_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnpref
 void get_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs, long noise_start, long noise_end,
 		    fftw_real *left_noise_min, fftw_real *left_noise_max, fftw_real *left_noise_avg,
 		    fftw_real *right_noise_min, fftw_real *right_noise_max, fftw_real *right_noise_avg) ;
-int  process_audio(gfloat *pL, gfloat *pR) ;
+int  process_audio(void) ;
 void push_status_text(gchar *msg) ;
 int read_fft_real_wavefile_data(fftw_real left[], fftw_real right[], long first, long last) ;
 int read_float_wavefile_data(float left[], float right[], long first, long last) ;
