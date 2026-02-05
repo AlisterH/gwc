@@ -3,16 +3,20 @@ GWC Changelog
 KNOWN ISSUES:
 - GWC fails to open wav files with metadata - this is a limitation of libsndfile, refer to README.md for details.
 - "Split audio on song markers" will overwrite existing files without confirmation (https://github.com/AlisterH/gwc/issues/8)
+- Undoing "paste" is inconsistent
 
 0.22-07
 Jan 26, 2026
+CODE: rework audio backends, improving VU meters, fixing various issues and modernising MACOS coreaudio backend.
 CODE: fixes to allow (and automate) building on recent MACOS (thanks to Philippe Gagné).
-BUGFIX: MACOS problems with coreaudio backend and dialogs with Quartz GTK backend (thanks to Philippe Gagné).
+BUGFIX: MACOS problems with dialogs (thanks to Philippe Gagné).
 CODE: build system fixes so that everything should work properly with modern tools.
 CODE: include built-in delete icon so there is no need to install a gtk icon theme.
 DOC: expanded gtkrc example configuration, providing more help for people to enlarge the gui for hidpi screens.
-NEW: double-click to select between song markers (or select current view when there are none), and triple-click to select current view (thanks to Jeff Welty who came back a few years ago to help with some things and added this).
+NEW: double-click to select between song markers (or select current view when there are none), and triple-click to 
+     select current view (thanks to Jeff Welty who came back a few years ago to help with some things and added this).
 NEW: draw a graph in the biquad filter dialog to help people with the settings.
+ENHANCEMENT: amplify dialog calculates maximum amplification without clipping for the selection, rather than the file.
 CHANGED BEHAVIOUR: the toolbar icons now use the custom "gwc" gtk icon size category, so if anyone is setting the icon size via gtkrc they will need to update their configuration (refer to doc/gtkrc-example.txt).
 
 0.22-06
