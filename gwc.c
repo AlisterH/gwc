@@ -1442,7 +1442,7 @@ if ((dbg2++ % 30) == 0) {
 			//float srcL = (float)sb[bi].rms[0];
 			//float srcR = (float)sb[bi].rms[1];
 
-			/* If you want PEAK instead, use: */
+			/* We will use PEAK: */
 			float srcL = (float)sb[bi].max_value[0];
 			float srcR = (float)sb[bi].max_value[1];
 			
@@ -1461,10 +1461,11 @@ if ((dbg2++ % 30) == 0) {
         	vu_l_smooth = vu_smooth(vu_l_smooth, ml);
         	vu_r_smooth = vu_smooth(vu_r_smooth, mr);
 			static int dbg=0;
-if ((dbg++ % 30) == 0) {
-    fprintf(stderr, "bi=%ld ml=%g mr=%g (srcL=%g srcR=%g)\n",
-            bi, ml, mr, srcL, srcR);
-}
+/* Useful for debugging */
+//if ((dbg++ % 30) == 0) {
+//    fprintf(stderr, "bi=%ld ml=%g mr=%g (srcL=%g srcR=%g)\n",
+//            bi, ml, mr, srcL, srcR);
+//}
         	led_bar_light_percent(dial[0], vu_l_smooth);
         	led_bar_light_percent(dial[1], vu_r_smooth);
     	} else {
