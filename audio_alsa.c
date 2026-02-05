@@ -33,396 +33,501 @@
 
 static snd_pcm_t *handle = NULL;
 static snd_pcm_uframes_t written_frames = 0;
-static long drain_delta = 0 ;
-static long last_processed_bytes0 = -1 ;
-static long last_processed_bytes = -1 ;
-/* cached monotonic "processed bytes" value */
-static long _audio_device_processed_bytes = 0 ;
-/* true ALSA ring buffer size (frames). Must NOT be confused with "avail". */
-static snd_pcm_uframes_t buffer_size_frames = 0 ;
-static snd_pcm_uframes_t period_size_frames = 0 ;
 
+/* Frames we estimate were queued but got dropped when ALSA stream was reset
+* (e.g. XRUN recovery via snd_pcm_prepare()). This keeps "processed bytes"
+* from jumping forward incorrectly after recovery. */
+static snd_pcm_uframes_t dropped_frames = 0;
+
+/* cached monotonic "processed bytes" value */
+static long _audio_device_processed_bytes = 0;
+
+/* true ALSA ring buffer size (frames). Must NOT be confused with "avail". */
+static snd_pcm_uframes_t buffer_size_frames = 0;
+static snd_pcm_uframes_t period_size_frames = 0;
+
+static snd_pcm_uframes_t estimate_queued_frames_best_effort(void);
 
 static void snd_perr(char *text, int err)
 {
-    fprintf(stderr, "##########################################################\n");
-    fprintf(stderr, "%s\n", text);
-    fprintf(stderr, "%s\n", snd_strerror(err));
-    warning(text) ;
+	fprintf(stderr, "##########################################################\n");
+	fprintf(stderr, "%s\n", text);
+	fprintf(stderr, "%s\n", snd_strerror(err));
+	warning(text);
 }
 
 int audio_device_open(char *output_device)
 {
-    int err = snd_pcm_open(&handle, output_device, /*"default",*/
-                           SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK);
-    if (err < 0) {
-        snd_perr("ALSA audio_device_open: snd_pcm_open", err);
-        return -1;
-    }
+	int err = snd_pcm_open(&handle, output_device, /*"default",*/
+                       	SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK);
+	if (err < 0) {
+    	snd_perr("ALSA audio_device_open: snd_pcm_open", err);
+    	return -1;
+	}
 
-    written_frames = 0;
-    drain_delta=0 ;
-    last_processed_bytes0 = -1 ;
-    last_processed_bytes = -1 ;
-    _audio_device_processed_bytes = 0 ;
-    buffer_size_frames = 0 ;
-    period_size_frames = 0 ;
-    return 0;
+	written_frames = 0;
+	dropped_frames = 0;
+	_audio_device_processed_bytes = 0;
+	buffer_size_frames = 0;
+	period_size_frames = 0;
+
+	return 0;
 }
 
 int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate)
 {
-    unsigned int utmp ;
-    int err;
-    snd_pcm_format_t alsa_format;
-    snd_pcm_hw_params_t *params;
-    snd_pcm_sw_params_t *swparams;
+if (handle == NULL) {
+    		warning("ALSA: audio_device_set_params called with NULL handle");
+    		return -1;
+	}
 
-    snd_pcm_hw_params_alloca(&params);
-    snd_pcm_sw_params_alloca(&swparams);
+	unsigned int utmp;
+	int err;
+	snd_pcm_format_t alsa_format;
+	snd_pcm_hw_params_t *params;
+	snd_pcm_sw_params_t *swparams;
 
-    err = snd_pcm_hw_params_any(handle, params);
-    if (err < 0) {
-        snd_perr("ALSA audio_device_set_params: snd_pcm_hw_params_any", err);
-        return -1;
-    }
+	snd_pcm_hw_params_alloca(&params);
+	snd_pcm_sw_params_alloca(&swparams);
 
-    err = snd_pcm_hw_params_set_access(handle, params, SND_PCM_ACCESS_RW_INTERLEAVED);
-    if (err < 0) {
-        snd_perr("ALSA audio_device_set_params: snd_pcm_hw_params_set_access", err);
-        return -1;
-    }
+	err = snd_pcm_hw_params_any(handle, params);
+	if (err < 0) {
+    	snd_perr("ALSA audio_device_set_params: snd_pcm_hw_params_any", err);
+    	return -1;
+	}
 
+	err = snd_pcm_hw_params_set_access(handle, params, SND_PCM_ACCESS_RW_INTERLEAVED);
+	if (err < 0) {
+    	snd_perr("ALSA audio_device_set_params: snd_pcm_hw_params_set_access", err);
+    	return -1;
+	}
 
+	switch (*format)
+	{
+	case GWC_U8: 	alsa_format = SND_PCM_FORMAT_U8; break;
+	case GWC_S8: 	alsa_format = SND_PCM_FORMAT_S8; break;
+	case GWC_S16_BE: alsa_format = SND_PCM_FORMAT_S16_BE; break;
+	default:
+	case GWC_S16_LE: alsa_format = SND_PCM_FORMAT_S16_LE; break;
+	}
 
-    switch (*format)
-    {
-    case GWC_U8:     alsa_format = SND_PCM_FORMAT_U8; break;
-    case GWC_S8:     alsa_format = SND_PCM_FORMAT_S8; break;
-    case GWC_S16_BE: alsa_format = SND_PCM_FORMAT_S16_BE; break;
-    default:
-    case GWC_S16_LE: alsa_format = SND_PCM_FORMAT_S16_LE; break;
-    }
+	err = snd_pcm_hw_params_set_format(handle, params, alsa_format);
+	if (err < 0) {
+    	snd_perr("ALSA audio_device_set_params: snd_pcm_hw_params_set_format", err);
+    	return -1;
+	}
 
-    if (snd_pcm_hw_params_set_format(handle, params, alsa_format) < 0) {
-        snd_perr("ALSA audio_device_set_params: snd_pcm_hw_params_set_format", err);
-        return -1;
-    }
-    if (snd_pcm_hw_params_get_format(params, &alsa_format) < 0) {
-        snd_perr("ALSA audio_device_set_params: snd_pcm_hw_params_get_format", err);
-        return -1;
-    }
+	err = snd_pcm_hw_params_get_format(params, &alsa_format);
+	if (err < 0) {
+    	snd_perr("ALSA audio_device_set_params: snd_pcm_hw_params_get_format", err);
+    	return -1;
+	}
 
-    switch (alsa_format)
-    {
-    case SND_PCM_FORMAT_U8: *format = GWC_U8; break;
-    case SND_PCM_FORMAT_S8 : *format = GWC_S8; break;
-    case SND_PCM_FORMAT_S16_BE: *format = GWC_S16_BE; break;
-    case SND_PCM_FORMAT_S16_LE: *format = GWC_S16_LE; break;
-    default: *format = GWC_UNKNOWN; break;
-    }
+	switch (alsa_format)
+	{
+	case SND_PCM_FORMAT_U8:  	*format = GWC_U8; 	break;
+	case SND_PCM_FORMAT_S8:  	*format = GWC_S8; 	break;
+	case SND_PCM_FORMAT_S16_BE:  *format = GWC_S16_BE; break;
+	case SND_PCM_FORMAT_S16_LE:  *format = GWC_S16_LE; break;
+	default:                 	*format = GWC_UNKNOWN; break;
+	}
 
+	err = snd_pcm_hw_params_set_channels(handle, params, (unsigned int)*channels);
+	if (err < 0) {
+    	snd_perr("ALSA audio_device_set_params: snd_pcm_hw_params_set_channels", err);
+    	return -1;
+	}
 
+	utmp = (unsigned int)*channels;
+	err = snd_pcm_hw_params_get_channels(params, &utmp);
+	if (err < 0) {
+    	snd_perr("ALSA audio_device_set_params: snd_pcm_hw_params_get_channels", err);
+    	return -1;
+	}
+	*channels = (int)utmp;
 
-    err = snd_pcm_hw_params_set_channels(handle, params, *channels);
-    if (err < 0) {
-        snd_perr("ALSA audio_device_set_params: snd_pcm_hw_params_set_channels", err);
-        return -1;
-    }
+	utmp = (unsigned int)*rate;
+	err = snd_pcm_hw_params_set_rate_near(handle, params, &utmp, 0);
+	if (err < 0) {
+    	snd_perr("ALSA audio_device_set_params: snd_pcm_hw_params_set_rate_near", err);
+    	return -1;
+	}
+	*rate = (int)utmp;
 
-    utmp = (unsigned int)*channels ;
+	err = snd_pcm_hw_params(handle, params);
+	if (err < 0) {
+    	snd_perr("ALSA audio_device_set_params: snd_pcm_hw_params", err);
+    	return -1;
+	}
 
-    if (snd_pcm_hw_params_get_channels(params, &utmp) < 0) {
-        snd_perr("ALSA audio_device_set_params: snd_pcm_hw_params_get_channels", err);
-        return -1;
-    }
-    *channels = (int)utmp ;
+	err = snd_pcm_prepare(handle);
+	if (err < 0) {
+    	snd_perr("ALSA audio_device_set_params: snd_pcm_prepare", err);
+    	return -1;
+	}
 
+	/* New stream configuration => reset all counters */
+	written_frames = 0;
+	dropped_frames = 0;
+	_audio_device_processed_bytes = 0;
 
+	/*
+ 	* Cache the TRUE buffer size (frames). Do NOT use snd_pcm_status_get_avail()
+ 	* for this; "avail" is a momentary value, not the capacity.
+ 	*/
+	{
+    	snd_pcm_uframes_t ps = 0;
+    	err = snd_pcm_get_params(handle, &buffer_size_frames, &ps);
+    	if (err < 0) {
+        	snd_perr("ALSA audio_device_set_params: snd_pcm_get_params", err);
+        	buffer_size_frames = 0;
+        	period_size_frames = 0;
+    	} else {
+        	period_size_frames = ps;
+    	}
+	}
 
-    utmp = (unsigned int)*rate ;
-    err = snd_pcm_hw_params_set_rate_near(handle, params, &utmp, 0);
-    if (err < 0) {
-        snd_perr("ALSA audio_device_set_params: snd_pcm_hw_params_set_rate_near", err);
-        return -1;
-    }
-    *rate = (int)utmp ;
+	/* Configure SW params for more predictable start/feeding behaviour */
+	err = snd_pcm_sw_params_current(handle, swparams);
+	if (err < 0) {
+    	snd_perr("ALSA audio_device_set_params: snd_pcm_sw_params_current", err);
+    	/* not fatal */
+	} else {
+    	snd_pcm_uframes_t start_th;
+    	snd_pcm_uframes_t avail_min;
 
+    	/* Start once we have at least one period (or a small fallback). */
+    	start_th  = (period_size_frames > 0) ? period_size_frames : 1024;
+    	avail_min = start_th;
 
-    err = snd_pcm_hw_params(handle, params);
-    if (err < 0) {
-        snd_perr("ALSA audio_device_set_params: snd_pcm_hw_params", err);
-        return -1;
-    }
+    	(void)snd_pcm_sw_params_set_start_threshold(handle, swparams, start_th);
+    	(void)snd_pcm_sw_params_set_avail_min(handle, swparams, avail_min);
 
-    err = snd_pcm_prepare(handle);
-    if (err < 0) {
-        snd_perr("ALSA audio_device_set_params: snd_pcm_prepare", err);
-        return -1;
-    }
+    	err = snd_pcm_sw_params(handle, swparams);
+    	if (err < 0) {
+        	snd_perr("ALSA audio_device_set_params: snd_pcm_sw_params", err);
+        	/* not fatal */
+    	}
+	}
 
-    /* New stream configuration => reset processed-bytes accumulator */
-    _audio_device_processed_bytes = 0;
+	fprintf(stderr, "audio_device_handle %p\n", (void*)handle);
 
-    /*
-     * Cache the TRUE buffer size (frames). Do NOT use snd_pcm_status_get_avail()
-     * for this; "avail" is a momentary value, not the capacity.
-     */
-    {
-        snd_pcm_uframes_t ps = 0;
-        err = snd_pcm_get_params(handle, &buffer_size_frames, &ps);
-        if (err < 0) {
-            snd_perr("ALSA audio_device_set_params: snd_pcm_get_params", err);
-            buffer_size_frames = 0;
-            period_size_frames = 0;
-        } else {
-            period_size_frames = ps;
-        }
-    }
-
-    fprintf(stderr, "audio_device_handle %d\n",(int)handle);
-
-    return 0;
+	return 0;
 }
 
 int audio_device_read(unsigned char *buffer, int buffersize)
 {
-    /* not implemented */
-    return -1;
+	/* not implemented */
+	(void)buffer;
+	(void)buffersize;
+	return -1;
 }
 
 /* recover underrun and suspend */
 static int recover_snd_handle(int err)
 {
-    if (err == -EPIPE) { /* underrun */
-	fprintf(stderr, "recover_snd_handle: err == -EPIPE\n");
-        err = snd_pcm_prepare(handle);
-        if (err < 0)
-            snd_perr("ALSA recover_snd_handle: can't recover underrun, prepare failed", err);
-        return 0;
-    }
-    else if (err == -ESTRPIPE) { /* suspend */
-	fprintf(stderr, "recover_snd_handle: err == -ESTRPIPE\n");
-        while ((err = snd_pcm_resume(handle)) == -EAGAIN)
-            sleep(1);
+	if (err == -EPIPE) { /* underrun */
+    	fprintf(stderr, "recover_snd_handle: err == -EPIPE\n");
 
-        if (err < 0) {
-            err = snd_pcm_prepare(handle);
-            if (err < 0)
-                snd_perr("ALSA recover_snd_handle: can't recover suspend, prepare failed", err);
-        }
-        return 0;
-    }
-    return err;
+    	/* Best-effort estimate of queued frames that will be dropped by prepare */
+    	snd_pcm_uframes_t q = estimate_queued_frames_best_effort();
+
+    	err = snd_pcm_prepare(handle);
+    	if (err < 0) {
+        	snd_perr("ALSA recover_snd_handle: can't recover underrun, prepare failed", err);
+        	return err;
+    	}
+
+    	/* Only account dropped frames if prepare succeeded */
+    	dropped_frames += q;
+    	return 0;
+	}
+	else if (err == -ESTRPIPE) { /* suspend */
+    	fprintf(stderr, "recover_snd_handle: err == -ESTRPIPE\n");
+    	while ((err = snd_pcm_resume(handle)) == -EAGAIN)
+        	sleep(1);
+
+    	if (err < 0) {
+        	/* Best-effort estimate of queued frames that may be dropped */
+        	snd_pcm_uframes_t q = estimate_queued_frames_best_effort();
+
+        	err = snd_pcm_prepare(handle);
+        	if (err < 0) {
+            	snd_perr("ALSA recover_snd_handle: can't recover suspend, prepare failed", err);
+            	return err;
+        	}
+
+        	/* Only account dropped frames if prepare succeeded */
+        	dropped_frames += q;
+    	}
+    	return 0;
+	}
+
+	return err;
 }
 
 int audio_device_write(unsigned char *data, int count)
 {
-    snd_pcm_sframes_t err;
-    snd_pcm_uframes_t result_frames = 0;
-    snd_pcm_uframes_t count_frames = snd_pcm_bytes_to_frames(handle, count);
+	snd_pcm_sframes_t r;
+	snd_pcm_uframes_t total_frames = 0;
+	snd_pcm_uframes_t frames_left;
 
-    while (count_frames > 0) {
-        err = snd_pcm_writei(handle, data, count_frames);
+	if (handle == NULL || data == NULL || count <= 0)
+    	return 0;
 
-        if (err > 0) {
-            result_frames += err;
-            count_frames -= err;
-            data += snd_pcm_frames_to_bytes(handle, err);
-        } else if (err == -EAGAIN) {
-            snd_pcm_wait(handle, 1000);
-        } else if (err < 0) {
-	    if(err == -EINVAL) {
-		fprintf(stderr, "snd_pcm_writei invalid argument: %d %d %d\n",(int)handle,(int)data,(int)count_frames);
-		exit(1) ;
-	    } else if (recover_snd_handle(err) < 0) {
-		fprintf(stderr, "audio_device_write %d %d %d\n",(int)handle,(int)data,(int)count_frames);
-                snd_perr("ALSA audio_device_write: snd_pcm_writei", err);
-		exit(1) ;
-                return -1;
-            }
-        }
-    }
+	frames_left = snd_pcm_bytes_to_frames(handle, (snd_pcm_uframes_t)count);
 
-    written_frames += result_frames;
+	while (frames_left > 0) {
+    	r = snd_pcm_writei(handle, data, frames_left);
 
-    return snd_pcm_frames_to_bytes(handle, result_frames);
+    	if (r > 0) {
+        	/* wrote r frames */
+        	total_frames += (snd_pcm_uframes_t)r;
+        	frames_left -= (snd_pcm_uframes_t)r;
+        	data += snd_pcm_frames_to_bytes(handle, (snd_pcm_uframes_t)r);
+        	continue;
+    	}
+
+    	if (r == -EINTR) {
+        	/* interrupted by signal, retry */
+        	continue;
+    	}
+
+if (r == -EAGAIN) {
+	/* nonblocking: wait until device is ready */
+	int w = snd_pcm_wait(handle, 1000);
+
+	if (w == 0) {
+		/* Timed out waiting; no progress right now. */
+		return (total_frames > 0)
+			? (int)snd_pcm_frames_to_bytes(handle, total_frames)
+			: 0;
+	}
+
+	if (w < 0) {
+    	/* wait failed; try recovery then retry */
+    	if (recover_snd_handle(w) < 0) {
+        	snd_perr("ALSA audio_device_write: snd_pcm_wait", w);
+        	return (total_frames > 0)
+            	? (int)snd_pcm_frames_to_bytes(handle, total_frames)
+            	: -1;
+    	}
+	}
+	continue;
 }
 
-/* Number of bytes processed since opening the device. */
+    	if (r == -EINVAL) {
+        	/* programming error / wrong params; do NOT crash whole app */
+        	fprintf(stderr,
+                	"ALSA snd_pcm_writei invalid argument: handle=%p data=%p frames=%lu\n",
+                	(void*)handle, (void*)data, (unsigned long)frames_left);
+        	snd_perr("ALSA audio_device_write: snd_pcm_writei (-EINVAL)", (int)r);
+        	return (total_frames > 0)
+            	? (int)snd_pcm_frames_to_bytes(handle, total_frames)
+            	: -1;
+    	}
+
+    	/* Other errors: try XRUN/suspend recovery */
+    	if (recover_snd_handle((int)r) < 0) {
+        	fprintf(stderr,
+                	"ALSA audio_device_write failed: handle=%p data=%p frames=%lu\n",
+                	(void*)handle, (void*)data, (unsigned long)frames_left);
+        	snd_perr("ALSA audio_device_write: snd_pcm_writei", (int)r);
+
+        	/* If we already wrote something, return partial progress */
+        	return (total_frames > 0)
+            	? (int)snd_pcm_frames_to_bytes(handle, total_frames)
+            	: -1;
+    	}
+
+    	/* recovered; retry write */
+	}
+
+	written_frames += total_frames;
+	return (int)snd_pcm_frames_to_bytes(handle, total_frames);
+}
+
+/* Best-effort estimate of queued frames currently pending playback.
+* This is used only to adjust dropped_frames during XRUN/suspend recovery.
+*
+* We prefer delay (distance between app and sound position), but fall back
+* to status/avail when needed. */
+static snd_pcm_uframes_t estimate_queued_frames_best_effort(void)
+{
+	snd_pcm_sframes_t delay = 0;
+	snd_pcm_status_t *status;
+	int err;
+
+	if (handle == NULL)
+    	return 0;
+
+	err = snd_pcm_delay(handle, &delay);
+	if (err >= 0 && delay > 0)
+    	return (snd_pcm_uframes_t)delay;
+
+	snd_pcm_status_alloca(&status);
+	err = snd_pcm_status(handle, status);
+	if (err < 0)
+    	return 0;
+
+	if (buffer_size_frames == 0)
+    	return 0;
+
+	/* queued ≈ buffer_size - avail (clamped) */
+	{
+    	snd_pcm_sframes_t avail = (snd_pcm_sframes_t)snd_pcm_status_get_avail(status);
+    	snd_pcm_sframes_t q = (snd_pcm_sframes_t)buffer_size_frames - avail;
+    	if (q < 0) q = 0;
+    	if ((snd_pcm_uframes_t)q > buffer_size_frames) q = (snd_pcm_sframes_t)buffer_size_frames;
+    	return (snd_pcm_uframes_t)q;
+	}
+}
+
 long query_processed_bytes(void)
 {
-    if(handle != NULL) {
+    if (!handle) return 0;
 
-        int err;
-        snd_pcm_status_t *status;
-        snd_pcm_sframes_t avail_frames;
-        snd_pcm_sframes_t queued_frames;
-        snd_pcm_sframes_t played_frames;
-        long played_bytes;
+    snd_pcm_status_t *status;
+    snd_pcm_status_alloca(&status);
 
-        snd_pcm_status_alloca(&status);
+    int err = snd_pcm_status(handle, status);
+    if (err < 0) {
+        if (recover_snd_handle(err) < 0) return _audio_device_processed_bytes;
         err = snd_pcm_status(handle, status);
-        if (err < 0) {
-            if (recover_snd_handle(err) < 0) {
-                snd_perr("ALSA query_processed_bytes: snd_pcm_status", err);
-                return 0;
-            }
-            err = snd_pcm_status(handle, status);
-            if (err < 0) {
-                snd_perr("ALSA query_processed_bytes: snd_pcm_status (after recover)", err);
-                return 0;
-            }
-        }
-
-        /* Consistent snapshot of avail (frames available for writing). */
-        avail_frames = (snd_pcm_sframes_t)snd_pcm_status_get_avail(status); /* see docs */
-
-        /* Ensure we have a real buffer size cached; fallback if needed. */
-        if (buffer_size_frames == 0) {
-            snd_pcm_uframes_t period_size = 0;
-            err = snd_pcm_get_params(handle, &buffer_size_frames, &period_size);
-            if (err < 0) buffer_size_frames = 0;
-        }
-        if (buffer_size_frames == 0) {
-            /* Can't compute queued reliably; best effort: never advance backwards */
-            return _audio_device_processed_bytes;
-        }
-
-        /* queued = buffer_size - avail (clamp to sane range) */
-        queued_frames = (snd_pcm_sframes_t)buffer_size_frames - avail_frames;
-        if (queued_frames < 0) queued_frames = 0;
-        if ((snd_pcm_uframes_t)queued_frames > buffer_size_frames)
-            queued_frames = (snd_pcm_sframes_t)buffer_size_frames;
-
-        played_frames = (snd_pcm_sframes_t)written_frames - queued_frames;
-        if (played_frames < 0) played_frames = 0;
-        if ((snd_pcm_uframes_t)played_frames > written_frames)
-            played_frames = (snd_pcm_sframes_t)written_frames;
-
-        played_bytes = snd_pcm_frames_to_bytes(handle, (snd_pcm_uframes_t)played_frames);
-
-        /* Monotonic clamp: never go backwards due to jitter */
-        if (played_bytes < _audio_device_processed_bytes)
-            played_bytes = _audio_device_processed_bytes;
-
-        return played_bytes;
+        if (err < 0) return _audio_device_processed_bytes;
     }
 
-    return 0 ;
-}
+    /* delay = frames still queued before playback catches up */
+    snd_pcm_sframes_t delay_frames = snd_pcm_status_get_delay(status);
+    if (delay_frames < 0) delay_frames = 0;
 
+    snd_pcm_sframes_t played_frames = (snd_pcm_sframes_t)written_frames - delay_frames;
+    if (played_frames < 0) played_frames = 0;
+
+    long played_bytes = snd_pcm_frames_to_bytes(handle, (snd_pcm_uframes_t)played_frames);
+
+    /* monotonic clamp */
+    if (played_bytes < _audio_device_processed_bytes)
+        played_bytes = _audio_device_processed_bytes;
+
+    return played_bytes;
+}
 
 /* Number of bytes processed since opening the device. */
 long audio_device_processed_bytes(void)
 {
-    if(handle != NULL)
-	_audio_device_processed_bytes = query_processed_bytes() ;
+	if (handle != NULL)
+    	_audio_device_processed_bytes = query_processed_bytes();
 
-    return _audio_device_processed_bytes ;
+	return _audio_device_processed_bytes;
 }
 
 void audio_device_close(int drain)
 {
-    if (handle != NULL) {
-        int err;
+	if (handle != NULL) {
+    	int err;
 
-	printf("Closing the ALSA audio device\n") ;
+    	printf("Closing the ALSA audio device\n");
 
-	_audio_device_processed_bytes = query_processed_bytes() ;
+    	_audio_device_processed_bytes = query_processed_bytes();
 
-	if(drain)
-	    err = snd_pcm_drain(handle);
+    	if (drain) {
+        	err = snd_pcm_drain(handle);
+        	if (err < 0) {
+            	snd_perr("ALSA audio_device_close: snd_pcm_drain", err);
+        	}
+    	} else {
+        	err = snd_pcm_drop(handle);
+        	if (err < 0) {
+            	snd_perr("ALSA audio_device_close: snd_pcm_drop", err);
+        	}
+    	}
 
-        err = snd_pcm_drop(handle);
-        if (err < 0) {
-            snd_perr("ALSA audio_device_close: snd_pcm_drop", err);
-        }
+    	err = snd_pcm_close(handle);
+    	if (err < 0) {
+        	snd_perr("ALSA audio_device_close: snd_pcm_close", err);
+    	}
 
-        err = snd_pcm_close(handle);
-        if (err < 0) {
-            snd_perr("ALSA audio_device_close: snd_pcm_close", err);
-        }
-
-        handle = NULL;
-    }
-    drain_delta=0 ;
+    	handle = NULL;
+	}
 }
 
 int audio_device_best_buffer_size(int playback_bytes_per_block)
 {
-    int frame_size = 4096;
-    snd_pcm_uframes_t bs = buffer_size_frames;
-    snd_pcm_uframes_t ps = period_size_frames;
+	int frame_size = 4096;
+	snd_pcm_uframes_t bs = buffer_size_frames;
+	snd_pcm_uframes_t ps = period_size_frames;
 
-    /* Ensure cached params exist (best effort) */
-    if (handle != NULL && (bs == 0 || ps == 0)) {
-        snd_pcm_uframes_t tmp_ps = 0;
-        int err = snd_pcm_get_params(handle, &bs, &tmp_ps);
-        if (err >= 0) {
-            buffer_size_frames = bs;
-            period_size_frames = tmp_ps;
-            ps = tmp_ps;
-        }
-    }
+	/* Ensure cached params exist (best effort) */
+	if (handle != NULL && (bs == 0 || ps == 0)) {
+    	snd_pcm_uframes_t tmp_ps = 0;
+    	int err = snd_pcm_get_params(handle, &bs, &tmp_ps);
+    	if (err >= 0) {
+        	buffer_size_frames = bs;
+        	period_size_frames = tmp_ps;
+        	ps = tmp_ps;
+    	}
+	}
 
-    /* Use period size as a stable write quantum; fallback to 4K if unknown */
-    if (handle != NULL && ps > 0)
-        frame_size = snd_pcm_frames_to_bytes(handle, ps);
-    else
-        frame_size = 4096;
+	/* Use period size as stable base quantum; scale up to requested block size */
+	if (handle != NULL && ps > 0) {
+    	int period_bytes = snd_pcm_frames_to_bytes(handle, ps);
+    	if (period_bytes > 0)
+        	frame_size = period_bytes;
 
-/*      fprintf(stderr, "ALSA audio_device_best_buffer_size:%d (frames:%ld)\n", frame_size, buffer_total_frames) ;  */
+    	/* If caller requested larger blocks, step up in whole periods */
+    	while (frame_size < playback_bytes_per_block && period_bytes > 0) {
+        	frame_size += period_bytes;
+    	}
+	} else {
+    	frame_size = 4096;
+	}
 
+	if (frame_size < 4096 && frame_size > 0) {
+    	int s = frame_size;
+    	while (frame_size < 4096) frame_size += s;
+    	printf("ALSA audio_device_adjusted_buffer_size:%d\n", frame_size);
+	}
 
-    if(frame_size < 4096 && frame_size > 0) {
-	int s = frame_size ;
-	while(frame_size < 4096) frame_size += s ;
-	printf("ALSA audio_device_adjusted_buffer_size:%d\n", frame_size) ;
-    }
+	if (frame_size == 0) {
+    	warning("Your ALSA audio device driver gives invalid information for its buffer size, defaulting to 4K bytes, this may produce strange playback results");
+    	frame_size = 4096;
+	}
 
-    if(frame_size == 0) {
-	warning("Your ALSA audio device driver gives invalid information for its buffer size, defaulting to 4K bytes, this may produce strange playback results") ;
-	frame_size = 4096 ;
-    }
-
-    return frame_size ;
+	return frame_size;
 }
 
 int audio_device_nonblocking_write_buffer_size(int maxbufsize,
-                                               int playback_bytes_remaining)
+                                           	int playback_bytes_remaining)
 {
-    int len = 0;
-    snd_pcm_sframes_t frames = snd_pcm_avail_update(handle);
+	int len = 0;
+	snd_pcm_sframes_t frames = snd_pcm_avail_update(handle);
 
-    if (frames < 0) {
-        snd_perr("audio_device_nonblocking_write_buffer_size: snd_pcm_avail_update",
-             frames);
+	if (frames < 0) {
+    	snd_perr("audio_device_nonblocking_write_buffer_size: snd_pcm_avail_update",
+             	(int)frames);
 
-		if (recover_snd_handle(frames) < 0) {
-			fprintf(stderr, "audio_device_nonblocking_write_buffer_size: could not recover handle\n");
-			return -1 ;
-		}
+    	if (recover_snd_handle((int)frames) < 0) {
+        	fprintf(stderr, "audio_device_nonblocking_write_buffer_size: could not recover handle\n");
+        	return -1;
+    	}
 
-        /* Re-query after recovery */
-        frames = snd_pcm_avail_update(handle);
-        if (frames < 0) {
-            snd_perr("audio_device_nonblocking_write_buffer_size: snd_pcm_avail_update (after recover)",
-                 frames);
-            return -1;
-        }
-    }
+    	/* Re-query after recovery */
+    	frames = snd_pcm_avail_update(handle);
+    	if (frames < 0) {
+        	snd_perr("audio_device_nonblocking_write_buffer_size: snd_pcm_avail_update (after recover)",
+                 	(int)frames);
+        	return -1;
+    	}
+	}
 
-    len = snd_pcm_frames_to_bytes(handle, frames);
+	len = snd_pcm_frames_to_bytes(handle, (snd_pcm_uframes_t)frames);
 
-    if (len > maxbufsize)
-        len = maxbufsize;
+	if (len > maxbufsize)
+    	len = maxbufsize;
 
-    if (len > playback_bytes_remaining)
-        len = playback_bytes_remaining;
+	if (len > playback_bytes_remaining)
+    	len = playback_bytes_remaining;
 
-    /*     printf("audio_device_nonblocking_write_buffer_size:%d\n", len); */
-
-    return len;
+	return len;
 }
-
