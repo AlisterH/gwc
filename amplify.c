@@ -32,6 +32,70 @@ static gfloat amount_first_r[2] = {0.0,1.0} ;
 static gfloat amount_last_r[2] = {0.0,1.0} ;
 static int feather_width = 20 ;
 
+#include <math.h>   /* fabs, log10 */
+
+/* If your internal samples are int32-scaled, this is correct.
+ * If you support other integer widths, replace with a proper per-file value. */
+static inline double full_scale_value(const struct sound_prefs *p)
+{
+    (void)p;
+    /* Use INT32_MAX for all files as GWC internals use 32bit for all processing */
+    return 2147483647.0;
+}
+
+static double peak_abs_range(long first, long last, int channel_mask)
+{
+    long left[BUFSIZE], right[BUFSIZE];
+    long current = first;
+    double peak = 0.0;
+
+    if (last < first) return 0.0;
+
+    while (current <= last) {
+        long n = MIN(last - current + 1, BUFSIZE);
+        long tmplast = current + n - 1;
+
+        n = read_wavefile_data(left, right, current, tmplast);
+
+        for (long i = 0; i < n; i++) {
+            if (channel_mask & 0x01) {
+                double a = fabs((double)left[i]);
+                if (a > peak) peak = a;
+            }
+            if (channel_mask & 0x02) {
+                double a = fabs((double)right[i]);
+                if (a > peak) peak = a;
+            }
+        }
+        current += n;
+    }
+
+    return peak;
+}
+
+static double max_selection_gain_simple(const struct sound_prefs *p,
+                                        const struct view *v)
+{
+    int mask = v->channel_selection_mask & 0x03;
+    if (mask == 0) mask = 0x03;
+
+    long first = v->selected_first_sample;
+    long last  = v->selected_last_sample;
+
+    /* If no selection is active, use the visible range (or choose whole file) */
+    if (!v->selection_region) {
+        first = v->first_sample;
+        last  = v->last_sample;
+    }
+
+    if (last < first) { long t = first; first = last; last = t; }
+
+    double peak = peak_abs_range(first, last, mask);
+    if (peak <= 0.0) return 1.0;
+
+    return full_scale_value(p) / peak;
+}
+
 void simple_amplify_audio(struct sound_prefs *p, long first, long last, int channel_mask, double amount)
 {
     long left[BUFSIZE], right[BUFSIZE] ;
@@ -207,7 +271,9 @@ int amplify_dialog(struct sound_prefs current, struct view *v)
 			 GTK_STOCK_OK, GTK_RESPONSE_OK, NULL, NULL);
     gtk_dialog_set_default_response (GTK_DIALOG(dlg), GTK_RESPONSE_OK);
 
-    sprintf(buf, "Maximum amplification without clipping is %6.2f.\n", (double)1.0/(double)current.max_value) ;
+	double maxamp = max_selection_gain_simple(&current, v);
+	sprintf(buf, "Maximum amplification without clipping for selection is %6.2f.\n",
+			maxamp);
 
     maxtext = gtk_label_new (buf);
     gtk_widget_show (maxtext);
@@ -288,6 +354,6 @@ void batch_normalize(struct sound_prefs *p, long first, long last, int channel_m
 	amount_first_r[1] = amount_first_l[0] ;
 	amount_last_r[1] = amount_first_l[0] ;
     feather_width = 2000;
-    //fprintf(stderr, "Maximum amplification without clipping is %f \n", amount_first_l[0]) ;
+    fprintf(stderr, "Amplifying by a factor of %f \n", amount_first_l[0]) ;
     amplify_audio(p,first,last,channel_mask);
 }
