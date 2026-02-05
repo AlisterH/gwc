@@ -163,6 +163,7 @@ gint decrackle_average = 3;
 gint encoding_type = GWC_OGG;
 
 extern double spectral_amp;
+extern int audio_state;
 
 #ifdef HAVE_ALSA
 char audio_device[256]="default";
@@ -1343,6 +1344,58 @@ void gnome_flush(void)
 	gtk_main_iteration();
 }
 
+/* -------------------------------------------------------------------------
+ * Cursor-driven meters using sample_block summaries
+ *
+ * Fixes VU freeze during ALSA "default" drain / large buffering by deriving
+ * VU values from the waveform summary at the current cursor position.
+ * ------------------------------------------------------------------------- */
+
+/* choose what your meter displays */
+static inline float amp_to_meter(float amp)
+{
+    /* "modern" dBFS meter mapping */
+    const float floor_db = -48.0f;          /* bottom of scale shown
+											Pick a display floor
+											Common choices:
+											−60 dBFS floor for “always shows something”
+											−48 dBFS if you want it less sensitive to background/noise */
+    float db = 20.0f * log10f(amp + 1e-12f);/* dBFS, amp in 0..1 */
+
+    /* map [floor_db .. 0] -> [0 .. 1] */
+    float m = (db - floor_db) / (0.0f - floor_db);
+    if (m < 0.0f) m = 0.0f;
+    if (m > 1.0f) m = 1.0f;
+    return m;
+}
+
+/* sample_block.c provides this accessor */
+int get_sample_buffer(struct sample_block **result);
+
+/* Optional meter smoothing (ballistics) */
+static float vu_l_smooth = 0.0f;
+static float vu_r_smooth = 0.0f;
+
+static inline float clamp01f(float x)
+{
+	if (x < 0.0f) return 0.0f;
+if (x > 1.0f) return 1.0f;
+	return x;
+}
+
+static inline float vu_smooth(float prev, float target)
+{
+	/* Simple attack/release smoothing.
+	* Tune these constants to taste.
+	*/
+	const float attack  = 0.55f;  /* faster rise */
+	const float release = 0.92f;  /* slower fall */
+	if (target > prev)
+		return attack * target + (1.0f - attack) * prev;
+	else
+		return release * prev + (1.0f - release) * target;
+}
+
 long playback_samples_per_block;
 
 gint play_a_block(gpointer data)
@@ -1353,17 +1406,78 @@ gint play_a_block(gpointer data)
     get_region_of_interest(&first, &last, &audio_view);
 
     if (audio_playback == TRUE) {
-
-	if (process_audio(&l, &r) == 0) {
-	    led_bar_light_percent(dial[0], l);
-	    led_bar_light_percent(dial[1], r);
-	} else {
-	    d_print("process_audio returns nonzero.\n");
-	}
+    	/* Keep feeding audio while we're actively decoding/writing */
+    	if (process_audio(&l, &r) != 0) {
+        	d_print("process_audio returns nonzero.\n");
+    	}
     }
 
     bytes_left =
 	set_playback_cursor_position(&audio_view, prev_cursor_millisec);
+	/* --- NEW: meters follow cursor using waveform summary (sample_buffer) --- */
+	if (audio_state == AUDIO_IS_PLAYBACK) {
+    	struct sample_block *sb = NULL;
+    	int nb = get_sample_buffer(&sb);
+
+    	if (sb != NULL && nb > 0) {
+        	long s = audio_view.cursor_position; /* sample index */
+        	long bi = s / SBW;
+        	float ml, mr;
+
+        	/* clamp to valid block range */
+        	if (bi < 0) bi = 0;
+        	if (bi >= nb) bi = nb - 1;
+
+/*static int dbg=0;
+if ((dbg++ % 60) == 0)
+    fprintf(stderr, "prefs.stereo=%d\n", prefs.stereo);
+static int dbg2=0;
+if ((dbg2++ % 30) == 0) {
+    fprintf(stderr, "bi=%ld rmsL=%g rmsR=%g maxL=%g maxR=%g\n",
+            bi,
+            sb[bi].rms[0], sb[bi].rms[1],
+            sb[bi].max_value[0], sb[bi].max_value[1]);
+}*/
+
+			/* Choose ONE: RMS-based or PEAK-based source  */
+			//float srcL = (float)sb[bi].rms[0];
+			//float srcR = (float)sb[bi].rms[1];
+
+			/* If you want PEAK instead, use: */
+			float srcL = (float)sb[bi].max_value[0];
+			float srcR = (float)sb[bi].max_value[1];
+			
+
+			if (!prefs.stereo) srcR = srcL;
+
+			/* Convert to "modern" meter scale */
+			ml = amp_to_meter(srcL);
+			mr = amp_to_meter(srcR);
+
+			/* RMS levels
+        	ml = clamp01f(ml);
+        	mr = clamp01f(mr);
+
+        	/* Optional smoothing */
+        	vu_l_smooth = vu_smooth(vu_l_smooth, ml);
+        	vu_r_smooth = vu_smooth(vu_r_smooth, mr);
+			static int dbg=0;
+if ((dbg++ % 30) == 0) {
+    fprintf(stderr, "bi=%ld ml=%g mr=%g (srcL=%g srcR=%g)\n",
+            bi, ml, mr, srcL, srcR);
+}
+        	led_bar_light_percent(dial[0], vu_l_smooth);
+        	led_bar_light_percent(dial[1], vu_r_smooth);
+    	} else {
+        	/* No sample buffer available -> decay to zero */
+        	vu_l_smooth = vu_smooth(vu_l_smooth, 0.0f);
+        	vu_r_smooth = vu_smooth(vu_r_smooth, 0.0f);
+        	led_bar_light_percent(dial[0], vu_l_smooth);
+        	led_bar_light_percent(dial[1], vu_r_smooth);
+    	}
+	}
+
+
 /*      fprintf(stderr, "bytes_left:%ld\n", bytes_left) ;  */
 
     if (bytes_left < 10 && !audio_is_looping) {	/* the  "10" is to allow some error in the audio driver */

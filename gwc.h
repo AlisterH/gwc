@@ -60,6 +60,11 @@
 #define PROGRESS_UPDATE_INTERVAL 0.5	/* update status bar every 1/2  second on long edit operations */
 #define MAX_AUDIO_BUFSIZE 32768
 
+#define AUDIO_IS_IDLE 0x00
+#define AUDIO_IS_MONITOR 0x01
+#define AUDIO_IS_RECORDING  0x02
+#define AUDIO_IS_PLAYBACK  0x04
+
 /* defs for declicking results */
 #define SINGULAR_MATRIX 0
 #define REPAIR_SUCCESS 1

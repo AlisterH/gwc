@@ -247,6 +247,9 @@ long playback_samples_remaining = 0 ;
 long playback_total_bytes ;
 int playback_bytes_per_block ;
 static long playback_processed_base = 0;
+static int playback_finishing = 0;
+static long playback_finish_target_bytes = 0;
+
 
 #define MAXBUFSIZE 32768
 int BUFSIZE ;
@@ -372,7 +375,8 @@ long start_playback(char *output_device, struct view *v, struct sound_prefs *p, 
     playback_total_bytes = playback_samples_remaining*PLAYBACK_FRAMESIZE ;
 
     audio_state = AUDIO_IS_PLAYBACK ;
-
+    playback_finishing = 0;
+    playback_finish_target_bytes = 0;
     position_wavefile_pointer(playback_start_position) ;
 /*      g_print("playback_start_position is %ld\n", playback_start_position) ;  */
 
@@ -1311,6 +1315,23 @@ int process_audio(gfloat *pL, gfloat *pR)
 	return 1 ;
     }
 
+/* If we're finishing, don't read more data; just wait for device to drain */
+if (audio_state == AUDIO_IS_PLAYBACK && playback_finishing) {
+    long bytes = audio_device_processed_bytes() - playback_processed_base;
+    if (bytes < 0) bytes = 0;
+
+    if (bytes >= playback_finish_target_bytes) {
+        /* Playback really finished. Close quickly (no drain needed now). */
+        audio_state = AUDIO_IS_IDLE;
+        audio_device_close(0);
+        playback_finishing = 0;
+        return 1;   /* stop timer */
+    }
+
+    /* Keep running timer so cursor updates until end */
+    return 0;
+}
+
     if(audio_state == AUDIO_IS_RECORDING) {
 	if((len = audio_device_read(audio_buffer, BUFSIZE)) == -1) {
 	    warning("Error on audio read...") ;
@@ -1427,26 +1448,32 @@ int process_audio(gfloat *pL, gfloat *pR)
 	if(playback_samples_remaining < 1) {
 	    extern int audio_is_looping ;
 
-	    if(audio_is_looping == FALSE) {
-		unsigned char zeros[1024] ;
-		long zeros_needed ;
-		memset(zeros,0,sizeof(zeros)) ;
-		audio_playback = FALSE ;
+if (audio_is_looping == FALSE) {
+    unsigned char zeros[1024];
+    long zeros_needed;
 
-		zeros_needed = playback_bytes_per_block - (playback_total_bytes % playback_bytes_per_block) ;
-		if(zeros_needed < PLAYBACK_FRAMESIZE) zeros_needed = PLAYBACK_FRAMESIZE ; 
-		do {
-		    len = audio_device_write(zeros, MIN(zeros_needed, sizeof(zeros))) ;
-                	if (len <= 0) break;      	/* stop on error or no progress */
-                	zeros_needed -= len ;
-            	} while (zeros_needed > 0) ;
+    /* Enter "finishing" mode: stop feeding file data, but keep callback alive
+       so cursor/VU can continue to update while device drains. */
+    audio_playback = FALSE;
+    playback_finishing = 1;
 
-            	/* Finish and release the device like the Stop button does */
-            	stop_playback(0);
+    /* We want the cursor to stop at the end of real audio, not padding. */
+    playback_finish_target_bytes = playback_total_bytes;
 
-		g_print("Stop playback with playback_samples_remaining:%ld\n", playback_samples_remaining) ;
-		return 1 ;
-	    } else {
+    /* Optional: write alignment padding ONCE */
+    memset(zeros, 0, sizeof(zeros));
+    zeros_needed = playback_bytes_per_block - (playback_total_bytes % playback_bytes_per_block);
+    if (zeros_needed < PLAYBACK_FRAMESIZE) zeros_needed = PLAYBACK_FRAMESIZE;
+
+    while (zeros_needed > 0) {
+        int n = audio_device_write(zeros, MIN(zeros_needed, (long)sizeof(zeros)));
+        if (n <= 0) break;          /* stop on error or no progress */
+        zeros_needed -= n;
+    }
+
+    /* Keep timer running */
+    return 0;
+} else {
 		playback_position = playback_start_position ;
 		playback_samples_remaining = (playback_end_position-playback_start_position) ;
 		position_wavefile_pointer(playback_position) ;

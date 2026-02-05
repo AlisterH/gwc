@@ -22,12 +22,6 @@
 #ifndef AUDIO_DEVICE_H
 #define AUDIO_DEVICE_H
 
-#define AUDIO_IS_IDLE 0x00
-#define AUDIO_IS_MONITOR 0x01
-#define AUDIO_IS_RECORDING  0x02
-#define AUDIO_IS_PLAYBACK  0x04
-
-
 typedef enum {
     GWC_U8,
     GWC_S8,
