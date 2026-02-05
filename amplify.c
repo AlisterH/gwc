@@ -87,54 +87,48 @@ static void normalise_range_to_file(const struct view *v, long *first, long *las
     if (*last  > v->n_samples - 1) *last  = v->n_samples - 1;
 }
 
+/* Returns true if the range covers the full file */
 static int range_is_full_file(const struct view *v, long first, long last)
 {
-    return (first == 0 && last == (v->n_samples - 1));
+    /* Allow for minor off-by-one rounding issues */
+	/* Perhaps we should change this to allow for a bit more? */
+    if (first <= 0 && last >= v->n_samples - 1)
+        return 1;
+    return 0;
 }
 
 /* Returns max safe multiply for either:
  *  - active selection, OR
  *  - current view if no selection.
- * If selection == full file, use old global computation (1/current.max_value). */
+ * Uses old global computation (1/current.max_value) if the range covers the full file.
+ * That may be faster for large files as the max value is already precalculated */
 static double max_gain_for_view_or_selection(const struct sound_prefs *p,
                                              const struct sound_prefs *current,
-                                             const struct view *v,
-                                             int *used_old_global,
-                                             int *used_selection)
-
+                                             const struct view *v)
 {
     int mask = v->channel_selection_mask & 0x03;
     if (mask == 0) mask = 0x03;
 
     long first, last;
+
     if (v->selection_region) {
         first = v->selected_first_sample;
         last  = v->selected_last_sample;
-        if (used_selection) *used_selection = 1;
-	} else {
+    } else {
         first = v->first_sample;
         last  = v->last_sample;
-        if (used_selection) *used_selection = 0;
-   }
+    }
 
     normalise_range_to_file(v, &first, &last);
 
-    /* Special case: selection is full file -> use existing old logic. */
-    if (v->selection_region && range_is_full_file(v, first, last)) {
-        if (used_old_global) *used_old_global = 1;
-        if (current->max_value > 0.0)
-            return 1.0 / (double)current->max_value;
-        return 1.0;
+    /* Full-file range -> old logic */
+    if (range_is_full_file(v, first, last)) {
+        return (current->max_value > 0.0) ? 1.0 / (double)current->max_value : 1.0;
     }
 
-    if (used_old_global) *used_old_global = 0;
-
-    {
-        double peak = peak_abs_range(first, last, mask);
-        if (peak <= 0.0) return 1.0;
-        return full_scale_value(p) / peak;
-    }
-
+    /* Otherwise, compute peak over the selected range */
+    double peak = peak_abs_range(first, last, mask);
+    return (peak > 0.0) ? full_scale_value(p) / peak : 1.0;
 }
 
 void simple_amplify_audio(struct sound_prefs *p, long first, long last, int channel_mask, double amount)
@@ -313,20 +307,8 @@ int amplify_dialog(struct sound_prefs current, struct view *v)
     gtk_dialog_set_default_response (GTK_DIALOG(dlg), GTK_RESPONSE_OK);
 
     {
-        int used_old = 0;
-        int used_sel = 0;
-        double maxamp = max_gain_for_view_or_selection(&current, &current, v, &used_old, &used_sel);
-
-        if (used_old) {
-            sprintf(buf, "Maximum amplification without clipping is %6.2f.\n",
-                    maxamp);
-        } else if (used_sel) {
-            sprintf(buf, "Maximum amplification without clipping for selection is %6.2f.\n",
-                    maxamp);
-        } else {
-            sprintf(buf, "Maximum amplification without clipping for current view is %6.2f.\n",
-                    maxamp);
-        }
+        double maxamp = max_gain_for_view_or_selection(&current, &current, v);
+        sprintf(buf, "Maximum amplification without clipping is %6.2f.\n", maxamp);
     }
 
     maxtext = gtk_label_new (buf);
