@@ -73,27 +73,68 @@ static double peak_abs_range(long first, long last, int channel_mask)
     return peak;
 }
 
-static double max_selection_gain_simple(const struct sound_prefs *p,
-                                        const struct view *v)
+
+/* Normalise bounds, clamp to file, and decide whether we should use old global logic. */
+static void normalise_range_to_file(const struct view *v, long *first, long *last)
+{
+    /* swap if reversed */
+    if (*last < *first) { long t = *first; *first = *last; *last = t; }
+
+    /* clamp to file range */
+    if (*first < 0) *first = 0;
+    if (*last < 0)  *last  = 0;
+    if (*first > v->n_samples - 1) *first = v->n_samples - 1;
+    if (*last  > v->n_samples - 1) *last  = v->n_samples - 1;
+}
+
+static int range_is_full_file(const struct view *v, long first, long last)
+{
+    return (first == 0 && last == (v->n_samples - 1));
+}
+
+/* Returns max safe multiply for either:
+ *  - active selection, OR
+ *  - current view if no selection.
+ * If selection == full file, use old global computation (1/current.max_value). */
+static double max_gain_for_view_or_selection(const struct sound_prefs *p,
+                                             const struct sound_prefs *current,
+                                             const struct view *v,
+                                             int *used_old_global,
+                                             int *used_selection)
+
 {
     int mask = v->channel_selection_mask & 0x03;
     if (mask == 0) mask = 0x03;
 
-    long first = v->selected_first_sample;
-    long last  = v->selected_last_sample;
-
-    /* If no selection is active, use the visible range (or choose whole file) */
-    if (!v->selection_region) {
+    long first, last;
+    if (v->selection_region) {
+        first = v->selected_first_sample;
+        last  = v->selected_last_sample;
+        if (used_selection) *used_selection = 1;
+	} else {
         first = v->first_sample;
         last  = v->last_sample;
+        if (used_selection) *used_selection = 0;
+   }
+
+    normalise_range_to_file(v, &first, &last);
+
+    /* Special case: selection is full file -> use existing old logic. */
+    if (v->selection_region && range_is_full_file(v, first, last)) {
+        if (used_old_global) *used_old_global = 1;
+        if (current->max_value > 0.0)
+            return 1.0 / (double)current->max_value;
+        return 1.0;
     }
 
-    if (last < first) { long t = first; first = last; last = t; }
+    if (used_old_global) *used_old_global = 0;
 
-    double peak = peak_abs_range(first, last, mask);
-    if (peak <= 0.0) return 1.0;
+    {
+        double peak = peak_abs_range(first, last, mask);
+        if (peak <= 0.0) return 1.0;
+        return full_scale_value(p) / peak;
+    }
 
-    return full_scale_value(p) / peak;
 }
 
 void simple_amplify_audio(struct sound_prefs *p, long first, long last, int channel_mask, double amount)
@@ -271,9 +312,22 @@ int amplify_dialog(struct sound_prefs current, struct view *v)
 			 GTK_STOCK_OK, GTK_RESPONSE_OK, NULL, NULL);
     gtk_dialog_set_default_response (GTK_DIALOG(dlg), GTK_RESPONSE_OK);
 
-	double maxamp = max_selection_gain_simple(&current, v);
-	sprintf(buf, "Maximum amplification without clipping for selection is %6.2f.\n",
-			maxamp);
+    {
+        int used_old = 0;
+        int used_sel = 0;
+        double maxamp = max_gain_for_view_or_selection(&current, &current, v, &used_old, &used_sel);
+
+        if (used_old) {
+            sprintf(buf, "Maximum amplification without clipping is %6.2f.\n",
+                    maxamp);
+        } else if (used_sel) {
+            sprintf(buf, "Maximum amplification without clipping for selection is %6.2f.\n",
+                    maxamp);
+        } else {
+            sprintf(buf, "Maximum amplification without clipping for current view is %6.2f.\n",
+                    maxamp);
+        }
+    }
 
     maxtext = gtk_label_new (buf);
     gtk_widget_show (maxtext);
