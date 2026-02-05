@@ -35,12 +35,18 @@
 
 static int audio_fd = -1 ;
 
-
 int audio_device_open(char *output_device)
 {
-    if( (audio_fd = open(output_device, O_WRONLY)) == -1) {
-        warning("Failed to open OSS audio output device.");
-	return -1;
+    int flags = O_WRONLY; /* safest if read() exists / some devices are quirky */
+    audio_fd = open(output_device, flags);
+    if (audio_fd == -1) {
+        char buf[512];
+        snprintf(buf, sizeof(buf),
+                 "Failed to open OSS audio device %s: %s",
+                 output_device ? output_device : "(null)",
+                 strerror(errno));
+        warning(buf);
+        return -1;
     }
     return 0;
 }
@@ -88,33 +94,68 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate)
 
 int audio_device_read(unsigned char *buffer, int buffersize)
 {
-    int len = read(audio_fd, buffer, buffersize);
+    ssize_t len;
+    do {
+        len = read(audio_fd, buffer, (size_t)buffersize);
+    } while (len == -1 && errno == EINTR);
+
     if (len == -1) {
-        warning("Error reading from audio device.");
+        char buf[256];
+        snprintf(buf, sizeof(buf),
+                 "Error reading from OSS audio device: %s",
+                 strerror(errno));
+        warning(buf);
         return -1;
     }
-    return len;
+    return (int)len;
 }
 
 int audio_device_write(unsigned char *buffer, int buffersize)
 {
-    int len = write(audio_fd, buffer, buffersize);
-    if (len == -1) {
-        warning("Error writing to audio device.");
+    int total = 0;
+
+    while (total < buffersize) {
+        ssize_t n = write(audio_fd,
+                          buffer + total,
+                          (size_t)(buffersize - total));
+
+        if (n > 0) {
+            total += (int)n;
+            continue;
+        }
+        if (n == -1 && errno == EINTR)
+            continue;
+
+        if (n == -1 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+            /* Non-blocking: report partial progress */
+            return total;
+        }
+
+        {
+            char buf[256];
+            snprintf(buf, sizeof(buf),
+                     "Error writing to OSS audio device: %s",
+                     strerror(errno));
+            warning(buf);
+        }
         return -1;
     }
-    return len;
+    return total;
 }
 
 void audio_device_close(int drain)
 {
-    if(audio_fd != -1) {
-	ioctl(audio_fd, SNDCTL_DSP_RESET, NULL) ;
-	close(audio_fd) ;
-		audio_fd = -1 ;
+    if (audio_fd != -1) {
+        int arg = 0;
+        if (drain) {
+            (void)ioctl(audio_fd, SNDCTL_DSP_SYNC, &arg);
+        } else {
+            (void)ioctl(audio_fd, SNDCTL_DSP_RESET, &arg);
+        }
+        close(audio_fd);
+        audio_fd = -1;
     }
 }
-
 /* Number of bytes processed since opening the device. */
 long audio_device_processed_bytes(void)
 {
