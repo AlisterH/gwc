@@ -263,7 +263,7 @@ long first_playback_sample ;
 
 long set_playback_cursor_position(struct view *v, long millisec_per_visual_frame)
 {
-    long first, last ;
+    long first, last, new_pos;
 
     if(audio_state == AUDIO_IS_PLAYBACK) {
 
@@ -291,18 +291,38 @@ long set_playback_cursor_position(struct view *v, long millisec_per_visual_frame
 			bytes = playback_total_bytes;
 	}
 
-	v->cursor_position = first_playback_sample+bytes/(PLAYBACK_FRAMESIZE) ;
+    get_region_of_interest(&first, &last, v);
+
+    /* Convert processed bytes to samples */
+    new_pos = first_playback_sample + bytes / PLAYBACK_FRAMESIZE;
+
+    /*
+     * If we've reached (or passed) the end of playback,
+     * snap the cursor exactly to the end of the region.
+     * This avoids permanent truncation stalls.
+     */
+    if (bytes >= playback_total_bytes)
+        new_pos = last;
+
+    v->cursor_position = new_pos;
 
 	return playback_total_bytes - bytes ;
     }
 
     {
 	long inc = rate*millisec_per_visual_frame/1000 ;
-/*  	g_print("inc:%ld\n", inc) ;  */
-	v->cursor_position += inc ;
+	long first, last ;
+  	/*g_print("inc:%ld\n", inc) ;  */
+        get_region_of_interest(&first, &last, v);
+
+        v->cursor_position += inc;
+
+        /* Allow cursor to reach end exactly */
+        if (v->cursor_position > last)
+            v->cursor_position = last;
 	return 1 ;
     }
-    
+
 }
 
 long start_playback(char *output_device, struct view *v, struct sound_prefs *p, double seconds_per_block, double seconds_to_preload)
@@ -1440,7 +1460,8 @@ if (audio_is_looping == FALSE) {
 		playback_position = playback_start_position ;
 		playback_samples_remaining = (playback_end_position-playback_start_position) ;
 		position_wavefile_pointer(playback_position) ;
-		g_print("Loop with playback_samples_remaining:%ld\n", playback_samples_remaining) ;
+		/* g_print("Loop with playback_samples_remaining:%ld\n",
+		 * playback_samples_remaining) ; */
 	    }
 	}
     }

@@ -1522,18 +1522,25 @@ gint update_cursor(gpointer data)
 
 	get_region_of_interest(&first, &last, &audio_view);
 
+	audio_debug_print("cursor=%ld last=%ld delta=%ld\n",
+		audio_view.cursor_position,
+		last,
+		last - audio_view.cursor_position);
+
 	if (audio_view.cursor_position < last) {
+		int saved_state = audio_state;
+		audio_state = AUDIO_IS_IDLE;
 	    set_playback_cursor_position(&audio_view,
 					 prev_cursor_millisec);
+		audio_state = saved_state;
 	    main_redraw(TRUE, TRUE);
 	    audio_debug_print("?\n") ;
 	} else {
 	    audio_debug_print("\nupdate_cursor is stopping cursor_timer\n") ;
 	    cursor_playback = FALSE;
 	    gtk_timeout_remove(cursor_timer);
-	    stop_playback_force = 0 ;
+	    stop_playback_force = 1;
 	    stop_all_playback_functions(NULL, NULL);
-	    stop_playback_force = 1 ;
 	    prev_cursor_millisec = -1;
 /*          this will redraw the whole sonogram view at the
             end of a "full view" playback  ...frank 31.08.03 */
