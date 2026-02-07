@@ -148,6 +148,13 @@ void audio_device_close(int drain)
     if (audio_fd != -1) {
         int arg = 0;
         if (drain) {
+	    /*
+	    * Zero-length write "kick":
+	    * Some OSS emulations (padsp / PulseAudio) fail to notice
+	    * end-of-stream unless a final write occurs.
+	    * This is harmless on real OSS and may help ensure SYNC drains.
+	    */
+            (void)write(audio_fd, NULL, 0);
             (void)ioctl(audio_fd, SNDCTL_DSP_SYNC, &arg);
         } else {
             (void)ioctl(audio_fd, SNDCTL_DSP_RESET, &arg);
