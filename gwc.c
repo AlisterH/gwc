@@ -1411,7 +1411,6 @@ gint play_a_block(gpointer data)
     	}
     }
 
-    bytes_left =
 	set_playback_cursor_position(&audio_view, prev_cursor_millisec);
 	/* --- NEW: meters follow cursor using waveform summary (sample_buffer) --- */
 	if (audio_state == AUDIO_IS_PLAYBACK) {
@@ -1477,16 +1476,7 @@ if ((dbg2++ % 30) == 0) {
     	}
 	}
 
-
 /*      fprintf(stderr, "bytes_left:%ld\n", bytes_left) ;  */
-
-    if (bytes_left < 10 && !audio_is_looping) {	/* the  "10" is to allow some error in the audio driver */
-	audio_debug_print("play_a_block is stopping the playback_timer.\n") ;
-	stop_playback_force = 0 ;
-	stop_all_playback_functions(NULL, NULL) ;
-	stop_playback_force = 1 ;
-    }
-
 
     return (TRUE);
 }
@@ -1497,6 +1487,9 @@ gint update_cursor(gpointer data)
     long cursor_millisec;
     audio_debug_print("update_cursor with audio_playback:%d\n", audio_playback) ;
 
+	/* playback_end_position is fixed at playback start */
+	extern long playback_end_position;
+
     if (audio_playback == TRUE) {
 	cursor_samples_per_pixel =
 	    (audio_view.last_sample -
@@ -1506,6 +1499,7 @@ gint update_cursor(gpointer data)
 	/* lower limit of 1/20th second on screen redraws */
 	if (cursor_millisec < 50)
 	    cursor_millisec = 50;
+	/* fprintf(stderr, "cursor_millisec:%ld\n", cursor_millisec) ; */
 
 	if (cursor_millisec != prev_cursor_millisec) {
 	    gtk_timeout_remove(cursor_timer);
@@ -1517,7 +1511,16 @@ gint update_cursor(gpointer data)
 	set_playback_cursor_position(&audio_view, prev_cursor_millisec);
 	main_redraw(TRUE, TRUE);
 	audio_debug_print(".\n") ;
-    } else {
+        /*
+         * Playback invariant:
+         * stop when cursor reaches playback end, regardless of backend state
+         */
+        if (audio_view.cursor_position >= playback_end_position) {
+            audio_debug_print("cursor reached end; stopping playback\n");
+            stop_all_playback_functions(NULL, NULL);
+            prev_cursor_millisec = -1;
+        }
+	} else {
 	long last, first;
 
 	get_region_of_interest(&first, &last, &audio_view);
@@ -1539,7 +1542,6 @@ gint update_cursor(gpointer data)
 	    audio_debug_print("\nupdate_cursor is stopping cursor_timer\n") ;
 	    cursor_playback = FALSE;
 	    gtk_timeout_remove(cursor_timer);
-	    stop_playback_force = 1;
 	    stop_all_playback_functions(NULL, NULL);
 	    prev_cursor_millisec = -1;
 /*          this will redraw the whole sonogram view at the
@@ -4009,7 +4011,7 @@ int main(int argc, char *argv[])
 	gchar *_CLIPBOARD_FILE = "gwc_intclip.dat" ;
     // I was using g_mkdtemp for alleged portability to Solaris (not OpenSolaris)
     // unfortunately it pushes the minimum GLIB required to 2.30, so let's not
-	// People are unlikely to use vintage Solaris...
+	// People are quite unlikely to be using vintage Solaris...
     if (!mkdtemp (newdir))
     {
 	  // this is expected if $XDG_CACHE_HOME is not set
