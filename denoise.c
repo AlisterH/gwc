@@ -1122,8 +1122,9 @@ void get_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs
 	}
 
 	if(0 && pDnprefs->noise_suppression_method == DENOISE_EXPERIMENTAL) {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+/* This stuff fails on some old versions of gcc, and it isn't exactly necessary
+/* #pragma GCC diagnostic push
+/* #pragma GCC diagnostic ignored "-Wunused-but-set-variable" */
 	    for(k = 1 ; k <= pDnprefs->FFT_SIZE/2 ; k++) {
 		double p2 ;
 		if(k < pDnprefs->FFT_SIZE/2) {
@@ -1143,7 +1144,7 @@ void get_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs
 /*  		    two_way_probs[j][k] = MAX(two_way_probs[j][k],p2j/p2) ;  */
 		}
 	    }
-#pragma GCC diagnostic pop
+/* #pragma GCC diagnostic pop */
 	}
 
 #ifdef HAVE_FFTW3
@@ -1167,8 +1168,8 @@ void get_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs
 	}
 
 	if(0 && pDnprefs->noise_suppression_method == DENOISE_EXPERIMENTAL) {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+/* #pragma GCC diagnostic push
+/* #pragma GCC diagnostic ignored "-Wunused-but-set-variable" */
 	    for(k = 1 ; k <= pDnprefs->FFT_SIZE/2 ; k++) {
 		double p2 ;
 		if(k < pDnprefs->FFT_SIZE/2) {
@@ -1188,7 +1189,7 @@ void get_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs
 /*  		    two_way_probs[j][k] = MAX(two_way_probs[j][k],p2j/p2) ;  */
 		}
 	    }
-#pragma GCC diagnostic pop
+/* #pragma GCC diagnostic pop */
 	}    }
 
 

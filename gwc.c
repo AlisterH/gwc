@@ -747,7 +747,7 @@ add_to_recent_files(const char *filename)
     GtkRecentData data;
 
     /* Make filename absolute to cater for files loaded from the command line as g_filename_to_uri() requires an absolute path*/
-    absolute = g_canonicalize_filename(filename, NULL);
+    absolute = realpath(filename, NULL);
     if (!absolute)
         return;
 
@@ -4007,9 +4007,10 @@ int main(int argc, char *argv[])
 
     gchar *newdir = g_build_filename (g_get_user_cache_dir (), "gwcXXXXXX", NULL) ; 
 	gchar *_CLIPBOARD_FILE = "gwc_intclip.dat" ;
-    // note that g_mkdtemp rather than mkdtemp is required for portability e.g. to Solaris (not OpenSolaris)
-    // unfortunately it pushes the minimum GLIB required to 2.30, so is it really more or less portable...?
-    if (!g_mkdtemp (newdir))
+    // I was using g_mkdtemp for alleged portability to Solaris (not OpenSolaris)
+    // unfortunately it pushes the minimum GLIB required to 2.30, so let's not
+	// People are unlikely to use vintage Solaris...
+    if (!mkdtemp (newdir))
     {
 	  // this is expected if $XDG_CACHE_HOME is not set
 	  // therefore don't use g_warning, which will error if G_DEBUG environment variable is set to "fatal-warnings"
@@ -4021,7 +4022,7 @@ int main(int argc, char *argv[])
 	  // should be able to avoid this nonsense - need to study pointers again I think
 	  newdir = g_build_filename (g_get_current_dir(), "gwcXXXXXX", NULL) ; 
 	  // might not need to test this - is it actually possible for it to fail but us still be able to write to the audio file we are working on itself?
-      if (!g_mkdtemp (newdir))
+      if (!mkdtemp (newdir))
       {
       	warning ("Could not create directory for temporary files in current working directory.\n"
       	         "If you run more than one instance of GWC in this directory their undo files will conflict.\n");

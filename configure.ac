@@ -1,10 +1,11 @@
 dnl Process this file with autoconf to produce a configure script.
 AC_INIT([Gtk Wave Cleaner], [0.22-07], [http://gwc.sourceforge.net])
 AC_CONFIG_HEADERS([config.h])
-AM_INIT_AUTOMAKE([1.12 foreign no-define tar-ustar])
+AM_INIT_AUTOMAKE([foreign no-define tar-ustar])
 
 dnl Checks for programs.
 AC_PROG_CC
+m4_version_prereq([2.70],[],[AC_PROG_CC_C99])
 AC_CANONICAL_HOST
 
 dnl check for osx platform
@@ -234,7 +235,7 @@ dnl Checks for library functions.
 AC_CHECK_FUNCS(gettimeofday)
 
 dnl refer to comments in gwc.c where these versions are required:
-PKG_CHECK_MODULES(GTK, [ gtk+-2.0 >= 2.16 glib-2.0 >= 2.30 ])
+PKG_CHECK_MODULES(GTK, [ gtk+-2.0 >= 2.16 glib-2.0 ])
 
 if test x$platform_osx = xyes; then
   AC_DEFINE([MAC_OS_X], [1], [Define if building on macOS])

@@ -19,6 +19,8 @@
 
 /* oss interface impl.  ...frank 12.09.03 */
 
+#include <string.h>
+#include <errno.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <fcntl.h>
