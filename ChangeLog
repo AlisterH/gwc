@@ -6,7 +6,7 @@ KNOWN ISSUES:
 - Undoing "paste" is inconsistent
 
 0.22-07
-Jan 26, 2026
+Feb 08, 2026
 CODE: rework audio backends, improving VU meters, fixing various issues and modernising MACOS coreaudio backend.
 CODE: fixes to allow (and automate) building on recent MACOS (thanks to Philippe Gagné).
 BUGFIX: MACOS problems with dialogs (thanks to Philippe Gagné).
