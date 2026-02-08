@@ -20,9 +20,11 @@ The source code and all associated files are freely available under the GNU Gene
 
 ### Linux/Unix
 1. Extract the release source tarball: `tar -xvzf <...>`
-2. Enter the directory created.
-3. Run `autoreconf -i` (not needed for release tarballs)
-4. Run `./configure`
+2. Enter the directory created
+3. [optional] Run `autoreconf -i` (needed for GitHub's automatically generated source bundles, but not for the named
+                                   release tarballs - "gtk-wave-cleaner-0.22-07.tar.gz")
+4. Run `./configure` (add arguments as appropriate, e.g.: --disable-alsa for oss audio backend, or
+                                                          --enable-pa for pulseaudio backend).
 5. Run `make`
 6. Run `make install`
 
@@ -90,7 +92,7 @@ Libsndfile does not support RDWR mode for these files. If you are creating them 
 
 2. Mono files look like stereo files, because the waveform is displayed twice.
 
-3. On some systems (very old Mac with default coreaudio backend) GWC may fail to play files with unusual sample rates (typically 44,100Hz and 48,000Hz should be fine).
+3. On some setups (e.g. very old Mac with default coreaudio backend) GWC may fail to play files with unusual sample rates (typically 44,100Hz and 48,000Hz should be fine).  On Linux with the Alsa backend you may just need to change the output device to "default", or a "plughw" device rather than "hw".
 
 ## Background
 For links and a brief presentation describing the technical aspects of the audio restoration methods used in GWC, visit [http://gwc.sourceforge.net/](http://gwc.sourceforge.net/)
