@@ -980,8 +980,7 @@ int denoise(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs, long noi
     return 0 ;
 }
 
-/* AJH: print_noise_sample is currently used by the DSP filter dialog's "show response" button; I suspect noise.dat is not an accurate name for the output */
-/* but I'm pretty sure we should be graphing the output instead, anyway */
+/* AJH: print_noise_sample is also used by the DSP filter dialog's "show response" button; */
 /* Also, there's currently no need for this function to return an int rather than void */
 int print_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs, long noise_start, long noise_end)
 {
@@ -1123,8 +1122,8 @@ void get_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs
 
 	if(0 && pDnprefs->noise_suppression_method == DENOISE_EXPERIMENTAL) {
 /* This stuff fails on some old versions of gcc, and it isn't exactly necessary
-/* #pragma GCC diagnostic push
-/* #pragma GCC diagnostic ignored "-Wunused-but-set-variable" */
+ * #pragma GCC diagnostic push
+ * #pragma GCC diagnostic ignored "-Wunused-but-set-variable" */
 	    for(k = 1 ; k <= pDnprefs->FFT_SIZE/2 ; k++) {
 		double p2 ;
 		if(k < pDnprefs->FFT_SIZE/2) {
@@ -1169,7 +1168,7 @@ void get_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs
 
 	if(0 && pDnprefs->noise_suppression_method == DENOISE_EXPERIMENTAL) {
 /* #pragma GCC diagnostic push
-/* #pragma GCC diagnostic ignored "-Wunused-but-set-variable" */
+ * #pragma GCC diagnostic ignored "-Wunused-but-set-variable" */
 	    for(k = 1 ; k <= pDnprefs->FFT_SIZE/2 ; k++) {
 		double p2 ;
 		if(k < pDnprefs->FFT_SIZE/2) {
