@@ -1137,6 +1137,31 @@ void remove_noise(GtkWidget * widget, gpointer data)
     }
 }
 
+void normalise(GtkWidget * widget, gpointer data)
+{
+    if ((file_processing == FALSE) && (file_is_open == TRUE)
+	&& (audio_playback == FALSE) && (cursor_playback == FALSE)) {
+		file_processing = TRUE;
+		long first, last;
+	    int cancel;
+	    get_region_of_interest(&first, &last, &audio_view);
+
+	    push_status_text("Saving undo information");
+	    start_save_undo("Undo normalise", &audio_view);
+	    cancel = save_undo_data(first, last, &prefs, TRUE);
+	    close_undo();
+	    pop_status_text();
+
+	    if (cancel != 1) {
+		batch_normalize(&prefs,&audio_view);
+		save_sample_block_data(&prefs);
+	    }
+
+		main_redraw(FALSE, TRUE);
+	    }
+	file_processing = FALSE;
+}
+
 void undo_callback(GtkWidget * widget, gpointer data)
 {
     if ((file_processing == FALSE) && (file_is_open == TRUE)
@@ -2910,6 +2935,7 @@ static const GtkActionEntry entries[] = {
   { "Denoise", "remove_noise_icon", "Denoise", NULL, "Remove noise from current view or selection", G_CALLBACK(remove_noise) },
   { "Silence", "silence_icon", "Silence", NULL, "Insert silence with size of current selection", G_CALLBACK(silence_callback) },
   { "Reverb", NULL, "Reverb", NULL, "Apply reverberation to the current view or selection", G_CALLBACK(reverb) },
+  { "Normalise", NULL, "Normalise", NULL, "Amplify the audio so the loudest sample reaches full scale without clipping.", G_CALLBACK(normalise) },
   { "Cut", GTK_STOCK_CUT, "Cut", NULL, "Cut current selection to internal clipboard", G_CALLBACK(cut_callback) },
   { "Copy", GTK_STOCK_COPY, "Copy", NULL, "Copy current selection to internal clipboard", G_CALLBACK(copy_callback) },
   { "Paste", GTK_STOCK_PASTE, "Paste", NULL, "Insert internal clipboard before current selection", G_CALLBACK(paste_callback) },
@@ -2979,6 +3005,7 @@ static const char *ui_description =
 "      <menuitem action='Denoise'/>"
 "      <menuitem action='Silence'/>"
 "      <menuitem action='Reverb'/>"
+"      <menuitem action='Normalise'/>"
 "      <separator/>"
 "      <menuitem action='Cut'/>"
 "      <menuitem action='Copy'/>"
@@ -2990,6 +3017,7 @@ static const char *ui_description =
 "      <menuitem action='ZoomIn'/>"
 "      <menuitem action='ZoomOut'/>"
 "      <menuitem action='ViewAll'/>"
+"      <separator/>"
 "      <menuitem action='SelectAll'/>"
 "      <menuitem action='SelectNone'/>"
 "      <menuitem action='Spectral'/>"
@@ -3493,7 +3521,11 @@ void batch(int argc, char **argv)
 		}
 		else if(!strcasecmp(argv[3], "normalize") || !strcasecmp(argv[3], "normalise")) {
 		g_print("Normalize audiofile\n");
-		batch_normalize(&prefs,0,prefs.n_samples-1,prefs.n_channels > 1 ? 0x03 : 0x01);
+		audio_view.selection_region = FALSE;          /* force whole-view (whole file) */
+		audio_view.first_sample = 0;
+		audio_view.last_sample  = prefs.n_samples - 1;
+		audio_view.channel_selection_mask = (prefs.n_channels > 1) ? 0x03 : 0x01;
+		batch_normalize(&prefs, &audio_view);
 		}
 		else if(!strcasecmp(argv[3], "dsp")) {
 		if(argc < 6) {

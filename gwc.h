@@ -357,4 +357,4 @@ void truncate_wavfile(struct view *v);
 #endif
 void start_timer(void);
 void stop_timer(char *message);
-void batch_normalize(struct sound_prefs *p, long first , long last, int channel_mask);
+void batch_normalize(struct sound_prefs *p, struct view *v);

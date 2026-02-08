@@ -121,9 +121,15 @@ static double max_gain_for_view_or_selection(const struct sound_prefs *p,
 
     normalise_range_to_file(v, &first, &last);
 
-    /* Full-file range -> old logic */
+    /* Full-file range -> old logic, but only when channel selection matches what max_value represents */
     if (range_is_full_file(v, first, last)) {
-        return (current->max_value > 0.0) ? 1.0 / (double)current->max_value : 1.0;
+        /* If stereo and only one channel is selected, don't use old method */
+        if (p->n_channels > 1 && mask != 0x03) {
+            /* fall through to computed-peak path */
+        } else {
+            /* fprintf(stderr, "Calculating max_value using old method\n"); */
+            return (current->max_value > 0.0) ? 1.0 / current->max_value : 1.0;
+		}
     }
 
     /* Otherwise, compute peak over the selected range */
@@ -154,15 +160,41 @@ void simple_amplify_audio(struct sound_prefs *p, long first, long last, int chan
 	    update_progress_bar(p,PROGRESS_UPDATE_INTERVAL,FALSE) ;
 
 	    for(i = 0 ; i < n ; i++) {
-		if(channel_mask & 0x01) {
-		    left[i] = lrint(amount*left[i]) ;
-		}
 
-		if(channel_mask & 0x02) {
-		    right[i] = lrint(amount*right[i]) ;
+            long icurrent = current + i;
 
-		}
-	    }
+            /* --- Same feathering logic as amplify_audio() --- */
+            double feather_p = 1.0;
+
+            if (feather_width > 0) {
+                if (icurrent - first < feather_width)
+                    feather_p = (double)(icurrent - first) / (double)feather_width;
+
+                if (last - icurrent < feather_width) {
+                    double tail = (double)(last - icurrent) / (double)feather_width;
+                    if (tail < feather_p) feather_p = tail;
+                }
+
+                /* clamp just in case */
+                if (feather_p < 0.0) feather_p = 0.0;
+                if (feather_p > 1.0) feather_p = 1.0;
+            } else {
+                /* feather_width <= 0 means "no feather": fully wet */
+                feather_p = 1.0;
+            }
+
+            if (channel_mask & 0x01) {
+                double dry = (double)left[i];
+                double wet = amount * dry;
+                left[i] = lrint(dry * (1.0 - feather_p) + wet * feather_p);
+            }
+
+            if (channel_mask & 0x02) {
+                double dry = (double)right[i];
+                double wet = amount * dry;
+                right[i] = lrint(dry * (1.0 - feather_p) + wet * feather_p);
+            }
+        }
 
 	    write_wavefile_data(left, right, current, tmplast) ;
 
@@ -181,6 +213,9 @@ void simple_amplify_audio(struct sound_prefs *p, long first, long last, int chan
 
     update_progress_bar(0.0,PROGRESS_UPDATE_INTERVAL,TRUE) ;
     pop_status_text() ;
+	gchar *status_text = g_strdup_printf("Amplified selection by factor of %.3f", amount);
+	push_status_text(status_text) ;
+	g_free(status_text);
 
     main_redraw(FALSE, TRUE) ;
 }
@@ -383,13 +418,28 @@ int amplify_dialog(struct sound_prefs current, struct view *v)
     return 0 ;
 }
 
-void batch_normalize(struct sound_prefs *p, long first, long last, int channel_mask)
+void batch_normalize(struct sound_prefs *p, struct view *v)
 {
-	amount_first_l[0] = (double)1.0/(double)p->max_value;
-	amount_last_l[0] = amount_first_l[0] ;
-	amount_first_r[1] = amount_first_l[0] ;
-	amount_last_r[1] = amount_first_l[0] ;
-    feather_width = 2000;
-    fprintf(stderr, "Amplifying by a factor of %f \n", amount_first_l[0]) ;
-    amplify_audio(p,first,last,channel_mask);
+    long first, last;
+
+    if (v->selection_region) {
+        first = v->selected_first_sample;
+        last  = v->selected_last_sample;
+    } else {
+        first = v->first_sample;
+        last  = v->last_sample;
+    }
+
+    normalise_range_to_file(v, &first, &last);
+
+    int channel_mask = v->channel_selection_mask & 0x03;
+    if (channel_mask == 0) channel_mask = 0x03;
+
+    double peak = peak_abs_range(first, last, channel_mask);
+    double maxamp = (peak > 0.0) ? full_scale_value(p) / peak : 1.0;
+
+    fprintf(stderr, "Normalizing: first=%ld last=%ld mask=%d peak=%f gain=%f\n",
+            first, last, channel_mask, peak, maxamp);
+
+    simple_amplify_audio(p, first, last, channel_mask, maxamp);
 }
