@@ -43,7 +43,7 @@
  */
 #if (defined(__APPLE__) && defined(__MACH__) && \
      defined(MAC_OS_X_VERSION_MIN_REQUIRED) && \
-     (MAC_OS_X_VERSION_MIN_REQUIRED < 1030)) || !defined(__APPLE__)
+     (MAC_OS_X_VERSION_MIN_REQUIRED < 1030))
 
 # ifndef __UCHAR_LEGACY_DEFINED
 typedef __u_char  u_char;
