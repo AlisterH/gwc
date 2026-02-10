@@ -301,5 +301,22 @@ fi
 
 AM_CONDITIONAL([MAC_OS_X], [test "x$platform_osx" = "xyes"])
 
+# Check for GNU Make
+AC_PATH_PROG([MAKE], [make], [no])
+
+if test "$MAKE" = "no"; then
+    AC_MSG_ERROR([Make utility not found. Please install GNU Make and try again.])
+else
+    MAKE_VERSION=$($MAKE --version | head -n 1)
+    case "$MAKE_VERSION" in
+        *"GNU Make"*)
+            AC_MSG_NOTICE([Using GNU Make: $MAKE_VERSION])
+            ;;
+        *)
+            AC_MSG_WARN([WARNING: You are not using GNU Make. Make may not work correctly.])
+            ;;
+    esac
+fi
+
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

@@ -209,13 +209,6 @@ declick.o dethunk.o stat.o : meschach.a
 # The .desktop and icon files aren't used, anyway, but at least it installs the docs!
 # How do we get it to load the logo in the about dialog from either the icon files or the .icns?
 
-all-local:
-	@$(MAKE) --version 2>/dev/null | grep -q 'GNU Make' || { \
-	echo "ERROR: GNU make is required."; \
-	echo "Install it and run: gmake"; \
-	exit 1; \
-	}
-
 # This supposedly means `make clean` etc still works if someone makes a file called clean
 .PHONY: clean distclean maintainer-clean clean-local distclean-local maintainer-clean-local
 
