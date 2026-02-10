@@ -741,7 +741,9 @@ int start_encode_old(int mode, char *newfilename, long start, long length, char 
 	if(fp == NULL) {
 	    fprintf(stderr, "FAILED to reopen stdout!\n") ;
 	} else {
-	    stdout = fp ;
+           /* This line breaks the build on Solaris
+            * AI says it doesn't do anything useful anyway */
+           /* stdout = fp ; */
 	    fprintf(stderr, "SUCCEEDED to reopen stdout!\n") ;
 	    printf("Finished encoding using %s\n", encoding_prefs.mp3loc) ;
 	}
