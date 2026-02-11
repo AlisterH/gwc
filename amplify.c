@@ -102,7 +102,7 @@ static int range_is_full_file(const struct view *v, long first, long last)
  *  - current view if no selection.
  * Uses old global computation (1/current.max_value) if the range covers the full file.
  * That may be faster for large files as the max value is already precalculated */
-static double max_gain_for_view_or_selection(const struct sound_prefs *p,
+double max_gain_for_view_or_selection(const struct sound_prefs *p,
                                              const struct sound_prefs *current,
                                              const struct view *v)
 {

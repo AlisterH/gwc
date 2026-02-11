@@ -53,6 +53,8 @@ static double resp_db[RESP_POINTS];
 static int resp_n = 0;
 static GtkWidget *response_area = NULL;
 static unsigned int channel_mask = 0x03; /* default: both; but we actually get this from the view */
+static double biquad_max_safe_gain_db; /* we will draw a line showing the maximum gain without
+										* clipping; get it from amplify.c */
 
 /* noise spectrum overlay */
 #define NOISE_POINTS 4096
@@ -439,19 +441,39 @@ capture_noise_spectrum(struct view *v,
     for (k = 1; k <= noise_n; k++) {
         double freq = (double)pPrefs->rate / 2.0 /
                       (double)(pDnprefs->FFT_SIZE / 2) * k;
-        double mag_l, mag_r;
 
         noise_freq[k-1] = freq;
-        /* ------------------------------------------------------------ */
-        /* Convert FFT magnitude to dB                                  */
-        /* Reference: FFT size (not signal max)                          */
-        /* ------------------------------------------------------------ */
 
-        mag_l = left_noise_avg[k] ;
-        mag_r = right_noise_avg[k] ;
+		/* ------------------------------------------------------------ */
+		/* Convert FFT magnitude to dBFS                                 */
+		/* Reference: full-scale sine wave                               */
+		/* ------------------------------------------------------------ */
 
-        noise_left_db[k-1]  = 10.0 * log10(mag_l + 1e-20);
-        noise_right_db[k-1] = 10.0 * log10(mag_r + 1e-20);
+        /* left_noise_avg[] contains accumulated FFT power (amplitude^2)
+           Match scaling used in print_noise_sample() */
+
+        double power_l =
+            left_noise_avg[k] /
+            (double)pDnprefs->n_noise_samples;
+
+        double power_r =
+            right_noise_avg[k] /
+            (double)pDnprefs->n_noise_samples;
+
+        /* Normalise FFT scaling (magnitude scales with N) */
+        double N = (double)pDnprefs->FFT_SIZE;
+        power_l /= (N * N);
+        power_r /= (N * N);
+
+        /* Convert power (sample^2) to dBFS */
+        noise_left_db[k-1] =
+            10.0 * log10(power_l + 1e-30)
+            - 20.0 * log10(32768.0);
+
+        noise_right_db[k-1] =
+            10.0 * log10(power_r + 1e-30)
+            - 20.0 * log10(32768.0);
+
     }
 
     free(mem_block);
@@ -591,8 +613,8 @@ static gboolean response_expose(GtkWidget *widget,
 		}
 	}
 
-    double min_db = -100.0;
-    double max_db =  300.0;
+    double min_db = -120.0; /* noise floor */
+    double max_db =   20.0; /* headroom above 0 dBFS so we can plot max amplification*/
 
     gdk_draw_rectangle(widget->window, bg_gc, TRUE, 0, 0, w, h);
 
@@ -600,7 +622,7 @@ static gboolean response_expose(GtkWidget *widget,
     gdk_draw_line(widget->window, green_gc, 40, 10,   40,  h-30);
 	/* ----- Horizontal line at 0 dB ----- */
 	int y0 = db_to_y(0.0, h, min_db, max_db);
-	gdk_draw_line(widget->window, dash_gc, 40, y0, w-10, y0);
+	gdk_draw_line(widget->window, green_gc, 40, y0, w-10, y0);
 
     /* ----- Axis labels ----- */
     PangoLayout *layout;
@@ -701,25 +723,76 @@ static gboolean response_expose(GtkWidget *widget,
 						   10.0, max_plot_freq);
 	}
 
-    /* ---- Predicted noise (filtered) overlay ---- */
-    if (predicted_noise_valid && noise_n > 1) {
-        GdkGC *blue_gc = gdk_gc_new(widget->window);
-        GdkColor blue = { 0, 0, 0, 65535 };
-        gdk_gc_set_rgb_fg_color(blue_gc, &blue);
+/* ---- Predicted noise (filtered) overlay ---- */
+ if (predicted_noise_valid && noise_n > 1) {
+     GdkGC *clip_gc = gdk_gc_new(widget->window);
+     GdkColor red = {0, 65535, 0, 0};   /* clipping */
+     GdkColor blue = {0, 0, 0, 65535};  /* safe */
+ 
+     int start = 0;
+     gboolean clipping = FALSE;
+ 
+     /* Ensure we use the global safe gain */
+     double safe_gain_db = 0;
 
-	if (channel_mask & 0x01) {
-		draw_db_curve_freq(widget, blue_gc,
-						   noise_freq, predicted_noise_left_db, noise_n,
-						   w, h, min_db, max_db,
-						   10.0, max_plot_freq);
-	}
+    /* draw left channel */
+     if (channel_mask & 0x01) {
+         clipping = (predicted_noise_left_db[0] > safe_gain_db);
+         gdk_gc_set_rgb_fg_color(clip_gc, clipping ? &red : &blue);
 
-	if (channel_mask & 0x02) {
-		draw_db_curve_freq(widget, blue_gc,
-						   noise_freq, predicted_noise_right_db, noise_n,
-						   w, h, min_db, max_db,
-						   10.0, max_plot_freq);
-	}
+        for (int i = 1; i < noise_n; i++) {
+             gboolean clip_now = (predicted_noise_left_db[i] > safe_gain_db);
+
+            if (clip_now != clipping) {
+                /* draw segment up to here */
+                draw_db_curve_freq(widget, clip_gc,
+                                   &noise_freq[start], &predicted_noise_left_db[start],
+                                   i - start + 1,
+                                   w, h, min_db, max_db,
+                                   10.0, max_plot_freq);
+                start = i - 1; /* start new segment at previous point */
+                clipping = clip_now;
+                gdk_gc_set_rgb_fg_color(clip_gc, clipping ? &red : &blue);
+            }
+        }
+
+        /* draw final segment */
+        draw_db_curve_freq(widget, clip_gc,
+                           &noise_freq[start], &predicted_noise_left_db[start],
+                           noise_n - start,
+                           w, h, min_db, max_db,
+                           10.0, max_plot_freq);
+    }
+
+    /* draw right channel */
+    if (channel_mask & 0x02) {
+        start = 0;
+		clipping = (predicted_noise_right_db[0] > safe_gain_db);
+        gdk_gc_set_rgb_fg_color(clip_gc, clipping ? &red : &blue);
+
+        for (int i = 1; i < noise_n; i++) {
+                gboolean clip_now = (predicted_noise_right_db[i] > safe_gain_db);
+
+            if (clip_now != clipping) {
+                draw_db_curve_freq(widget, clip_gc,
+                                   &noise_freq[start], &predicted_noise_right_db[start],
+                                   i - start + 1,
+                                   w, h, min_db, max_db,
+                                   10.0, max_plot_freq);
+                start = i - 1;
+                clipping = clip_now;
+                gdk_gc_set_rgb_fg_color(clip_gc, clipping ? &red : &blue);
+            }
+        }
+
+        draw_db_curve_freq(widget, clip_gc,
+                           &noise_freq[start], &predicted_noise_right_db[start],
+                           noise_n - start,
+                           w, h, min_db, max_db,
+                           10.0, max_plot_freq);
+    }
+
+    g_object_unref(clip_gc);
 
 
     }
@@ -772,16 +845,20 @@ void show_response(GtkWidget *w, gpointer gdata)
             if (f < 1.0)
                 continue;
 
-            gain_db = BiQuad_response(f, srate, iir, &dummy);
+            // Convert linear magnitude to dB before adding
+			gain_db = BiQuad_response(f, srate, iir, &dummy);
 
-            predicted_noise_left_db[i]  =
-                noise_left_db[i]  + gain_db;
-            predicted_noise_right_db[i] =
-                noise_right_db[i] + gain_db;
+			/* predicted = measured + filter gain (all in dBFS) */
+			predicted_noise_left_db[i] =
+				noise_left_db[i] + gain_db;
+
+			predicted_noise_right_db[i] =
+				noise_right_db[i] + gain_db;
+
         }
         predicted_noise_valid = TRUE;
     }
-   free(iir);
+    free(iir);
 
     gtk_widget_queue_draw(response_area);
 }
@@ -844,8 +921,8 @@ int filter_dialog(struct sound_prefs current, struct view *v)
 		       TRUE, TRUE, 0);
     feather_entry = add_number_entry_with_label_int(filter_prefs.feather_width, "Feather Width", dialog_table, row++) ;
     dbGain_entry = add_number_entry_with_label_double(filter_prefs.dbGain, "Gain (db)", dialog_table, row++) ;
-    freq_entry = add_number_entry_with_label_double(filter_prefs.Fc, "Center frequency freq (hertz)", dialog_table, row++) ;
-    bandwidth_entry = add_number_entry_with_label_double(filter_prefs.bandwidth, "bandwidth (octaves)", dialog_table, row++) ;
+    freq_entry = add_number_entry_with_label_double(filter_prefs.Fc, "Center frequency (hertz)", dialog_table, row++) ;
+    bandwidth_entry = add_number_entry_with_label_double(filter_prefs.bandwidth, "Bandwidth (octaves)", dialog_table, row++) ;
 
     gtk_box_pack_start (GTK_BOX (GTK_DIALOG(dlg)->vbox), dialog_table, TRUE, TRUE, 0);
 
@@ -877,10 +954,12 @@ int filter_dialog(struct sound_prefs current, struct view *v)
 
 	update_filter_ui(filter_type);
 
-    /* Draw initial response when dialog is shown */
-    show_response(NULL, NULL);
-
     /* ------------------------------------------------------------ */
+
+	/* get this so we can check if the signal will be clipped */
+	double maxamp = max_gain_for_view_or_selection(&current, &current, v);
+	biquad_max_safe_gain_db = (maxamp > 0.0) ? 20.0 * log10(maxamp) : -INFINITY;
+	printf("biquad_max_safe_gain_db: %lg\n", biquad_max_safe_gain_db) ;
 
     /* Capture noise spectrum once on dialog open */
     {

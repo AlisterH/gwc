@@ -285,6 +285,7 @@ int print_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnpref
 void get_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs, long noise_start, long noise_end,
 		    fftw_real *left_noise_min, fftw_real *left_noise_max, fftw_real *left_noise_avg,
 		    fftw_real *right_noise_min, fftw_real *right_noise_max, fftw_real *right_noise_avg) ;
+double max_gain_for_view_or_selection(const struct sound_prefs *p, const struct sound_prefs *current, const struct view *v);
 int  process_audio(void) ;
 void push_status_text(gchar *msg) ;
 int read_fft_real_wavefile_data(fftw_real left[], fftw_real right[], long first, long last) ;
