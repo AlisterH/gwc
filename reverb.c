@@ -222,17 +222,21 @@ int reverb_dialog(struct sound_prefs current, struct view *v)
     
     /* Create a scrolled window to pack the CList widget into */
     scrolled_window = gtk_scrolled_window_new (NULL, NULL);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window),
-				    GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled_window), GTK_POLICY_AUTOMATIC, GTK_POLICY_ALWAYS);
 
     gtk_widget_show (scrolled_window);
 
     gtk_container_add(GTK_CONTAINER(scrolled_window), reverb_method_window_list);
 
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox),
-		       scrolled_window, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dlg)->vbox), scrolled_window, TRUE, TRUE, 0);
 
-    gtk_box_pack_start (GTK_BOX (GTK_DIALOG(dlg)->vbox), dialog_table, TRUE, TRUE, 0);
+    gtk_box_pack_start (GTK_BOX (GTK_DIALOG(dlg)->vbox), dialog_table, FALSE, FALSE, 0);
+
+	/* Size scrolled window based on visible rows instead of pixels */
+	gint visible_rows = 10;
+	gint row_height = GTK_CLIST(reverb_method_window_list)->row_height > 0 ? GTK_CLIST(reverb_method_window_list)->row_height : 16;
+	/* 18/7.0 fudge factor makes up for the header and decorations here */
+	gtk_widget_set_size_request(scrolled_window, -1, (row_height * (visible_rows+18/7.0)));
 
     dres = gwc_dialog_run(GTK_DIALOG(dlg)) ;
 
