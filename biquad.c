@@ -207,6 +207,7 @@ extern biquad *BiQuad_new(int type, smp_type dbGain, /* gain of filter */
     {
 	double freq, d_freq = 10 ;
 
+	/* print coefficients to stdout; note that the left and right coefficients are always the same even if we are only operating on one channel */
 	g_print("left a0:%lg\n", iir_left->a0) ;
 	g_print("left a1:%lg\n", iir_left->a1) ;
 	g_print("left a2:%lg\n", iir_left->a2) ;
@@ -371,9 +372,9 @@ capture_noise_spectrum(struct view *v,
                        struct denoise_prefs *pDnprefs)
 {
     int k;
-	long first = v->selected_first_sample;
-	long last  = v->selected_last_sample;
-
+	long first, last;
+	get_region_of_interest(&first, &last, v);
+	//printf("first: %ld last: %ld\n", first, last) ;
     long nsamples;
 
     /* ------------------------------------------------------------ */
@@ -440,6 +441,10 @@ capture_noise_spectrum(struct view *v,
 					first, last,
 					left_noise_min, left_noise_max, left_noise_avg,
 					right_noise_min, right_noise_max, right_noise_avg);
+	
+	
+	//printf("first: %ld last: %ld\n", first, last) ;
+	//print_noise_sample(pPrefs, pDnprefs, first, last) ;
 
     noise_n = pDnprefs->FFT_SIZE / 2;
     if (noise_n > NOISE_POINTS)

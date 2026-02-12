@@ -762,6 +762,7 @@ void print_denoise(char *header, struct denoise_prefs *pDnprefs)
 void print_denoise(char *header, struct denoise_prefs *pDnprefs) {}
 #endif
 
+/* AJH: get_noise_sample is also used by the DSP filter dialog to graph frequency response */
 void get_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs,
 		    long noise_start, long noise_end,
 		    fftw_real *left_noise_min, fftw_real *left_noise_max, fftw_real *left_noise_avg,
@@ -980,8 +981,6 @@ int denoise(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs, long noi
     return 0 ;
 }
 
-/* AJH: print_noise_sample is also used by the DSP filter dialog's "show response" button; */
-/* Also, there's currently no need for this function to return an int rather than void */
 int print_noise_sample(struct sound_prefs *pPrefs, struct denoise_prefs *pDnprefs, long noise_start, long noise_end)
 {
     int k ;
