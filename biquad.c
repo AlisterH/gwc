@@ -338,6 +338,13 @@ update_filter_ui(int filter_type)
 
     gtk_widget_set_sensitive(dbGain_entry, gain_ok);
 
+    gboolean bw_ok =
+        (filter_type == PEQ ||
+         filter_type == BPF ||
+         filter_type == NOTCH);
+
+    gtk_widget_set_sensitive(bandwidth_entry, bw_ok);
+
 }
 
  static void
@@ -732,8 +739,10 @@ static gboolean response_expose(GtkWidget *widget,
      int start = 0;
      gboolean clipping = FALSE;
  
-     /* Ensure we use the global safe gain */
-     double safe_gain_db = 0;
+     /* This safe gain check isn't actually useful except for a Peaking EQ with a wide bandwidth */
+	 /* We are plotting in the frequency domain */
+	 /* To know what gain will really clip we need to apply the biquad to the noise samples in time domain then measure the actual peak (TODO)*/
+     double safe_gain_db = biquad_max_safe_gain_db;
 
     /* draw left channel */
      if (channel_mask & 0x01) {
@@ -1046,6 +1055,7 @@ smp_type srate, smp_type bandwidth)
     biquad *b;
     smp_type A, omega, sn, cs, alpha, beta;
     smp_type a0, a1, a2, b0, b1, b2;
+    smp_type Q;
 
     b = malloc(sizeof(biquad));
     if (b == NULL)
@@ -1061,17 +1071,23 @@ smp_type srate, smp_type bandwidth)
 
     switch (type) {
     case LPF:
-        b0 = (1.0 - cs) /2.0;
+		/* 2nd-order Butterworth */
+        Q = 1.0 / sqrt(2.0);
+        alpha = sn / (2.0 * Q);
+        b0 = (1.0 - cs) / 2.0;
         b1 = 1.0 - cs;
-        b2 = (1.0 - cs) /2.0;
+        b2 = (1.0 - cs) / 2.0;
         a0 = 1.0 + alpha;
         a1 = -2.0 * cs;
         a2 = 1.0 - alpha;
         break;
     case HPF:
-        b0 = (1.0 + cs) /2.0;
+		/* 2nd-order Butterworth */
+        Q = 1.0 / sqrt(2.0);
+        alpha = sn / (2.0 * Q);
+        b0 = (1.0 + cs) / 2.0;
         b1 = -(1.0 + cs);
-        b2 = (1.0 + cs) /2.0;
+        b2 = (1.0 + cs) / 2.0;
         a0 = 1.0 + alpha;
         a1 = -2.0 * cs;
         a2 = 1.0 - alpha;
@@ -1122,13 +1138,14 @@ smp_type srate, smp_type bandwidth)
     }
 
 
-    /* the canonical coefficients */
-    b->can_a0 = a0 ;
+    /* the canonical coefficients
+	 * we don't actually use them */
+    /*b->can_a0 = a0 ;
     b->can_a1 = a1 ;
     b->can_a2 = a2 ;
     b->can_b0 = b0 ;
     b->can_b1 = b1 ;
-    b->can_b2 = b2 ;
+    b->can_b2 = b2 ;*/
 
     /* precompute the coefficients */
     b->a0 = b0 /a0;
@@ -1145,12 +1162,12 @@ smp_type srate, smp_type bandwidth)
     b->a3 = 0.1 ;
     b->a4 = 0.9 ;
 
-    b->can_a0 = b->a0 ;
+    /*b->can_a0 = b->a0 ;
     b->can_a1 = b->a1 ;
     b->can_a2 = b->a2 ;
     b->can_b0 = 1.0 ;
     b->can_b1 = b->a3 ;
-    b->can_b2 = b->a4 ;
+    b->can_b2 = b->a4 ;*/
 #endif
 
     /* zero initial samples */
@@ -1198,6 +1215,38 @@ double BiQuad_response(double freq, double srate, biquad *p, double *from_formul
    return *from_formula;
 }
 
+/* Alternative formula that does the same maths using canonical coefficients */
+/* Alternative formula that does the same maths using canonical coefficients */
+/* double BiQuad_response(double freq, double srate, biquad *p, double *from_formula)
+ {
+    double omega = 2.0 * M_PI * freq / srate;
+
+    double cos1 = cos(omega);
+    double sin1 = sin(omega);
+    double cos2 = cos(2.0 * omega);
+    double sin2 = sin(2.0 * omega);*/
+
+    /* Use canonical (unnormalized) coefficients */
+/*    double b0 = p->can_b0;
+    double b1 = p->can_b1;
+    double b2 = p->can_b2;
+    double a0 = p->can_a0;
+    double a1 = p->can_a1;
+    double a2 = p->can_a2;*/
+
+    /* Evaluate H(e^{jw}) */
+/*    double num_re = b0 + b1 * cos1 + b2 * cos2;
+    double num_im = -b1 * sin1 - b2 * sin2;
+
+    double den_re = a0 + a1 * cos1 + a2 * cos2;
+    double den_im = -a1 * sin1 - a2 * sin2;
+
+    double num_mag = sqrt(num_re*num_re + num_im*num_im);
+    double den_mag = sqrt(den_re*den_re + den_im*den_im);
+
+    *from_formula = 20.0 * log10(num_mag / den_mag);
+    return *from_formula;
+ }*/
 
 /* from robert bristow-johnson's response, march 1, 2005
 http://groups.google.com/group/comp.dsp/browse_frm/thread/8c0fa8d396aeb444/a1bc5b63ac56b686
