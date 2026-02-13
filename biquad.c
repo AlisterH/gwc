@@ -778,89 +778,178 @@ if (predicted_noise_valid && noise_n > 1) {
 }
 
 /* ------------------------------------------------------------ */
-/* Time-domain clipping prediction (early exit on clip)         */
-/* ------------------------------------------------------------ */
-/* Predict whether the BiQuad filter + optional gain will clip */
-/* Feathering at start/end of region is included              */
-/* Returns TRUE if any sample exceeds ±1.0                     */
+/* Time-domain clipping prediction with analytic short-circuit   */
+/* 1) Compute conservative Gmax = max_f |H(e^{jw})|              */
+/* 2) Single pass over selection to find peak dry (normalized)   */
+/* 3) If peak*Gmax < CLIP_LIMIT for enabled channels -> no clip  */
+/* 4) Otherwise: fast loop (no feather) with inline biquad       */
 /* ------------------------------------------------------------ */
 static gboolean
 predict_biquad_clipping(struct view *v,
                         struct sound_prefs *prefs,
                         biquad *iir_template,
-                        long unused_feather_width)
+                        long feather_width /* unused: no feathering in predictor */)
 {
-    long first, last;
-    long left[BUFSIZE], right[BUFSIZE];
-    long current;
+    (void)feather_width;
 
+    /* -------- region bounds -------- */
+    long first, last;
     get_region_of_interest(&first, &last, v);
     if (first >= last)
         return FALSE;
 
-    /* Copy template and reset state */
+    /* -------- constants & buffers -------- */
+    const double INV_FS_32  = 1.0 / 2147483648.0;               /* original predictor scaling */
+    const double CLIP_LIMIT = 32767.0 / 32768.0;                /* ~= 0.999969 for robustness */
+    const long   N_BLOCK    = BUFSIZE;
+
+    long left[BUFSIZE], right[BUFSIZE];
+
+    /* -------- helper: max filter gain over [0, Nyquist] --------
+       Use BiQuad_response() on a log grid + closed-form DC/Nyquist.
+       Coefficients in 'biquad' are already normalized (RBJ form).   */
+    auto double max_biquad_gain_linear(double srate, const biquad *p)
+    {
+        /* Start with DC and Nyquist using normalized coeffs:
+           DC:      z = 1      -> H(1)      = (b0+b1+b2) / (1 + a1 + a2)
+           Nyquist: z = -1     -> H(-1)     = (b0-b1+b2) / (1 - a1 + a2)
+           Here: b0=p->a0, b1=p->a1, b2=p->a2, a1=p->a3, a2=p->a4
+        */
+        const double b0 = p->a0, b1 = p->a1, b2 = p->a2;
+        const double A1 = p->a3, A2 = p->a4;
+
+        double den, num;
+        double gmax = 0.0;
+
+        /* DC */
+        num = b0 + b1 + b2;
+        den = 1.0 + A1 + A2;
+        if (fabs(den) > 1e-30) {
+            double g = fabs(num / den);
+            if (g > gmax) gmax = g;
+        }
+
+        /* Nyquist */
+        num = b0 - b1 + b2;
+        den = 1.0 - A1 + A2;
+        if (fabs(den) > 1e-30) {
+            double g = fabs(num / den);
+            if (g > gmax) gmax = g;
+        }
+
+        /* Log-spaced sampling across (1 Hz .. Nyquist) */
+        const int    SAMPLES = 128; /* enough for a tight bound, cheap */
+        const double fmin    = 1.0;
+        const double fnyq    = 0.5 * srate;
+        if (fnyq > fmin) {
+            for (int i = 0; i < SAMPLES; i++) {
+                double t    = (double)i / (double)(SAMPLES - 1);
+                double freq = fmin * pow(fnyq / fmin, t);
+                double db, lin;
+                /* BiQuad_response returns dB magnitude at 'freq' */
+                (void)BiQuad_response(freq, srate, (biquad *)p, &db);
+                lin = pow(10.0, db / 20.0);
+                if (lin > gmax) gmax = lin;
+            }
+        }
+
+        if (gmax < 0.0 || !isfinite(gmax))
+            gmax = 0.0;
+
+        return gmax;
+    }
+
+    /* -------- 1) Compute max filter gain -------- */
+    const double srate = (double)prefs->rate;
+    /* Copy template; don't disturb caller's state */
+    biquad g_probe = *iir_template;
+    const double Gmax = max_biquad_gain_linear(srate, &g_probe);
+
+    /* -------- 2) One-pass scan for peak dry (normalized) -------- */
+    double peakL = 0.0, peakR = 0.0;
+    {
+        long current = first;
+        while (current <= last) {
+            long n_req   = MIN(last - current + 1, N_BLOCK);
+            long tmplast = current + n_req - 1;
+
+            long n = read_wavefile_data(left, right, current, tmplast);
+            if (n <= 0) break;
+
+            if (channel_mask & 0x01) {
+                for (long i = 0; i < n; i++) {
+                    double a = fabs((double)left[i] * INV_FS_32);
+                    if (a > peakL) peakL = a;
+                }
+            }
+            if (channel_mask & 0x02) {
+                for (long i = 0; i < n; i++) {
+                    double a = fabs((double)right[i] * INV_FS_32);
+                    if (a > peakR) peakR = a;
+                }
+            }
+            current += n;
+        }
+    }
+
+    /* -------- 3) Analytic short-circuit --------
+       If peak * Gmax < CLIP_LIMIT (for each enabled channel),
+       then even the *worst-case* filtered output cannot clip.   */
+    gboolean left_safe  = !(channel_mask & 0x01) || (peakL * Gmax < CLIP_LIMIT);
+    gboolean right_safe = !(channel_mask & 0x02) || (peakR * Gmax < CLIP_LIMIT);
+    if (left_safe && right_safe) {
+        return FALSE; /* proven safe without running the filter */
+    }
+
+    /* -------- 4) Fallback: fast simulation (no feather), inline biquad -------- */
+
+    /* Reset per-channel IIR state for the simulation */
     biquad L = *iir_template;
     biquad R = *iir_template;
     L.x1 = L.x2 = L.y1 = L.y2 = 0.0;
     R.x1 = R.x2 = R.y1 = R.y2 = 0.0;
 
-    const double INV_FS = 1.0 / 2147483648.0;   /* original correct normalization */
-    const double LIMIT  = 1.0;
+    /* Local copies for slightly better ILP (the compiler may hoist anyway) */
+    double La0 = L.a0, La1 = L.a1, La2 = L.a2, La3 = L.a3, La4 = L.a4;
+    double Lx1 = L.x1, Lx2 = L.x2, Ly1 = L.y1, Ly2 = L.y2;
 
-    current = first;
+    double Ra0 = R.a0, Ra1 = R.a1, Ra2 = R.a2, Ra3 = R.a3, Ra4 = R.a4;
+    double Rx1 = R.x1, Rx2 = R.x2, Ry1 = R.y1, Ry2 = R.y2;
 
-    /* --- START TIMING --- */
-    clock_t start_time = clock();
-
+    long current = first;
     while (current <= last) {
-        long n = MIN(last - current + 1, BUFSIZE);
-        long tmplast = current + n - 1;
+        long n_req   = MIN(last - current + 1, N_BLOCK);
+        long tmplast = current + n_req - 1;
 
-        n = read_wavefile_data(left, right, current, tmplast);
-        if (n <= 0)
-            break;
+        long n = read_wavefile_data(left, right, current, tmplast);
+        if (n <= 0) break;
 
         for (long i = 0; i < n; i++) {
-
-            /* LEFT */
+            /* LEFT channel */
             if (channel_mask & 0x01) {
-                double dry = (double)left[i] * INV_FS;
-                double wet = L.a0 * dry
-                           + L.a1 * L.x1
-                           + L.a2 * L.x2
-                           - L.a3 * L.y1
-                           - L.a4 * L.y2;
+                double x  = (double)left[i] * INV_FS_32;
+                double y  = La0 * x + La1 * Lx1 + La2 * Lx2 - La3 * Ly1 - La4 * Ly2;
+                Lx2 = Lx1; Lx1 = x;
+                Ly2 = Ly1; Ly1 = y;
 
-                L.x2 = L.x1;  L.x1 = dry;
-                L.y2 = L.y1;  L.y1 = wet;
-
-                if (wet >= LIMIT || wet <= -LIMIT)
+                if (y >= CLIP_LIMIT || y <= -CLIP_LIMIT)
                     return TRUE;
             }
 
-            /* RIGHT */
+            /* RIGHT channel */
             if (channel_mask & 0x02) {
-                double dry = (double)right[i] * INV_FS;
-                double wet = R.a0 * dry
-                           + R.a1 * R.x1
-                           + R.a2 * R.x2
-                           - R.a3 * R.y1
-                           - R.a4 * R.y2;
+                double x  = (double)right[i] * INV_FS_32;
+                double y  = Ra0 * x + Ra1 * Rx1 + Ra2 * Rx2 - Ra3 * Ry1 - Ra4 * Ry2;
+                Rx2 = Rx1; Rx1 = x;
+                Ry2 = Ry1; Ry1 = y;
 
-                R.x2 = R.x1;  R.x1 = dry;
-                R.y2 = R.y1;  R.y1 = wet;
-
-                if (wet >= LIMIT || wet <= -LIMIT)
+                if (y >= CLIP_LIMIT || y <= -CLIP_LIMIT)
                     return TRUE;
             }
         }
 
         current += n;
     }
-    /* --- END TIMING --- */
-    clock_t end_time = clock();
-    double elapsed = (double)(end_time - start_time) / CLOCKS_PER_SEC;
-    printf("predict_biquad_clipping completed without clipping, took %.6f seconds\n", elapsed);
     return FALSE;
 }
 
@@ -921,6 +1010,11 @@ void show_response(struct view *v)
         }
         predicted_noise_valid = TRUE;
     }
+
+
+    /* --- START TIMING --- */
+    clock_t start_time = clock();
+
     /* ------------------------------------------------------------ */
     /* Time-domain clipping prediction                              */
     /* ------------------------------------------------------------ */
@@ -931,6 +1025,11 @@ void show_response(struct view *v)
 								feather_width);
     free(iir);
 	printf("predicted_will_clip: %d\n", predicted_will_clip) ;
+
+    /* --- END TIMING --- */
+    clock_t end_time = clock();
+    double elapsed = (double)(end_time - start_time) / CLOCKS_PER_SEC;
+    printf("predict_biquad_clipping completed without clipping, took %.6f seconds\n", elapsed);
 
     gtk_widget_queue_draw(response_area);
 }
