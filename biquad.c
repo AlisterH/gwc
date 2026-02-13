@@ -20,8 +20,10 @@
 /* biquad.c */
 #include <stdlib.h>
 #include <glib.h>
-#include <time.h>
 #include "gwc.h"
+#ifdef DEBUG_CLIPPING
+#include <time.h>
+#endif
 
 struct {
     int filter_type ;
@@ -55,8 +57,8 @@ static int resp_n = 0;
 static GtkWidget *response_area = NULL;
 static unsigned int channel_mask = 0x03; /* default: both; but we actually get this from the view */
 static gboolean predicted_will_clip = FALSE; /* flag if the predicted curve reaches full scale */
-static double biquad_max_safe_gain_db; /* we will draw a line showing the maximum gain without
-										* clipping; get it from amplify.c */
+static double max_safe_amplification_db; 	/* we will draw a line showing the maximum gain without
+											* clipping; get it from amplify.c */
 
 /* noise spectrum overlay */
 #define NOISE_POINTS 4096
@@ -1011,9 +1013,10 @@ void show_response(struct view *v)
         predicted_noise_valid = TRUE;
     }
 
-
+#ifdef DEBUG_CLIPPING
     /* --- START TIMING --- */
     clock_t start_time = clock();
+#endif
 
     /* ------------------------------------------------------------ */
     /* Time-domain clipping prediction                              */
@@ -1026,10 +1029,12 @@ void show_response(struct view *v)
     free(iir);
 	printf("predicted_will_clip: %d\n", predicted_will_clip) ;
 
+#ifdef DEBUG_CLIPPING
     /* --- END TIMING --- */
     clock_t end_time = clock();
     double elapsed = (double)(end_time - start_time) / CLOCKS_PER_SEC;
     printf("predict_biquad_clipping completed without clipping, took %.6f seconds\n", elapsed);
+#endif
 
     gtk_widget_queue_draw(response_area);
 }
@@ -1127,10 +1132,12 @@ int filter_dialog(struct sound_prefs current, struct view *v)
 
     /* ------------------------------------------------------------ */
 
+#ifdef DEBUG_CLIPPING
 	/* get this for comparison */
 	double maxamp = max_gain_for_view_or_selection(&current, &current, v);
-	biquad_max_safe_gain_db = (maxamp > 0.0) ? 20.0 * log10(maxamp) : -INFINITY;
-	printf("biquad_max_safe_gain_db: %lg\n", biquad_max_safe_gain_db) ;
+	max_safe_amplification_db = (maxamp > 0.0) ? 20.0 * log10(maxamp) : -INFINITY;
+	printf("max_safe_amplification_db: %lg\n", max_safe_amplification_db) ;
+#endif
 
     /* Capture noise spectrum once on dialog open */
     {
