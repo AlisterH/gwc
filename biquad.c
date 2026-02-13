@@ -20,6 +20,7 @@
 /* biquad.c */
 #include <stdlib.h>
 #include <glib.h>
+#include <time.h>
 #include "gwc.h"
 
 struct {
@@ -809,6 +810,9 @@ predict_biquad_clipping(struct view *v,
     current = first;
     const double CLIP_LIMIT = 32767.0 / 32768.0;
 
+    /* --- START TIMING --- */
+    clock_t start_time = clock();
+
     while (current <= last) {
         long n = MIN(last - current + 1, BUFSIZE);
         long tmplast = current + n - 1;
@@ -855,6 +859,11 @@ predict_biquad_clipping(struct view *v,
 
         current += n;
     }
+
+    /* --- END TIMING --- */
+    clock_t end_time = clock();
+    double elapsed = (double)(end_time - start_time) / CLOCKS_PER_SEC;
+    printf("predict_biquad_clipping completed without clipping, took %.6f seconds\n", elapsed);
 
     return FALSE;
 }
