@@ -788,27 +788,26 @@ static gboolean
 predict_biquad_clipping(struct view *v,
                         struct sound_prefs *prefs,
                         biquad *iir_template,
-                        long feather_width)
+                        long unused_feather_width)
 {
     long first, last;
-    long current;
     long left[BUFSIZE], right[BUFSIZE];
-    biquad iir_left, iir_right;
+    long current;
 
     get_region_of_interest(&first, &last, v);
     if (first >= last)
         return FALSE;
 
-    /* Copy the template so we don't overwrite the original state */
-    iir_left  = *iir_template;
-    iir_right = *iir_template;
+    /* Copy template and reset state */
+    biquad L = *iir_template;
+    biquad R = *iir_template;
+    L.x1 = L.x2 = L.y1 = L.y2 = 0.0;
+    R.x1 = R.x2 = R.y1 = R.y2 = 0.0;
 
-    /* Clear filter memory */
-    iir_left.x1 = iir_left.x2 = iir_left.y1 = iir_left.y2 = 0.0;
-    iir_right.x1 = iir_right.x2 = iir_right.y1 = iir_right.y2 = 0.0;
+    const double INV_FS = 1.0 / 2147483648.0;   /* original correct normalization */
+    const double LIMIT  = 1.0;
 
     current = first;
-    const double CLIP_LIMIT = 32767.0 / 32768.0;
 
     /* --- START TIMING --- */
     clock_t start_time = clock();
@@ -818,53 +817,50 @@ predict_biquad_clipping(struct view *v,
         long tmplast = current + n - 1;
 
         n = read_wavefile_data(left, right, current, tmplast);
+        if (n <= 0)
+            break;
 
         for (long i = 0; i < n; i++) {
-            long icurrent = current + i;
 
-            double feather = 1.0;
-            if (feather_width > 0) {
-                if (icurrent - first < feather_width)
-                    feather = (double)(icurrent - first) / feather_width;
-                if (last - icurrent < feather_width)
-                    feather = fmin(feather, (double)(last - icurrent) / feather_width);
+            /* LEFT */
+            if (channel_mask & 0x01) {
+                double dry = (double)left[i] * INV_FS;
+                double wet = L.a0 * dry
+                           + L.a1 * L.x1
+                           + L.a2 * L.x2
+                           - L.a3 * L.y1
+                           - L.a4 * L.y2;
+
+                L.x2 = L.x1;  L.x1 = dry;
+                L.y2 = L.y1;  L.y1 = wet;
+
+                if (wet >= LIMIT || wet <= -LIMIT)
+                    return TRUE;
             }
 
-			/* Left channel */
-			if (channel_mask & 0x01) {
-				double dry = left[i] / 2147483648.0;  // <-- normalize for 32-bit PCM
-				double wet = BiQuad(dry, &iir_left);
-				double out = dry * (1.0 - feather) + wet * feather;
+            /* RIGHT */
+            if (channel_mask & 0x02) {
+                double dry = (double)right[i] * INV_FS;
+                double wet = R.a0 * dry
+                           + R.a1 * R.x1
+                           + R.a2 * R.x2
+                           - R.a3 * R.y1
+                           - R.a4 * R.y2;
 
-				if (out >= 1.0 || out <= -1.0) {
-					printf("==> LEFT CLIP detected at index %ld (dry=%lg, wet=%lg, out=%lg)\n",
-						   current + i, dry, wet, out);
-					return TRUE;
-				}
-			}
+                R.x2 = R.x1;  R.x1 = dry;
+                R.y2 = R.y1;  R.y1 = wet;
 
-			/* Right channel */
-			if (channel_mask & 0x02) {
-				double dry = right[i] / 2147483648.0; // <-- normalize for 32-bit PCM
-				double wet = BiQuad(dry, &iir_right);
-				double out = dry * (1.0 - feather) + wet * feather;
-
-				if (out >= 1.0 || out <= -1.0) {
-					printf("==> RIGHT CLIP detected at index %ld (dry=%lg, wet=%lg, out=%lg)\n",
-						   current + i, dry, wet, out);
-					return TRUE;
-				}
-			}
+                if (wet >= LIMIT || wet <= -LIMIT)
+                    return TRUE;
+            }
         }
 
         current += n;
     }
-
     /* --- END TIMING --- */
     clock_t end_time = clock();
     double elapsed = (double)(end_time - start_time) / CLOCKS_PER_SEC;
     printf("predict_biquad_clipping completed without clipping, took %.6f seconds\n", elapsed);
-
     return FALSE;
 }
 
