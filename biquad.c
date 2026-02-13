@@ -53,6 +53,7 @@ static double resp_db[RESP_POINTS];
 static int resp_n = 0;
 static GtkWidget *response_area = NULL;
 static unsigned int channel_mask = 0x03; /* default: both; but we actually get this from the view */
+static gboolean predicted_will_clip = FALSE; /* flag if the predicted curve reaches full scale */
 static double biquad_max_safe_gain_db; /* we will draw a line showing the maximum gain without
 										* clipping; get it from amplify.c */
 
@@ -140,7 +141,12 @@ void save_filter_preferences(void)
     write_config(key_file);
 }
 
-void show_response(GtkWidget *w, gpointer gdata);
+static void show_response(struct view *v);
+static void show_response_cb(GtkWidget *w, gpointer data)
+{
+    struct view *v = (struct view *)data;
+    show_response(v);
+}
 
 static void filter_type_changed(GtkWidget *clist,
                                 gint row,
@@ -355,12 +361,14 @@ update_filter_ui(int filter_type)
                      GdkEventButton *event,
                      gpointer data)
  {
+     struct view *v = (struct view *)data;
+
      filter_type = row2filter(row);
 
      update_filter_ui(filter_type);
 
      /* Redraw response and predicted noise */
-     show_response(NULL, NULL);
+     show_response(v);
  }
 
 /* ------------------------------------------------------------ */
@@ -736,86 +744,122 @@ static gboolean response_expose(GtkWidget *widget,
 	}
 
 /* ---- Predicted noise (filtered) overlay ---- */
- if (predicted_noise_valid && noise_n > 1) {
-     GdkGC *clip_gc = gdk_gc_new(widget->window);
-     GdkColor red = {0, 65535, 0, 0};   /* clipping */
-     GdkColor blue = {0, 0, 0, 65535};  /* safe */
- 
-     int start = 0;
-     gboolean clipping = FALSE;
- 
-     /* This safe gain check isn't actually useful except for a Peaking EQ with a wide bandwidth */
-	 /* We are plotting in the frequency domain */
-	 /* To know what gain will really clip we need to apply the biquad to the noise samples in time domain then measure the actual peak (TODO)*/
-     double safe_gain_db = biquad_max_safe_gain_db;
+if (predicted_noise_valid && noise_n > 1) {
 
-    /* draw left channel */
-     if (channel_mask & 0x01) {
-         clipping = (predicted_noise_left_db[0] > safe_gain_db);
-         gdk_gc_set_rgb_fg_color(clip_gc, clipping ? &red : &blue);
+    GdkGC *clip_gc = gdk_gc_new(widget->window);
+    GdkColor red  = {0, 65535, 0, 0};
+    GdkColor blue = {0, 0, 0, 65535};
 
-        for (int i = 1; i < noise_n; i++) {
-             gboolean clip_now = (predicted_noise_left_db[i] > safe_gain_db);
+    gdk_gc_set_rgb_fg_color(clip_gc,
+                            predicted_will_clip ? &red : &blue);
 
-            if (clip_now != clipping) {
-                /* draw segment up to here */
-                draw_db_curve_freq(widget, clip_gc,
-                                   &noise_freq[start], &predicted_noise_left_db[start],
-                                   i - start + 1,
-                                   w, h, min_db, max_db,
-                                   10.0, max_plot_freq);
-                start = i - 1; /* start new segment at previous point */
-                clipping = clip_now;
-                gdk_gc_set_rgb_fg_color(clip_gc, clipping ? &red : &blue);
-            }
-        }
-
-        /* draw final segment */
+    if (channel_mask & 0x01)
         draw_db_curve_freq(widget, clip_gc,
-                           &noise_freq[start], &predicted_noise_left_db[start],
-                           noise_n - start,
+                           noise_freq,
+                           predicted_noise_left_db,
+                           noise_n,
                            w, h, min_db, max_db,
                            10.0, max_plot_freq);
-    }
 
-    /* draw right channel */
-    if (channel_mask & 0x02) {
-        start = 0;
-		clipping = (predicted_noise_right_db[0] > safe_gain_db);
-        gdk_gc_set_rgb_fg_color(clip_gc, clipping ? &red : &blue);
-
-        for (int i = 1; i < noise_n; i++) {
-                gboolean clip_now = (predicted_noise_right_db[i] > safe_gain_db);
-
-            if (clip_now != clipping) {
-                draw_db_curve_freq(widget, clip_gc,
-                                   &noise_freq[start], &predicted_noise_right_db[start],
-                                   i - start + 1,
-                                   w, h, min_db, max_db,
-                                   10.0, max_plot_freq);
-                start = i - 1;
-                clipping = clip_now;
-                gdk_gc_set_rgb_fg_color(clip_gc, clipping ? &red : &blue);
-            }
-        }
-
+    if (channel_mask & 0x02)
         draw_db_curve_freq(widget, clip_gc,
-                           &noise_freq[start], &predicted_noise_right_db[start],
-                           noise_n - start,
+                           noise_freq,
+                           predicted_noise_right_db,
+                           noise_n,
                            w, h, min_db, max_db,
                            10.0, max_plot_freq);
-    }
 
     g_object_unref(clip_gc);
-
-
-    }
+}
     pango_font_description_free(font);
     g_object_unref(layout);
     return TRUE;
 }
 
-void show_response(GtkWidget *w, gpointer gdata)
+/* ------------------------------------------------------------ */
+/* Time-domain clipping prediction (early exit on clip)         */
+/* ------------------------------------------------------------ */
+/* Predict whether the BiQuad filter + optional gain will clip */
+/* Feathering at start/end of region is included              */
+/* Returns TRUE if any sample exceeds ±1.0                     */
+/* ------------------------------------------------------------ */
+static gboolean
+predict_biquad_clipping(struct view *v,
+                        struct sound_prefs *prefs,
+                        biquad *iir_template,
+                        long feather_width)
+{
+    long first, last;
+    long current;
+    long left[BUFSIZE], right[BUFSIZE];
+    biquad iir_left, iir_right;
+
+    get_region_of_interest(&first, &last, v);
+    if (first >= last)
+        return FALSE;
+
+    /* Copy the template so we don't overwrite the original state */
+    iir_left  = *iir_template;
+    iir_right = *iir_template;
+
+    /* Clear filter memory */
+    iir_left.x1 = iir_left.x2 = iir_left.y1 = iir_left.y2 = 0.0;
+    iir_right.x1 = iir_right.x2 = iir_right.y1 = iir_right.y2 = 0.0;
+
+    current = first;
+    const double CLIP_LIMIT = 32767.0 / 32768.0;
+
+    while (current <= last) {
+        long n = MIN(last - current + 1, BUFSIZE);
+        long tmplast = current + n - 1;
+
+        n = read_wavefile_data(left, right, current, tmplast);
+
+        for (long i = 0; i < n; i++) {
+            long icurrent = current + i;
+
+            double feather = 1.0;
+            if (feather_width > 0) {
+                if (icurrent - first < feather_width)
+                    feather = (double)(icurrent - first) / feather_width;
+                if (last - icurrent < feather_width)
+                    feather = fmin(feather, (double)(last - icurrent) / feather_width);
+            }
+
+			/* Left channel */
+			if (channel_mask & 0x01) {
+				double dry = left[i] / 2147483648.0;  // <-- normalize for 32-bit PCM
+				double wet = BiQuad(dry, &iir_left);
+				double out = dry * (1.0 - feather) + wet * feather;
+
+				if (out >= 1.0 || out <= -1.0) {
+					printf("==> LEFT CLIP detected at index %ld (dry=%lg, wet=%lg, out=%lg)\n",
+						   current + i, dry, wet, out);
+					return TRUE;
+				}
+			}
+
+			/* Right channel */
+			if (channel_mask & 0x02) {
+				double dry = right[i] / 2147483648.0; // <-- normalize for 32-bit PCM
+				double wet = BiQuad(dry, &iir_right);
+				double out = dry * (1.0 - feather) + wet * feather;
+
+				if (out >= 1.0 || out <= -1.0) {
+					printf("==> RIGHT CLIP detected at index %ld (dry=%lg, wet=%lg, out=%lg)\n",
+						   current + i, dry, wet, out);
+					return TRUE;
+				}
+			}
+        }
+
+        current += n;
+    }
+
+    return FALSE;
+}
+
+void show_response(struct view *v)
 {
     biquad *iir;
     int i;
@@ -872,7 +916,16 @@ void show_response(GtkWidget *w, gpointer gdata)
         }
         predicted_noise_valid = TRUE;
     }
+    /* ------------------------------------------------------------ */
+    /* Time-domain clipping prediction                              */
+    /* ------------------------------------------------------------ */
+    predicted_will_clip =
+        predict_biquad_clipping(v,
+                                &local_sound_prefs,
+								iir,
+								feather_width);
     free(iir);
+	printf("predicted_will_clip: %d\n", predicted_will_clip) ;
 
     gtk_widget_queue_draw(response_area);
 }
@@ -954,23 +1007,23 @@ int filter_dialog(struct sound_prefs current, struct view *v)
 
     /* Update when numeric entries change */
     gtk_signal_connect(GTK_OBJECT(freq_entry), "changed",
-                       GTK_SIGNAL_FUNC(show_response), NULL);
+                       GTK_SIGNAL_FUNC(show_response_cb), v);
 
     gtk_signal_connect(GTK_OBJECT(dbGain_entry), "changed",
-                       GTK_SIGNAL_FUNC(show_response), NULL);
+                       GTK_SIGNAL_FUNC(show_response_cb), v);
 
     gtk_signal_connect(GTK_OBJECT(bandwidth_entry), "changed",
-                       GTK_SIGNAL_FUNC(show_response), NULL);
+                       GTK_SIGNAL_FUNC(show_response_cb), v);
 
     /* Update when filter type changes */
 	gtk_signal_connect(GTK_OBJECT(type_window_list), "select_row",
-					   GTK_SIGNAL_FUNC(filter_type_changed), NULL);
+					   GTK_SIGNAL_FUNC(filter_type_changed), v);
 
 	update_filter_ui(filter_type);
 
     /* ------------------------------------------------------------ */
 
-	/* get this so we can check if the signal will be clipped */
+	/* get this for comparison */
 	double maxamp = max_gain_for_view_or_selection(&current, &current, v);
 	biquad_max_safe_gain_db = (maxamp > 0.0) ? 20.0 * log10(maxamp) : -INFINITY;
 	printf("biquad_max_safe_gain_db: %lg\n", biquad_max_safe_gain_db) ;
@@ -984,7 +1037,7 @@ int filter_dialog(struct sound_prefs current, struct view *v)
 		noise_valid = FALSE; /* capture_noise_spectrum() sets TRUE only on success */
         capture_noise_spectrum(v, &local_sound_prefs, &p);
 		/* Force redraw now that noise exists */
-		show_response(NULL, NULL);
+		show_response(v);
     }
 
     dres = gwc_dialog_run(GTK_DIALOG(dlg)) ;
