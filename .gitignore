@@ -19,10 +19,12 @@ meschach/maxint
 
 # Autotools generated files
 autoscan.log
+config.guess
 config.h
 config.h.in
 config.log
 config.status
+config.sub
 configure.scan
 Makefile
 Makefile.in
@@ -34,6 +36,7 @@ install-sh
 missing
 depcomp
 stamp-h1
+machine.h
 
 # Backup files
 *.bak
@@ -60,3 +63,6 @@ tags
 build/
 dist/
 osx_packaging/Gtk\ Wave\ Cleaner.app
+
+# File that may be created by running gwc
+cdrdao.toc
