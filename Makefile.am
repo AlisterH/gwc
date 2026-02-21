@@ -164,7 +164,7 @@ icons_256x256_appsdir = $(datadir)/icons/hicolor/256x256/apps
 
 gtk_wave_cleaner_LDADD = meschach.a @FFTW_LIBS@ \
 	@GTK_LIBS@ @SNDFILE_LIBS@ @ALSALIB@ @PALIB@ \
-	@OGGLIB@ @MP3LIB@ @OSXLIBS@ @M_LIBS@
+	@OGGLIB@ @MP3LIB@ @OSSLIBS@ @OSXLIBS@ @M_LIBS@
 
 BUILT_SOURCES = meschach/machine.h
 CLEANFILES = meschach/machine.h meschach.a

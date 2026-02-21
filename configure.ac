@@ -180,6 +180,19 @@ fi
 
 AM_CONDITIONAL([HAVE_PULSE_AUDIO], [test "x$pa" = "xyes"])
 
+dnl OSS audio backend - check if we need -lossaudio for linking
+dnl Should only need it if we're building the OSS backend (not CoreAudio, ALSA, or PulseAudio)
+dnl and building it on a system using sndio (OpenBSD) or audioio (NetBSD), not Linux, FreeBSD (real OSS) or recent Solaris (Boomer)
+if test "x$pa" = "xdisabled" && test "x$alsa" = "xdisabled" && test "x$OSXLIBS" = "x"; then
+  AC_CHECK_LIB([ossaudio], [_oss_ioctl],
+    [OSSLIBS="-lossaudio"],
+    [OSSLIBS=""])
+else
+  OSSLIBS=""
+fi
+
+AC_SUBST(OSSLIBS)
+
 dnl ------------------------------------------------------------
 dnl FFTW3 (single or double precision)
 dnl ------------------------------------------------------------
