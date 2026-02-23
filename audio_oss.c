@@ -17,8 +17,6 @@
 *   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 *******************************************************************************/
 
-/* oss interface impl.  ...frank 12.09.03 */
-
 #include <string.h>
 #include <errno.h>
 #include <sys/ioctl.h>
@@ -32,14 +30,29 @@
 #include <sys/soundcard.h>
 #endif
 
+/* Required for the CPU usage fix on OpenBSD */
+#if defined(__OpenBSD__)
+#include <poll.h>
+#endif
+
 #include "audio_device.h"
 #include "gwc.h"
 
 static int audio_fd = -1 ;
 
+/* OpenBSD-specific software clock tracking */
+#if defined(__OpenBSD__)
+static long bytes_sent = 0;
+#endif
+
 int audio_device_open(char *output_device)
 {
     int flags = O_WRONLY; /* safest if read() exists / some devices are quirky */
+    
+#if defined(__OpenBSD__)
+    bytes_sent = 0;
+#endif
+
     audio_fd = open(output_device, flags);
     if (audio_fd == -1) {
         char buf[512];
@@ -50,12 +63,27 @@ int audio_device_open(char *output_device)
         warning(buf);
         return -1;
     }
+
+#if defined(__OpenBSD__)
+    /* Force blocking mode so write() throttles to hardware speed */
+    int f = fcntl(audio_fd, F_GETFL);
+    if (f != -1) fcntl(audio_fd, F_SETFL, f & ~O_NONBLOCK);
+#endif
+
     return 0;
 }
 
 int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate)
 {
     int oss_format;
+
+#if defined(__OpenBSD__)
+    /* Set fragments early to align with sndio defaults */
+    {
+        int frag_spec = (8 << 16) | 11; /* 8 fragments of 2048 bytes */
+        ioctl(audio_fd, SNDCTL_DSP_SETFRAGMENT, &frag_spec);
+    }
+#endif
 
     switch (*format)
     {
@@ -80,7 +108,6 @@ int audio_device_set_params(AUDIO_FORMAT *format, int *channels, int *rate)
     default:          *format = GWC_UNKNOWN; break;
     }
 
-    
     if (ioctl(audio_fd, SNDCTL_DSP_CHANNELS, channels) == -1) {
         warning("Failed to set audio channels.");
         return -1;
@@ -123,6 +150,9 @@ int audio_device_write(unsigned char *buffer, int buffersize)
 
         if (n > 0) {
             total += (int)n;
+#if defined(__OpenBSD__)
+            bytes_sent += n;
+#endif
             continue;
         }
         if (n == -1 && errno == EINTR)
@@ -168,6 +198,9 @@ void audio_device_close(int drain)
 /* Number of bytes processed since opening the device. */
 long audio_device_processed_bytes(void)
 {
+#if defined(__OpenBSD__)
+    return bytes_sent;
+#else
     count_info info;
 
     if (audio_fd != -1) {
@@ -179,10 +212,14 @@ long audio_device_processed_bytes(void)
     }
 
     return 0;
+#endif
 }
 
 int audio_device_best_buffer_size(int playback_bytes_per_block)
 {
+#if defined(__OpenBSD__)
+    return 4096; /* Safe default for sndio */
+#else
     int bufsize;
     audio_buf_info oss_info;
 
@@ -199,14 +236,28 @@ int audio_device_best_buffer_size(int playback_bytes_per_block)
 	    break;
     }
     return bufsize;
+#endif
 }
 
 int audio_device_nonblocking_write_buffer_size(int maxbufsize,
                                                int playback_bytes_remaining)
 {
+#if defined(__OpenBSD__)
+    struct pollfd pfd;
+    pfd.fd = audio_fd;
+    pfd.events = POLLOUT;
+
+    /* Use poll to prevent 100% CPU usage */
+    if (poll(&pfd, 1, 0) > 0) {
+        if (pfd.revents & POLLOUT) {
+            return (maxbufsize < playback_bytes_remaining) ? 
+                    maxbufsize : playback_bytes_remaining;
+        }
+    }
+    return 0;
+#else
     audio_buf_info info;
     int len = 0;
-
     if (ioctl(audio_fd, SNDCTL_DSP_GETOSPACE, &info) == -1) {
         warning("Error getting buffer space from audio device.");
         return 0;
@@ -228,4 +279,5 @@ int audio_device_nonblocking_write_buffer_size(int maxbufsize,
         return 0 ;
     }
     return len;
+#endif
 }
