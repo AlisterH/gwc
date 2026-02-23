@@ -779,6 +779,60 @@ if (predicted_noise_valid && noise_n > 1) {
     return TRUE;
 }
 
+/* -------- helper: max filter gain over [0, Nyquist] --------
+   Use BiQuad_response() on a log grid + closed-form DC/Nyquist.
+   Coefficients in 'biquad' are already normalized (RBJ form).   */
+static double max_biquad_gain_linear(double srate, const biquad *p)
+{
+    /* Start with DC and Nyquist using normalized coeffs:
+       DC:      z = 1      -> H(1)      = (b0+b1+b2) / (1 + a1 + a2)
+       Nyquist: z = -1     -> H(-1)     = (b0-b1+b2) / (1 - a1 + a2)
+       Here: b0=p->a0, b1=p->a1, b2=p->a2, a1=p->a3, a2=p->a4
+    */
+    const double b0 = p->a0, b1 = p->a1, b2 = p->a2;
+    const double A1 = p->a3, A2 = p->a4;
+
+    double den, num;
+    double gmax = 0.0;
+
+    /* DC */
+    num = b0 + b1 + b2;
+    den = 1.0 + A1 + A2;
+    if (fabs(den) > 1e-30) {
+        double g = fabs(num / den);
+        if (g > gmax) gmax = g;
+    }
+
+    /* Nyquist */
+    num = b0 - b1 + b2;
+    den = 1.0 - A1 + A2;
+    if (fabs(den) > 1e-30) {
+        double g = fabs(num / den);
+        if (g > gmax) gmax = g;
+    }
+
+    /* Log-spaced sampling across (1 Hz .. Nyquist) */
+    const int    SAMPLES = 128; /* enough for a tight bound, cheap */
+    const double fmin    = 1.0;
+    const double fnyq    = 0.5 * srate;
+    if (fnyq > fmin) {
+        for (int i = 0; i < SAMPLES; i++) {
+            double t    = (double)i / (double)(SAMPLES - 1);
+            double freq = fmin * pow(fnyq / fmin, t);
+            double db, lin;
+            /* BiQuad_response returns dB magnitude at 'freq' */
+            (void)BiQuad_response(freq, srate, (biquad *)p, &db);
+            lin = pow(10.0, db / 20.0);
+            if (lin > gmax) gmax = lin;
+        }
+    }
+
+    if (gmax < 0.0 || !isfinite(gmax))
+        gmax = 0.0;
+
+    return gmax;
+}
+
 /* ------------------------------------------------------------ */
 /* Time-domain clipping prediction with analytic short-circuit   */
 /* 1) Compute conservative Gmax = max_f |H(e^{jw})|              */
@@ -806,60 +860,6 @@ predict_biquad_clipping(struct view *v,
     const long   N_BLOCK    = BUFSIZE;
 
     long left[BUFSIZE], right[BUFSIZE];
-
-    /* -------- helper: max filter gain over [0, Nyquist] --------
-       Use BiQuad_response() on a log grid + closed-form DC/Nyquist.
-       Coefficients in 'biquad' are already normalized (RBJ form).   */
-    auto double max_biquad_gain_linear(double srate, const biquad *p)
-    {
-        /* Start with DC and Nyquist using normalized coeffs:
-           DC:      z = 1      -> H(1)      = (b0+b1+b2) / (1 + a1 + a2)
-           Nyquist: z = -1     -> H(-1)     = (b0-b1+b2) / (1 - a1 + a2)
-           Here: b0=p->a0, b1=p->a1, b2=p->a2, a1=p->a3, a2=p->a4
-        */
-        const double b0 = p->a0, b1 = p->a1, b2 = p->a2;
-        const double A1 = p->a3, A2 = p->a4;
-
-        double den, num;
-        double gmax = 0.0;
-
-        /* DC */
-        num = b0 + b1 + b2;
-        den = 1.0 + A1 + A2;
-        if (fabs(den) > 1e-30) {
-            double g = fabs(num / den);
-            if (g > gmax) gmax = g;
-        }
-
-        /* Nyquist */
-        num = b0 - b1 + b2;
-        den = 1.0 - A1 + A2;
-        if (fabs(den) > 1e-30) {
-            double g = fabs(num / den);
-            if (g > gmax) gmax = g;
-        }
-
-        /* Log-spaced sampling across (1 Hz .. Nyquist) */
-        const int    SAMPLES = 128; /* enough for a tight bound, cheap */
-        const double fmin    = 1.0;
-        const double fnyq    = 0.5 * srate;
-        if (fnyq > fmin) {
-            for (int i = 0; i < SAMPLES; i++) {
-                double t    = (double)i / (double)(SAMPLES - 1);
-                double freq = fmin * pow(fnyq / fmin, t);
-                double db, lin;
-                /* BiQuad_response returns dB magnitude at 'freq' */
-                (void)BiQuad_response(freq, srate, (biquad *)p, &db);
-                lin = pow(10.0, db / 20.0);
-                if (lin > gmax) gmax = lin;
-            }
-        }
-
-        if (gmax < 0.0 || !isfinite(gmax))
-            gmax = 0.0;
-
-        return gmax;
-    }
 
     /* -------- 1) Compute max filter gain -------- */
     const double srate = (double)prefs->rate;
