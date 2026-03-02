@@ -7,6 +7,8 @@ mkShell {
     automake
     libtool
     pkg-config
+    # so we can test building with CC=clang
+    clang
     # We don't need these for building but may want them for testing
     alsa-oss
     apulse

@@ -837,7 +837,7 @@ void help(GtkWidget * widget, gpointer data)
   // We should probably modify this so that it works if running GWC from the build directory without installing, and/or
   // so that it shows a warning message if the help file does not exist.  But should figure out test for gvfs first.
 
-  char *uri = g_strconcat ("file://", HELPDIR, "/", APPNAME, "/", APPNAME, ".html", NULL);
+  char *uri = g_strconcat ("file://", HELPDIR, "/", APPNAME, ".html", NULL);
   #ifdef MAC_OS_X
 #ifdef HAVE_GTK_MAC_INTEGRATION
 	  if ( gtkosx_application_get_bundle_id() ) {
